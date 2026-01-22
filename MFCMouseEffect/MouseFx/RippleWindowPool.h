@@ -1,0 +1,28 @@
+#pragma once
+
+#include <memory>
+#include <vector>
+
+#include "RippleWindow.h"
+
+namespace mousefx {
+
+class RippleWindowPool final {
+public:
+    RippleWindowPool() = default;
+    ~RippleWindowPool() = default;
+
+    RippleWindowPool(const RippleWindowPool&) = delete;
+    RippleWindowPool& operator=(const RippleWindowPool&) = delete;
+
+    bool Initialize(size_t count);
+    void Shutdown();
+
+    void ShowRipple(const ClickEvent& ev);
+
+private:
+    std::vector<std::unique_ptr<RippleWindow>> windows_;
+};
+
+} // namespace mousefx
+

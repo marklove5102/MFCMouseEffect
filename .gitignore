@@ -1,0 +1,41 @@
+# Build outputs
+/x64/
+/Win32/
+/Debug/
+/Release/
+*/x64/
+*/Win32/
+*/Debug/
+*/Release/
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+ipch/
+
+# Intermediate/obj
+*.obj
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.log
+*.tlog
+*.lastcodeanalysissucceeded
+*.cachefile
+*.opendb
+*.VC.db
+
+# Other
+*.aps
+*.ncb
+*.log?
+*.tmp
+*.bak
+Thumbs.db
+ehthumbs.db
+Desktop.ini
