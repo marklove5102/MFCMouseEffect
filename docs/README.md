@@ -29,5 +29,6 @@ Language: [English](README.md) | [中文](README.zh-CN.md)
 - **Ripple off-position at >100% DPI:** DPI awareness is enabled at startup; rebuild and run the newest binary.
 - **Running wrong binary:** There was a duplicate output under `MFCMouseEffect\x64\Debug\...`. Current project outputs to `x64\Debug\...`. Clean + Rebuild to ensure you run the right one.
 
-## MDI Shell Notes
-- The MDI window you see is just the MFC template shell; the effect runs independently in transparent layered windows. It can be converted to a tray/background app if desired.
+## SDI / Single-Window Notes
+- The app now uses an SDI frame: one top-level window hosts the view; ripples are still rendered in separate transparent layered windows, so UI and effect remain decoupled.
+- If you need multiple windows, create multiple top-level frames (no MDI children/tabs), or run multiple instances.

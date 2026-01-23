@@ -9,7 +9,6 @@
 #include "MFCMouseEffect.h"
 #include "MainFrm.h"
 
-#include "ChildFrm.h"
 #include "MFCMouseEffectDoc.h"
 #include "MFCMouseEffectView.h"
 
@@ -177,18 +176,7 @@ BOOL CMFCMouseEffectApp::InitInstance()
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
-	// 注册应用程序的文档模板。  文档模板
-	// 将用作文档、框架窗口和视图之间的连接
-	CMultiDocTemplate* pDocTemplate;
-	pDocTemplate = new CMultiDocTemplate(IDR_MFCMouseEffectTYPE,
-		RUNTIME_CLASS(CMFCMouseEffectDoc),
-		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
-		RUNTIME_CLASS(CMFCMouseEffectView));
-	if (!pDocTemplate)
-		return FALSE;
-	AddDocTemplate(pDocTemplate);
-
-	// 创建主 MDI 框架窗口
+	// 简化为纯框架模式（不再使用 Doc/View），直接创建主框架窗口。
 	CMainFrame* pMainFrame = new CMainFrame;
 	if (!pMainFrame || !pMainFrame->LoadFrame(IDR_MAINFRAME))
 	{
@@ -196,19 +184,6 @@ BOOL CMFCMouseEffectApp::InitInstance()
 		return FALSE;
 	}
 	m_pMainWnd = pMainFrame;
-
-
-	// 分析标准 shell 命令、DDE、打开文件操作的命令行
-	CCommandLineInfo cmdInfo;
-	ParseCommandLine(cmdInfo);
-
-
-
-	// 调度在命令行中指定的命令。  如果
-	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
-	// 主窗口已初始化，因此显示它并对其进行更新
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();
 
