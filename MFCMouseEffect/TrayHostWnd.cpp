@@ -12,8 +12,9 @@ BEGIN_MESSAGE_MAP(CTrayHostWnd, CWnd)
 	ON_COMMAND(32772, &CTrayHostWnd::OnTrayExit)
 END_MESSAGE_MAP()
 
-BOOL CTrayHostWnd::CreateHost()
+BOOL CTrayHostWnd::CreateHost(bool showTrayIcon)
 {
+	m_showTrayIcon = showTrayIcon;
 	const CString className = AfxRegisterWndClass(0);
 	// Create a hidden tool window (never shown) to receive tray callbacks.
 	return CreateEx(WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
@@ -30,22 +31,28 @@ int CTrayHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_trayIcon.cbSize = sizeof(NOTIFYICONDATA);
-	m_trayIcon.hWnd = GetSafeHwnd();
-	m_trayIcon.uID = kTrayIconId;
-	m_trayIcon.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	m_trayIcon.uCallbackMessage = kTrayMsg;
-	m_trayIcon.hIcon = hIcon;
-	lstrcpyn(m_trayIcon.szTip, _T("MFCMouseEffect（托盘常驻）- 右键退出"), _countof(m_trayIcon.szTip));
+	if (m_showTrayIcon)
+	{
+		HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+		m_trayIcon.cbSize = sizeof(NOTIFYICONDATA);
+		m_trayIcon.hWnd = GetSafeHwnd();
+		m_trayIcon.uID = kTrayIconId;
+		m_trayIcon.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+		m_trayIcon.uCallbackMessage = kTrayMsg;
+		m_trayIcon.hIcon = hIcon;
+		lstrcpyn(m_trayIcon.szTip, _T("MFCMouseEffect（托盘常驻）- 右键退出"), _countof(m_trayIcon.szTip));
 
-	Shell_NotifyIcon(NIM_ADD, &m_trayIcon);
+		Shell_NotifyIcon(NIM_ADD, &m_trayIcon);
+	}
 	return 0;
 }
 
 void CTrayHostWnd::OnDestroy()
 {
-	Shell_NotifyIcon(NIM_DELETE, &m_trayIcon);
+	if (m_showTrayIcon)
+	{
+		Shell_NotifyIcon(NIM_DELETE, &m_trayIcon);
+	}
 	CWnd::OnDestroy();
 }
 

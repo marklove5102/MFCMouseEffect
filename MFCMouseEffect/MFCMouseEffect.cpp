@@ -178,6 +178,30 @@ BOOL CMFCMouseEffectApp::InitInstance()
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
+	// Parse command line arguments to determine mode
+	// -mode tray (default)
+	// -mode background
+	bool showTrayIcon = true;
+	int argc = 0;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	if (argv)
+	{
+		for (int i = 0; i < argc; ++i)
+		{
+			CString arg = argv[i];
+			if (arg.CompareNoCase(L"-mode") == 0 && (i + 1 < argc))
+			{
+				CString val = argv[i + 1];
+				if (val.CompareNoCase(L"background") == 0)
+				{
+					showTrayIcon = false;
+				}
+				// else if val == "tray", keep true.
+			}
+		}
+		LocalFree(argv);
+	}
+
 #ifdef _DEBUG
 	// Debug：创建一个可见主窗口，方便调试（不影响波纹窗口的独立渲染）。
 	CMainFrame* pMainFrame = new CMainFrame;
@@ -192,7 +216,7 @@ BOOL CMFCMouseEffectApp::InitInstance()
 #else
 	// Release：仅创建一个隐藏宿主窗口用于托盘图标（完全不创建主框架窗口，避免任何闪现）。
 	trayHost_ = std::make_unique<CTrayHostWnd>();
-	if (!trayHost_->CreateHost())
+	if (!trayHost_->CreateHost(showTrayIcon))
 	{
 		trayHost_.reset();
 		return FALSE;

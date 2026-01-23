@@ -10,7 +10,7 @@ public:
 	CTrayHostWnd() = default;
 	~CTrayHostWnd() override = default;
 
-	BOOL CreateHost();
+	BOOL CreateHost(bool showTrayIcon = true);
 
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -26,5 +26,6 @@ private:
 	static constexpr UINT kCmdTrayExit = 32772;
 
 	NOTIFYICONDATA m_trayIcon{};
+	bool m_showTrayIcon{ true };
 };
 
