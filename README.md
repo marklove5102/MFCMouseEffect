@@ -25,6 +25,8 @@ Right-click tray icon to access submenu per category with checkmarks.
 {"cmd": "set_effect", "category": "click", "type": "ripple"}
 {"cmd": "set_effect", "category": "trail", "type": "line"}
 {"cmd": "clear_effect", "category": "trail"}
+{"cmd": "set_theme", "theme": "neon"}   // neon | scifi | minimal | game
+{"cmd": "exit"}
 ```
 
 Legacy format (assumes click category):
@@ -40,6 +42,8 @@ MFCMouseEffect.exe -mode tray   # Explicit tray mode
 MFCMouseEffect.exe -mode background  # No tray icon
 ```
 
+Background mode is IPC-only and will exit when stdin closes (parent process gone).
+
 ## Configuration
 
 Place `config.json` next to the exe. Built-in defaults used if missing.
@@ -47,14 +51,18 @@ Place `config.json` next to the exe. Built-in defaults used if missing.
 ```json
 {
   "default_effect": "ripple",
+  "theme": "neon",
+  "active_effects": {
+    "click": "ripple",
+    "trail": "particle",
+    "scroll": "arrow",
+    "hover": "glow",
+    "hold": "charge"
+  },
   "effects": {
-    "click": {
-      "ripple": { "duration_ms": 350, "end_radius": 45 },
-      "star": { "end_radius": 35 }
-    },
-    "trail": {
-      "line": { "max_points": 20, "color": "#DC64FFDA" }
-    }
+    "ripple": { "duration_ms": 350, "end_radius": 45 },
+    "icon_star": { "end_radius": 35 },
+    "trail": { "max_points": 20, "color": "#DC64FFDA" }
   }
 }
 ```

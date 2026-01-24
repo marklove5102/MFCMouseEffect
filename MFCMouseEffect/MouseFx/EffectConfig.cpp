@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using json = nlohmann::json;
 
@@ -57,6 +58,21 @@ static Argb GetColorOr(const json& j, const std::string& key, Argb defaultVal) {
     return defaultVal;
 }
 
+static std::string ArgbToHex(Argb c) {
+    std::ostringstream ss;
+    ss << '#' << std::uppercase << std::setfill('0') << std::hex << std::setw(8) << c.value;
+    return ss.str();
+}
+
+static std::string WStringToUtf8(const std::wstring& ws) {
+    if (ws.empty()) return {};
+    int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (len <= 0) return {};
+    std::string out(len - 1, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, out.empty() ? nullptr : &out[0], len, nullptr, nullptr);
+    return out;
+}
+
 // ============================================================================
 // EffectConfig Implementation
 // ============================================================================
@@ -93,6 +109,15 @@ EffectConfig EffectConfig::Load(const std::wstring& exeDir) {
     
     // Parse root level
     cfg.defaultEffect = GetOr<std::string>(root, "default_effect", cfg.defaultEffect);
+    cfg.theme = GetOr<std::string>(root, "theme", cfg.theme);
+    if (root.contains("active_effects") && root["active_effects"].is_object()) {
+        const auto& a = root["active_effects"];
+        cfg.active.click = GetOr<std::string>(a, "click", cfg.active.click);
+        cfg.active.trail = GetOr<std::string>(a, "trail", cfg.active.trail);
+        cfg.active.scroll = GetOr<std::string>(a, "scroll", cfg.active.scroll);
+        cfg.active.hover = GetOr<std::string>(a, "hover", cfg.active.hover);
+        cfg.active.hold = GetOr<std::string>(a, "hold", cfg.active.hold);
+    }
     
     // Parse effects
     if (root.contains("effects") && root["effects"].is_object()) {
@@ -194,6 +219,103 @@ EffectConfig EffectConfig::Load(const std::wstring& exeDir) {
     OutputDebugStringW(L"MouseFx: config.json loaded successfully.\n");
 #endif
     return cfg;
+}
+
+bool EffectConfig::Save(const std::wstring& exeDir, const EffectConfig& cfg) {
+    std::wstring configPath = exeDir + L"\\config.json";
+
+    json root;
+    root["default_effect"] = cfg.defaultEffect;
+    root["theme"] = cfg.theme;
+
+    json active;
+    active["click"] = cfg.active.click;
+    active["trail"] = cfg.active.trail;
+    active["scroll"] = cfg.active.scroll;
+    active["hover"] = cfg.active.hover;
+    active["hold"] = cfg.active.hold;
+    root["active_effects"] = active;
+
+    json effects;
+    // Ripple
+    {
+        json r;
+        r["duration_ms"] = cfg.ripple.durationMs;
+        r["start_radius"] = cfg.ripple.startRadius;
+        r["end_radius"] = cfg.ripple.endRadius;
+        r["stroke_width"] = cfg.ripple.strokeWidth;
+        r["window_size"] = cfg.ripple.windowSize;
+
+        json lc;
+        lc["fill"] = ArgbToHex(cfg.ripple.leftClick.fill);
+        lc["stroke"] = ArgbToHex(cfg.ripple.leftClick.stroke);
+        lc["glow"] = ArgbToHex(cfg.ripple.leftClick.glow);
+        r["left_click"] = lc;
+
+        json rc;
+        rc["fill"] = ArgbToHex(cfg.ripple.rightClick.fill);
+        rc["stroke"] = ArgbToHex(cfg.ripple.rightClick.stroke);
+        rc["glow"] = ArgbToHex(cfg.ripple.rightClick.glow);
+        r["right_click"] = rc;
+
+        json mc;
+        mc["fill"] = ArgbToHex(cfg.ripple.middleClick.fill);
+        mc["stroke"] = ArgbToHex(cfg.ripple.middleClick.stroke);
+        mc["glow"] = ArgbToHex(cfg.ripple.middleClick.glow);
+        r["middle_click"] = mc;
+
+        effects["ripple"] = r;
+    }
+    // Trail
+    {
+        json t;
+        t["duration_ms"] = cfg.trail.durationMs;
+        t["max_points"] = cfg.trail.maxPoints;
+        t["line_width"] = cfg.trail.lineWidth;
+        t["color"] = ArgbToHex(cfg.trail.color);
+        effects["trail"] = t;
+    }
+    // Icon/Star
+    {
+        json i;
+        i["duration_ms"] = cfg.icon.durationMs;
+        i["start_radius"] = cfg.icon.startRadius;
+        i["end_radius"] = cfg.icon.endRadius;
+        i["stroke_width"] = cfg.icon.strokeWidth;
+        i["fill"] = ArgbToHex(cfg.icon.fillColor);
+        i["stroke"] = ArgbToHex(cfg.icon.strokeColor);
+        effects["icon_star"] = i;
+    }
+    // Text Click
+    {
+        json t;
+        t["duration_ms"] = cfg.textClick.durationMs;
+        t["float_distance"] = cfg.textClick.floatDistance;
+        t["font_size"] = cfg.textClick.fontSize;
+        t["font_family"] = WStringToUtf8(cfg.textClick.fontFamily);
+
+        json texts = json::array();
+        for (const auto& ws : cfg.textClick.texts) {
+            texts.push_back(WStringToUtf8(ws));
+        }
+        t["texts"] = texts;
+
+        json colors = json::array();
+        for (const auto& c : cfg.textClick.colors) {
+            colors.push_back(ArgbToHex(c));
+        }
+        t["colors"] = colors;
+        effects["text_click"] = t;
+    }
+
+    root["effects"] = effects;
+
+    std::ofstream file(configPath);
+    if (!file.is_open()) {
+        return false;
+    }
+    file << root.dump(2);
+    return true;
 }
 
 } // namespace mousefx

@@ -52,6 +52,30 @@ void RippleWindowPool::ShowRipple(const ClickEvent& ev) {
     }
 }
 
+void RippleWindowPool::ShowRipple(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params) {
+    if (windows_.empty()) {
+        if (!Initialize(8)) return;
+    }
+
+    RippleWindow* best = nullptr;
+    uint64_t bestTick = UINT64_MAX;
+
+    for (auto& w : windows_) {
+        if (!w->IsActive()) {
+            best = w.get();
+            break;
+        }
+        if (w->StartTick() < bestTick) {
+            bestTick = w->StartTick();
+            best = w.get();
+        }
+    }
+
+    if (best) {
+        best->StartAt(ev, style, mode, params);
+    }
+}
+
 RippleWindow* RippleWindowPool::ShowContinuous(const ClickEvent& ev) {
     if (windows_.empty()) {
         if (!Initialize(8)) return nullptr;
@@ -77,6 +101,31 @@ RippleWindow* RippleWindowPool::ShowContinuous(const ClickEvent& ev) {
     return best;
 }
 
+RippleWindow* RippleWindowPool::ShowContinuous(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params) {
+    if (windows_.empty()) {
+        if (!Initialize(8)) return nullptr;
+    }
+
+    RippleWindow* best = nullptr;
+    uint64_t bestTick = UINT64_MAX;
+
+    for (auto& w : windows_) {
+        if (!w->IsActive()) {
+            best = w.get();
+            break;
+        }
+        if (w->StartTick() < bestTick) {
+            bestTick = w->StartTick();
+            best = w.get();
+        }
+    }
+
+    if (best) {
+        best->StartContinuous(ev, style, mode, params);
+    }
+    return best;
+}
+
 void RippleWindowPool::SetDrawMode(RippleWindow::DrawMode mode) {
     for (auto& w : windows_) {
         w->SetDrawMode(mode);
@@ -84,4 +133,3 @@ void RippleWindowPool::SetDrawMode(RippleWindow::DrawMode mode) {
 }
 
 } // namespace mousefx
-

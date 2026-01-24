@@ -1,7 +1,12 @@
 #include "pch.h"
 #include "HoldEffect.h"
+#include "ThemeStyle.h"
 
 namespace mousefx {
+
+HoldEffect::HoldEffect(const std::string& themeName) {
+    style_ = GetThemePalette(themeName).hold;
+}
 
 HoldEffect::~HoldEffect() {
     Shutdown();
@@ -24,10 +29,13 @@ void HoldEffect::OnHoldStart(const POINT& pt, int button) {
     
     ClickEvent ev{};
     ev.pt = pt;
-    ev.button = static_cast<MouseButton>(button);
-    
-    // Start looping animation
-    currentRipple_ = pool_.ShowContinuous(ev);
+    ev.button = MouseButton::Left;
+
+    RippleWindow::RenderParams params;
+    params.loop = false;
+    params.intensity = 1.0f;
+
+    currentRipple_ = pool_.ShowContinuous(ev, style_, RippleWindow::DrawMode::ChargeRing, params);
 }
 
 void HoldEffect::OnHoldUpdate(const POINT& pt, DWORD durationMs) {
@@ -35,6 +43,7 @@ void HoldEffect::OnHoldUpdate(const POINT& pt, DWORD durationMs) {
     if (currentRipple_) {
         currentRipple_->UpdatePosition(pt);
     }
+    (void)durationMs;
 }
 
 void HoldEffect::OnHoldEnd() {

@@ -1,7 +1,12 @@
 #include "pch.h"
 #include "HoverEffect.h"
+#include "ThemeStyle.h"
 
 namespace mousefx {
+
+HoverEffect::HoverEffect(const std::string& themeName) {
+    style_ = GetThemePalette(themeName).hover;
+}
 
 HoverEffect::~HoverEffect() {
     Shutdown();
@@ -21,9 +26,13 @@ void HoverEffect::OnHoverStart(const POINT& pt) {
 
     ClickEvent ev{};
     ev.pt = pt;
-    ev.button = MouseButton::Left; // Use default styling for now
-    
-    currentGlow_ = pool_.ShowContinuous(ev);
+    ev.button = MouseButton::Left;
+
+    RippleWindow::RenderParams params;
+    params.loop = true;
+    params.intensity = 1.0f;
+
+    currentGlow_ = pool_.ShowContinuous(ev, style_, RippleWindow::DrawMode::HoverCrosshair, params);
 }
 
 void HoverEffect::OnHoverEnd() {

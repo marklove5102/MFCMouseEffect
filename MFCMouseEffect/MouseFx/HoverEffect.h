@@ -2,13 +2,14 @@
 
 #include "IMouseEffect.h"
 #include "RippleWindowPool.h"
+#include <string>
 
 namespace mousefx {
 
 // Hover effect: shows a pulsing glow when the mouse is idle.
 class HoverEffect final : public IMouseEffect {
 public:
-    HoverEffect() = default;
+    explicit HoverEffect(const std::string& themeName);
     ~HoverEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Hover; }
@@ -23,6 +24,7 @@ public:
 private:
     RippleWindowPool pool_{};
     RippleWindow* currentGlow_ = nullptr;
+    RippleStyle style_{};
 };
 
 } // namespace mousefx

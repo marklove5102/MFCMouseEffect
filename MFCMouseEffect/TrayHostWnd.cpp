@@ -166,6 +166,26 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 	}
 	menu.AppendMenu(MF_POPUP, (UINT_PTR)hoverMenu.m_hMenu, _T("悬停特效 (Hover)"));
 
+	// === Theme Submenu ===
+	CMenu themeMenu;
+	themeMenu.CreatePopupMenu();
+	themeMenu.AppendMenu(MF_STRING, kCmdThemeSciFi, _T("科幻 (Sci-Fi)"));
+	themeMenu.AppendMenu(MF_STRING, kCmdThemeNeon, _T("霓虹 (Neon)"));
+	themeMenu.AppendMenu(MF_STRING, kCmdThemeMinimal, _T("极简 (Minimal)"));
+	themeMenu.AppendMenu(MF_STRING, kCmdThemeGame, _T("游戏感 (Game)"));
+
+	if (mouseFx) {
+		std::string theme = mouseFx->Config().theme;
+		for (auto& c : theme) {
+			if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
+		}
+		if (theme == "scifi" || theme == "sci-fi" || theme == "sci_fi") themeMenu.CheckMenuItem(kCmdThemeSciFi, MF_CHECKED);
+		else if (theme == "minimal") themeMenu.CheckMenuItem(kCmdThemeMinimal, MF_CHECKED);
+		else if (theme == "game") themeMenu.CheckMenuItem(kCmdThemeGame, MF_CHECKED);
+		else themeMenu.CheckMenuItem(kCmdThemeNeon, MF_CHECKED);
+	}
+	menu.AppendMenu(MF_POPUP, (UINT_PTR)themeMenu.m_hMenu, _T("主题 (Theme)"));
+
 	menu.AppendMenu(MF_SEPARATOR);
 	menu.AppendMenu(MF_STRING, kCmdTrayExit, _T("退出"));
 
@@ -180,50 +200,72 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 		PostMessage(WM_CLOSE);
 	}
 	else if (mouseFx) {
+		auto sendEffect = [mouseFx](const char* category, const char* type) {
+			std::string cmd = std::string("{\"cmd\":\"set_effect\",\"category\":\"") + category +
+				"\",\"type\":\"" + type + "\"}";
+			mouseFx->HandleCommand(cmd);
+		};
+		auto clearEffect = [mouseFx](const char* category) {
+			std::string cmd = std::string("{\"cmd\":\"clear_effect\",\"category\":\"") + category + "\"}";
+			mouseFx->HandleCommand(cmd);
+		};
 		switch (cmd) {
 			// Click category
 			case kCmdClickRipple:
-				mouseFx->SetEffect(mousefx::EffectCategory::Click, "ripple");
+				sendEffect("click", "ripple");
 				break;
 			case kCmdClickStar:
-				mouseFx->SetEffect(mousefx::EffectCategory::Click, "star");
+				sendEffect("click", "star");
 				break;
 			case kCmdClickText:
-				mouseFx->SetEffect(mousefx::EffectCategory::Click, "text");
+				sendEffect("click", "text");
 				break;
 			case kCmdClickNone:
-				mouseFx->ClearEffect(mousefx::EffectCategory::Click);
+				clearEffect("click");
 				break;
 			// Trail category
 			case kCmdTrailLine:
-				mouseFx->SetEffect(mousefx::EffectCategory::Trail, "line");
+				sendEffect("trail", "line");
 				break;
 			case kCmdTrailParticle:
-				mouseFx->SetEffect(mousefx::EffectCategory::Trail, "particle");
+				sendEffect("trail", "particle");
 				break;
 			case kCmdTrailNone:
-				mouseFx->ClearEffect(mousefx::EffectCategory::Trail);
+				clearEffect("trail");
 				break;
 			// Scroll category
 			case kCmdScrollArrow:
-				mouseFx->SetEffect(mousefx::EffectCategory::Scroll, "arrow");
+				sendEffect("scroll", "arrow");
 				break;
 			case kCmdScrollNone:
-				mouseFx->ClearEffect(mousefx::EffectCategory::Scroll);
+				clearEffect("scroll");
 				break;
 			// Hold category
 			case kCmdHoldCharge:
-				mouseFx->SetEffect(mousefx::EffectCategory::Hold, "charge");
+				sendEffect("hold", "charge");
 				break;
 			case kCmdHoldNone:
-				mouseFx->ClearEffect(mousefx::EffectCategory::Hold);
+				clearEffect("hold");
 				break;
 			// Hover category
 			case kCmdHoverGlow:
-				mouseFx->SetEffect(mousefx::EffectCategory::Hover, "glow");
+				sendEffect("hover", "glow");
 				break;
 			case kCmdHoverNone:
-				mouseFx->ClearEffect(mousefx::EffectCategory::Hover);
+				clearEffect("hover");
+				break;
+			// Theme
+			case kCmdThemeSciFi:
+				mouseFx->SetTheme("scifi");
+				break;
+			case kCmdThemeNeon:
+				mouseFx->SetTheme("neon");
+				break;
+			case kCmdThemeMinimal:
+				mouseFx->SetTheme("minimal");
+				break;
+			case kCmdThemeGame:
+				mouseFx->SetTheme("game");
 				break;
 			default:
 				break;

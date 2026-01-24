@@ -66,9 +66,20 @@ struct IconConfig {
     Argb strokeColor{ 0xFFFF8C00 }; // Dark Orange
 };
 
+// Active effect selections per category (persisted).
+struct ActiveEffectConfig {
+    std::string click = "ripple";
+    std::string trail = "particle";
+    std::string scroll = "arrow";
+    std::string hover = "glow";
+    std::string hold = "charge";
+};
+
 // Root configuration container
 struct EffectConfig {
     std::string defaultEffect = "ripple";
+    std::string theme = "neon";
+    ActiveEffectConfig active;
     
     RippleConfig ripple;
     TrailConfig trail;
@@ -78,6 +89,9 @@ struct EffectConfig {
     // Load config from file, merging with defaults.
     // If file doesn't exist or has errors, returns defaults (no crash).
     static EffectConfig Load(const std::wstring& exeDir);
+
+    // Save config to file (best effort). Returns true if write succeeded.
+    static bool Save(const std::wstring& exeDir, const EffectConfig& cfg);
     
     // Get built-in defaults
     static EffectConfig GetDefault();

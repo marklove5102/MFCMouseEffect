@@ -82,6 +82,30 @@ static const wchar_t* StartStageToString(mousefx::AppController::StartStage stag
 	}
 }
 
+static std::string ExtractJsonValueA(const std::string& json, const std::string& key) {
+	std::string search = "\"" + key + "\"";
+	size_t keyPos = json.find(search);
+	if (keyPos == std::string::npos) return "";
+
+	size_t startQuote = json.find('"', keyPos + search.length());
+	if (startQuote == std::string::npos) {
+		startQuote = json.find('"', keyPos + search.length() + 1);
+	}
+	if (startQuote == std::string::npos) return "";
+
+	size_t endQuote = json.find('"', startQuote + 1);
+	if (endQuote == std::string::npos) return "";
+
+	return json.substr(startQuote + 1, endQuote - startQuote - 1);
+}
+
+static bool IsExitCommand(const std::string& cmd) {
+	if (cmd == "exit") return true;
+	if (cmd.find("\"cmd\"") != std::string::npos) {
+		return ExtractJsonValueA(cmd, "cmd") == "exit";
+	}
+	return false;
+}
 
 
 // CMFCMouseEffectApp
@@ -203,6 +227,7 @@ BOOL CMFCMouseEffectApp::InitInstance()
 		}
 		LocalFree(argv);
 	}
+	backgroundMode_ = !showTrayIcon;
 
 #ifdef _DEBUG
 	// Debug：创建 CTrayHostWnd (完整托盘菜单) + CMainFrame (MDI调试窗口)
@@ -256,9 +281,24 @@ BOOL CMFCMouseEffectApp::InitInstance()
 	// Start IPC listener (for parent process control)
 	ipc_ = std::make_unique<mousefx::IpcController>();
 	ipc_->Start([this](const std::string& cmd) {
-		if (mouseFx_)
-		{
+		if (IsExitCommand(cmd)) {
+			if (m_pMainWnd) {
+				::PostMessageW(m_pMainWnd->GetSafeHwnd(), WM_CLOSE, 0, 0);
+			} else {
+				::PostQuitMessage(0);
+			}
+			return;
+		}
+		if (mouseFx_) {
 			mouseFx_->HandleCommand(cmd);
+		}
+	}, [this]() {
+		if (backgroundMode_) {
+			if (m_pMainWnd) {
+				::PostMessageW(m_pMainWnd->GetSafeHwnd(), WM_CLOSE, 0, 0);
+			} else {
+				::PostQuitMessage(0);
+			}
 		}
 	});
 
@@ -353,6 +393,5 @@ void CMFCMouseEffectApp::SaveCustomState()
 }
 
 // CMFCMouseEffectApp 消息处理程序
-
 
 

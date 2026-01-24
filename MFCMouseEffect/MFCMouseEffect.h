@@ -50,6 +50,7 @@ public:
 
 private:
 	std::unique_ptr<class CTrayHostWnd> trayHost_;
+	bool backgroundMode_ = false;
 };
 
 

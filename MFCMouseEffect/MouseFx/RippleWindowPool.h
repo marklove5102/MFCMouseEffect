@@ -19,8 +19,10 @@ public:
     void Shutdown();
 
     void ShowRipple(const ClickEvent& ev);
+    void ShowRipple(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params);
     // Returns active window handle for tracking (to stop it later)
     RippleWindow* ShowContinuous(const ClickEvent& ev);
+    RippleWindow* ShowContinuous(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params);
     void SetDrawMode(RippleWindow::DrawMode mode);
 
 private:
@@ -28,4 +30,3 @@ private:
 };
 
 } // namespace mousefx
-

@@ -105,6 +105,7 @@ void RippleWindow::StartContinuous(const ClickEvent& ev) {
 
     current_ = ev;
     continuous_ = true;
+    loop_ = true;
 
     // Slightly different accent by button, keeps the effect expressive but consistent.
     style_ = RippleStyle{};
@@ -138,7 +139,37 @@ void RippleWindow::StartContinuous(const ClickEvent& ev) {
     active_ = true;
 
     // Render first frame immediately to avoid missing on fast clicks.
-    RenderFrame(0.0f);
+    RenderFrame(0.0f, 0);
+    SetTimer(hwnd_, kTimerId, 16, nullptr);
+}
+
+void RippleWindow::StartAt(const ClickEvent& ev, const RippleStyle& style, DrawMode mode, const RenderParams& params) {
+    StartContinuous(ev, style, mode, params);
+    continuous_ = false;
+}
+
+void RippleWindow::StartContinuous(const ClickEvent& ev, const RippleStyle& style, DrawMode mode, const RenderParams& params) {
+    if (!hwnd_ && !Create()) return;
+
+    current_ = ev;
+    continuous_ = true;
+    loop_ = params.loop;
+    style_ = style;
+    drawMode_ = mode;
+    render_ = params;
+
+    EnsureSurface(style_.windowSize);
+
+    int left = static_cast<int>(ev.pt.x - (style_.windowSize / 2));
+    int top = static_cast<int>(ev.pt.y - (style_.windowSize / 2));
+
+    SetWindowPos(hwnd_, HWND_TOPMOST, left, top, style_.windowSize, style_.windowSize,
+        SWP_NOACTIVATE | SWP_SHOWWINDOW);
+
+    startTick_ = NowMs();
+    active_ = true;
+
+    RenderFrame(0.0f, 0);
     SetTimer(hwnd_, kTimerId, 16, nullptr);
 }
 
@@ -212,14 +243,15 @@ void RippleWindow::OnTick() {
     float t = (style_.durationMs == 0) ? 1.0f : (float)elapsed / (float)style_.durationMs;
 
     if (continuous_) {
-        // Loop 0.0 -> 1.0 -> 0.0 ...
-        // Using fmod for simple repeat: 0->1, 0->1
-        // Or sin wave? EaseOutCubic is 0 to 1.
-        // Let's just repeat the ripple 0->1.
-        if (t > 1.0f) {
-            // Reset start tick to loop
-            startTick_ = NowMs();
-            t = 0.0f;
+        if (loop_) {
+            if (t > 1.0f) {
+                startTick_ = NowMs();
+                t = 0.0f;
+            }
+        } else {
+            if (t > 1.0f) {
+                t = 1.0f;
+            }
         }
     } else {
         if (t >= 1.0f) {
@@ -228,7 +260,7 @@ void RippleWindow::OnTick() {
         }
     }
 
-    RenderFrame(t);
+    RenderFrame(t, elapsed);
 }
 
 void RippleWindow::EnsureSurface(int sizePx) {
@@ -270,7 +302,7 @@ void RippleWindow::DestroySurface() {
     sizePx_ = 0;
 }
 
-void RippleWindow::RenderFrame(float t) {
+void RippleWindow::RenderFrame(float t, uint64_t elapsedMs) {
     if (!hwnd_ || !memDc_ || !dib_ || !bits_ || sizePx_ <= 0) return;
 
     // Clear to fully transparent (premultiplied alpha).
@@ -325,8 +357,132 @@ void RippleWindow::RenderFrame(float t) {
         Gdiplus::Pen pen(stroke, style_.strokeWidth);
         pen.SetLineJoin(Gdiplus::LineJoinRound);
         g.DrawPolygon(&pen, pts, 10);
-    }
-    else {
+    } else if (drawMode_ == DrawMode::ScrollChevron) {
+        const float intensity = Clamp01(render_.intensity);
+        const float alpha = (1.0f - eased) * intensity;
+
+        const float radius = style_.startRadius + (style_.endRadius - style_.startRadius) * eased;
+        const float cx = sizePx_ / 2.0f;
+        const float cy = sizePx_ / 2.0f;
+
+        const float dir = render_.directionRad;
+        const float dx = (float)cos(dir);
+        const float dy = (float)sin(dir);
+        const float px = -dy;
+        const float py = dx;
+
+        const Gdiplus::Color base = ToGdiPlus(style_.stroke);
+        const BYTE aBase = ClampByte((int)(base.GetA() * alpha));
+
+        for (int i = 0; i < 3; ++i) {
+            const float offset = i * (radius * 0.25f);
+            const float length = radius * 1.1f;
+            const float halfWidth = style_.strokeWidth * (3.2f - i * 0.6f);
+
+            const float tipX = cx + dx * (length * 0.5f - offset);
+            const float tipY = cy + dy * (length * 0.5f - offset);
+            const float tailX = cx - dx * (length * 0.5f + offset);
+            const float tailY = cy - dy * (length * 0.5f + offset);
+
+            const float lx = tailX + px * halfWidth;
+            const float ly = tailY + py * halfWidth;
+            const float rx = tailX - px * halfWidth;
+            const float ry = tailY - py * halfWidth;
+
+            const float fade = 1.0f - i * 0.18f;
+            const Gdiplus::Color glow = ToGdiPlus(style_.glow);
+            const BYTE a = ClampByte((int)(aBase * fade));
+            const BYTE glowA = ClampByte((int)(glow.GetA() * alpha * fade));
+            Gdiplus::Pen glowPen(Gdiplus::Color(glowA, glow.GetR(), glow.GetG(), glow.GetB()),
+                style_.strokeWidth + 6.0f);
+            glowPen.SetLineJoin(Gdiplus::LineJoinRound);
+            g.DrawLine(&glowPen, tipX, tipY, lx, ly);
+            g.DrawLine(&glowPen, tipX, tipY, rx, ry);
+
+            Gdiplus::Pen pen(Gdiplus::Color(a, base.GetR(), base.GetG(), base.GetB()),
+                style_.strokeWidth + 1.0f);
+            pen.SetLineJoin(Gdiplus::LineJoinRound);
+            g.DrawLine(&pen, tipX, tipY, lx, ly);
+            g.DrawLine(&pen, tipX, tipY, rx, ry);
+        }
+    } else if (drawMode_ == DrawMode::ChargeRing) {
+        const float cx = sizePx_ / 2.0f;
+        const float cy = sizePx_ / 2.0f;
+        const float radius = style_.endRadius;
+        const float progress = Clamp01(t);
+        const float pulse = 0.5f + 0.5f * (float)sin((double)elapsedMs * 0.0045);
+        const float alpha = 0.55f + 0.45f * pulse;
+
+        const Gdiplus::Color stroke = ToGdiPlus(style_.stroke);
+        const BYTE aStroke = ClampByte((int)(stroke.GetA() * alpha));
+        const Gdiplus::Color glow = ToGdiPlus(style_.glow);
+        const BYTE aGlow = ClampByte((int)(glow.GetA() * alpha * 0.6f));
+
+        // Background ring
+        Gdiplus::Pen bgPen(Gdiplus::Color(ClampByte((int)(aStroke * 0.25f)),
+            stroke.GetR(), stroke.GetG(), stroke.GetB()), style_.strokeWidth);
+        bgPen.SetLineJoin(Gdiplus::LineJoinRound);
+        g.DrawEllipse(&bgPen, cx - radius, cy - radius, radius * 2.0f, radius * 2.0f);
+
+        // Glow arc
+        Gdiplus::Pen glowPen(Gdiplus::Color(aGlow, glow.GetR(), glow.GetG(), glow.GetB()),
+            style_.strokeWidth + 8.0f);
+        glowPen.SetLineJoin(Gdiplus::LineJoinRound);
+        g.DrawArc(&glowPen, cx - radius, cy - radius, radius * 2.0f, radius * 2.0f, -90.0f, progress * 360.0f);
+
+        // Progress arc
+        Gdiplus::Pen pen(Gdiplus::Color(aStroke, stroke.GetR(), stroke.GetG(), stroke.GetB()),
+            style_.strokeWidth + 1.0f);
+        pen.SetLineJoin(Gdiplus::LineJoinRound);
+        g.DrawArc(&pen, cx - radius, cy - radius, radius * 2.0f, radius * 2.0f, -90.0f, progress * 360.0f);
+
+        // Accent dot at head
+        const float angle = (-90.0f + progress * 360.0f) * 3.1415926f / 180.0f;
+        const float dotX = cx + (float)cos(angle) * radius;
+        const float dotY = cy + (float)sin(angle) * radius;
+        const float dotR = style_.strokeWidth * 2.2f;
+        Gdiplus::SolidBrush dotBrush(Gdiplus::Color(aStroke, stroke.GetR(), stroke.GetG(), stroke.GetB()));
+        g.FillEllipse(&dotBrush, dotX - dotR, dotY - dotR, dotR * 2.0f, dotR * 2.0f);
+    } else if (drawMode_ == DrawMode::HoverCrosshair) {
+        const float cx = sizePx_ / 2.0f;
+        const float cy = sizePx_ / 2.0f;
+        const float radius = style_.endRadius * 0.9f;
+        const float phase = (float)fmod((double)elapsedMs / (double)style_.durationMs, 1.0);
+        const float pulse = 0.4f + 0.6f * (float)sin(phase * 2.0f * 3.1415926f);
+        const float alpha = Clamp01(pulse);
+
+        const Gdiplus::Color stroke = ToGdiPlus(style_.stroke);
+        const BYTE aStroke = ClampByte((int)(stroke.GetA() * alpha));
+        const Gdiplus::Color glow = ToGdiPlus(style_.glow);
+        const BYTE aGlow = ClampByte((int)(glow.GetA() * alpha * 0.6f));
+
+        Gdiplus::Pen glowPen(Gdiplus::Color(aGlow, glow.GetR(), glow.GetG(), glow.GetB()),
+            style_.strokeWidth + 6.0f);
+        glowPen.SetLineJoin(Gdiplus::LineJoinRound);
+
+        Gdiplus::Pen pen(Gdiplus::Color(aStroke, stroke.GetR(), stroke.GetG(), stroke.GetB()),
+            style_.strokeWidth + 0.5f);
+        pen.SetLineJoin(Gdiplus::LineJoinRound);
+
+        const float tick = radius * 0.22f;
+        g.DrawLine(&glowPen, cx - radius, cy, cx - radius + tick, cy);
+        g.DrawLine(&glowPen, cx + radius - tick, cy, cx + radius, cy);
+        g.DrawLine(&glowPen, cx, cy - radius, cx, cy - radius + tick);
+        g.DrawLine(&glowPen, cx, cy + radius - tick, cx, cy + radius);
+
+        g.DrawLine(&pen, cx - radius, cy, cx - radius + tick, cy);
+        g.DrawLine(&pen, cx + radius - tick, cy, cx + radius, cy);
+        g.DrawLine(&pen, cx, cy - radius, cx, cy - radius + tick);
+        g.DrawLine(&pen, cx, cy + radius - tick, cx, cy + radius);
+
+        // Orbiting dot
+        const float dotAngle = phase * 2.0f * 3.1415926f;
+        const float dotR = style_.strokeWidth * 1.6f;
+        const float dotX = cx + (float)cos(dotAngle) * (radius * 0.6f);
+        const float dotY = cy + (float)sin(dotAngle) * (radius * 0.6f);
+        Gdiplus::SolidBrush dotBrush(Gdiplus::Color(aStroke, stroke.GetR(), stroke.GetG(), stroke.GetB()));
+        g.FillEllipse(&dotBrush, dotX - dotR, dotY - dotR, dotR * 2.0f, dotR * 2.0f);
+    } else {
         // Draw Ripple (Circle)
         // Fill
         Gdiplus::Color base = ToGdiPlus(style_.fill);

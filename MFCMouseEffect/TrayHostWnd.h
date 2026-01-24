@@ -47,6 +47,11 @@ private:
 		// Hold category
 		kCmdHoldCharge = 7001,
 		kCmdHoldNone = 7002,
+		// Theme
+		kCmdThemeSciFi = 8001,
+		kCmdThemeNeon = 8002,
+		kCmdThemeMinimal = 8003,
+		kCmdThemeGame = 8004,
 	};
 
 	NOTIFYICONDATA m_trayIcon{};

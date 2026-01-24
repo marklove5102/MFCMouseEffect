@@ -211,6 +211,7 @@
     <ClInclude Include="MouseFx\RippleStyle.h" />
     <ClInclude Include="MouseFx\RippleWindow.h" />
     <ClInclude Include="MouseFx\RippleWindowPool.h" />
+    <ClInclude Include="MouseFx\ThemeStyle.h" />
     <ClInclude Include="MouseFx\TextEffect.h" />
     <ClInclude Include="MouseFx\TextWindow.h" />
     <ClInclude Include="MouseFx\TextWindowPool.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="MouseFx\RippleEffect.cpp" />
     <ClCompile Include="MouseFx\RippleWindow.cpp" />
     <ClCompile Include="MouseFx\RippleWindowPool.cpp" />
+    <ClCompile Include="MouseFx\ThemeStyle.cpp" />
     <ClCompile Include="MouseFx\TextEffect.cpp" />
     <ClCompile Include="MouseFx\TextWindow.cpp" />
     <ClCompile Include="MouseFx\TextWindowPool.cpp" />

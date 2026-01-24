@@ -44,6 +44,9 @@ public:
     
     // Clear (disable) effect for a category.
     void ClearEffect(EffectCategory category);
+
+    // Set visual theme (affects themed effects).
+    void SetTheme(const std::string& theme);
     
     // Get the current effect for a category (may be null).
     IMouseEffect* GetEffect(EffectCategory category) const;
@@ -75,6 +78,7 @@ private:
     std::array<std::unique_ptr<IMouseEffect>, kCategoryCount> effects_{};
     
     EffectConfig config_{};
+    std::wstring exeDir_{};
     StartDiagnostics diag_{};
 
     uint64_t lastInputTime_ = 0;

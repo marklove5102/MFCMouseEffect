@@ -2,13 +2,14 @@
 
 #include "IMouseEffect.h"
 #include "RippleWindowPool.h"
+#include <string>
 
 namespace mousefx {
 
 // Scroll effect: shows directional arrow on mouse wheel.
 class ScrollEffect final : public IMouseEffect {
 public:
-    ScrollEffect() = default;
+    explicit ScrollEffect(const std::string& themeName);
     ~ScrollEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Scroll; }
@@ -20,6 +21,7 @@ public:
 
 private:
     RippleWindowPool pool_{};
+    RippleStyle style_{};
 };
 
 } // namespace mousefx

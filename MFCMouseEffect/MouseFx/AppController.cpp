@@ -64,7 +64,8 @@ bool AppController::Start() {
     diag_ = {};
 
     // Load config from EXE directory
-    config_ = EffectConfig::Load(GetExeDirectory());
+    exeDir_ = GetExeDirectory();
+    config_ = EffectConfig::Load(exeDir_);
 
     diag_.stage = StartStage::GdiPlusStartup;
     if (!gdiplus_.Startup()) {
@@ -85,11 +86,14 @@ bool AppController::Start() {
 
     // Initialize effects with defaults
     diag_.stage = StartStage::EffectInit;
-    SetEffect(EffectCategory::Click, config_.defaultEffect.empty() ? "ripple" : config_.defaultEffect);
-    SetEffect(EffectCategory::Trail, "particle");
-    SetEffect(EffectCategory::Scroll, "arrow");
-    SetEffect(EffectCategory::Hold, "charge");
-    SetEffect(EffectCategory::Hover, "glow");
+    const std::string clickType = config_.active.click.empty()
+        ? (config_.defaultEffect.empty() ? "ripple" : config_.defaultEffect)
+        : config_.active.click;
+    SetEffect(EffectCategory::Click, clickType);
+    SetEffect(EffectCategory::Trail, config_.active.trail);
+    SetEffect(EffectCategory::Scroll, config_.active.scroll);
+    SetEffect(EffectCategory::Hold, config_.active.hold);
+    SetEffect(EffectCategory::Hover, config_.active.hover);
 
     lastInputTime_ = GetTickCount64();
     SetTimer(dispatchHwnd_, kHoverTimerId, 100, nullptr);
@@ -140,13 +144,13 @@ std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory categor
             if (type == "particle") return std::make_unique<ParticleTrailEffect>();
             break;
         case EffectCategory::Scroll:
-            if (type == "arrow")  return std::make_unique<ScrollEffect>();
+            if (type == "arrow")  return std::make_unique<ScrollEffect>(config_.theme);
             break;
         case EffectCategory::Hold:
-            if (type == "charge") return std::make_unique<HoldEffect>();
+            if (type == "charge") return std::make_unique<HoldEffect>(config_.theme);
             break;
         case EffectCategory::Hover:
-            if (type == "glow")   return std::make_unique<HoverEffect>();
+            if (type == "glow")   return std::make_unique<HoverEffect>(config_.theme);
             break;
         case EffectCategory::Edge:
             // TODO: implement these categories
@@ -191,6 +195,18 @@ void AppController::ClearEffect(EffectCategory category) {
     SetEffect(category, "none");
 }
 
+void AppController::SetTheme(const std::string& theme) {
+    if (theme.empty()) return;
+    config_.theme = theme;
+    // Re-create themed effects to pick up new palette.
+    SetEffect(EffectCategory::Scroll, config_.active.scroll);
+    SetEffect(EffectCategory::Hold, config_.active.hold);
+    SetEffect(EffectCategory::Hover, config_.active.hover);
+    if (!exeDir_.empty()) {
+        EffectConfig::Save(exeDir_, config_);
+    }
+}
+
 IMouseEffect* AppController::GetEffect(EffectCategory category) const {
     size_t idx = static_cast<size_t>(category);
     if (idx >= kCategoryCount) return nullptr;
@@ -208,12 +224,40 @@ void AppController::HandleCommand(const std::string& jsonCmd) {
             // Legacy format: {"cmd": "set_effect", "type": "ripple"}
             // Assume click category for backward compatibility
             SetEffect(EffectCategory::Click, type);
+            config_.active.click = type;
         } else {
-            SetEffect(CategoryFromString(category), type);
+            const auto cat = CategoryFromString(category);
+            SetEffect(cat, type);
+            switch (cat) {
+            case EffectCategory::Click: config_.active.click = type; break;
+            case EffectCategory::Trail: config_.active.trail = type; break;
+            case EffectCategory::Scroll: config_.active.scroll = type; break;
+            case EffectCategory::Hover: config_.active.hover = type; break;
+            case EffectCategory::Hold: config_.active.hold = type; break;
+            default: break;
+            }
+        }
+        if (!exeDir_.empty()) {
+            EffectConfig::Save(exeDir_, config_);
         }
     } else if (cmd == "clear_effect") {
         std::string category = ExtractJsonValue(jsonCmd, "category");
-        ClearEffect(CategoryFromString(category));
+        const auto cat = CategoryFromString(category);
+        ClearEffect(cat);
+        switch (cat) {
+        case EffectCategory::Click: config_.active.click = "none"; break;
+        case EffectCategory::Trail: config_.active.trail = "none"; break;
+        case EffectCategory::Scroll: config_.active.scroll = "none"; break;
+        case EffectCategory::Hover: config_.active.hover = "none"; break;
+        case EffectCategory::Hold: config_.active.hold = "none"; break;
+        default: break;
+        }
+        if (!exeDir_.empty()) {
+            EffectConfig::Save(exeDir_, config_);
+        }
+    } else if (cmd == "set_theme") {
+        std::string theme = ExtractJsonValue(jsonCmd, "theme");
+        SetTheme(theme);
     }
 }
 
@@ -421,4 +465,3 @@ LRESULT AppController::OnDispatchMessage(HWND hwnd, UINT msg, WPARAM wParam, LPA
 }
 
 } // namespace mousefx
-

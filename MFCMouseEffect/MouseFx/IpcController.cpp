@@ -12,11 +12,12 @@ namespace mousefx
 		Stop();
 	}
 
-	void IpcController::Start(CommandCallback callback)
+	void IpcController::Start(CommandCallback callback, ClosedCallback onClosed)
 	{
 		if (running_) return;
 
 		callback_ = std::move(callback);
+		closedCallback_ = std::move(onClosed);
 		running_ = true;
 		worker_ = std::thread(&IpcController::ListenerLoop, this);
 	}
@@ -49,5 +50,8 @@ namespace mousefx
 		
 		// If cin closes (EOF), we also stop.
 		running_ = false;
+		if (closedCallback_) {
+			closedCallback_();
+		}
 	}
 }

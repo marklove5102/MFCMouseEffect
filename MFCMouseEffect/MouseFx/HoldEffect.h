@@ -2,13 +2,14 @@
 
 #include "IMouseEffect.h"
 #include "RippleWindowPool.h"
+#include <string>
 
 namespace mousefx {
 
 // Hold effect: shows growing ring while button is held down.
 class HoldEffect final : public IMouseEffect {
 public:
-    HoldEffect() = default;
+    explicit HoldEffect(const std::string& themeName);
     ~HoldEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Hold; }
@@ -27,6 +28,7 @@ private:
     
     // Track active window to stop looping
     RippleWindow* currentRipple_ = nullptr;
+    RippleStyle style_{};
 };
 
 } // namespace mousefx

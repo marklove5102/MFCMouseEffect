@@ -1,7 +1,19 @@
 #include "pch.h"
 #include "ScrollEffect.h"
+#include "ThemeStyle.h"
+
+#include <algorithm>
+#include <cstdlib>
 
 namespace mousefx {
+
+static float Clamp01(float v) {
+    return std::max(0.0f, std::min(1.0f, v));
+}
+
+ScrollEffect::ScrollEffect(const std::string& themeName) {
+    style_ = GetThemePalette(themeName).scroll;
+}
 
 ScrollEffect::~ScrollEffect() {
     Shutdown();
@@ -17,12 +29,22 @@ void ScrollEffect::Shutdown() {
 }
 
 void ScrollEffect::OnScroll(const ScrollEvent& event) {
-    // For now, use ripple to indicate scroll.
-    // TODO: Create a dedicated arrow/chevron drawing mode.
     ClickEvent ev{};
     ev.pt = event.pt;
-    ev.button = event.delta > 0 ? MouseButton::Left : MouseButton::Right;
-    pool_.ShowRipple(ev);
+    ev.button = MouseButton::Left;
+
+    RippleWindow::RenderParams params;
+    const float base = (event.delta >= 0) ? -3.1415926f / 2.0f : 3.1415926f / 2.0f;
+    if (event.horizontal) {
+        params.directionRad = (event.delta >= 0) ? 0.0f : 3.1415926f;
+    } else {
+        params.directionRad = base;
+    }
+    const float strength = (float)std::abs(event.delta) / 120.0f;
+    params.intensity = Clamp01(0.6f + strength * 0.6f);
+    params.loop = false;
+
+    pool_.ShowRipple(ev, style_, RippleWindow::DrawMode::ScrollChevron, params);
 }
 
 } // namespace mousefx
