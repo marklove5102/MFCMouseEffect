@@ -33,7 +33,8 @@ private:
 		kCmdClickNone = 2003,
 		// Trail category
 		kCmdTrailLine = 3001,
-		kCmdTrailNone = 3002,
+		kCmdTrailParticle = 3002,
+		kCmdTrailNone = 3003,
 		// Hover category
 		kCmdHoverGlow = 4001,
 		kCmdHoverNone = 4002,

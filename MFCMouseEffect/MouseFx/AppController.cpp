@@ -10,6 +10,7 @@
 #include "ScrollEffect.h"
 #include "HoldEffect.h"
 #include "HoverEffect.h"
+#include "ParticleTrailEffect.h"
 
 #include <new>
 #include <windowsx.h>  // For GET_X_LPARAM, GET_Y_LPARAM
@@ -84,7 +85,7 @@ bool AppController::Start() {
     // Initialize effects with defaults
     diag_.stage = StartStage::EffectInit;
     SetEffect(EffectCategory::Click, config_.defaultEffect.empty() ? "ripple" : config_.defaultEffect);
-    SetEffect(EffectCategory::Trail, "line");
+    SetEffect(EffectCategory::Trail, "particle");
     SetEffect(EffectCategory::Scroll, "arrow");
     SetEffect(EffectCategory::Hold, "charge");
     SetEffect(EffectCategory::Hover, "glow");
@@ -133,7 +134,8 @@ std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory categor
             if (type == "star")   return std::make_unique<IconEffect>();
             break;
         case EffectCategory::Trail:
-            if (type == "line")   return std::make_unique<TrailEffect>();
+            if (type == "line")     return std::make_unique<TrailEffect>();
+            if (type == "particle") return std::make_unique<ParticleTrailEffect>();
             break;
         case EffectCategory::Scroll:
             if (type == "arrow")  return std::make_unique<ScrollEffect>();

@@ -213,6 +213,8 @@
     <ClInclude Include="MouseFx\RippleWindowPool.h" />
     <ClInclude Include="MouseFx\TrailEffect.h" />
     <ClInclude Include="MouseFx\TrailWindow.h" />
+    <ClInclude Include="MouseFx\ParticleTrailEffect.h" />
+    <ClInclude Include="MouseFx\ParticleTrailWindow.h" />
     <ClInclude Include="MouseFx\ScrollEffect.h" />
     <ClInclude Include="MouseFx\HoldEffect.h" />
     <ClInclude Include="MouseFx\HoverEffect.h" />
@@ -243,6 +245,8 @@
     <ClCompile Include="MouseFx\RippleWindowPool.cpp" />
     <ClCompile Include="MouseFx\TrailEffect.cpp" />
     <ClCompile Include="MouseFx\TrailWindow.cpp" />
+    <ClCompile Include="MouseFx\ParticleTrailEffect.cpp" />
+    <ClCompile Include="MouseFx\ParticleTrailWindow.cpp" />
     <ClCompile Include="MouseFx\ScrollEffect.cpp" />
     <ClCompile Include="MouseFx\HoldEffect.cpp" />
     <ClCompile Include="MouseFx\HoverEffect.cpp" />

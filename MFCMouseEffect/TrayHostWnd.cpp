@@ -100,13 +100,16 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 	// === Trail Category Submenu ===
 	CMenu trailMenu;
 	trailMenu.CreatePopupMenu();
-	trailMenu.AppendMenu(MF_STRING, kCmdTrailLine, _T("拖尾线 (Line)"));
+	trailMenu.AppendMenu(MF_STRING, kCmdTrailParticle, _T("彩虹粒子 (Particle)"));
+	trailMenu.AppendMenu(MF_STRING, kCmdTrailLine, _T("普通线条 (Line)"));
 	trailMenu.AppendMenu(MF_STRING, kCmdTrailNone, _T("无 (None)"));
 	
 	if (mouseFx) {
 		auto* trailEffect = mouseFx->GetEffect(mousefx::EffectCategory::Trail);
 		if (trailEffect) {
-			trailMenu.CheckMenuItem(kCmdTrailLine, MF_CHECKED);
+			std::string typeName = trailEffect->TypeName();
+			if (typeName == "particle") trailMenu.CheckMenuItem(kCmdTrailParticle, MF_CHECKED);
+			else if (typeName == "line") trailMenu.CheckMenuItem(kCmdTrailLine, MF_CHECKED);
 		} else {
 			trailMenu.CheckMenuItem(kCmdTrailNone, MF_CHECKED);
 		}
@@ -189,6 +192,9 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 			// Trail category
 			case kCmdTrailLine:
 				mouseFx->SetEffect(mousefx::EffectCategory::Trail, "line");
+				break;
+			case kCmdTrailParticle:
+				mouseFx->SetEffect(mousefx::EffectCategory::Trail, "particle");
 				break;
 			case kCmdTrailNone:
 				mouseFx->ClearEffect(mousefx::EffectCategory::Trail);
