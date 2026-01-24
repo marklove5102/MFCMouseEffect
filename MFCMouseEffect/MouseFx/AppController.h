@@ -82,6 +82,16 @@ private:
     static constexpr UINT_PTR kHoverTimerId = 2;
     static constexpr DWORD kHoverThresholdMs = 2000;
 
+    // Hold delay logic
+    static constexpr UINT_PTR kHoldTimerId = 5;
+    static constexpr DWORD kHoldDelayMs = 350; // Increased to 350ms to distinguish from click
+    struct PendingHold {
+        POINT pt;
+        int button;
+        bool active = false;
+    } pendingHold_{};
+    bool ignoreNextClick_ = false; // If hold triggered, ignore the subsequent click
+
 #ifdef _DEBUG
     uint32_t debugClickCount_ = 0;
 #endif

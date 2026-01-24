@@ -106,9 +106,9 @@ bool AppController::Start() {
         return false;
     }
 
-#ifdef _DEBUG
-    SetTimer(dispatchHwnd_, kSelfTestTimerId, 250, nullptr);
-#endif
+//#ifdef _DEBUG
+//    SetTimer(dispatchHwnd_, kSelfTestTimerId, 250, nullptr);
+//#endif
     return true;
 }
 
@@ -281,6 +281,11 @@ LRESULT AppController::OnDispatchMessage(HWND hwnd, UINT msg, WPARAM wParam, LPA
     }
 
     if (msg == WM_MFX_CLICK) {
+        if (ignoreNextClick_) {
+            ignoreNextClick_ = false;
+            return 0; // Suppress click after a long hold
+        }
+
         auto* ev = reinterpret_cast<ClickEvent*>(lParam);
         if (ev) {
 #ifdef _DEBUG
@@ -338,15 +343,25 @@ LRESULT AppController::OnDispatchMessage(HWND hwnd, UINT msg, WPARAM wParam, LPA
         POINT pt;
         pt.x = GET_X_LPARAM(lParam);
         pt.y = GET_Y_LPARAM(lParam);
-        // Dispatch to Hold category effect
-        if (auto* effect = GetEffect(EffectCategory::Hold)) {
-            effect->OnHoldStart(pt, button);
-        }
+        
+        // Start delayed hold
+        pendingHold_.pt = pt;
+        pendingHold_.button = button;
+        pendingHold_.active = true;
+        ignoreNextClick_ = false; // Reset for new interaction
+        SetTimer(hwnd, kHoldTimerId, kHoldDelayMs, nullptr);
+        
         return 0;
     }
 
     if (msg == WM_MFX_BUTTON_UP) {
-        // End hold effect
+        // Cancel pending hold if quick click
+        if (pendingHold_.active) {
+            KillTimer(hwnd, kHoldTimerId);
+            pendingHold_.active = false;
+        }
+
+        // End hold effect if it was started
         if (auto* effect = GetEffect(EffectCategory::Hold)) {
             effect->OnHoldEnd();
         }
@@ -365,6 +380,25 @@ LRESULT AppController::OnDispatchMessage(HWND hwnd, UINT msg, WPARAM wParam, LPA
                         effect->OnHoverStart(pt);
                     }
                 }
+            }
+            return 0;
+        }
+        
+        if (wParam == kHoldTimerId) {
+            KillTimer(hwnd, kHoldTimerId);
+            if (pendingHold_.active) {
+                // Timer elapsed, this is a real hold: trigger effect
+                if (auto* effect = GetEffect(EffectCategory::Hold)) {
+                    effect->OnHoldStart(pendingHold_.pt, pendingHold_.button);
+                }
+                // Keep active true so we know we triggered it (moved/up logic might use it)
+                // But actually once triggered, the Effect manages state independently.
+                // We just mark it inactive here to avoid double Trigger? No, logic is fine.
+                // Actually if we keep active=true, UP handler knows we just finished a hold timing.
+                // But UP checks 'active' to kill timer. If timer already dead, UP just calls OnHoldEnd.
+                // So we set active=false to say "timer/pending phase is over".
+                pendingHold_.active = false;
+                ignoreNextClick_ = true; // Timer fired = Hold triggered = Ignore next click
             }
             return 0;
         }

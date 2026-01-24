@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "TextWindow.h"
 #include <algorithm>
+#include <cmath>
 
 namespace mousefx {
 
@@ -85,6 +86,11 @@ void TextWindow::StartAt(const POINT& pt, const std::wstring& text, Argb color, 
     startTick_ = NowMs();
     active_ = true;
 
+    // Randomize path characteristics
+    driftX_ = (float)(rand() % 100 - 50); // Drift -50 to 50 pixels horizontally
+    swayFreq_ = 1.0f + (float)(rand() % 200) / 100.0f; // 1.0 to 3.0 frequency
+    swayAmp_ = 5.0f + (float)(rand() % 100) / 10.0f;   // 5.0 to 15.0 px amplitude
+
     RenderFrame(0.0f);
     SetTimer(hwnd_, kTimerId, 16, nullptr);
 }
@@ -164,6 +170,11 @@ void TextWindow::DestroySurface() {
     dib_ = nullptr; memDc_ = nullptr; bits_ = nullptr;
 }
 
+static float EaseOutCubic(float t) {
+    float u = 1.0f - t;
+    return 1.0f - (u * u * u);
+}
+
 void TextWindow::RenderFrame(float t) {
     if (!hwnd_ || !memDc_ || !bits_) return;
 
@@ -174,25 +185,43 @@ void TextWindow::RenderFrame(float t) {
     g.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
     g.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
 
-    // Float UP: 0 at t=0, floatDistance at t=1
-    float yOffset = t * config_.floatDistance;
-    float alpha = 1.0f - t;
-    if (t > 0.5f) {
-        // Faster fade in second half? Or just linear.
-        // Let's stick to linear for now.
-    }
+    // Elegant movement: Non-linear path
+    float eased = EaseOutCubic(t);
+    float yOffset = eased * config_.floatDistance;
+    
+    // Combine drift and sway for a curved path
+    float xPos = (t * driftX_) + std::sin(t * 3.14159f * swayFreq_) * swayAmp_;
+    
+    // Scale: pop up slightly at start
+    float scale = 1.0f;
+    if (t < 0.3f) scale = 0.8f + (t / 0.3f) * 0.4f;
+    else scale = 1.2f - ((t - 0.3f) / 0.7f) * 0.2f;
+
+    // Alpha
+    float alpha = 1.0f;
+    if (t < 0.15f) alpha = t / 0.15f; 
+    else if (t > 0.6f) alpha = 1.0f - (t - 0.6f) / 0.4f;
 
     Gdiplus::FontFamily fontFamily(config_.fontFamily.c_str());
-    Gdiplus::Font font(&fontFamily, config_.fontSize, Gdiplus::FontStyleBold);
+    Gdiplus::Font font(&fontFamily, config_.fontSize * scale, Gdiplus::FontStyleBold);
     Gdiplus::SolidBrush brush(ToGdiPlus(color_, (BYTE)(alpha * 255)));
 
     Gdiplus::StringFormat format;
     format.SetAlignment(Gdiplus::StringAlignmentCenter);
     format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
 
-    // Center in window, then subtract yOffset
-    Gdiplus::RectF rect(0.0f, -yOffset, (float)width_, (float)height_);
+    // Center in window, apply curved path and a slight rotation
+    float centerX = (float)width_ / 2.0f + xPos;
+    float centerY = (float)height_ / 2.0f - yOffset;
+
+    g.TranslateTransform(centerX, centerY);
+    g.RotateTransform(xPos * 0.2f);
+    g.TranslateTransform(-centerX, -centerY);
+    
+    Gdiplus::RectF rect(xPos, -yOffset, (float)width_, (float)height_);
     g.DrawString(text_.c_str(), -1, &font, rect, &format, &brush);
+    
+    g.ResetTransform();
 
     // Push to screen
     POINT ptSrc{ 0, 0 };

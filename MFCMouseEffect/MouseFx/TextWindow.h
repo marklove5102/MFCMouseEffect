@@ -44,6 +44,9 @@ private:
     Argb color_{};
     POINT startPt_{};
     uint64_t startTick_ = 0;
+    float driftX_ = 0.0f;
+    float swayFreq_ = 1.0f;
+    float swayAmp_ = 0.0f;
 
     // Layered window backbuffer.
     HDC memDc_ = nullptr;
