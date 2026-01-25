@@ -185,9 +185,13 @@ void CSettingsWnd::OnCommandClose() {
 
 void CSettingsWnd::OnSelChange() {
     if (updating_) return;
-    model_.uiLanguage = GetComboValue(cmbLang_);
-    ApplyLanguageToControls();
 
+    // 1. Capture all current values from UI to Model FIRST
+    //    Critical: Do this BEFORE ApplyLanguageToControls, because that function 
+    //    rebuilds the UI based on the current state of 'model_'.
+    std::string oldLang = model_.uiLanguage;
+
+    model_.uiLanguage = GetComboValue(cmbLang_);
     model_.theme = GetComboValue(cmbTheme_);
     model_.click = GetComboValue(cmbClick_);
     model_.trail = GetComboValue(cmbTrail_);
@@ -195,6 +199,13 @@ void CSettingsWnd::OnSelChange() {
     model_.hold = GetComboValue(cmbHold_);
     model_.hover = GetComboValue(cmbHover_);
 
+    // 2. Only refresh UI text/items if language actually changed
+    //    This prevents unnecessary flicker and potential state reset issues
+    if (model_.uiLanguage != oldLang) {
+        ApplyLanguageToControls();
+    }
+
+    // 3. Save to backend and refresh screen
     Apply();
 }
 
