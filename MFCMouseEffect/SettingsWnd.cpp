@@ -114,14 +114,16 @@ int CSettingsWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 
     auto mkLabel = [&](CStatic& s, int row) {
         const int y = rowY(row);
-        CRect rc(left, y, left + labelW, y + rowH);
-        s.Create(L"", WS_CHILD | WS_VISIBLE, rc, this);
+        CRect rc(left + S(8), y, left + labelW, y + rowH);
+        s.Create(L"", WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE | SS_LEFT, rc, this);
         if (font_.GetSafeHandle()) s.SetFont(&font_);
     };
     auto mkCombo = [&](CComboBox& c, int row, UINT id) {
         const int dropH = S(140);
         const int y = rowY(row);
-        CRect rc(left + labelW + S(8), y - S(2),
+        // Slightly center the combo box vertically relative to the row height if needed, 
+        // but usually +S(2) or similar helps match the label's visual center.
+        CRect rc(left + labelW + S(8), y + S(2),
                  left + labelW + S(8) + boxW, y + rowH + dropH);
         c.Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_TABSTOP, rc, this, id);
         if (font_.GetSafeHandle()) c.SetFont(&font_);
@@ -425,6 +427,7 @@ void CSettingsWnd::DrawText(Gdiplus::Graphics& g, const wchar_t* text, const CRe
     fmt.SetTrimming(Gdiplus::StringTrimmingEllipsisCharacter);
     fmt.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
     fmt.SetLineAlignment(Gdiplus::StringAlignmentCenter);
+    fmt.SetAlignment(Gdiplus::StringAlignmentCenter);
 
     g.DrawString(text, -1, &font, r, &fmt, &b);
 }
@@ -465,7 +468,7 @@ void CSettingsWnd::OnPaint() {
 
         CRect sub = h;
         sub.left += S(18);
-        sub.top += S(40);
+        sub.top += S(44); // Lowered slightly for better gap from title
         sub.bottom = h.bottom;
         DrawText(g, t.subtitle, sub, S(11), false, C(255, GetRValue(sysMuted), GetGValue(sysMuted), GetBValue(sysMuted)));
 
