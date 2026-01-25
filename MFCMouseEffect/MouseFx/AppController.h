@@ -81,7 +81,7 @@ private:
     std::array<std::unique_ptr<IMouseEffect>, kCategoryCount> effects_{};
     
     EffectConfig config_{};
-    std::wstring exeDir_{};
+    std::wstring configDir_{};
     StartDiagnostics diag_{};
 
     uint64_t lastInputTime_ = 0;

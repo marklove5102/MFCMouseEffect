@@ -24,6 +24,9 @@ OutputBaseFilename=MFCMouseEffect_Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+; --- 64-bit Architecture Configuration ---
+ArchitecturesAllowed=x64
+ArchitecturesInstallIn64BitMode=x64
 
 ; --- CRITICAL Singleton Logic ---
 ; Using the mutex we implemented in the app to detect if it's currently running.
@@ -32,18 +35,18 @@ AppMutex=Global\MFCMouseEffect_SingleInstance_Mutex
 CloseApplications=yes
 
 [Languages]
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+; Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "startup"; Description: "Run at Windows startup"; GroupDescription: "Additional options:"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "startup"; Description: "Run at Windows startup"; GroupDescription: "Additional options:"
 
 [Files]
 ; Source path is relative to where the .iss file is located.
 ; Assuming .iss is in 'Install' folder, exe is in '..\x64\Release\'
 Source: "..\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\x64\Release\config.json"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist
+Source: "..\x64\Release\config.json"; DestDir: "{app}"; Flags: ignoreversion onlyifdoesntexist skipifsourcedoesntexist
 ; Add any other assets here
 ; Source: "..\Config\*"; DestDir: "{app}\Config"; Flags: ignoreversion recursesubdirs createallsubdirs
 

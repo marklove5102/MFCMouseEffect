@@ -77,6 +77,49 @@ static std::string WStringToUtf8(const std::wstring& ws) {
 // EffectConfig Implementation
 // ============================================================================
 
+// Helper to ensure UTF-8 content
+static std::string ReadFileAsUtf8(const std::wstring& path) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file.is_open()) return "";
+
+    std::stringstream ss;
+    ss << file.rdbuf();
+    std::string raw = ss.str();
+    
+    if (raw.empty()) return "";
+
+    // 1. Remove BOM if present
+    if (raw.size() >= 3 && 
+        static_cast<unsigned char>(raw[0]) == 0xEF && 
+        static_cast<unsigned char>(raw[1]) == 0xBB && 
+        static_cast<unsigned char>(raw[2]) == 0xBF) {
+        raw = raw.substr(3);
+    }
+
+    // 2. Try to validate as UTF-8
+    int res = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, raw.c_str(), -1, nullptr, 0);
+    bool isUtf8 = (res > 0);
+
+    if (isUtf8) {
+        return raw;
+    }
+
+    // 3. If failed, assume ACP (ANSI/GBK) and convert
+    int wlen = MultiByteToWideChar(CP_ACP, 0, raw.c_str(), -1, nullptr, 0);
+    if (wlen <= 0) return raw; // Failed completely, fallback
+
+    std::wstring wstr(wlen, 0);
+    MultiByteToWideChar(CP_ACP, 0, raw.c_str(), -1, &wstr[0], wlen);
+
+    int ulen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (ulen <= 0) return raw;
+
+    std::string utf8(ulen - 1, 0); 
+    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &utf8[0], ulen, nullptr, nullptr);
+
+    return utf8;
+}
+
 EffectConfig EffectConfig::GetDefault() {
     return EffectConfig{};
 }
@@ -85,25 +128,31 @@ EffectConfig EffectConfig::Load(const std::wstring& exeDir) {
     EffectConfig cfg = GetDefault();
     
     std::wstring configPath = exeDir + L"\\config.json";
-    
-    std::ifstream file(configPath);
-    if (!file.is_open()) {
-        // No config file, use defaults
 #ifdef _DEBUG
-        OutputDebugStringW(L"MouseFx: config.json not found, using defaults.\n");
+    OutputDebugStringW((L"MouseFx: Loading config from " + configPath + L"\n").c_str());
 #endif
+    
+    std::string jsonContent = ReadFileAsUtf8(configPath);
+    if (jsonContent.empty()) {
+#ifdef _DEBUG
+        OutputDebugStringW(L"MouseFx: config.json not found or empty, creating default.\n");
+#endif
+        Save(exeDir, cfg); // Create new default file
         return cfg;
     }
     
     json root;
     try {
-        file >> root;
+        root = json::parse(jsonContent);
     } catch (const json::exception& e) {
 #ifdef _DEBUG
         std::wstringstream ss;
-        ss << L"MouseFx: JSON parse error: " << e.what() << L"\n";
+        ss << L"MouseFx: JSON parse error: " << e.what() << L". Recreating config.\n";
         OutputDebugStringW(ss.str().c_str());
 #endif
+        // If parse error, maybe file is corrupted. Recreate it?
+        // User asked: "config file really bad -> delete and new"
+        Save(exeDir, cfg);
         return cfg;
     }
     

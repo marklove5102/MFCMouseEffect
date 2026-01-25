@@ -36,6 +36,9 @@ static std::string ExtractJsonValue(const std::string& json, const std::string& 
 	return json.substr(startQuote + 1, endQuote - startQuote - 1);
 }
 
+#include <shlobj.h>
+// #include <filesystem> // Removed to avoid C++17 requirement in Release mode
+
 namespace mousefx {
 
 static const wchar_t* kDispatchClassName = L"MouseFxDispatchWindow";
@@ -47,9 +50,26 @@ AppController::~AppController() {
     Stop();
 }
 
-// Helper: Get exe directory for config loading
-static std::wstring GetExeDirectory() {
+// Helper: Get best directory for config (AppData if possible, else EXE dir)
+static std::wstring GetConfigDirectory() {
     wchar_t path[MAX_PATH] = {};
+    
+    // Try to get %AppData%\MFCMouseEffect
+#ifndef _DEBUG
+    PWSTR appDataPath = nullptr;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &appDataPath))) {
+        std::wstring p = std::wstring(appDataPath) + L"\\MFCMouseEffect";
+        CoTaskMemFree(appDataPath);
+        
+        // Create directory if it doesn't exist (using Win32 API to support older C++ standards)
+        int res = SHCreateDirectoryExW(nullptr, p.c_str(), nullptr);
+        if (res == ERROR_SUCCESS || res == ERROR_ALREADY_EXISTS || res == ERROR_FILE_EXISTS) {
+            return p;
+        }
+    }
+#endif
+
+    // Fallback to EXE directory
     GetModuleFileNameW(nullptr, path, MAX_PATH);
     std::wstring p(path);
     size_t pos = p.find_last_of(L"\\/");
@@ -63,9 +83,9 @@ bool AppController::Start() {
     if (dispatchHwnd_) return true;
     diag_ = {};
 
-    // Load config from EXE directory
-    exeDir_ = GetExeDirectory();
-    config_ = EffectConfig::Load(exeDir_);
+    // Load config from the best available directory (AppData preferred)
+    configDir_ = GetConfigDirectory();
+    config_ = EffectConfig::Load(configDir_);
 
     diag_.stage = StartStage::GdiPlusStartup;
     if (!gdiplus_.Startup()) {
@@ -202,16 +222,16 @@ void AppController::SetTheme(const std::string& theme) {
     SetEffect(EffectCategory::Scroll, config_.active.scroll);
     SetEffect(EffectCategory::Hold, config_.active.hold);
     SetEffect(EffectCategory::Hover, config_.active.hover);
-    if (!exeDir_.empty()) {
-        EffectConfig::Save(exeDir_, config_);
+    if (!configDir_.empty()) {
+        EffectConfig::Save(configDir_, config_);
     }
 }
 
 void AppController::SetUiLanguage(const std::string& lang) {
     if (lang.empty()) return;
     config_.uiLanguage = lang;
-    if (!exeDir_.empty()) {
-        EffectConfig::Save(exeDir_, config_);
+    if (!configDir_.empty()) {
+        EffectConfig::Save(configDir_, config_);
     }
 }
 
@@ -245,8 +265,8 @@ void AppController::HandleCommand(const std::string& jsonCmd) {
             default: break;
             }
         }
-        if (!exeDir_.empty()) {
-            EffectConfig::Save(exeDir_, config_);
+        if (!configDir_.empty()) {
+            EffectConfig::Save(configDir_, config_);
         }
     } else if (cmd == "clear_effect") {
         std::string category = ExtractJsonValue(jsonCmd, "category");
@@ -260,8 +280,8 @@ void AppController::HandleCommand(const std::string& jsonCmd) {
         case EffectCategory::Hold: config_.active.hold = "none"; break;
         default: break;
         }
-        if (!exeDir_.empty()) {
-            EffectConfig::Save(exeDir_, config_);
+        if (!configDir_.empty()) {
+            EffectConfig::Save(configDir_, config_);
         }
     } else if (cmd == "set_theme") {
         std::string theme = ExtractJsonValue(jsonCmd, "theme");
