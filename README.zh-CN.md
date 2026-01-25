@@ -1,87 +1,60 @@
-# MFCMouseEffect / 鼠标点击波纹效果
+# MFCMouseEffect
 
-语言：[English](README.md) | [中文](README.zh-CN.md)
+<p align="center">
+  <img src="./MFCMouseEffect/res/logo_elegant.png" width="128" alt="MFCMouseEffect Logo">
+</p>
 
-Windows 上的全局鼠标点击波纹特效（类似 `keyviz` 鼠标可视化），基于 MFC + Win32 实现。
+<p align="center">
+  [English](./README.md) | [简体中文]
+</p>
 
-## 功能介绍
-- 监听全局鼠标点击（左/右/中键）。
-- 在点击位置绘制短促的波纹动画。
-- 使用可点击穿透的分层窗口，不会拦截用户操作。
+---
 
-## 构建运行
-1. 在 Visual Studio 中打开 `F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect.slnx`（或生成的 `.sln`）。
-2. 编译并运行 `MFCMouseEffect` 项目（推荐 x64）。
-3. 运行后点击任意位置，会看到波纹动画。
+**MFCMouseEffect** 是一款轻量级、高性能的 Windows 桌面增强工具，旨在通过实时视觉反馈（波纹、粒子轨迹、文字特效等）提升您的交互体验。
 
-后台模式：`MFCMouseEffect.exe -mode background` 不显示托盘图标，仅接受 IPC 控制；stdin 关闭时自动退出。
+### 🌟 核心特性
+- **多种点击特效**：支持波纹动画、随机文字飘浮、点击爆破等多种点击反馈。
+- **动态鼠标拖尾**：优雅的粒子流随鼠标移动，支持多种颜色主题（如彩虹、极光等）。
+- **滚动与悬浮反馈**：不仅是点击，滚动滚轮和鼠标悬浮时也提供细腻的视觉指引。
+- **极致性能**：基于 C++/MFC 开发，利用 GDI+ 进行硬件加速绘制，低 CPU 和内存消耗。
+- **进程单例与托盘化**：自动确保单实例运行，支持系统托盘后台运行。
 
-托盘模式：右键托盘图标可快速切换；“设置... (Settings...)”可打开设置窗口集中配置并持久化。
+### 📸 特效展示
 
-## 架构（低耦合）
-所有波纹相关逻辑都封装在 `MFCMouseEffect\MouseFx\`，通过一个控制器对外暴露：
+| | |
+| :---: | :---: |
+| <img src="./docs/images/settings_mockup.png" width="350"><br>**设置界面** | <img src="./docs/images/ripple_concept.png" width="350"><br>**点击波纹** |
+| <img src="./docs/images/trail_concept.png" width="350"><br>**粒子拖尾** | <img src="./docs/images/scroll_concept.png" width="350"><br>**滚动反馈** |
+| <img src="./docs/images/hold_concept.png" width="350"><br>**长按蓄力** | <img src="./docs/images/hover_concept.png" width="350"><br>**悬停发光** |
 
-- `MFCMouseEffect\MouseFx\AppController.*`
-  - 生命周期控制：初始化 GDI+、创建消息窗口、启动/停止全局钩子、维护波纹窗口池。
-- `MFCMouseEffect\MouseFx\GlobalMouseHook.*`
-  - 安装 `WH_MOUSE_LL` 钩子，并把点击事件发送到消息窗口（钩子回调轻量）。
-- `MFCMouseEffect\MouseFx\RippleWindow.*`
-  - 每次点击都会创建一个分层窗口，用 GDI+ 渲染波纹、调用 `UpdateLayeredWindow`。
-  - `WM_NCHITTEST -> HTTRANSPARENT` 让窗口对点击透明。
-- `MFCMouseEffect\MouseFx\RippleWindowPool.*`
-  - 小型窗口池，避免频繁分配。
-- `MFCMouseEffect\MouseFx\RippleStyle.h`
-  - 统一配置时长、尺寸、颜色。
+### 🎨 主题与自定义
+您可以在设置窗口中轻松切换不同的视觉主题（如彩虹、极光、霓虹等）。每种特效都可以独立开启或关闭，并根据您的个人喜好进行配置。
 
-MFC 层只做启动/停止调用：
-- `mouseFx_ = std::make_unique<mousefx::AppController>(); mouseFx_->Start();`
-- `mouseFx_->Stop();`
+---
 
-## 外观自定义
-编辑 `MFCMouseEffect\MouseFx\RippleStyle.h` 和 `MFCMouseEffect\MouseFx\RippleWindow.cpp`：
-- 时间：`RippleStyle::durationMs`
-- 半径：`startRadius`、`endRadius`
-- 窗口大小：`windowSize`
-- 颜色：
-  - 左键：蓝色
-  - 右键：橙色
-  - 中键：绿色
+## 🛠 安装与使用
 
-## IPC 命令
+### 编译构建
+1. 使用 Visual Studio 2022 打开 `MFCMouseEffect.sln`。
+2. 选择 `Release | x64` 配置。
+3. 执行 `生成 -> 重新生成解决方案`。
+4. 运行 `x64/Release/MFCMouseEffect.exe`。
 
-```json
-{"cmd": "set_effect", "category": "click", "type": "ripple"}
-{"cmd": "set_effect", "category": "trail", "type": "line"}
-{"cmd": "clear_effect", "category": "trail"}
-{"cmd": "set_theme", "theme": "neon"}   // neon | scifi | minimal | game
-{"cmd": "set_ui_language", "lang": "zh-CN"}  // zh-CN | en-US
-{"cmd": "exit"}
-```
+### 安装包
+使用配套的 [Inno Setup 脚本](./Install/MFCMouseEffect.iss) 创建安装包。
 
-## 配置文件
+---
 
-`config.json` 放在 exe 同目录，支持持久化主题与分类特效：
+## 📂 项目结构
+- **MFCMouseEffect/**: MFC 核心界面与应用逻辑。
+- **MouseFx/**: 特效引擎底层核心。
+- **docs/**: 技术文档 ([UI 优化记录](./docs/ui_refinement.md), [单例实现记录](./docs/singleton_implementation.md))。
+- **Install/**: Inno Setup 安装脚本。
 
-```json
-{
-  "default_effect": "ripple",
-  "theme": "neon",
-  "ui_language": "zh-CN",
-  "active_effects": {
-    "click": "ripple",
-    "trail": "particle",
-    "scroll": "arrow",
-    "hover": "glow",
-    "hold": "charge"
-  }
-}
-```
+---
 
-## 说明与限制
-- 仅在 Windows 上有效（依赖 Win32 钩子 + 分层窗口）。
-- 如果目标窗口是管理员/高权限，建议本程序也用相同权限运行，避免钩子失效。
+## ⚖️ 开源协议
+[MIT License](./LICENSE)
 
-## 文档
-详细构建、运行、定制与排查说明：
-- English：`docs/README.md`
-- 中文：`docs/README.zh-CN.md`
+---
+*Powered by Antigravity - 为交互赋予灵魂。*
