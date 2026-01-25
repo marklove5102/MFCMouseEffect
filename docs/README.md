@@ -2,6 +2,9 @@
 
 Language: [English](README.md) | [中文](README.zh-CN.md)
 
+## Doc Index
+- Marketing: `docs/marketing/readme_language_switch.md` (README language toggle rendering)
+
 ## What It Is
 - Global mouse click visualization for Windows: low-level hook (`WH_MOUSE_LL`) + GDI+ layered ripple windows.
 - Click-through: does not block the underlying app.
