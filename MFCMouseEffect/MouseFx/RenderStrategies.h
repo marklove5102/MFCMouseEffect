@@ -127,9 +127,34 @@ public:
              g.FillPath(&pgb, &path);
         }
 
-        // Draw Core
-        Gdiplus::SolidBrush coreBrush(Gdiplus::Color(ClampByte((int)(coreColor.GetA() * coreAlpha)), coreColor.GetR(), coreColor.GetG(), coreColor.GetB()));
-        g.FillEllipse(&coreBrush, cx - coreRadius, cy - coreRadius, coreRadius * 2.0f, coreRadius * 2.0f);
+        // Draw Core (Optimized: Energy Orb instead of solid blob)
+        {
+             Gdiplus::GraphicsPath path;
+             // Slightly larger than before to account for soft edges
+             float drawRadius = coreRadius * 1.5f; 
+             path.AddEllipse(cx - drawRadius, cy - drawRadius, drawRadius * 2.0f, drawRadius * 2.0f);
+             
+             Gdiplus::PathGradientBrush pgb(&path);
+             
+             // Center: Very bright (almost white), high alpha
+             // Blend coreColor with White for the center hot spot
+             BYTE r = (BYTE)std::min(255, (int)coreColor.GetR() + 100);
+             BYTE gVal = (BYTE)std::min(255, (int)coreColor.GetG() + 100);
+             BYTE bVal = (BYTE)std::min(255, (int)coreColor.GetB() + 100);
+             
+             pgb.SetCenterColor(Gdiplus::Color(ClampByte((int)(coreAlpha * 255)), r, gVal, bVal));
+             
+             // Edge: Theme color but transparent
+             Gdiplus::Color surround[1] = { Gdiplus::Color(0, coreColor.GetR(), coreColor.GetG(), coreColor.GetB()) };
+             int count = 1;
+             pgb.SetSurroundColors(surround, &count);
+             pgb.SetCenterPoint(Gdiplus::PointF(cx, cy));
+             
+             // Focus scale to make the hot spot smaller
+             pgb.SetFocusScales(0.4f, 0.4f); 
+             
+             g.FillPath(&pgb, &path);
+        }
         
         // Draw Particles / Lightning streaks
         srand((unsigned int)elapsedMs); // Deterministic-ish for frame but we want jitter
