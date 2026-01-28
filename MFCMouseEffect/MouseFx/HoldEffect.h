@@ -25,6 +25,10 @@ public:
     void OnHoldStart(const POINT& pt, int button) override;
     void OnHoldUpdate(const POINT& pt, DWORD durationMs) override;
     void OnHoldEnd() override;
+    
+    void OnCommand(const std::string& cmd, const std::string& args) override {
+        pool_.BroadcastCommand(cmd, args);
+    }
 
 private:
     RippleWindowPool pool_{};

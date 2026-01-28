@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "HoldEffect.h"
 #include "ThemeStyle.h"
+#include "RenderStrategies.h"
 
 namespace mousefx {
 
@@ -31,15 +32,16 @@ void HoldEffect::OnHoldStart(const POINT& pt, int button) {
     ev.pt = pt;
     ev.button = MouseButton::Left;
 
-    RippleWindow::RenderParams params;
+    RenderParams params;
     params.loop = false;
     params.intensity = 1.0f;
 
-    auto drawMode = RippleWindow::DrawMode::ChargeRing;
-    if (mode_ == Mode::Lightning) drawMode = RippleWindow::DrawMode::LightningSingularity;
-    else if (mode_ == Mode::Hex)  drawMode = RippleWindow::DrawMode::HexForceField;
+    std::unique_ptr<IRippleRenderer> renderer;
+    if (mode_ == Mode::Lightning) renderer = std::make_unique<LightningRenderer>();
+    else if (mode_ == Mode::Hex) renderer = std::make_unique<HexRenderer>();
+    else renderer = std::make_unique<ChargeRenderer>();
 
-    currentRipple_ = pool_.ShowContinuous(ev, style_, drawMode, params);
+    currentRipple_ = pool_.ShowContinuous(ev, style_, std::move(renderer), params);
 }
 
 void HoldEffect::OnHoldUpdate(const POINT& pt, DWORD durationMs) {

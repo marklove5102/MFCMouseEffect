@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "RippleWindow.h"
+#include "IRippleRenderer.h"
 
 namespace mousefx {
 
@@ -18,12 +19,13 @@ public:
     bool Initialize(size_t count);
     void Shutdown();
 
-    void ShowRipple(const ClickEvent& ev);
-    void ShowRipple(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params);
-    // Returns active window handle for tracking (to stop it later)
+    void ShowRipple(const ClickEvent& ev); // Convenience for standard ripple
+    void ShowRipple(const ClickEvent& ev, const RippleStyle& style, std::unique_ptr<IRippleRenderer> renderer, const RenderParams& params);
+    
     RippleWindow* ShowContinuous(const ClickEvent& ev);
-    RippleWindow* ShowContinuous(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params);
-    void SetDrawMode(RippleWindow::DrawMode mode);
+    RippleWindow* ShowContinuous(const ClickEvent& ev, const RippleStyle& style, std::unique_ptr<IRippleRenderer> renderer, const RenderParams& params);
+    
+    void BroadcastCommand(const std::string& cmd, const std::string& args);
 
 private:
     std::vector<std::unique_ptr<RippleWindow>> windows_;

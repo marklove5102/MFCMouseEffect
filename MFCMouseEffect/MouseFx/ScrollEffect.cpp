@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include "StandardRenderers.h"
 
 namespace mousefx {
 
@@ -33,7 +34,7 @@ void ScrollEffect::OnScroll(const ScrollEvent& event) {
     ev.pt = event.pt;
     ev.button = MouseButton::Left;
 
-    RippleWindow::RenderParams params;
+    RenderParams params;
     const float base = (event.delta >= 0) ? -3.1415926f / 2.0f : 3.1415926f / 2.0f;
     if (event.horizontal) {
         params.directionRad = (event.delta >= 0) ? 0.0f : 3.1415926f;
@@ -44,7 +45,9 @@ void ScrollEffect::OnScroll(const ScrollEvent& event) {
     params.intensity = Clamp01(0.6f + strength * 0.6f);
     params.loop = false;
 
-    pool_.ShowRipple(ev, style_, RippleWindow::DrawMode::ScrollChevron, params);
+    auto renderer = std::make_unique<ChevronRenderer>();
+    renderer->SetParams(params);
+    pool_.ShowRipple(ev, style_, std::move(renderer), params);
 }
 
 } // namespace mousefx

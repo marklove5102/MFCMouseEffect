@@ -1,9 +1,7 @@
 // RippleWindowPool.cpp
 
 #include "pch.h"
-
 #include "RippleWindowPool.h"
-
 #include <algorithm>
 
 namespace mousefx {
@@ -27,108 +25,48 @@ void RippleWindowPool::Shutdown() {
 }
 
 void RippleWindowPool::ShowRipple(const ClickEvent& ev) {
-    if (windows_.empty()) {
-        // Lazy init (works even if caller forgot).
-        if (!Initialize(8)) return;
-    }
-
-    // Prefer an inactive window; otherwise recycle the oldest one.
-    RippleWindow* best = nullptr;
-    uint64_t bestTick = UINT64_MAX;
-
     for (auto& w : windows_) {
         if (!w->IsActive()) {
-            best = w.get();
-            break;
+            w->StartAt(ev, nullptr);
+            return;
         }
-        if (w->StartTick() < bestTick) {
-            bestTick = w->StartTick();
-            best = w.get();
-        }
-    }
-
-    if (best) {
-        best->StartAt(ev);
     }
 }
 
-void RippleWindowPool::ShowRipple(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params) {
-    if (windows_.empty()) {
-        if (!Initialize(8)) return;
-    }
-
-    RippleWindow* best = nullptr;
-    uint64_t bestTick = UINT64_MAX;
-
+void RippleWindowPool::ShowRipple(const ClickEvent& ev, const RippleStyle& style, std::unique_ptr<IRippleRenderer> renderer, const RenderParams& params) {
     for (auto& w : windows_) {
         if (!w->IsActive()) {
-            best = w.get();
-            break;
+            w->StartAt(ev, style, std::move(renderer), params);
+            return;
         }
-        if (w->StartTick() < bestTick) {
-            bestTick = w->StartTick();
-            best = w.get();
-        }
-    }
-
-    if (best) {
-        best->StartAt(ev, style, mode, params);
     }
 }
 
 RippleWindow* RippleWindowPool::ShowContinuous(const ClickEvent& ev) {
-    if (windows_.empty()) {
-        if (!Initialize(8)) return nullptr;
-    }
-
-    RippleWindow* best = nullptr;
-    uint64_t bestTick = UINT64_MAX;
-
     for (auto& w : windows_) {
         if (!w->IsActive()) {
-            best = w.get();
-            break;
-        }
-        if (w->StartTick() < bestTick) {
-            bestTick = w->StartTick();
-            best = w.get();
+            w->StartContinuous(ev, nullptr);
+            return w.get();
         }
     }
-
-    if (best) {
-        best->StartContinuous(ev);
-    }
-    return best;
+    return nullptr;
 }
 
-RippleWindow* RippleWindowPool::ShowContinuous(const ClickEvent& ev, const RippleStyle& style, RippleWindow::DrawMode mode, const RippleWindow::RenderParams& params) {
-    if (windows_.empty()) {
-        if (!Initialize(8)) return nullptr;
-    }
-
-    RippleWindow* best = nullptr;
-    uint64_t bestTick = UINT64_MAX;
-
+RippleWindow* RippleWindowPool::ShowContinuous(const ClickEvent& ev, const RippleStyle& style, std::unique_ptr<IRippleRenderer> renderer, const RenderParams& params) {
     for (auto& w : windows_) {
         if (!w->IsActive()) {
-            best = w.get();
-            break;
-        }
-        if (w->StartTick() < bestTick) {
-            bestTick = w->StartTick();
-            best = w.get();
+            w->StartContinuous(ev, style, std::move(renderer), params);
+            return w.get();
         }
     }
-
-    if (best) {
-        best->StartContinuous(ev, style, mode, params);
-    }
-    return best;
+    return nullptr;
 }
 
-void RippleWindowPool::SetDrawMode(RippleWindow::DrawMode mode) {
+void RippleWindowPool::BroadcastCommand(const std::string& cmd, const std::string& args) {
     for (auto& w : windows_) {
-        w->SetDrawMode(mode);
+        if (w->IsActive()) {
+            w->SendCommand(cmd, args);
+        }
     }
 }
 

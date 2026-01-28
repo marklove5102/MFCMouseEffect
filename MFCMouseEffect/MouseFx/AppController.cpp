@@ -283,6 +283,15 @@ IMouseEffect* AppController::GetEffect(EffectCategory category) const {
 }
 
 void AppController::HandleCommand(const std::string& jsonCmd) {
+    if (!dispatchHwnd_) return;
+
+    // Thread Safety: Marshal to UI thread if we are on a background thread.
+    // SendMessage is synchronous, so the string on the caller's stack is safe to pass by pointer.
+    if (GetWindowThreadProcessId(dispatchHwnd_, nullptr) != GetCurrentThreadId()) {
+        SendMessageW(dispatchHwnd_, WM_MFX_EXEC_CMD, 0, reinterpret_cast<LPARAM>(&jsonCmd));
+        return;
+    }
+
     std::string cmd = ExtractJsonValue(jsonCmd, "cmd");
     
     if (cmd == "set_effect") {
@@ -330,6 +339,18 @@ void AppController::HandleCommand(const std::string& jsonCmd) {
     } else if (cmd == "set_ui_language") {
         std::string lang = ExtractJsonValue(jsonCmd, "lang");
         SetUiLanguage(lang);
+    } else if (cmd == "effect_cmd") {
+        // Generic command pass-through: { "cmd": "effect_cmd", "category": "hold", "command": "speed", "args": "2.0" }
+        std::string category = ExtractJsonValue(jsonCmd, "category");
+        std::string command = ExtractJsonValue(jsonCmd, "command");
+        std::string args = ExtractJsonValue(jsonCmd, "args");
+        
+        if (!category.empty()) {
+            const auto cat = CategoryFromString(category);
+            if (auto* effect = GetEffect(cat)) {
+                effect->OnCommand(command, args);
+            }
+        }
     }
 }
 
@@ -531,6 +552,14 @@ LRESULT AppController::OnDispatchMessage(HWND hwnd, UINT msg, WPARAM wParam, LPA
             return 0;
         }
 #endif
+    }
+
+    if (msg == WM_MFX_EXEC_CMD) {
+        auto* cmdStr = reinterpret_cast<const std::string*>(lParam);
+        if (cmdStr) {
+            HandleCommand(*cmdStr);
+        }
+        return 0;
     }
 
     return DefWindowProcW(hwnd, msg, wParam, lParam);

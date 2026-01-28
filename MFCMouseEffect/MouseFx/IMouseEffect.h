@@ -62,6 +62,9 @@ public:
     virtual void OnHoldUpdate(const POINT& pt, DWORD durationMs) { (void)pt; (void)durationMs; }
     virtual void OnHoldEnd() {}
     virtual void OnEdgeHit(const EdgeEvent& event) { (void)event; }
+    
+    // Interaction interface
+    virtual void OnCommand(const std::string& cmd, const std::string& args) {}
 };
 
 // Helper to get category name string

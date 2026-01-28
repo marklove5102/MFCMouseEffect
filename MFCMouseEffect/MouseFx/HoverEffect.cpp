@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "HoverEffect.h"
 #include "ThemeStyle.h"
+#include "StandardRenderers.h"
 
 namespace mousefx {
 
@@ -28,11 +29,11 @@ void HoverEffect::OnHoverStart(const POINT& pt) {
     ev.pt = pt;
     ev.button = MouseButton::Left;
 
-    RippleWindow::RenderParams params;
+    RenderParams params;
     params.loop = true;
     params.intensity = 1.0f;
 
-    currentGlow_ = pool_.ShowContinuous(ev, style_, RippleWindow::DrawMode::HoverCrosshair, params);
+    currentGlow_ = pool_.ShowContinuous(ev, style_, std::make_unique<CrosshairRenderer>(), params);
 }
 
 void HoverEffect::OnHoverEnd() {

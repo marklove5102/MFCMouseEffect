@@ -24,4 +24,7 @@ constexpr unsigned int WM_MFX_BUTTON_DOWN = WM_APP + 0x213;
 // Button up (for Hold end): wParam = button
 constexpr unsigned int WM_MFX_BUTTON_UP = WM_APP + 0x214;
 
+// Execute command from IPC: lParam = std::string* (pointer to stack string from sender thread)
+constexpr unsigned int WM_MFX_EXEC_CMD = WM_APP + 0x215;
+
 } // namespace mousefx

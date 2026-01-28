@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RippleEffect.h"
 #include "ThemeStyle.h"
+#include "StandardRenderers.h"
 
 namespace mousefx {
 
@@ -22,10 +23,10 @@ void RippleEffect::Shutdown() {
 }
 
 void RippleEffect::OnClick(const ClickEvent& event) {
-    RippleWindow::RenderParams params;
+    RenderParams params;
     params.loop = false;
     params.intensity = 1.0f;
-    pool_.ShowRipple(event, style_, RippleWindow::DrawMode::Ripple, params);
+    pool_.ShowRipple(event, style_, std::make_unique<RippleRenderer>(), params);
 }
 
 } // namespace mousefx
