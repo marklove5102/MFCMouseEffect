@@ -22,6 +22,7 @@ public:
 private:
     RippleWindowPool pool_{};
     RippleStyle style_{};
+    bool isChromatic_ = false;
 };
 
 } // namespace mousefx

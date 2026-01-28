@@ -15,4 +15,13 @@ struct ThemePalette {
 
 ThemePalette GetThemePalette(const std::string& themeName);
 
+// Generates a random style based on the input template but with a random vibrant color.
+RippleStyle MakeRandomStyle(const RippleStyle& base);
+
+// Generates a random vibrant color (alpha is preserved from input arg if needed, else full).
+Argb MakeRandomColor(uint8_t alpha = 255);
+
+// Helper to convert string to lower case ascii
+std::string ToLowerAscii(const std::string& s);
+
 } // namespace mousefx

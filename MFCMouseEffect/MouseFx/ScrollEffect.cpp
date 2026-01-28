@@ -14,6 +14,7 @@ static float Clamp01(float v) {
 
 ScrollEffect::ScrollEffect(const std::string& themeName) {
     style_ = GetThemePalette(themeName).scroll;
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
 
 ScrollEffect::~ScrollEffect() {
@@ -47,7 +48,13 @@ void ScrollEffect::OnScroll(const ScrollEvent& event) {
 
     auto renderer = std::make_unique<ChevronRenderer>();
     renderer->SetParams(params);
-    pool_.ShowRipple(ev, style_, std::move(renderer), params);
+
+    RippleStyle finalStyle = style_;
+    if (isChromatic_) {
+        finalStyle = MakeRandomStyle(style_);
+    }
+
+    pool_.ShowRipple(ev, finalStyle, std::move(renderer), params);
 }
 
 } // namespace mousefx

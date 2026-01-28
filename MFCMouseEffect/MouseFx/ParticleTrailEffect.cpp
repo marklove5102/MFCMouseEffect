@@ -1,15 +1,21 @@
 #include "pch.h"
 #include "ParticleTrailEffect.h"
+#include "ThemeStyle.h"
 
 namespace mousefx {
+
+ParticleTrailEffect::ParticleTrailEffect(const std::string& themeName) : window_(std::make_unique<ParticleTrailWindow>()) {
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
+}
 
 ParticleTrailEffect::~ParticleTrailEffect() {
     Shutdown();
 }
 
 bool ParticleTrailEffect::Initialize() {
-    window_ = std::make_unique<ParticleTrailWindow>();
-    return window_->Create();
+    if (!window_->Create()) return false;
+    window_->SetChromatic(isChromatic_);
+    return true;
 }
 
 void ParticleTrailEffect::Shutdown() {

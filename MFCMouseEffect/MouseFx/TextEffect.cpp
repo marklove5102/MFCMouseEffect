@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "TextEffect.h"
+#include "ThemeStyle.h"
 #include <random>
 
 namespace mousefx {
@@ -11,7 +12,9 @@ static int RandomRange(int min, int max) {
     return dis(gen);
 }
 
-TextEffect::TextEffect(const TextConfig& config) : config_(config) {}
+TextEffect::TextEffect(const TextConfig& config, const std::string& themeName) : config_(config) {
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
+}
 
 TextEffect::~TextEffect() {
     Shutdown();
@@ -32,7 +35,10 @@ void TextEffect::OnClick(const ClickEvent& event) {
     const std::wstring& text = config_.texts[RandomRange(0, (int)config_.texts.size() - 1)];
     
     Argb color = { 0xFFFF69B4 }; // Default
-    if (!config_.colors.empty()) {
+    if (isChromatic_) {
+        // Random vibrant color
+        color = MakeRandomColor();
+    } else if (!config_.colors.empty()) {
         color = config_.colors[RandomRange(0, (int)config_.colors.size() - 1)];
     }
 

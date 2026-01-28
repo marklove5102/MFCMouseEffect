@@ -116,7 +116,13 @@ void ParticleTrailWindow::Emit(const POINT& pt, int count) {
         p.vy = std::sin(angle) * speed;
         
         p.life = 1.0f;
-        p.hue = globalHue + (rand() % 40 - 20); // Variety
+        if (isChromatic_) {
+             // Fully random for Chromatic
+             p.hue = (float)(rand() % 360);
+        } else {
+             // Sequential cycling for standard (Rainbow Trace)
+             p.hue = globalHue + (rand() % 40 - 20); // Variety
+        }
         p.size = (float)(rand() % 40) / 10.0f + 2.0f;
         
         particles_.push_back(p);

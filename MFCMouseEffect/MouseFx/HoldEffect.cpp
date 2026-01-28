@@ -7,6 +7,7 @@ namespace mousefx {
 
 HoldEffect::HoldEffect(const std::string& themeName, Mode mode) : mode_(mode) {
     style_ = GetThemePalette(themeName).hold;
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
 
 HoldEffect::~HoldEffect() {
@@ -41,7 +42,14 @@ void HoldEffect::OnHoldStart(const POINT& pt, int button) {
     else if (mode_ == Mode::Hex) renderer = std::make_unique<HexRenderer>();
     else renderer = std::make_unique<ChargeRenderer>();
 
-    currentRipple_ = pool_.ShowContinuous(ev, style_, std::move(renderer), params);
+    RippleStyle finalStyle = style_;
+    if (isChromatic_) {
+        // For Hold effect, maybe we want it to change color over time?
+        // But for v1, just random start color is enough.
+        finalStyle = MakeRandomStyle(style_);
+    }
+
+    currentRipple_ = pool_.ShowContinuous(ev, finalStyle, std::move(renderer), params);
 }
 
 void HoldEffect::OnHoldUpdate(const POINT& pt, DWORD durationMs) {

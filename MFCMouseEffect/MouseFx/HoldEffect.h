@@ -39,6 +39,7 @@ private:
     RippleWindow* currentRipple_ = nullptr;
     RippleStyle style_{};
     Mode mode_ = Mode::Charge;
+    bool isChromatic_ = false;
 };
 
 } // namespace mousefx

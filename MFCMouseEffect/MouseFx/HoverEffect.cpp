@@ -7,6 +7,7 @@ namespace mousefx {
 
 HoverEffect::HoverEffect(const std::string& themeName) {
     style_ = GetThemePalette(themeName).hover;
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
 
 HoverEffect::~HoverEffect() {
@@ -33,7 +34,14 @@ void HoverEffect::OnHoverStart(const POINT& pt) {
     params.loop = true;
     params.intensity = 1.0f;
 
-    currentGlow_ = pool_.ShowContinuous(ev, style_, std::make_unique<CrosshairRenderer>(), params);
+    params.intensity = 1.0f;
+
+    RippleStyle finalStyle = style_;
+    if (isChromatic_) {
+        finalStyle = MakeRandomStyle(style_);
+    }
+
+    currentGlow_ = pool_.ShowContinuous(ev, finalStyle, std::make_unique<CrosshairRenderer>(), params);
 }
 
 void HoverEffect::OnHoverEnd() {

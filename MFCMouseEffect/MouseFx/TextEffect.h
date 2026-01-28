@@ -8,7 +8,7 @@ namespace mousefx {
 
 class TextEffect final : public IMouseEffect {
 public:
-    TextEffect(const TextConfig& config);
+    TextEffect(const TextConfig& config, const std::string& themeName);
     ~TextEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Click; }
@@ -22,6 +22,7 @@ public:
 private:
     TextConfig config_;
     TextWindowPool pool_{};
+    bool isChromatic_ = false;
 };
 
 } // namespace mousefx

@@ -17,9 +17,11 @@ public:
     
     void Emit(const POINT& pt, int count = 5);
     void Clear();
+    void SetChromatic(bool b) { isChromatic_ = b; }
 
 private:
     static constexpr UINT_PTR kTimerId = 3;
+    bool isChromatic_ = false;
     static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     LRESULT OnMessage(UINT msg, WPARAM wParam, LPARAM lParam);

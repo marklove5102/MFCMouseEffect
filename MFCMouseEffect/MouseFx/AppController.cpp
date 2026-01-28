@@ -157,11 +157,11 @@ std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory categor
         case EffectCategory::Click:
             if (type == "ripple") return std::make_unique<RippleEffect>(config_.theme);
             if (type == "star")   return std::make_unique<IconEffect>(config_.theme);
-            if (type == "text")   return std::make_unique<TextEffect>(config_.textClick);
+            if (type == "text")   return std::make_unique<TextEffect>(config_.textClick, config_.theme);
             break;
         case EffectCategory::Trail:
-            if (type == "line")     return std::make_unique<TrailEffect>();
-            if (type == "particle") return std::make_unique<ParticleTrailEffect>();
+            if (type == "line")     return std::make_unique<TrailEffect>(config_.theme);
+            if (type == "particle") return std::make_unique<ParticleTrailEffect>(config_.theme);
             break;
         case EffectCategory::Scroll:
             if (type == "arrow")  return std::make_unique<ScrollEffect>(config_.theme);

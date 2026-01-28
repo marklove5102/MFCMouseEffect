@@ -20,9 +20,11 @@ public:
     
     // Clear trail immediately.
     void Clear();
+    void SetChromatic(bool b) { isChromatic_ = b; }
 
 private:
     static constexpr UINT_PTR kTimerId = 2;
+    bool isChromatic_ = false;
     static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     LRESULT OnMessage(UINT msg, WPARAM wParam, LPARAM lParam);

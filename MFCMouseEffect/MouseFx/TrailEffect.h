@@ -8,7 +8,7 @@ namespace mousefx {
 
 class TrailEffect final : public IMouseEffect {
 public:
-    TrailEffect();
+    explicit TrailEffect(const std::string& themeName);
     ~TrailEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Trail; }
@@ -20,6 +20,7 @@ public:
 
 private:
     std::unique_ptr<TrailWindow> window_;
+    bool isChromatic_ = false;
 };
 
 } // namespace mousefx

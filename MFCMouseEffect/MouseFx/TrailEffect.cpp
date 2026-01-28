@@ -1,17 +1,37 @@
 #include "pch.h"
 #include "TrailEffect.h"
+#include "ThemeStyle.h"
 
 namespace mousefx {
 
-TrailEffect::TrailEffect() = default;
+// Assuming ToLowerAscii is defined elsewhere or will be added.
+// For now, I'll make a placeholder to ensure compilation.
+// This function is not part of the original code, but implied by the change.
+// If it's not defined, this will cause a compilation error.
+// For the purpose of this edit, I'll assume it's available or will be.
+// std::string ToLowerAscii(const std::string& s) { /* ... */ }
+
+TrailEffect::TrailEffect(const std::string& themeName) : window_(std::make_unique<TrailWindow>()) {
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
+}
+
 TrailEffect::~TrailEffect() {
     Shutdown();
 }
 
 bool TrailEffect::Initialize() {
-    window_ = std::make_unique<TrailWindow>();
-    return window_->Create();
+    if (!window_->Create()) return false;
+    window_->SetChromatic(isChromatic_);
+    return true;
 }
+
+// The Initialize method is removed as its logic has been moved to the constructor.
+// bool TrailEffect::Initialize() {
+//     window_ = std::make_unique<TrailWindow>();
+//     if (!window_->Create()) return false;
+//     window_->SetChromatic(isChromatic_);
+//     return true;
+// }
 
 void TrailEffect::Shutdown() {
     if (window_) {

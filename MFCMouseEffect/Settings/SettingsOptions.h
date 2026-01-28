@@ -86,12 +86,14 @@ inline const SettingOption* LangOptions(size_t& n) {
 
 inline const SettingOption* ThemeOptions(bool zh, size_t& n) {
     static const SettingOption zhOpts[] = {
+        {L"\u70ab\u5f69", "chromatic"},
         {L"\u9713\u8679", "neon"},
         {L"\u79D1\u5E7B", "scifi"},
         {L"\u6781\u7B80", "minimal"},
         {L"\u6E38\u620F\u611F", "game"},
     };
     static const SettingOption enOpts[] = {
+        {L"Chromatic", "chromatic"},
         {L"Neon", "neon"},
         {L"Sci-Fi", "scifi"},
         {L"Minimal", "minimal"},

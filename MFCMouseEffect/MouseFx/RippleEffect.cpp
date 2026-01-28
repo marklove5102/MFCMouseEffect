@@ -7,6 +7,7 @@ namespace mousefx {
 
 RippleEffect::RippleEffect(const std::string& themeName) {
     style_ = GetThemePalette(themeName).click;
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
 
 RippleEffect::~RippleEffect() {
@@ -26,7 +27,13 @@ void RippleEffect::OnClick(const ClickEvent& event) {
     RenderParams params;
     params.loop = false;
     params.intensity = 1.0f;
-    pool_.ShowRipple(event, style_, std::make_unique<RippleRenderer>(), params);
+    
+    RippleStyle finalStyle = style_;
+    if (isChromatic_) {
+        finalStyle = MakeRandomStyle(style_);
+    }
+    
+    pool_.ShowRipple(event, finalStyle, std::make_unique<RippleRenderer>(), params);
 }
 
 } // namespace mousefx

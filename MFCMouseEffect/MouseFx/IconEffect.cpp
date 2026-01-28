@@ -7,6 +7,7 @@ namespace mousefx {
 
 IconEffect::IconEffect(const std::string& themeName) {
     style_ = GetThemePalette(themeName).icon;
+    isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
 
 IconEffect::~IconEffect() {
@@ -28,7 +29,12 @@ void IconEffect::OnClick(const ClickEvent& event) {
     RenderParams params;
     params.loop = false;
     params.intensity = 1.0f;
-    pool_.ShowRipple(event, style_, std::make_unique<StarRenderer>(), params);
+
+    RippleStyle finalStyle = style_;
+    if (isChromatic_) {
+        finalStyle = MakeRandomStyle(style_);
+    }
+    pool_.ShowRipple(event, finalStyle, std::make_unique<StarRenderer>(), params);
 }
 
 } // namespace mousefx

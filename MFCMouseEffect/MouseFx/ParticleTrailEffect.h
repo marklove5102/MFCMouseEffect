@@ -8,7 +8,7 @@ namespace mousefx {
 
 class ParticleTrailEffect final : public IMouseEffect {
 public:
-    ParticleTrailEffect() = default;
+    explicit ParticleTrailEffect(const std::string& themeName);
     ~ParticleTrailEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Trail; }
@@ -21,6 +21,7 @@ public:
 
 private:
     std::unique_ptr<ParticleTrailWindow> window_;
+    bool isChromatic_ = false;
 };
 
 } // namespace mousefx

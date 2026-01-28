@@ -25,6 +25,7 @@ private:
     RippleWindowPool pool_{};
     RippleWindow* currentGlow_ = nullptr;
     RippleStyle style_{};
+    bool isChromatic_ = false;
 };
 
 } // namespace mousefx
