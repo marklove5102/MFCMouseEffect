@@ -2,10 +2,11 @@
 #include "HoverEffect.h"
 #include "ThemeStyle.h"
 #include "Renderers/Hover/CrosshairRenderer.h"
+#include "Renderers/Hover/TubesHoverRenderer.h"
 
 namespace mousefx {
 
-HoverEffect::HoverEffect(const std::string& themeName) {
+HoverEffect::HoverEffect(const std::string& themeName, const std::string& type) : type_(type) {
     style_ = GetThemePalette(themeName).hover;
     isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
@@ -41,7 +42,15 @@ void HoverEffect::OnHoverStart(const POINT& pt) {
         finalStyle = MakeRandomStyle(style_);
     }
 
-    currentGlow_ = pool_.ShowContinuous(ev, finalStyle, std::make_unique<CrosshairRenderer>(), params);
+    std::unique_ptr<IRippleRenderer> renderer;
+    if (type_ == "tubes" || type_ == "suspension") {
+        renderer = std::make_unique<TubesHoverRenderer>(isChromatic_);
+    } else {
+        // Default "glow"
+        renderer = std::make_unique<CrosshairRenderer>();
+    }
+
+    currentGlow_ = pool_.ShowContinuous(ev, finalStyle, std::move(renderer), params);
 }
 
 void HoverEffect::OnHoverEnd() {

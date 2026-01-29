@@ -17,7 +17,10 @@
 #include "Renderers/Click/RippleRenderer.h"
 #include "Renderers/Click/StarRenderer.h"
 #include "Renderers/Scroll/ChevronRenderer.h"
+#include "Renderers/Click/StarRenderer.h"
+#include "Renderers/Scroll/ChevronRenderer.h"
 #include "Renderers/Hover/CrosshairRenderer.h"
+#include "Renderers/Hover/TubesHoverRenderer.h"
 
 #include <new>
 #include <windowsx.h>  // For GET_X_LPARAM, GET_Y_LPARAM
@@ -185,7 +188,9 @@ std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory categor
             return std::make_unique<HoldEffect>(config_.theme, type);
             break;
         case EffectCategory::Hover:
-            if (type == "glow")   return std::make_unique<HoverEffect>(config_.theme);
+
+            // Pass type directly
+            return std::make_unique<HoverEffect>(config_.theme, type);
             break;
         case EffectCategory::Edge:
             // TODO: implement these categories

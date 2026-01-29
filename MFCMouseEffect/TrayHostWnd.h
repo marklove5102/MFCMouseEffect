@@ -43,6 +43,7 @@ private:
 		kCmdTrailNone = 3003,
 		// Hover category
 		kCmdHoverGlow = 4001,
+        kCmdHoverTubes = 4003,
 		kCmdHoverNone = 4002,
 		// Scroll category
 		kCmdScrollArrow = 5001,
@@ -58,6 +59,7 @@ private:
 		kCmdHoldSciFi3D = 7005, // Alias for backward compat
 		kCmdHoldTechRing = 7006,
 		// Theme
+        kCmdThemeChromatic = 8000,
 		kCmdThemeSciFi = 8001,
 		kCmdThemeNeon = 8002,
 		kCmdThemeMinimal = 8003,

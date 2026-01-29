@@ -169,12 +169,15 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 	CMenu hoverMenu;
 	hoverMenu.CreatePopupMenu();
 	hoverMenu.AppendMenu(MF_STRING, kCmdHoverGlow, _T("呼吸灯 (Glow)"));
+    hoverMenu.AppendMenu(MF_STRING, kCmdHoverTubes, _T("机械悬浮 (Suspension)"));
 	hoverMenu.AppendMenu(MF_STRING, kCmdHoverNone, _T("无 (None)"));
 	
 	if (mouseFx) {
 		auto* hoverEffect = mouseFx->GetEffect(mousefx::EffectCategory::Hover);
 		if (hoverEffect) {
-			hoverMenu.CheckMenuItem(kCmdHoverGlow, MF_CHECKED);
+            std::string type = hoverEffect->TypeName();
+			if (type == "glow") hoverMenu.CheckMenuItem(kCmdHoverGlow, MF_CHECKED);
+            else if (type == "tubes" || type == "suspension") hoverMenu.CheckMenuItem(kCmdHoverTubes, MF_CHECKED);
 		} else {
 			hoverMenu.CheckMenuItem(kCmdHoverNone, MF_CHECKED);
 		}
@@ -184,6 +187,7 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 	// === Theme Submenu ===
 	CMenu themeMenu;
 	themeMenu.CreatePopupMenu();
+    themeMenu.AppendMenu(MF_STRING, kCmdThemeChromatic, _T("炫彩 (Chromatic)"));
 	themeMenu.AppendMenu(MF_STRING, kCmdThemeSciFi, _T("科幻 (Sci-Fi)"));
 	themeMenu.AppendMenu(MF_STRING, kCmdThemeNeon, _T("霓虹 (Neon)"));
 	themeMenu.AppendMenu(MF_STRING, kCmdThemeMinimal, _T("极简 (Minimal)"));
@@ -195,6 +199,7 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 			if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
 		}
 		if (theme == "scifi" || theme == "sci-fi" || theme == "sci_fi") themeMenu.CheckMenuItem(kCmdThemeSciFi, MF_CHECKED);
+        else if (theme == "chromatic") themeMenu.CheckMenuItem(kCmdThemeChromatic, MF_CHECKED);
 		else if (theme == "minimal") themeMenu.CheckMenuItem(kCmdThemeMinimal, MF_CHECKED);
 		else if (theme == "game") themeMenu.CheckMenuItem(kCmdThemeGame, MF_CHECKED);
 		else themeMenu.CheckMenuItem(kCmdThemeNeon, MF_CHECKED);
@@ -305,10 +310,16 @@ LRESULT CTrayHostWnd::OnTrayNotify(WPARAM wp, LPARAM lp)
 			case kCmdHoverGlow:
 				sendEffect("hover", "glow");
 				break;
+            case kCmdHoverTubes:
+                sendEffect("hover", "tubes");
+                break;
 			case kCmdHoverNone:
 				clearEffect("hover");
 				break;
 			// Theme
+            case kCmdThemeChromatic:
+                mouseFx->SetTheme("chromatic");
+                break;
 			case kCmdThemeSciFi:
 				mouseFx->SetTheme("scifi");
 				break;
