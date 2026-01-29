@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "HoverEffect.h"
 #include "ThemeStyle.h"
-#include "StandardRenderers.h"
+#include "Renderers/Hover/CrosshairRenderer.h"
 
 namespace mousefx {
 

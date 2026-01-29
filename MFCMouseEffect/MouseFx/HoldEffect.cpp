@@ -1,11 +1,22 @@
 #include "pch.h"
 #include "HoldEffect.h"
 #include "ThemeStyle.h"
-#include "RenderStrategies.h"
+#include "Renderers/RendererRegistry.h"
+// Include all renderers so they are linked/registered? 
+// No, reliance on static registration means we need to link the object files or include headers somewhere.
+// In a single project, headers included in .cpps are enough if that cpp is compiled.
+// For now, let's include headers here to ensure they are compiled (as separate files).
+// Or we can include them in AppController or a "RegistryInit.cpp".
+// Safest is to include them here or in a central place.
+#include "Renderers/Hold/ChargeRenderer.h"
+#include "Renderers/Hold/LightningRenderer.h"
+#include "Renderers/Hold/HexRenderer.h"
+#include "Renderers/Hold/TechRingRenderer.h"
+#include "Renderers/Hold/HologramHudRenderer.h"
 
 namespace mousefx {
 
-HoldEffect::HoldEffect(const std::string& themeName, Mode mode) : mode_(mode) {
+HoldEffect::HoldEffect(const std::string& themeName, const std::string& type) : type_(type) {
     style_ = GetThemePalette(themeName).hold;
     isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
 }
@@ -37,20 +48,14 @@ void HoldEffect::OnHoldStart(const POINT& pt, int button) {
     params.loop = false;
     params.intensity = 1.0f;
 
-    std::unique_ptr<IRippleRenderer> renderer;
-    switch (mode_) {
-    case Mode::Charge:    renderer = std::make_unique<ChargeRenderer>(); break;
-    case Mode::Lightning: renderer = std::make_unique<LightningRenderer>(); break;
-    case Mode::Hex:       renderer = std::make_unique<HexRenderer>(); break;
-    case Mode::TechRing:  renderer = std::make_unique<HologramRenderer>(); break; // Tech Ring = Complex Gyro
-    case Mode::Hologram:  renderer = std::make_unique<TechHudRenderer>(); break;  // Hologram  = Simple HUD
-    default:              renderer = std::make_unique<ChargeRenderer>(); break;
+    std::unique_ptr<IRippleRenderer> renderer = RendererRegistry::Instance().Create(type_);
+    if (!renderer) {
+        // Fallback to charge if not found
+        renderer = RendererRegistry::Instance().Create("charge");
     }
 
     RippleStyle finalStyle = style_;
     if (isChromatic_) {
-        // For Hold effect, maybe we want it to change color over time?
-        // But for v1, just random start color is enough.
         finalStyle = MakeRandomStyle(style_);
     }
 

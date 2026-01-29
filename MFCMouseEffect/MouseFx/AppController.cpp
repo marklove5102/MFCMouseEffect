@@ -13,6 +13,12 @@
 #include "ParticleTrailEffect.h"
 #include "TextEffect.h"
 
+// Include new renderers (must be global scope to avoid std namespace pollution)
+#include "Renderers/Click/RippleRenderer.h"
+#include "Renderers/Click/StarRenderer.h"
+#include "Renderers/Scroll/ChevronRenderer.h"
+#include "Renderers/Hover/CrosshairRenderer.h"
+
 #include <new>
 #include <windowsx.h>  // For GET_X_LPARAM, GET_Y_LPARAM
 
@@ -148,6 +154,12 @@ void AppController::Stop() {
     gdiplus_.Shutdown();
 }
 
+// (Moved to top)
+// Hold renderers are included in HoldEffect.cpp, but safe to include here too if needed, 
+// though generally we rely on the creation site.
+// Actually, AppController creates the Effects, but Effects create the Renderers (mostly).
+// Except simpler effects might fallback?
+
 std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory category, const std::string& type) {
     if (type == "none" || type.empty()) {
         return nullptr;
@@ -169,11 +181,8 @@ std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory categor
             if (type == "arrow")  return std::make_unique<ScrollEffect>(config_.theme);
             break;
         case EffectCategory::Hold:
-            if (type == "charge")     return std::make_unique<HoldEffect>(config_.theme, HoldEffect::Mode::Charge);
-            if (type == "lightning")  return std::make_unique<HoldEffect>(config_.theme, HoldEffect::Mode::Lightning);
-            if (type == "hex")        return std::make_unique<HoldEffect>(config_.theme, HoldEffect::Mode::Hex);
-            if (type == "tech_ring")  return std::make_unique<HoldEffect>(config_.theme, HoldEffect::Mode::TechRing);
-            if (type == "hologram" || type == "scifi3d") return std::make_unique<HoldEffect>(config_.theme, HoldEffect::Mode::Hologram); // scifi3d legacy alias
+            // Refactored to pass type string directly. Registry handles the rest.
+            return std::make_unique<HoldEffect>(config_.theme, type);
             break;
         case EffectCategory::Hover:
             if (type == "glow")   return std::make_unique<HoverEffect>(config_.theme);

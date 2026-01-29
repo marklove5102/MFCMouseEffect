@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "RippleEffect.h"
 #include "ThemeStyle.h"
-#include "StandardRenderers.h"
+#include "Renderers/Click/RippleRenderer.h"
 
 namespace mousefx {
 

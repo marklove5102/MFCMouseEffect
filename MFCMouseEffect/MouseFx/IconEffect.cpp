@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "IconEffect.h"
 #include "ThemeStyle.h"
-#include "StandardRenderers.h"
+#include "Renderers/Click/StarRenderer.h"
 
 namespace mousefx {
 

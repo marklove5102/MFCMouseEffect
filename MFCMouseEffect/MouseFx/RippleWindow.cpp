@@ -3,7 +3,7 @@
 #include "pch.h"
 
 #include "RippleWindow.h"
-#include "StandardRenderers.h" // Default strategies for convenience
+#include "Renderers/Click/RippleRenderer.h" // Default strategy
 
 #include <algorithm>
 #include <cmath>

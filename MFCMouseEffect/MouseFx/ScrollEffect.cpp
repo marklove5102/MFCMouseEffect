@@ -3,8 +3,7 @@
 #include "ThemeStyle.h"
 
 #include <algorithm>
-#include <cstdlib>
-#include "StandardRenderers.h"
+#include "Renderers/Scroll/ChevronRenderer.h"
 
 namespace mousefx {
 
