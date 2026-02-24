@@ -42,6 +42,7 @@
 - Linux 跟随门禁（54x）：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54c-posix-regression-suite-orchestrator.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54f-core-automation-http-contract-regression.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54g-macos-automation-injection-selfcheck-suite-gate.md`
 - WASM 运行时与诊断（55x）：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55h-macos-wasm-overlay-throttle-guardrail.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55j-macos-wasm-throttle-cause-breakdown.md`

@@ -58,6 +58,8 @@
   - 54e completed (acceptance): core smoke command and updated suite command executed and passed on current host.
   - 54f completed (code): core-lane automation HTTP contracts are now scriptized (`run-posix-core-automation-contract-regression.sh`) with test-only WebSettings probe output.
   - 54f completed (acceptance): core automation contract command and updated suite command executed and passed on current host.
+  - 54g completed (code): POSIX suite now includes macOS automation injection selfcheck (`--dry-run`) as a default phase with explicit skip control.
+  - 54g completed (acceptance): full suite remains green after injection selfcheck gate integration.
 - Phase 55 (mac WASM runtime): in progress (M2).
   - 55a completed (code): macOS core lane now wires a native `wasm3_static` backend while keeping Windows default on `dynamic_bridge`.
   - 55a completed (acceptance): core build/smoke/contracts passed, and `/api/state` contract now asserts `runtime_backend=wasm3_static` on macOS.
@@ -163,7 +165,7 @@
 - phase55o closure is complete with minimal evidence; no additional phase55o-specific manual command choreography is required.
 - Core automation HTTP contracts now include non-interactive import-dialog capability probing (`probe_only=true`) and assert macOS support automatically.
 - Core automation HTTP contracts now include non-interactive WASM dispatch invocation checks (`load-manifest -> enable -> test-dispatch-click`) under test-only endpoint gate.
-- POSIX unified regression suite now includes macOS WASM runtime selfcheck by default, reducing manual acceptance drift for invoke/render/fallback behavior.
+- POSIX unified regression suite now includes macOS automation injection selfcheck (`--dry-run`) and WASM runtime selfcheck by default, reducing manual acceptance drift for both automation and plugin runtime behavior.
 - Linux WASM renderer path is now explicitly defined as `degrade-only` for current M2, preserving `invoke_supported=true` and `render_supported=false` contract semantics until a separate Linux-native renderer phase is approved.
 
 ## Next slice

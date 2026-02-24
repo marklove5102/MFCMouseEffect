@@ -17,6 +17,7 @@ MFX_BUILD_JOBS_VALUE=""
 MFX_SKIP_SCAFFOLD=0
 MFX_SKIP_CORE_SMOKE=0
 MFX_SKIP_CORE_AUTOMATION=0
+MFX_SKIP_MACOS_AUTOMATION_INJECTION_SELFCHECK=0
 MFX_SKIP_LINUX_GATE=0
 MFX_SKIP_AUTOMATION_TEST=0
 MFX_SKIP_MACOS_WASM_SELFCHECK=0
@@ -61,6 +62,10 @@ while [[ $# -gt 0 ]]; do
             MFX_SKIP_CORE_AUTOMATION=1
             shift
             ;;
+        --skip-macos-automation-injection-selfcheck)
+            MFX_SKIP_MACOS_AUTOMATION_INJECTION_SELFCHECK=1
+            shift
+            ;;
         --skip-linux-gate)
             MFX_SKIP_LINUX_GATE=1
             shift
@@ -93,6 +98,7 @@ Usage: run-posix-regression-suite.sh [options]
   --skip-scaffold                 skip scaffold regression phase
   --skip-core-smoke               skip core-lane smoke phase
   --skip-core-automation          skip core automation HTTP contract phase
+  --skip-macos-automation-injection-selfcheck skip macOS automation injection selfcheck phase
   --skip-linux-gate               skip linux compile gate phase
   --skip-automation-test          skip webui automation platform semantic tests
   --skip-macos-wasm-selfcheck     skip macOS wasm runtime selfcheck phase
@@ -164,6 +170,25 @@ if [[ "$MFX_SKIP_CORE_AUTOMATION" -eq 0 ]]; then
     "$SCRIPT_DIR/run-posix-core-automation-contract-regression.sh" "${local_core_automation_args[@]}"
 else
     mfx_info "skip core automation contract phase"
+fi
+
+if [[ "$MFX_SKIP_MACOS_AUTOMATION_INJECTION_SELFCHECK" -eq 0 ]]; then
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        local_automation_inject_selfcheck_args=("--skip-build" "--dry-run")
+        if [[ -n "$MFX_CORE_AUTOMATION_BUILD_DIR" ]]; then
+            local_automation_inject_selfcheck_args+=("--build-dir" "$MFX_CORE_AUTOMATION_BUILD_DIR")
+        elif [[ -n "$MFX_CORE_BUILD_DIR" ]]; then
+            local_automation_inject_selfcheck_args+=("--build-dir" "$MFX_CORE_BUILD_DIR")
+        fi
+
+        mfx_info "run macos automation injection selfcheck phase"
+        "$REPO_ROOT/tools/platform/manual/run-macos-automation-injection-selfcheck.sh" \
+            "${local_automation_inject_selfcheck_args[@]}"
+    else
+        mfx_info "skip macos automation injection selfcheck phase (non-macos host)"
+    fi
+else
+    mfx_info "skip macos automation injection selfcheck phase"
 fi
 
 if [[ "$MFX_SKIP_MACOS_WASM_SELFCHECK" -eq 0 ]]; then
