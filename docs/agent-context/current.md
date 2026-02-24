@@ -30,6 +30,7 @@
   - WebSettings production WASM routes are now isolated in `WebSettingsServer.WasmRoutes.*`, reducing main route file coupling further
   - WebSettings production automation routes are now isolated in `WebSettingsServer.AutomationRoutes.*`, reducing main route file coupling further
   - WebSettings core settings routes are now isolated in `WebSettingsServer.CoreApiRoutes.*`, and main routing file now focuses on request gate + top-level delegation
+  - WebSettings request-entry gateway (`token/fallback/exception mapping`) is now isolated in `WebSettingsServer.RequestGateway.*`
   - test-gated `/api/input-indicator/test-mouse-labels` enables non-interactive mac indicator label contract checks (`L/R/M`)
   - `/api/automation/active-process` now guarantees non-empty `process` on macOS via foreground-query fallback chain
   - schema capability `capabilities.input.keyboard_injector` now reports true on macOS (aligned with runtime injector wiring)
