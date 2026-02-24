@@ -21,6 +21,7 @@
   - test-gated `/api/wasm/test-dispatch-click` enables non-interactive invoke/render contract checks
   - test-gated `/api/automation/test-app-scope-match` enables non-interactive app-scope alias contract checks (`code/.exe/.app`)
   - test-gated `/api/automation/test-binding-priority` enables non-interactive priority contract checks (`process > all`, `longest chain > shorter chain`)
+  - test-gated `/api/automation/test-match-and-inject` enables non-interactive matcher+injector integration checks (`history -> selected binding -> inject`)
   - test-gated `/api/automation/test-shortcut-from-mac-keycode` enables non-interactive `Cmd+V/Cmd+Tab` mapping contract checks
   - test-gated `/api/automation/test-inject-shortcut` enables non-interactive injector call-path checks (`Cmd+C`) under dry-run mode
   - test-gated `/api/input-indicator/test-mouse-labels` enables non-interactive mac indicator label contract checks (`L/R/M`)
@@ -52,6 +53,11 @@ Use this one-command entry for manual WebSettings verification on macOS core lan
 Use this one-command entry for WASM runtime invoke/render/fallback selfcheck:
 ```bash
 ./tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build
+```
+
+Use this one-command entry for automation injection selfcheck (`left_click -> Cmd+C` path):
+```bash
+./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
 ```
 
 ## Current Next Slice

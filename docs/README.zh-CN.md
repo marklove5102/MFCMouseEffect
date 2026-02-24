@@ -38,6 +38,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53f-macos-automation-scope-ui-platform-semantics.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53g-appscope-match-test-endpoint-and-contract-closure.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53h-automation-binding-priority-contract-closure.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53i-macos-automation-injection-selfcheck-and-match-inject-contract.md`
 - Linux 跟随门禁（54x）：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54c-posix-regression-suite-orchestrator.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54f-core-automation-http-contract-regression.md`
@@ -70,6 +71,9 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 
 # macOS wasm 运行时自检（load/invoke/render/fallback）
 ./tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build
+
+# macOS 自动化注入自检（默认真实注入；加 --dry-run 为确定性测试模式）
+./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
 ```
 
 ## 归档区

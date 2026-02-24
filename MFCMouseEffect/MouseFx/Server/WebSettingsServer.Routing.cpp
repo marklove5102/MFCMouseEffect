@@ -345,6 +345,27 @@ std::vector<automation_match::ActionHistoryEntry> NormalizeMouseHistoryEntries(
     return history;
 }
 
+json BuildSelectedBindingJson(const automation_match::BindingMatchResult& match) {
+    if (match.binding == nullptr) {
+        return nullptr;
+    }
+
+    json normalizedScopes = json::array();
+    for (const auto& scope : match.binding->appScopes) {
+        normalizedScopes.push_back(automation_scope::NormalizeScopeToken(scope));
+    }
+
+    return json({
+        {"index", static_cast<uint64_t>(match.bindingIndex)},
+        {"trigger", match.binding->trigger},
+        {"keys", match.binding->keys},
+        {"app_scopes", match.binding->appScopes},
+        {"app_scopes_normalized", normalizedScopes},
+        {"chain_length", static_cast<uint64_t>(match.chainLength)},
+        {"scope_specificity", match.scopeSpecificity},
+    });
+}
+
 std::wstring NormalizeManifestPathForCompare(const std::wstring& path) {
     std::wstring normalized = path;
     for (wchar_t& ch : normalized) {
@@ -639,22 +660,7 @@ bool WebSettingsServer::HandleApiRoute(const HttpRequest& req, const std::string
             automation_match::ChainTimingLimit{},
             automation_ids::NormalizeMouseActionId);
 
-        json selected = nullptr;
-        if (match.binding != nullptr) {
-            json normalizedScopes = json::array();
-            for (const auto& scope : match.binding->appScopes) {
-                normalizedScopes.push_back(automation_scope::NormalizeScopeToken(scope));
-            }
-            selected = json({
-                {"index", static_cast<uint64_t>(match.bindingIndex)},
-                {"trigger", match.binding->trigger},
-                {"keys", match.binding->keys},
-                {"app_scopes", match.binding->appScopes},
-                {"app_scopes_normalized", normalizedScopes},
-                {"chain_length", static_cast<uint64_t>(match.chainLength)},
-                {"scope_specificity", match.scopeSpecificity},
-            });
-        }
+        const json selected = BuildSelectedBindingJson(match);
 
         SetJsonResponse(resp, json({
             {"ok", true},
@@ -664,6 +670,67 @@ bool WebSettingsServer::HandleApiRoute(const HttpRequest& req, const std::string
             {"history_normalized", normalizedHistory},
             {"mapping_count", static_cast<uint64_t>(mappings.size())},
             {"matched", match.binding != nullptr},
+            {"selected_binding_index", match.binding != nullptr ? static_cast<int64_t>(match.bindingIndex) : -1},
+            {"selected_chain_length", static_cast<uint64_t>(match.chainLength)},
+            {"selected_scope_specificity", match.scopeSpecificity},
+            {"selected_keys", match.binding != nullptr ? match.binding->keys : std::string{}},
+            {"selected", selected},
+        }).dump());
+        return true;
+    }
+
+    if (req.method == "POST" && path == "/api/automation/test-match-and-inject") {
+        if (!IsAutomationInjectionTestApiEnabled() || !IsAutomationScopeTestApiEnabled()) {
+            SetPlainResponse(resp, 404, "not found");
+            return true;
+        }
+
+        if (!controller_) {
+            SetJsonResponse(resp, json({
+                {"ok", false},
+                {"error", "no controller"},
+            }).dump());
+            return true;
+        }
+
+        const json payload = ParseObjectOrEmpty(req.body);
+        const std::vector<std::string> rawHistory = ParseActionHistory(payload);
+        std::vector<std::string> normalizedHistory;
+        const std::vector<automation_match::ActionHistoryEntry> history =
+            NormalizeMouseHistoryEntries(rawHistory, &normalizedHistory);
+        const std::vector<AutomationKeyBinding> mappings = ParseAutomationMappings(payload);
+
+        std::string processBaseName = ParseProcessBaseName(payload);
+        if (processBaseName.empty()) {
+            processBaseName = controller_->CurrentForegroundProcessBaseName();
+        }
+        const std::string normalizedProcess = automation_scope::NormalizeProcessName(processBaseName);
+
+        const automation_match::BindingMatchResult match = automation_match::FindBestEnabledBinding(
+            mappings,
+            history,
+            processBaseName,
+            automation_match::ChainTimingLimit{},
+            automation_ids::NormalizeMouseActionId);
+
+        bool injected = false;
+        if (match.binding != nullptr) {
+            const std::string keys = TrimAscii(match.binding->keys);
+            if (!keys.empty()) {
+                injected = controller_->InjectShortcutForTest(keys);
+            }
+        }
+
+        const json selected = BuildSelectedBindingJson(match);
+        SetJsonResponse(resp, json({
+            {"ok", true},
+            {"process", processBaseName},
+            {"process_normalized", normalizedProcess},
+            {"history", rawHistory},
+            {"history_normalized", normalizedHistory},
+            {"mapping_count", static_cast<uint64_t>(mappings.size())},
+            {"matched", match.binding != nullptr},
+            {"injected", injected},
             {"selected_binding_index", match.binding != nullptr ? static_cast<int64_t>(match.bindingIndex) : -1},
             {"selected_chain_length", static_cast<uint64_t>(match.chainLength)},
             {"selected_scope_specificity", match.scopeSpecificity},

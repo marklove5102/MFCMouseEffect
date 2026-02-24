@@ -22,6 +22,7 @@ Run this to validate core-lane automation API contracts on macOS:
    - `POST /api/state` can persist selected-app scope from scanned catalog entries (roundtrip verified via `GET /api/state`).
    - `POST /api/automation/test-app-scope-match` (test-gated) verifies process-scope alias matching semantics.
    - `POST /api/automation/test-binding-priority` (test-gated) verifies binding priority semantics (`process > all` on same chain length; `longest chain > shorter chain`).
+   - `POST /api/automation/test-match-and-inject` (test-gated) verifies matcher+injector integration path (`history -> binding select -> shortcut inject`) in one call.
    - `POST /api/automation/test-shortcut-from-mac-keycode` (test-gated) verifies mac keycode->shortcut mapping semantics.
    - `POST /api/automation/test-inject-shortcut` (test-gated) verifies automation injector call path under deterministic dry-run mode.
    - Startup-missing-permission path is simulated via `MFX_TEST_INPUT_CAPTURE_PERMISSION_SIM_FILE=trusted=0` and must converge to degraded `permission_denied`.
