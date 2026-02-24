@@ -26,6 +26,7 @@
   - test-gated `/api/automation/test-inject-shortcut` enables non-interactive injector call-path checks (`Cmd+C`) under dry-run mode
   - real injection manual acceptance (`left_click -> Cmd+C`) is user-verified on macOS via one-command selfcheck
   - unified POSIX suite now includes macOS automation injection selfcheck (`--dry-run`) by default
+  - WebSettings test-only routes are now isolated in `WebSettingsServer.TestApiRoutes.*`, reducing main route file coupling
   - test-gated `/api/input-indicator/test-mouse-labels` enables non-interactive mac indicator label contract checks (`L/R/M`)
   - `/api/automation/active-process` now guarantees non-empty `process` on macOS via foreground-query fallback chain
   - schema capability `capabilities.input.keyboard_injector` now reports true on macOS (aligned with runtime injector wiring)
