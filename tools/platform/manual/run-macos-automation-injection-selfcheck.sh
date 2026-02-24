@@ -18,6 +18,7 @@ Options:
   --build-dir <path>          Build directory (default: /tmp/mfx-platform-macos-core-build)
   --log-file <path>           Host log path (default: /tmp/mfx-core-automation-inject-selfcheck.log)
   --probe-file <path>         Probe file path (default: /tmp/mfx-core-automation-inject-selfcheck.probe)
+  --osascript-timeout-seconds <num> Timeout for TextEdit preparation AppleScript (default: 12)
   --jobs <num>                Build jobs (sets MFX_BUILD_JOBS)
   --skip-build                Skip cmake configure/build
   --dry-run                   Use keyboard injector dry-run mode (no real OS key dispatch)
@@ -64,6 +65,7 @@ skip_build=0
 dry_run=0
 keep_running=0
 auto_stop_seconds=120
+osascript_timeout_seconds=12
 build_jobs=""
 
 while [[ $# -gt 0 ]]; do
@@ -86,6 +88,11 @@ while [[ $# -gt 0 ]]; do
     --jobs)
         [[ $# -ge 2 ]] || mfx_fail "missing value for --jobs"
         build_jobs="$2"
+        shift 2
+        ;;
+    --osascript-timeout-seconds)
+        [[ $# -ge 2 ]] || mfx_fail "missing value for --osascript-timeout-seconds"
+        osascript_timeout_seconds="$2"
         shift 2
         ;;
     --skip-build)
@@ -129,6 +136,9 @@ fi
 if ! [[ "$auto_stop_seconds" =~ ^[0-9]+$ ]]; then
     mfx_fail "--auto-stop-seconds must be a non-negative integer"
 fi
+if ! [[ "$osascript_timeout_seconds" =~ ^[0-9]+$ ]] || [[ "$osascript_timeout_seconds" -le 0 ]]; then
+    mfx_fail "--osascript-timeout-seconds must be a positive integer"
+fi
 
 mfx_require_cmd cmake
 mfx_require_cmd curl
@@ -163,6 +173,37 @@ cleanup() {
 }
 trap cleanup EXIT
 
+run_with_timeout() {
+    local timeout_seconds="$1"
+    shift
+
+    local timeout_marker="$tmp_dir/.timeout-marker"
+    rm -f "$timeout_marker"
+
+    "$@" &
+    local cmd_pid="$!"
+    (
+        sleep "$timeout_seconds"
+        if kill -0 "$cmd_pid" 2>/dev/null; then
+            touch "$timeout_marker"
+            kill -TERM "$cmd_pid" 2>/dev/null || true
+        fi
+    ) >/dev/null 2>&1 &
+    local watchdog_pid="$!"
+
+    local cmd_status=0
+    if ! wait "$cmd_pid"; then
+        cmd_status=$?
+    fi
+    kill -TERM "$watchdog_pid" 2>/dev/null || true
+    wait "$watchdog_pid" 2>/dev/null || true
+
+    if [[ -f "$timeout_marker" ]]; then
+        return 124
+    fi
+    return "$cmd_status"
+}
+
 declare -a host_env
 host_env+=("MFX_ENABLE_AUTOMATION_SCOPE_TEST_API=1")
 host_env+=("MFX_ENABLE_AUTOMATION_INJECTION_TEST_API=1")
@@ -183,7 +224,9 @@ if [[ "$dry_run" -eq 0 ]]; then
     target_text="MFX_AUTOMATION_INJECT_OK_$(date +%s)"
     baseline_text="MFX_AUTOMATION_INJECT_BASELINE_$(date +%s)"
     printf '%s' "$baseline_text" | pbcopy
-    prepare_textedit_selection "$target_text"
+    if ! run_with_timeout "$osascript_timeout_seconds" prepare_textedit_selection "$target_text"; then
+        mfx_fail "TextEdit preparation timed out or failed. verify Terminal Accessibility permission and retry."
+    fi
 fi
 
 payload='{"history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["all"],"keys":"Cmd+C"}]}'

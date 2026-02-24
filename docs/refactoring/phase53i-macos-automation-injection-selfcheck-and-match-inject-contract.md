@@ -35,6 +35,8 @@
   - prepare TextEdit selection (`Cmd+A`) with sentinel text,
   - call `/api/automation/test-match-and-inject`,
   - verify clipboard equals sentinel (real OS dispatch evidence).
+- Fail-safe:
+  - AppleScript/TextEdit preparation is timeout-protected to avoid indefinite hang when permission prompts block automation.
 - Test-friendly mode:
   - `--dry-run` enables `MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN=1`,
   - skips TextEdit/clipboard check and only validates match+inject contract path.
@@ -42,10 +44,12 @@
 ## Test-Friendly Parameters
 - Default (production-like manual selfcheck):
   - `dry_run=0` (real injection)
+  - `osascript_timeout_seconds=12`
   - `auto_stop_seconds=120` (only with `--keep-running`)
 - Test mode:
   - `--dry-run` (deterministic no-system-input mode)
   - `--skip-build` (reuse existing build for fast rerun)
+  - `--osascript-timeout-seconds 5` (faster fail in CI-like diagnostics)
 - Switch method:
   - real dispatch: omit `--dry-run`
   - deterministic contract: add `--dry-run`
