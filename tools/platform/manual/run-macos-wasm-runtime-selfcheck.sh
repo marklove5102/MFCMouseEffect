@@ -115,7 +115,6 @@ fi
 mfx_require_cmd cmake
 mfx_require_cmd curl
 mfx_require_cmd sed
-mfx_require_cmd rg
 
 if [[ "$skip_build" -eq 0 ]]; then
     mfx_configure_platform_build_dir "$repo_root" "$build_dir" "macos" \

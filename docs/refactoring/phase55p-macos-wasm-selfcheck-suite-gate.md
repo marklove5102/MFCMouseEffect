@@ -19,6 +19,8 @@
     - `--skip-macos-wasm-selfcheck`
   - run condition:
     - macOS host only; non-mac hosts report explicit skip (no failure).
+  - environment resilience:
+    - manual selfcheck scripts no longer hard-require `rg`; shared assert helper falls back to `grep` when ripgrep is missing.
 
 ## Validation
 - `./tools/platform/regression/run-posix-core-automation-contract-regression.sh --platform auto --build-dir /tmp/mfx-platform-macos-core-build`

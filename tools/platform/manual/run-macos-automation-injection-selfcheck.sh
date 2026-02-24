@@ -142,7 +142,6 @@ fi
 
 mfx_require_cmd cmake
 mfx_require_cmd curl
-mfx_require_cmd rg
 mfx_require_cmd sed
 
 if [[ "$dry_run" -eq 0 ]]; then

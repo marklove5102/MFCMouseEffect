@@ -24,6 +24,7 @@
   - test-gated `/api/automation/test-match-and-inject` enables non-interactive matcher+injector integration checks (`history -> selected binding -> inject`)
   - test-gated `/api/automation/test-shortcut-from-mac-keycode` enables non-interactive `Cmd+V/Cmd+Tab` mapping contract checks
   - test-gated `/api/automation/test-inject-shortcut` enables non-interactive injector call-path checks (`Cmd+C`) under dry-run mode
+  - real injection manual acceptance (`left_click -> Cmd+C`) is user-verified on macOS via one-command selfcheck
   - test-gated `/api/input-indicator/test-mouse-labels` enables non-interactive mac indicator label contract checks (`L/R/M`)
   - `/api/automation/active-process` now guarantees non-empty `process` on macOS via foreground-query fallback chain
   - schema capability `capabilities.input.keyboard_injector` now reports true on macOS (aligned with runtime injector wiring)
@@ -61,7 +62,6 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
 ```
 
 ## Current Next Slice
-- Close remaining Phase 53 manual acceptance (`left_click -> Cmd+C` real dispatch) with stable suite baseline.
 - Continue M2 with macOS-first WASM quality and contract hardening.
 - Keep platform abstraction reusable for Linux follow-up.
 - Keep Windows behavior unchanged unless explicit approved scope.

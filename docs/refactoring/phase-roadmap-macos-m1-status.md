@@ -28,7 +28,7 @@
 - Phase 53 (automation mapping with unified shortcut semantics): in progress.
   - 53a completed (code): mac keyboard injector + foreground-process service landed and factory/build wiring completed.
   - 53a completed (acceptance-script): core automation contract regression now enforces non-empty `active-process`, `schema.capabilities.input.keyboard_injector=true`, and test-inject shortcut acceptance (`Cmd+C`) under explicit dry-run injector mode.
-  - 53a pending (acceptance-manual): real OS key event dispatch (`left_click -> Cmd+C`) still requires permissioned manual verification.
+  - 53a completed (acceptance-manual): user-side real-dispatch selfcheck passed on macOS on February 24, 2026 via `run-macos-automation-injection-selfcheck.sh` (`dry_run=0`, final result `mfx:ok`).
   - 53b completed (code): shared app-scope normalization/matching helper landed; `.exe/.app/none` suffix compatibility is now unified.
   - 53b completed (acceptance): core automation contract regression now asserts cross-suffix app-scope hits (`process:code.exe` / `process:code` / `process:code.app`) via test-gated API.
   - 53c completed (code): POSIX core settings entry rewired to WebSettingsServer, tray width fixed, and Svelte WebUI directory discovery improved.
@@ -127,7 +127,7 @@
 - phase53f manual acceptance is now closed by user-side macOS verification.
 - phase53b acceptance is now script-closed by core contract assertions (`code/.exe/.app` alias matching).
 - phase53d acceptance is now script-closed by core contract assertions (`mac_key_code 9 -> Win+V`, `mac_key_code 48 -> Win+Tab`).
-- phase53a service wiring is now script-closed (`process` non-empty + `keyboard_injector=true` + test-inject `accepted=true` in dry-run mode), while real key-event dispatch E2E remains manual.
+- phase53a service wiring and real key-event dispatch are now both closed (script + user manual evidence).
 - phase53c WebUI, shell-launch, and tray `Settings` action contract is now script-closed (tokenized root + Svelte shell asset + settings-launcher URL probe + tray smoke action/launch assertions).
 - phase53e refresh/catalog/persistence path is now script-closed (`force=true/false` + selected scope roundtrip via `/api/state`).
 - phase53h scope-priority contract is now script-closed (`process > all` and `longest chain > shorter chain` under shared matcher path).
@@ -167,7 +167,7 @@
 - Linux WASM renderer path is now explicitly defined as `degrade-only` for current M2, preserving `invoke_supported=true` and `render_supported=false` contract semantics until a separate Linux-native renderer phase is approved.
 
 ## Next slice
-- Complete Phase 52/53 acceptance closure:
-  - execute 53a manual re-check (`left_click -> Cmd+C` injection path) via `tools/platform/manual/run-macos-automation-injection-selfcheck.sh`,
+- Continue Phase 55+ hardening with macOS-first and Linux compile follow:
   - keep Phase 54 suite green via `run-posix-regression-suite.sh --platform auto`,
-  - if pass, mark Phase 53 acceptance fully closed and continue next platform capability slice with Linux compile gate unchanged.
+  - keep one-command manual entries stable (`run-macos-core-websettings-manual.sh`, `run-macos-wasm-runtime-selfcheck.sh`, `run-macos-automation-injection-selfcheck.sh`),
+  - continue platform capability expansion without changing Windows behavior contracts.

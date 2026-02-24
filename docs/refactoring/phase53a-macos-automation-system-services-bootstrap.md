@@ -75,3 +75,10 @@ cmake --build /tmp/mfx-platform-linux-build --target mfx_shell_linux mfx_entry_p
 - 预期: 快捷键注入生效。
 3. 调用 `/api/automation/active-process`。
 - 预期: `process` 字段返回非空进程基名（前台不可取时为回退值）。
+
+## 手工收口证据（2026-02-24）
+1. 用户在 macOS 上执行：
+   - `./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build --dry-run`（通过）
+   - `./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build`（real-dispatch 最终通过）
+2. 结论：
+   - `left_click -> Cmd+C` 真实注入路径已完成用户侧手工验收，`phase53a` manual acceptance 可判定关闭。

@@ -37,6 +37,7 @@
   - verify clipboard equals sentinel (real OS dispatch evidence).
 - Fail-safe:
   - AppleScript/TextEdit preparation is timeout-protected to avoid indefinite hang when permission prompts block automation.
+  - no hard `rg` precheck is required; shared assert helper now falls back to `grep` when `rg` is unavailable.
 - Test-friendly mode:
   - `--dry-run` enables `MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN=1`,
   - skips TextEdit/clipboard check and only validates match+inject contract path.
@@ -63,3 +64,4 @@
 ## Closure
 - `history -> binding selection -> shortcut inject` is now script-closed in core contracts.
 - Real OS-level injection acceptance has a stable one-command path instead of ad-hoc manual steps.
+- User-side manual acceptance on macOS was completed on February 24, 2026 with final `dry_run=0` success output.

@@ -41,7 +41,13 @@ mfx_assert_file_contains() {
     local file_path="$1"
     local pattern="$2"
     local context="$3"
-    if ! rg -q --fixed-strings "$pattern" "$file_path"; then
+    if command -v rg >/dev/null 2>&1; then
+        if ! rg -q --fixed-strings "$pattern" "$file_path"; then
+            mfx_fail "$context: missing pattern '$pattern' in $file_path"
+        fi
+        return 0
+    fi
+    if ! grep -Fq -- "$pattern" "$file_path"; then
         mfx_fail "$context: missing pattern '$pattern' in $file_path"
     fi
 }
