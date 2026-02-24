@@ -49,6 +49,8 @@
   - 53j completed (acceptance): core automation contracts + full POSIX suite remain green after route-module split.
   - 53k completed (code): split WebSettings production WASM API routes into dedicated module (`WebSettingsServer.WasmRoutes.*`) and reduced main routing file coupling further.
   - 53k completed (acceptance): core automation contracts + full POSIX suite remain green after wasm-route module split.
+  - 53l completed (code): split WebSettings production automation API routes into dedicated module (`WebSettingsServer.AutomationRoutes.*`) and reduced main routing file coupling further.
+  - 53l completed (acceptance): core automation contracts + full POSIX suite remain green after automation-route module split.
 - Phase 54 (Linux compile-level + contract-level follow): in progress, compile gate currently passing in CI-style local commands.
   - 54a completed (code): Linux compile-level gate is now scriptized as one-command workflow (`run-posix-linux-compile-gate.sh`) with modular regression packaging.
   - 54a completed (acceptance): gate command executed and passed on current host.
@@ -140,6 +142,7 @@
 - phase53i matcher+inject contract is now script-closed (`history -> selected binding -> injected=true`), and real OS injection has one-command manual selfcheck entry.
 - phase53j routing structure is now split by responsibility (production routes vs test-only routes), reducing single-file coupling without changing API contracts.
 - phase53k WebSettings production WASM routes are now isolated in `WebSettingsServer.WasmRoutes.*`, keeping main routing focused on shared and automation endpoints.
+- phase53l WebSettings production automation routes are now isolated in `WebSettingsServer.AutomationRoutes.*`, keeping main routing focused on shared settings and top-level dispatch.
 - Linux compile gate now has a dedicated orchestration script, reducing manual command drift risk for cross-host follow.
 - Automation platform semantics now have script-level regression guard, reducing manual-only verification for `.app/.exe` behavior.
 - POSIX regression now has a single suite entrypoint with phase-level skip switches for faster diagnosis.
