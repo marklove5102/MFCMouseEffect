@@ -239,6 +239,8 @@
   - 55zz completed (acceptance): full POSIX regression suite remains green after wasm image-overlay renderer split.
   - 55zza completed (code): split `MacosDispatchMessageHost` implementation into lifecycle (`.cpp`), messaging worker (`.Messaging.cpp`), and timer management (`.Timers.cpp`) units with shared class-level error constants.
   - 55zza completed (acceptance): full POSIX regression suite remains green after dispatch-host implementation split.
+  - 55zzb completed (code): split `MacosTrayService` into lifecycle facade + dedicated menu factory/runtime helper modules (`MacosTrayMenuFactory.*`, `MacosTrayRuntimeHelpers.*`) and moved Objective-C action bridge out of service file.
+  - 55zzb completed (acceptance): full POSIX regression suite remains green after tray service menu-factory/runtime-helper split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.

@@ -8,9 +8,13 @@ endif()
 
 set(MFX_MACOS_TRAY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayService.cpp")
 set(MFX_MACOS_TRAY_LOCALIZATION_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuLocalization.cpp")
+set(MFX_MACOS_TRAY_RUNTIME_HELPERS_SOURCE "")
+set(MFX_MACOS_TRAY_MENU_FACTORY_SOURCE "")
 if(APPLE)
     set(MFX_MACOS_TRAY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayService.mm")
     set(MFX_MACOS_TRAY_LOCALIZATION_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuLocalization.mm")
+    set(MFX_MACOS_TRAY_RUNTIME_HELPERS_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayRuntimeHelpers.mm")
+    set(MFX_MACOS_TRAY_MENU_FACTORY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuFactory.mm")
 endif()
 
 add_library(mfx_shell_macos STATIC
@@ -39,6 +43,8 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosShellServicesFactory.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosSettingsLauncher.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosSingleInstanceGuard.cpp"
+    "${MFX_MACOS_TRAY_RUNTIME_HELPERS_SOURCE}"
+    "${MFX_MACOS_TRAY_MENU_FACTORY_SOURCE}"
     "${MFX_MACOS_TRAY_LOCALIZATION_SOURCE}"
     "${MFX_MACOS_TRAY_SOURCE}"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosCursorPositionService.cpp"
