@@ -151,6 +151,8 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
         "${MFX_PROJECT_ROOT}/Platform/posix/Shell/ScaffoldSettingsRuntime.cpp"
         "${MFX_PROJECT_ROOT}/Platform/posix/Shell/ScaffoldSettingsWebUiAssets.cpp"
         "${MFX_PROJECT_ROOT}/MouseFx/Server/HttpServer.cpp"
+        "${MFX_PROJECT_ROOT}/MouseFx/Server/HttpServer.ClientSession.cpp"
+        "${MFX_PROJECT_ROOT}/MouseFx/Server/HttpServer.Lifecycle.cpp"
         "${MFX_PROJECT_ROOT}/MouseFx/Server/HttpServer.Protocol.cpp"
     )
     target_link_libraries(mfx_entry_runtime_common PUBLIC mfx_shell_contracts)

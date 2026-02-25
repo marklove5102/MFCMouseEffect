@@ -1,4 +1,4 @@
-# Agent Current Context (2026-02-24)
+# Agent Current Context (2026-02-25)
 
 ## Scope and Priority
 - Primary dev host: macOS.
@@ -36,6 +36,7 @@
   - WebSettings test routes are now split into `TestAutomationApiRoutes.*`, `TestWasmInputApiRoutes.*`, and `TestRouteCommon.*` with delegating `TestApiRoutes.cpp`
   - `SettingsStateMapper` is now split into `BaseSections.*` and `Diagnostics.*` with top-level composition kept in `SettingsStateMapper.cpp`
   - `SettingsSchemaBuilder` is now split into `OptionsSections.*` and `CapabilitiesSections.*` with top-level composition kept in `SettingsSchemaBuilder.cpp`
+  - `HttpServer` is now split into lifecycle/session/protocol layers (`HttpServer.Lifecycle.cpp`, `HttpServer.ClientSession.cpp`, `HttpServer.Protocol.cpp`) with thin `HttpServer.cpp` entry
   - test-gated `/api/input-indicator/test-mouse-labels` enables non-interactive mac indicator label contract checks (`L/R/M`)
   - `/api/automation/active-process` now guarantees non-empty `process` on macOS via foreground-query fallback chain
   - schema capability `capabilities.input.keyboard_injector` now reports true on macOS (aligned with runtime injector wiring)
