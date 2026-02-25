@@ -107,6 +107,7 @@ public:
 
     StartDiagnostics Diagnostics() const { return diag_; }
     InputCaptureRuntimeStatus InputCaptureStatus() const;
+    bool EffectsSuspendedByInputCapture() const;
     void SetInputCaptureStatusCallback(std::function<void(const InputCaptureRuntimeStatus&)> callback);
     
     // Get current config (for effects to read)
@@ -218,6 +219,7 @@ private:
     StartDiagnostics diag_{};
     std::atomic<bool> inputCaptureActive_{false};
     std::atomic<uint32_t> inputCaptureError_{0};
+    std::atomic<bool> effectsSuspendedByInputCapture_{false};
     std::function<void(const InputCaptureRuntimeStatus&)> inputCaptureStatusCallback_{};
     mutable std::mutex inputCaptureStatusCallbackMutex_{};
 

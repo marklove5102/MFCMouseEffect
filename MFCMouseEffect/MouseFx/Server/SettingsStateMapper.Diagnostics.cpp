@@ -179,6 +179,7 @@ json BuildInputCaptureState(const AppController* controller, const std::string& 
     out["error"] = status.error;
     out["reason"] = InputCaptureReasonToCode(status.reason);
     out["degraded"] = !status.active;
+    out["effects_suspended"] = controller->EffectsSuspendedByInputCapture();
 #if MFX_PLATFORM_MACOS
     out["required_permissions"] = json::array({"accessibility", "input_monitoring"});
 #endif

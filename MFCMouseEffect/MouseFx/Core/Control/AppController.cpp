@@ -144,6 +144,10 @@ AppController::InputCaptureRuntimeStatus AppController::InputCaptureStatus() con
     return status;
 }
 
+bool AppController::EffectsSuspendedByInputCapture() const {
+    return effectsSuspendedByInputCapture_.load(std::memory_order_acquire);
+}
+
 void AppController::SetInputCaptureStatusCallback(
     std::function<void(const InputCaptureRuntimeStatus&)> callback) {
     std::lock_guard<std::mutex> lock(inputCaptureStatusCallbackMutex_);
@@ -281,6 +285,7 @@ void AppController::RefreshInputCaptureRuntimeState() {
 
         inputCaptureActive_.store(true, std::memory_order_release);
         inputCaptureError_.store(0, std::memory_order_release);
+        effectsSuspendedByInputCapture_.store(false, std::memory_order_release);
         hovering_ = false;
         pendingHold_.active = false;
         holdButtonDown_ = false;
@@ -321,6 +326,7 @@ void AppController::RefreshInputCaptureRuntimeState() {
 void AppController::EnterInputCaptureDegradedMode(uint32_t error) {
     inputCaptureActive_.store(false, std::memory_order_release);
     inputCaptureError_.store(error, std::memory_order_release);
+    effectsSuspendedByInputCapture_.store(true, std::memory_order_release);
     NotifyInputCaptureStatusChanged();
     lastInputCaptureRestartAttemptTickMs_ = 0;
     if (dispatchMessageHost_ && dispatchMessageHost_->IsCreated()) {
@@ -589,6 +595,7 @@ bool AppController::Start() {
     diag_ = {};
     inputCaptureActive_.store(false, std::memory_order_release);
     inputCaptureError_.store(0, std::memory_order_release);
+    effectsSuspendedByInputCapture_.store(false, std::memory_order_release);
 
     // Load config from the best available directory (AppData preferred)
     configDir_ = ResolveConfigDirectory();
@@ -652,6 +659,7 @@ bool AppController::Start() {
     } else {
         inputCaptureActive_.store(true, std::memory_order_release);
         inputCaptureError_.store(0, std::memory_order_release);
+        effectsSuspendedByInputCapture_.store(false, std::memory_order_release);
     }
 
     return true;
@@ -660,6 +668,7 @@ bool AppController::Start() {
 void AppController::Stop() {
     inputCaptureActive_.store(false, std::memory_order_release);
     inputCaptureError_.store(0, std::memory_order_release);
+    effectsSuspendedByInputCapture_.store(false, std::memory_order_release);
     if (dispatchMessageHost_ && dispatchMessageHost_->IsCreated()) {
         dispatchMessageHost_->KillTimer(kInputCaptureHealthTimerId);
     }

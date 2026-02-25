@@ -316,6 +316,7 @@ mfx_run_core_http_contract_checks() {
         "permission_denied" \
         "$tmp_dir/input-capture-startup-denied.out" \
         "core input-capture startup denied"
+    mfx_assert_file_contains "$tmp_dir/input-capture-startup-denied.out" "\"effects_suspended\":true" "core input-capture startup denied effects suspended"
 
     sleep 1.2
     local startup_notification_count
@@ -330,6 +331,7 @@ mfx_run_core_http_contract_checks() {
         "none" \
         "$tmp_dir/input-capture-startup-recovered.out" \
         "core input-capture startup recovery"
+    mfx_assert_file_contains "$tmp_dir/input-capture-startup-recovered.out" "\"effects_suspended\":false" "core input-capture startup recovery effects resumed"
 
     local launch_probe_url
     local launch_probe_opened
@@ -354,6 +356,7 @@ mfx_run_core_http_contract_checks() {
         "permission_denied" \
         "$tmp_dir/input-capture-runtime-revoke.out" \
         "core input-capture runtime revoke"
+    mfx_assert_file_contains "$tmp_dir/input-capture-runtime-revoke.out" "\"effects_suspended\":true" "core input-capture runtime revoke effects suspended"
 
     _mfx_core_http_write_permission_sim_state "$permission_sim_file" "1"
     _mfx_core_http_wait_input_capture_state \
@@ -363,6 +366,7 @@ mfx_run_core_http_contract_checks() {
         "none" \
         "$tmp_dir/input-capture-runtime-regrant.out" \
         "core input-capture runtime regrant"
+    mfx_assert_file_contains "$tmp_dir/input-capture-runtime-regrant.out" "\"effects_suspended\":false" "core input-capture runtime regrant effects resumed"
 
     local code_root
     code_root="$(mfx_http_code "$tmp_dir/root.out" "$settings_url")"

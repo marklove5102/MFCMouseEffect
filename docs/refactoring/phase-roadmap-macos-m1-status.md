@@ -85,6 +85,8 @@
   - 53ab completed (acceptance): full POSIX regression suite remains green after automation dispatch boundary split.
   - 53ac completed (code): added keyboard label probe support for input indicator (`RunKeyboardLabelProbe` + `/api/input-indicator/test-keyboard-labels`) and integrated it into core automation contract checks.
   - 53ac completed (acceptance): full POSIX regression suite remains green after keyboard indicator probe contract expansion.
+  - 53ad completed (code): added `input_capture.effects_suspended` state contract backed by `AppController` runtime flag (`effectsSuspendedByInputCapture_`) and wired transition updates on degraded/recovery.
+  - 53ad completed (acceptance): core automation contract now asserts effect suspension transitions (`true/false`) across startup/runtime permission revoke/regrant, and full POSIX suite remains green.
 - Phase 54 (Linux compile-level + contract-level follow): in progress, compile gate currently passing in CI-style local commands.
   - 54a completed (code): Linux compile-level gate is now scriptized as one-command workflow (`run-posix-linux-compile-gate.sh`) with modular regression packaging.
   - 54a completed (acceptance): gate command executed and passed on current host.
@@ -194,6 +196,7 @@
 - phase53aa WebSettings WASM runtime state/action internals are now split by endpoint ownership (`enable/disable`, `policy`, `reload`, `load-manifest`), reducing runtime control-plane coupling while preserving endpoint contracts.
 - phase53ab automation matcher/executor flow is now isolated in `InputAutomationDispatch`, reducing coupling between input orchestration and dispatch execution while preserving trigger/match contracts.
 - phase53ac keyboard indicator labels now have script-level probe coverage (`A`, `Cmd+K9`, `K6`) in addition to mouse labels, reducing manual-only regression risk in input-indicator rendering.
+- phase53ad input-capture diagnostics now expose `effects_suspended`, making effect pipeline degradation/resume transitions explicit and regression-testable under permission revoke/regrant flows.
 - Linux compile gate now has a dedicated orchestration script, reducing manual command drift risk for cross-host follow.
 - Automation platform semantics now have script-level regression guard, reducing manual-only verification for `.app/.exe` behavior.
 - POSIX regression now has a single suite entrypoint with phase-level skip switches for faster diagnosis.
