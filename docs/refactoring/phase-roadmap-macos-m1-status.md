@@ -247,6 +247,8 @@
   - 55zzd completed (acceptance): full POSIX regression suite remains green after wasm overlay runtime state split.
   - 55zze completed (code): split macOS scroll pulse overlay internals by extracting style helpers (`MacosScrollPulseOverlayStyle.*`) and transient-window registry (`MacosScrollPulseWindowRegistry.*`), keeping `MacosScrollPulseOverlayRenderer.mm` as orchestration facade.
   - 55zze completed (acceptance): full POSIX regression suite remains green after scroll pulse overlay internals split.
+  - 55zzf completed (code): split macOS click pulse effect internals into renderer/style/window-registry modules (`MacosClickPulseOverlayRenderer.*`, `MacosClickPulseOverlayStyle.*`, `MacosClickPulseWindowRegistry.*`) and kept `MacosClickPulseEffect.mm` as lifecycle/event-entry facade.
+  - 55zzf completed (acceptance): full POSIX regression suite remains green after click pulse overlay internals split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
