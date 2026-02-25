@@ -227,6 +227,8 @@
   - 55zt completed (acceptance): full POSIX regression suite remains green after implementation-unit split.
   - 55zu completed (code): split `MacosInputIndicatorOverlay` into render/lifecycle unit, probe/event-entry unit, and shared internals helper unit (`label/main-thread/string` utilities).
   - 55zu completed (acceptance): full POSIX regression suite remains green after indicator overlay implementation split.
+  - 55zv completed (code): extracted macOS keyboard shortcut key-resolution logic into dedicated module (`MacosKeyboardInjectorKeyResolver.*`) and kept `MacosKeyboardInjector` focused on injection flow.
+  - 55zv completed (acceptance): full POSIX regression suite remains green after keyboard-injector resolver split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
