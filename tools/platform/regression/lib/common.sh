@@ -122,6 +122,26 @@ mfx_terminate_stale_entry_host() {
     fi
 }
 
+mfx_prepare_core_entry_runtime() {
+    local context="$1"
+    local repo_root="$2"
+    local build_dir="$3"
+    local platform="$4"
+
+    mfx_terminate_stale_entry_host "before $context"
+    mfx_configure_and_build_entry_host \
+        "$repo_root" \
+        "$build_dir" \
+        "$platform" \
+        "-DMFX_ENABLE_POSIX_CORE_RUNTIME=ON"
+}
+
+mfx_run_with_entry_lock() {
+    local workflow_fn="$1"
+    local timeout_seconds="${MFX_ENTRY_LOCK_TIMEOUT_SECONDS:-180}"
+    mfx_with_lock "mfx-entry-posix-host" "$timeout_seconds" "$workflow_fn"
+}
+
 mfx_acquire_lock() {
     local lock_name="$1"
     local timeout_seconds="${2:-180}"

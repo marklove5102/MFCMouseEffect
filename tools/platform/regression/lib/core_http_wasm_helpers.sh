@@ -48,6 +48,55 @@ _mfx_core_http_wasm_export_all_http_code() {
         -d '{}'
 }
 
+_mfx_core_http_wasm_test_dispatch_http_code() {
+    local output_file="$1"
+    local base_url="$2"
+    local token="$3"
+    mfx_http_code "$output_file" "$base_url/api/wasm/test-dispatch-click" \
+        -X POST \
+        -H "x-mfcmouseeffect-token: $token" \
+        -H "Content-Type: application/json" \
+        -d '{"x":640,"y":360,"button":1}'
+}
+
+_mfx_core_http_assert_wasm_test_dispatch_ok() {
+    local output_file="$1"
+    local base_url="$2"
+    local token="$3"
+    local context="$4"
+    local require_rendered_any="${5:-false}"
+    local timeout_seconds="${MFX_CORE_HTTP_WASM_DISPATCH_TIMEOUT_SECONDS:-5}"
+    local retry_interval_seconds="${MFX_CORE_HTTP_WASM_DISPATCH_RETRY_INTERVAL_SECONDS:-0.2}"
+    local deadline=$((SECONDS + timeout_seconds))
+    local code=""
+
+    while true; do
+        code="$(_mfx_core_http_wasm_test_dispatch_http_code "$output_file" "$base_url" "$token")"
+        if [[ "$code" == "200" ]] && \
+           mfx_file_contains_fixed "$output_file" "\"ok\":true" && \
+           mfx_file_contains_fixed "$output_file" "\"route_active\":true" && \
+           mfx_file_contains_fixed "$output_file" "\"invoke_ok\":true"; then
+            if [[ "$require_rendered_any" != "true" ]] || \
+               mfx_file_contains_fixed "$output_file" "\"rendered_any\":true"; then
+                return 0
+            fi
+        fi
+
+        if (( SECONDS >= deadline )); then
+            break
+        fi
+        sleep "$retry_interval_seconds"
+    done
+
+    mfx_assert_eq "$code" "200" "$context status"
+    mfx_assert_file_contains "$output_file" "\"ok\":true" "$context ok"
+    mfx_assert_file_contains "$output_file" "\"route_active\":true" "$context route_active"
+    mfx_assert_file_contains "$output_file" "\"invoke_ok\":true" "$context invoke_ok"
+    if [[ "$require_rendered_any" == "true" ]]; then
+        mfx_assert_file_contains "$output_file" "\"rendered_any\":true" "$context rendered_any"
+    fi
+}
+
 _mfx_core_http_assert_wasm_load_manifest_ok() {
     local output_file="$1"
     local base_url="$2"

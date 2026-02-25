@@ -43,6 +43,8 @@ Env tuning:
   MFX_TEST_INPUT_CAPTURE_PERMISSION_SIM_FILE optional mac input-permission simulation file used by the script
   MFX_TEST_NOTIFICATION_CAPTURE_FILE optional shell notification capture file used by the script
   MFX_CORE_HTTP_INPUT_CAPTURE_TIMEOUT_SECONDS timeout for permission transition waits (default: 10)
+  MFX_CORE_HTTP_WASM_DISPATCH_TIMEOUT_SECONDS max wait for invoke/render ready in test-dispatch assertion (default: 5)
+  MFX_CORE_HTTP_WASM_DISPATCH_RETRY_INTERVAL_SECONDS retry interval for test-dispatch assertion (default: 0.2)
 USAGE
             exit 0
             ;;
@@ -73,18 +75,10 @@ mfx_info "enable core runtime lane: ON"
 mfx_info "entry host lock: mfx-entry-posix-host"
 
 mfx_run_core_automation_contract_workflow() {
-    mfx_terminate_stale_entry_host "before core automation contracts"
-
-    mfx_configure_and_build_entry_host \
-        "$REPO_ROOT" \
-        "$MFX_BUILD_DIR" \
-        "$MFX_PLATFORM" \
-        "-DMFX_ENABLE_POSIX_CORE_RUNTIME=ON"
+    mfx_prepare_core_entry_runtime "core automation contracts" "$REPO_ROOT" "$MFX_BUILD_DIR" "$MFX_PLATFORM"
 
     mfx_run_core_http_contract_checks "$MFX_PLATFORM" "$MFX_BUILD_DIR"
     mfx_ok "posix core automation contract regression passed"
 }
 
-MFX_ENTRY_LOCK_TIMEOUT_SECONDS="${MFX_ENTRY_LOCK_TIMEOUT_SECONDS:-180}"
-mfx_with_lock "mfx-entry-posix-host" "$MFX_ENTRY_LOCK_TIMEOUT_SECONDS" \
-    mfx_run_core_automation_contract_workflow
+mfx_run_with_entry_lock mfx_run_core_automation_contract_workflow

@@ -26,6 +26,10 @@ Options:
   --keep-running              Keep host running after selfcheck
   --auto-stop-seconds <num>   Auto stop host after N seconds (only used with --keep-running, default: 120)
   -h, --help                  Show this help
+
+Env tuning:
+  MFX_MANUAL_WASM_DISPATCH_TIMEOUT_SECONDS         max wait for invoke/render ready in test-dispatch assertion (default: 5)
+  MFX_MANUAL_WASM_DISPATCH_RETRY_INTERVAL_SECONDS  retry interval for test-dispatch assertion (default: 0.2)
 EOF
 }
 
@@ -210,14 +214,12 @@ mfx_assert_eq "$code_enable" "200" "selfcheck wasm enable status"
 mfx_assert_file_contains "$enable_file" "\"ok\":true" "selfcheck wasm enable ok"
 
 dispatch_file="$tmp_dir/wasm-test-dispatch.out"
-code_dispatch="$(mfx_http_code "$dispatch_file" "$MFX_MANUAL_BASE_URL/api/wasm/test-dispatch-click" \
-    -X POST -H "$token_header" -H "Content-Type: application/json" \
-    -d '{"x":640,"y":360,"button":1}')"
-mfx_assert_eq "$code_dispatch" "200" "selfcheck wasm test-dispatch status"
-mfx_assert_file_contains "$dispatch_file" "\"ok\":true" "selfcheck wasm test-dispatch ok"
-mfx_assert_file_contains "$dispatch_file" "\"route_active\":true" "selfcheck wasm route active"
-mfx_assert_file_contains "$dispatch_file" "\"invoke_ok\":true" "selfcheck wasm invoke ok"
-mfx_assert_file_contains "$dispatch_file" "\"rendered_any\":true" "selfcheck wasm rendered"
+mfx_wasm_selfcheck_assert_test_dispatch_ok \
+    "wasm test-dispatch" \
+    "$dispatch_file" \
+    "$MFX_MANUAL_BASE_URL" \
+    "$token" \
+    "true"
 
 invalid_manifest_path="${manifest_path}.missing"
 invalid_file="$tmp_dir/wasm-load-invalid.out"

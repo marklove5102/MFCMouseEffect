@@ -85,6 +85,16 @@ mfx_wasm_selfcheck_import_dialog_probe_http_code() {
         -d '{"probe_only":true}'
 }
 
+mfx_wasm_selfcheck_test_dispatch_http_code() {
+    local output_file="$1"
+    local base_url="$2"
+    local token="$3"
+
+    mfx_http_code "$output_file" "$base_url/api/wasm/test-dispatch-click" \
+        -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" \
+        -d '{"x":640,"y":360,"button":1}'
+}
+
 mfx_wasm_selfcheck_assert_import_selected_ok() {
     local label="$1"
     local output_file="$2"
@@ -165,4 +175,42 @@ mfx_wasm_selfcheck_assert_import_dialog_probe_supported() {
     mfx_assert_file_contains "$output_file" "\"ok\":true" "selfcheck $label ok"
     mfx_assert_file_contains "$output_file" "\"probe_only\":true" "selfcheck $label probe flag"
     mfx_assert_file_contains "$output_file" "\"supported\":true" "selfcheck $label supported"
+}
+
+mfx_wasm_selfcheck_assert_test_dispatch_ok() {
+    local label="$1"
+    local output_file="$2"
+    local base_url="$3"
+    local token="$4"
+    local require_rendered_any="${5:-true}"
+    local timeout_seconds="${MFX_MANUAL_WASM_DISPATCH_TIMEOUT_SECONDS:-5}"
+    local retry_interval_seconds="${MFX_MANUAL_WASM_DISPATCH_RETRY_INTERVAL_SECONDS:-0.2}"
+    local deadline=$((SECONDS + timeout_seconds))
+    local code=""
+
+    while true; do
+        code="$(mfx_wasm_selfcheck_test_dispatch_http_code "$output_file" "$base_url" "$token")"
+        if [[ "$code" == "200" ]] && \
+           mfx_file_contains_fixed "$output_file" "\"ok\":true" && \
+           mfx_file_contains_fixed "$output_file" "\"route_active\":true" && \
+           mfx_file_contains_fixed "$output_file" "\"invoke_ok\":true"; then
+            if [[ "$require_rendered_any" != "true" ]] || \
+               mfx_file_contains_fixed "$output_file" "\"rendered_any\":true"; then
+                return 0
+            fi
+        fi
+
+        if (( SECONDS >= deadline )); then
+            break
+        fi
+        sleep "$retry_interval_seconds"
+    done
+
+    mfx_assert_eq "$code" "200" "selfcheck $label status"
+    mfx_assert_file_contains "$output_file" "\"ok\":true" "selfcheck $label ok"
+    mfx_assert_file_contains "$output_file" "\"route_active\":true" "selfcheck $label route active"
+    mfx_assert_file_contains "$output_file" "\"invoke_ok\":true" "selfcheck $label invoke ok"
+    if [[ "$require_rendered_any" == "true" ]]; then
+        mfx_assert_file_contains "$output_file" "\"rendered_any\":true" "selfcheck $label rendered"
+    fi
 }

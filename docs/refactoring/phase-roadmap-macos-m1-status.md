@@ -217,6 +217,10 @@
   - 55zo completed (acceptance): full POSIX regression suite remains green after platform-arg helper consolidation.
   - 55zp completed (docs): compacted top-level P0/P1 indexes (`docs/README*.md`, `docs/agent-context/current.md`) by replacing exhaustive 53x/55x lists with key-doc subsets and roadmap pointers.
   - 55zp completed (acceptance): strict doc hygiene remains green after index compaction.
+  - 55zq completed (code): consolidated core regression workflow boilerplate into shared helpers (`mfx_prepare_core_entry_runtime`, `mfx_run_with_entry_lock`) and rewired core smoke/automation/wasm scripts to use them.
+  - 55zq completed (acceptance): full POSIX regression suite remains green after core workflow-helper consolidation.
+  - 55zr completed (code): added retry-based WASM test-dispatch readiness assertions in both regression and manual selfcheck paths to absorb transient startup races (`invoke_ok`/`rendered_any` timing).
+  - 55zr completed (acceptance): full POSIX regression suite remains green after dispatch-readiness retry hardening.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -332,6 +336,8 @@
 - Regression file-content matching now has shared `rg -> grep` fallback helpers, reducing environment friction on hosts without `rg`.
 - POSIX regression entry scripts now share one platform-arg resolution path, reducing script-level drift risk in host detection and cross-host guards.
 - Top-level first-read doc indexes are now compacted (key-doc subsets + roadmap pointer), reducing ongoing token pressure as Phase 55 slices continue.
+- Core regression entry scripts now share one workflow-prep/lock execution path, reducing boilerplate drift in stale cleanup, build lane setup, and lock wrapping.
+- WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

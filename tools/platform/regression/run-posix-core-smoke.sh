@@ -57,18 +57,10 @@ mfx_info "enable core runtime lane: ON"
 mfx_info "entry host lock: mfx-entry-posix-host"
 
 mfx_run_core_smoke_workflow() {
-    mfx_terminate_stale_entry_host "before core smoke"
-
-    mfx_configure_and_build_entry_host \
-        "$REPO_ROOT" \
-        "$MFX_BUILD_DIR" \
-        "$MFX_PLATFORM" \
-        "-DMFX_ENABLE_POSIX_CORE_RUNTIME=ON"
+    mfx_prepare_core_entry_runtime "core smoke" "$REPO_ROOT" "$MFX_BUILD_DIR" "$MFX_PLATFORM"
 
     mfx_run_core_lane_smoke "$MFX_PLATFORM" "$MFX_BUILD_DIR"
     mfx_ok "posix core-lane smoke regression passed"
 }
 
-MFX_ENTRY_LOCK_TIMEOUT_SECONDS="${MFX_ENTRY_LOCK_TIMEOUT_SECONDS:-180}"
-mfx_with_lock "mfx-entry-posix-host" "$MFX_ENTRY_LOCK_TIMEOUT_SECONDS" \
-    mfx_run_core_smoke_workflow
+mfx_run_with_entry_lock mfx_run_core_smoke_workflow

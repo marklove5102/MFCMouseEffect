@@ -34,6 +34,8 @@ Env tuning:
   MFX_CORE_HTTP_START_WAIT_SECONDS      wait time before startup alive check (default: 1)
   MFX_CORE_HTTP_PROBE_TIMEOUT_SECONDS   wait time for websettings probe file (default: 8)
   MFX_ENABLE_WASM_TEST_DISPATCH_API     enable test dispatch endpoint during regression (default: 1 in script)
+  MFX_CORE_HTTP_WASM_DISPATCH_TIMEOUT_SECONDS max wait for invoke/render ready in test-dispatch assertion (default: 5)
+  MFX_CORE_HTTP_WASM_DISPATCH_RETRY_INTERVAL_SECONDS retry interval for test-dispatch assertion (default: 0.2)
 USAGE
             exit 0
             ;;
@@ -65,18 +67,10 @@ mfx_info "enable core runtime lane: ON"
 mfx_info "entry host lock: mfx-entry-posix-host"
 
 mfx_run_core_wasm_contract_workflow() {
-    mfx_terminate_stale_entry_host "before core wasm contracts"
-
-    mfx_configure_and_build_entry_host \
-        "$REPO_ROOT" \
-        "$MFX_BUILD_DIR" \
-        "$MFX_PLATFORM" \
-        "-DMFX_ENABLE_POSIX_CORE_RUNTIME=ON"
+    mfx_prepare_core_entry_runtime "core wasm contracts" "$REPO_ROOT" "$MFX_BUILD_DIR" "$MFX_PLATFORM"
 
     mfx_run_core_http_contract_checks "$MFX_PLATFORM" "$MFX_BUILD_DIR" "wasm"
     mfx_ok "posix core wasm contract regression passed"
 }
 
-MFX_ENTRY_LOCK_TIMEOUT_SECONDS="${MFX_ENTRY_LOCK_TIMEOUT_SECONDS:-180}"
-mfx_with_lock "mfx-entry-posix-host" "$MFX_ENTRY_LOCK_TIMEOUT_SECONDS" \
-    mfx_run_core_wasm_contract_workflow
+mfx_run_with_entry_lock mfx_run_core_wasm_contract_workflow

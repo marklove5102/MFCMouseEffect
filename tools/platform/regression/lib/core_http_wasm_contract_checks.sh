@@ -63,12 +63,16 @@ _mfx_core_http_run_wasm_contract_checks() {
         mfx_assert_eq "$code_wasm_enable" "200" "core wasm enable status"
         mfx_assert_file_contains "$tmp_dir/wasm-enable.out" "\"ok\":true" "core wasm enable ok"
 
-        local code_wasm_test_dispatch
-        code_wasm_test_dispatch="$(mfx_http_code "$tmp_dir/wasm-test-dispatch.out" "$base_url/api/wasm/test-dispatch-click" -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" -d '{"x":640,"y":360,"button":1}')"
-        mfx_assert_eq "$code_wasm_test_dispatch" "200" "core wasm test-dispatch status"
-        mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"ok\":true" "core wasm test-dispatch ok"
-        mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"route_active\":true" "core wasm test-dispatch route_active"
-        mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"invoke_ok\":true" "core wasm test-dispatch invoke_ok"
+        local require_rendered_any="false"
+        if [[ "$platform" == "macos" ]]; then
+            require_rendered_any="true"
+        fi
+        _mfx_core_http_assert_wasm_test_dispatch_ok \
+            "$tmp_dir/wasm-test-dispatch.out" \
+            "$base_url" \
+            "$token" \
+            "core wasm test-dispatch" \
+            "$require_rendered_any"
 
         local invalid_manifest_path="${wasm_manifest_path}.missing"
         _mfx_core_http_assert_wasm_import_selected_failure \
@@ -142,11 +146,6 @@ _mfx_core_http_run_wasm_contract_checks() {
         fi
         if ! mfx_file_contains_fixed "$tmp_dir/wasm-import-dialog-probe.out" "\"supported\":true"; then
             mfx_fail "core wasm import dialog support on macos: expected supported=true"
-        fi
-        if [[ -f "$tmp_dir/wasm-test-dispatch.out" ]]; then
-            if ! mfx_file_contains_fixed "$tmp_dir/wasm-test-dispatch.out" "\"rendered_any\":true"; then
-                mfx_fail "core wasm test-dispatch render on macos: expected rendered_any=true"
-            fi
         fi
     fi
 }
