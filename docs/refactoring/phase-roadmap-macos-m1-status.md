@@ -229,6 +229,10 @@
   - 55zu completed (acceptance): full POSIX regression suite remains green after indicator overlay implementation split.
   - 55zv completed (code): extracted macOS keyboard shortcut key-resolution logic into dedicated module (`MacosKeyboardInjectorKeyResolver.*`) and kept `MacosKeyboardInjector` focused on injection flow.
   - 55zv completed (acceptance): full POSIX regression suite remains green after keyboard-injector resolver split.
+  - 55zw completed (code): extracted app-catalog root-scan workflow (`root discovery`, `bundle resolution`, `dedup/sort`) into dedicated module (`MacosApplicationCatalogScanWorkflow.*`) and kept `MacosApplicationCatalogScanner` as thin entry façade.
+  - 55zw completed (acceptance): full POSIX regression suite remains green after app-catalog workflow split.
+  - 55zx completed (code): split macOS wasm renderer into parse/orchestration (`MacosWasmCommandRenderer.mm`), command dispatch (`MacosWasmCommandRenderDispatch.*`), and resolver helpers (`MacosWasmCommandRenderResolvers.*`).
+  - 55zx completed (acceptance): full POSIX regression suite remains green after wasm renderer dispatch/resolver split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.

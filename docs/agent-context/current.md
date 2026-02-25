@@ -97,6 +97,8 @@
   - macOS `MacosGlobalInputHook` implementation is now split by responsibility (`MacosGlobalInputHook.mm`, `.EventTap.mm`, `.RunLoop.mm`) to lower file coupling without behavior changes
   - macOS input-indicator overlay path is now split into render/lifecycle (`MacosInputIndicatorOverlay.mm`), probe/event-entry (`MacosInputIndicatorOverlay.Probes.mm`), and shared internals (`MacosInputIndicatorOverlayInternals.*`)
   - macOS keyboard injection path now isolates shortcut key-resolution (`MacosKeyboardInjectorKeyResolver.*`) from event-post execution flow (`MacosKeyboardInjector.mm`)
+  - macOS app-catalog scanner now isolates root-scan workflow in `MacosApplicationCatalogScanWorkflow.*` and keeps `MacosApplicationCatalogScanner` as thin entry façade
+  - macOS wasm renderer now isolates command dispatch and resolver utilities (`MacosWasmCommandRenderDispatch.*`, `MacosWasmCommandRenderResolvers.*`) from top-level parse/orchestration
 
 ## Known Stable Gates
 Run these as first-line regression checks:
@@ -156,10 +158,12 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zt-macos-global-input-hook-impl-split-eventtap-runloop.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zu-macos-input-indicator-overlay-impl-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zv-macos-keyboard-injector-key-resolver-split.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zw-macos-application-catalog-scan-workflow-split.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zx-macos-wasm-command-renderer-dispatch-split.md`
 - Phase closure docs:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54i-linux-follow-phase-closure.md`
-- For full Phase 55 sequence (`55h-55zv`), read roadmap status doc above instead of loading all slice docs by default.
+- For full Phase 55 sequence (`55h-55zx`), read roadmap status doc above instead of loading all slice docs by default.
 
 ## AI-IDE Context Loading Rule
 - Read this file first for active truth.
