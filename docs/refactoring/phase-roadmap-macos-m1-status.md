@@ -183,6 +183,8 @@
   - 55x completed (acceptance): shell syntax checks and full POSIX suite remain green after helper-module split.
   - 55y completed (code): expanded core HTTP WASM helper module with transfer API contracts (`import-selected` success/failure and `export-all` success with minimum count assertion) and migrated inline assertions from `core_http.sh` to helperized calls.
   - 55y completed (acceptance): core automation contract regression and full POSIX suite remain green after WASM transfer-contract expansion.
+  - 55z completed (code): strengthened `export-all` contract assertions by validating response-vs-filesystem consistency (`export_path` exists and top-level exported directory count matches response `count`).
+  - 55z completed (acceptance): core automation contract regression and full POSIX suite remain green after export filesystem-contract expansion.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -278,6 +280,7 @@
 - macOS WASM selfcheck internals are now helper-split, reducing future extension/change risk while preserving existing contract assertions.
 - Core HTTP contract regression now enforces the same load-failure diagnostics semantics, reducing drift between manual selfcheck and CI-style contract gates.
 - Core HTTP contract regression now also enforces WASM transfer semantics (`import-selected` success/failure and `export-all` success count), reducing CI blind spots in plugin transfer paths.
+- Core HTTP `export-all` contract now verifies filesystem materialization (`export_path` existence + directory count consistency), reducing false-green risk on transfer regressions.
 - Shared WebUI diagnostics now surfaces load-failure stage/code directly, closing backend-vs-UI observability gap for WASM load failures.
 - Shared WebUI WASM state normalization now has one source of truth, reducing future diagnostics-field drift in UI adapters.
 - Core HTTP regression helper responsibilities are now split by domain (core flow vs wasm helpers), reducing future maintenance risk in script-level contract evolution.
