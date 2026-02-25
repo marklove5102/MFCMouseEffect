@@ -10,6 +10,10 @@
     buildWasmCallMetricsText,
     hasWasmDiagnosticWarning,
   } from './diagnostics-model.js';
+  import {
+    normalizeActionErrorCode,
+    resolveWasmActionErrorMessage,
+  } from './action-error-model.js';
   import { normalizeWasmState } from './state-model.js';
 
   export let schemaState = {};
@@ -147,6 +151,7 @@
   let busy = false;
   let statusTone = '';
   let statusMessage = '';
+  let statusErrorCode = '';
   let initialCatalogRequested = false;
   let policyFallbackToBuiltin = current.fallback_to_builtin_click !== false;
   let policyCatalogRootPath = current.configured_catalog_root_path || '';
@@ -198,8 +203,21 @@
   }
 
   function resolveActionError(response) {
+    const errorCode = normalizeActionErrorCode(response?.error_code);
     const textValue = `${response?.error || ''}`.trim();
-    return textValue || text('wasm_action_failed', 'WASM action failed.');
+    const errorByCode = resolveWasmActionErrorMessage(errorCode, text);
+    const message = textValue || errorByCode || text('wasm_action_failed', 'WASM action failed.');
+    const label = text('label_wasm_error_code', 'Error code');
+    if (!errorCode) {
+      return {
+        message,
+        errorCode: '',
+      };
+    }
+    return {
+      message: `${message} (${label}: ${errorCode})`,
+      errorCode,
+    };
   }
 
   async function runAction(action, payload) {
@@ -209,11 +227,13 @@
     if (typeof onAction !== 'function') {
       statusTone = 'error';
       statusMessage = text('wasm_action_not_ready', 'WASM action handler is not ready yet.');
+      statusErrorCode = '';
       return { ok: false, error: statusMessage };
     }
     busy = true;
     statusTone = '';
     statusMessage = '';
+    statusErrorCode = '';
     try {
       const response = await onAction(action, payload || {});
       if (action === 'catalog') {
@@ -222,19 +242,24 @@
       if (response?.cancelled === true) {
         statusTone = '';
         statusMessage = text('wasm_import_cancelled', 'Import cancelled.');
+        statusErrorCode = '';
         return response;
       }
       if (!response || response.ok === false) {
         statusTone = 'error';
-        statusMessage = resolveActionError(response);
+        const resolved = resolveActionError(response);
+        statusMessage = resolved.message;
+        statusErrorCode = resolved.errorCode;
         return response || { ok: false };
       }
       statusTone = 'ok';
       statusMessage = text('wasm_action_success', 'Operation completed.');
+      statusErrorCode = '';
       return response;
     } catch (error) {
       statusTone = 'error';
       statusMessage = `${error?.message || error || text('wasm_action_failed', 'WASM action failed.')}`;
+      statusErrorCode = '';
       return { ok: false, error: statusMessage };
     } finally {
       busy = false;
@@ -711,6 +736,10 @@
       {#if statusMessage}
         <div class="wasm-label">{text('label_wasm_operation_result', 'Operation result')}</div>
         <div class={`wasm-value wasm-text-block ${statusTone === 'error' ? 'is-error' : 'is-ok'}`}>{statusMessage}</div>
+        {#if statusTone === 'error' && statusErrorCode}
+          <div class="wasm-label" data-i18n="label_wasm_error_code">Error code</div>
+          <div class="wasm-value wasm-text-block is-error">{statusErrorCode}</div>
+        {/if}
       {/if}
     </div>
   </section>
