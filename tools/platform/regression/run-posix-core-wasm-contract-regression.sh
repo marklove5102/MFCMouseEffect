@@ -81,21 +81,27 @@ mfx_info "platform: $MFX_PLATFORM"
 mfx_info "build dir: $MFX_BUILD_DIR"
 mfx_info "check scope: wasm"
 mfx_info "enable core runtime lane: ON"
+mfx_info "entry host lock: mfx-entry-posix-host"
 
-if command -v pgrep >/dev/null 2>&1 && command -v pkill >/dev/null 2>&1; then
-    if pgrep -f mfx_entry_posix_host >/dev/null 2>&1; then
-        mfx_info "terminate stale mfx_entry_posix_host processes before core wasm contracts"
-        pkill -f mfx_entry_posix_host >/dev/null 2>&1 || true
-        sleep 0.2
+mfx_run_core_wasm_contract_workflow() {
+    if command -v pgrep >/dev/null 2>&1 && command -v pkill >/dev/null 2>&1; then
+        if pgrep -f mfx_entry_posix_host >/dev/null 2>&1; then
+            mfx_info "terminate stale mfx_entry_posix_host processes before core wasm contracts"
+            pkill -f mfx_entry_posix_host >/dev/null 2>&1 || true
+            sleep 0.2
+        fi
     fi
-fi
 
-mfx_configure_and_build_entry_host \
-    "$REPO_ROOT" \
-    "$MFX_BUILD_DIR" \
-    "$MFX_PLATFORM" \
-    "-DMFX_ENABLE_POSIX_CORE_RUNTIME=ON"
+    mfx_configure_and_build_entry_host \
+        "$REPO_ROOT" \
+        "$MFX_BUILD_DIR" \
+        "$MFX_PLATFORM" \
+        "-DMFX_ENABLE_POSIX_CORE_RUNTIME=ON"
 
-mfx_run_core_http_contract_checks "$MFX_PLATFORM" "$MFX_BUILD_DIR" "wasm"
+    mfx_run_core_http_contract_checks "$MFX_PLATFORM" "$MFX_BUILD_DIR" "wasm"
+    mfx_ok "posix core wasm contract regression passed"
+}
 
-mfx_ok "posix core wasm contract regression passed"
+MFX_ENTRY_LOCK_TIMEOUT_SECONDS="${MFX_ENTRY_LOCK_TIMEOUT_SECONDS:-180}"
+mfx_with_lock "mfx-entry-posix-host" "$MFX_ENTRY_LOCK_TIMEOUT_SECONDS" \
+    mfx_run_core_wasm_contract_workflow
