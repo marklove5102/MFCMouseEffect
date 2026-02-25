@@ -27,7 +27,8 @@
   - 52j completed (acceptance): core automation contract regression now captures shell warnings and asserts startup degraded notify dedup + startup grant-after-start auto-recovery.
   - 52l completed (code): macOS scroll baseline effect landed (`MacosScrollPulseEffect`) and factory mapping now enables native scroll-visible feedback in core lane.
   - 52l completed (acceptance): full POSIX regression suite remains green after scroll-effect enablement and schema now reports `capabilities.effects.scroll=true` on macOS.
-- Phase 53 (automation mapping with unified shortcut semantics): in progress.
+- Phase 53 (automation mapping with unified shortcut semantics): completed (M1 scope closure).
+  - Evidence: core automation contracts + unified suite remain green, and manual macOS injection acceptance is recorded; closure boundary is documented in `phase53ai`.
   - 53a completed (code): mac keyboard injector + foreground-process service landed and factory/build wiring completed.
   - 53a completed (acceptance-script): core automation contract regression now enforces non-empty `active-process`, `schema.capabilities.input.keyboard_injector=true`, and test-inject shortcut acceptance (`Cmd+C`) under explicit dry-run injector mode.
   - 53a completed (acceptance-manual): user-side real-dispatch selfcheck passed on macOS on February 24, 2026 via `run-macos-automation-injection-selfcheck.sh` (`dry_run=0`, final result `mfx:ok`).
@@ -97,6 +98,7 @@
   - 53ag completed (acceptance): full POSIX regression suite remains green after effects/vm split, and Windows build-lane wiring is preserved in `MFCMouseEffect.vcxproj`.
   - 53ah completed (code): extracted dispatch-state runtime helpers (`OnGlobalKey`, shortcut-capture session lifecycle, hover/hold timers/state helpers) from `AppController.cpp` into `AppController.DispatchState.cpp` and wired both CMake + Visual Studio build ownership.
   - 53ah completed (acceptance): full POSIX regression suite remains green after dispatch-state split, and Windows build-lane wiring is preserved in `MFCMouseEffect.vcxproj`.
+  - 53ai completed (closure): phase closure boundary is now explicitly documented with minimal evidence (`core-automation-contract`, unified suite, and manual injection selfcheck) in `phase53ai-automation-mapping-phase-closure.md`.
 - Phase 54 (Linux compile-level + contract-level follow): in progress, compile gate currently passing in CI-style local commands.
   - 54a completed (code): Linux compile-level gate is now scriptized as one-command workflow (`run-posix-linux-compile-gate.sh`) with modular regression packaging.
   - 54a completed (acceptance): gate command executed and passed on current host.
@@ -232,6 +234,7 @@
 - phase53af lifecycle runtime logic is now split into a dedicated controller unit (`AppController.Lifecycle.cpp`), reducing startup/teardown coupling in `AppController.cpp` while keeping POSIX/Windows build ownership aligned.
 - phase53ag effect orchestration and VM suppression runtime logic is now split into a dedicated controller unit (`AppController.Effects.cpp`), reducing effect/VM coupling in `AppController.cpp` while keeping POSIX/Windows build ownership aligned.
 - phase53ah dispatch-state runtime helpers are now split into a dedicated controller unit (`AppController.DispatchState.cpp`), reducing hover/hold/session handling coupling in `AppController.cpp` while keeping POSIX/Windows build ownership aligned.
+- phase53 is now explicitly closed for current M1 automation scope, and future automation expansion will proceed as new slices without changing existing contracts by default.
 - phase54h Linux compile gate now covers both scaffold-lane and core-runtime-lane compile contracts by default, reducing Linux drift risk while mac-first development continues.
 - Linux compile gate now has a dedicated orchestration script, reducing manual command drift risk for cross-host follow.
 - Automation platform semantics now have script-level regression guard, reducing manual-only verification for `.app/.exe` behavior.
