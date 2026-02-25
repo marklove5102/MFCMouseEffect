@@ -152,4 +152,19 @@ _mfx_core_http_assert_wasm_export_all_ok() {
     if [[ "$exported_dir_count" != "$exported_count" ]]; then
         mfx_fail "$context exported directory count mismatch: response=$exported_count filesystem=$exported_dir_count"
     fi
+
+    local exported_manifest_count
+    exported_manifest_count="$(find "$export_path" -mindepth 2 -maxdepth 2 -type f -name 'plugin.json' | wc -l | tr -d ' ')"
+    if [[ -z "$exported_manifest_count" ]]; then
+        mfx_fail "$context exported manifest count parse failed"
+    fi
+    if [[ "$exported_manifest_count" != "$exported_count" ]]; then
+        mfx_fail "$context exported manifest count mismatch: response=$exported_count manifests=$exported_manifest_count"
+    fi
+
+    while IFS= read -r exported_manifest; do
+        if [[ ! -s "$exported_manifest" ]]; then
+            mfx_fail "$context exported manifest is empty: $exported_manifest"
+        fi
+    done < <(find "$export_path" -mindepth 2 -maxdepth 2 -type f -name 'plugin.json' | sort)
 }
