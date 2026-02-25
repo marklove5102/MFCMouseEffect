@@ -287,6 +287,8 @@
   - 55zzx completed (acceptance): automation contract gate and full POSIX regression suite remain green after core-http helper split.
   - 55zzy completed (code): split core HTTP input-capture helper responsibilities (parse/permission/notification/state/steps) into dedicated modules while keeping `core_http_input_contract_checks.sh` as the contract entry.
   - 55zzy completed (acceptance): automation contract gate and full POSIX regression suite remain green after input-capture helper split.
+  - 55zzz completed (code): split scaffold HTTP entry lifecycle helpers into `http_entry_helpers.sh` and keep `http.sh` focused on route checks.
+  - 55zzz completed (acceptance): full POSIX regression suite remains green after scaffold HTTP helper split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -408,6 +410,7 @@
 - Core HTTP wasm contract checks are now modularized by scenario (catalog/path/runtime/transfer/fixture/dispatch/platform), reducing monolithic script churn risk while preserving entrypoints.
 - Core HTTP automation contract checks are now modularized by scenario (basic/app-scope/priority/match-inject/shortcut/indicator/effects/platform), reducing monolithic script churn risk while preserving entrypoints.
 - Core HTTP orchestrator is now helper-split (probe/entry/state), reducing lifecycle/probe coupling in `core_http.sh` while preserving contract flows.
+- Scaffold HTTP entry lifecycle helpers are now split into `http_entry_helpers.sh`, keeping route checks in `http.sh` focused and easier to extend.
 - Shared lock owner-pid read path now tolerates transient `owner.env` races, so concurrent gate waits degrade to normal lock waiting rather than shell parse failure.
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.
