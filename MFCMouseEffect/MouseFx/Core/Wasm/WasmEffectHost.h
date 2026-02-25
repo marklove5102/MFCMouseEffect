@@ -72,6 +72,8 @@ struct HostDiagnostics final {
     uint32_t lastThrottledByIntervalRenderCommands = 0;
     uint32_t lastDroppedRenderCommands = 0;
     std::string lastRenderError{};
+    std::string lastLoadFailureStage{};
+    std::string lastLoadFailureCode{};
     std::string lastError{};
 };
 
@@ -106,6 +108,8 @@ public:
 
 private:
     EventInputV1 BuildEventInputV1(const EventInvokeInput& input) const;
+    void SetLoadFailure(const std::string& stage, const std::string& code, const std::string& message);
+    void ClearLoadFailure();
     void SetError(const std::string& error);
     void ClearError();
     void ClearActivePluginMetadata();

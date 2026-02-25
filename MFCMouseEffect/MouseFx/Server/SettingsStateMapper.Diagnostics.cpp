@@ -164,6 +164,8 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["last_throttled_by_interval_render_commands"] = diag.lastThrottledByIntervalRenderCommands;
     out["last_dropped_render_commands"] = diag.lastDroppedRenderCommands;
     out["last_render_error"] = diag.lastRenderError;
+    out["last_load_failure_stage"] = diag.lastLoadFailureStage;
+    out["last_load_failure_code"] = diag.lastLoadFailureCode;
     out["last_error"] = diag.lastError;
     return out;
 }

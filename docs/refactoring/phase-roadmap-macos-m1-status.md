@@ -161,6 +161,8 @@
   - 55o-d completed (closure): minimal closure evidence is now recorded (selfcheck pass + manual runner availability + user-confirmed folder-import UX fixes).
   - 55p completed (code): POSIX regression suite now runs macOS WASM runtime selfcheck as a first-class phase (default enabled, explicit skip flag available).
   - 55p completed (acceptance): full POSIX suite and standalone selfcheck remain green after suite integration.
+  - 55q completed (code): WASM host and WebSettings diagnostics now expose machine-readable load-failure stage/code fields, and manifest load failures are classified into stable categories (`io_error/json_parse/invalid`).
+  - 55q completed (acceptance): full POSIX suite remains green and macOS WASM selfcheck now asserts invalid-manifest response contract (`last_load_failure_stage=manifest_load`, `last_load_failure_code=manifest_io_error`).
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -248,6 +250,7 @@
 - Core automation HTTP contracts now include non-interactive WASM dispatch invocation checks (`load-manifest -> enable -> test-dispatch-click`) under test-only endpoint gate.
 - POSIX unified regression suite now includes macOS automation injection selfcheck (`--dry-run`) and WASM runtime selfcheck by default, reducing manual acceptance drift for both automation and plugin runtime behavior.
 - Linux WASM renderer path is now explicitly defined as `degrade-only` for current M2, preserving `invoke_supported=true` and `render_supported=false` contract semantics until a separate Linux-native renderer phase is approved.
+- WASM load failure diagnostics now provide stable stage/code pairs in `/api/state` and `/api/wasm/*` responses, reducing triage ambiguity on manifest/runtime load failures.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

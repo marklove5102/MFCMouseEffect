@@ -152,6 +152,8 @@ bool HandleWebSettingsTestWasmInputApiRoute(
             {"render_error", dispatchResult.render.lastError},
             {"plugin_loaded", diag.pluginLoaded},
             {"runtime_backend", diag.runtimeBackend},
+            {"last_load_failure_stage", diag.lastLoadFailureStage},
+            {"last_load_failure_code", diag.lastLoadFailureCode},
             {"last_error", diag.lastError},
             {"last_render_error", diag.lastRenderError},
             {"last_output_bytes", diag.lastOutputBytes},

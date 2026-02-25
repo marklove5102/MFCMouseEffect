@@ -195,6 +195,8 @@ code_invalid="$(mfx_http_code "$invalid_file" "$MFX_MANUAL_BASE_URL/api/wasm/loa
     -d "{\"manifest_path\":\"$invalid_manifest_escaped\"}")"
 mfx_assert_eq "$code_invalid" "200" "selfcheck invalid manifest status"
 mfx_assert_file_contains "$invalid_file" "\"ok\":false" "selfcheck invalid manifest should fail"
+mfx_assert_file_contains "$invalid_file" "\"last_load_failure_stage\":\"manifest_load\"" "selfcheck invalid manifest stage"
+mfx_assert_file_contains "$invalid_file" "\"last_load_failure_code\":\"manifest_io_error\"" "selfcheck invalid manifest code"
 
 if ! kill -0 "$MFX_MANUAL_HOST_PID" 2>/dev/null; then
     tail -n 100 "$MFX_MANUAL_LOG_FILE" >&2 || true

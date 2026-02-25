@@ -79,6 +79,8 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
             "last_throttled_by_interval_render_commands",
             "last_dropped_render_commands",
             "last_render_error",
+            "last_load_failure_stage",
+            "last_load_failure_code",
             "last_error"
         })}
     };

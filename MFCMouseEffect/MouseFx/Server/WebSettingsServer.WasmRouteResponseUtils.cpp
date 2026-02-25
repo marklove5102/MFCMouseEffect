@@ -56,6 +56,8 @@ json BuildWasmResponse(AppController* controller, bool ok) {
     body["last_throttled_by_interval_render_commands"] = diag.lastThrottledByIntervalRenderCommands;
     body["last_dropped_render_commands"] = diag.lastDroppedRenderCommands;
     body["last_render_error"] = diag.lastRenderError;
+    body["last_load_failure_stage"] = diag.lastLoadFailureStage;
+    body["last_load_failure_code"] = diag.lastLoadFailureCode;
     body["last_error"] = diag.lastError;
     return body;
 }

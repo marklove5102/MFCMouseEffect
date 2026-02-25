@@ -2,11 +2,30 @@
 
 #include "WasmEffectHost.h"
 
+#include "MouseFx/Utils/StringUtils.h"
+
 #include <algorithm>
 #include <chrono>
 #include <utility>
 
 namespace mousefx::wasm {
+namespace {
+
+std::string ClassifyManifestLoadFailure(const std::string& message) {
+    const std::string lowered = ToLowerAscii(message);
+    if (lowered.find("does not exist") != std::string::npos ||
+        lowered.find("cannot open") != std::string::npos ||
+        lowered.find("failed reading") != std::string::npos ||
+        lowered.find("file is empty") != std::string::npos) {
+        return "manifest_io_error";
+    }
+    if (lowered.find("json parse error") != std::string::npos) {
+        return "manifest_json_parse_error";
+    }
+    return "manifest_invalid";
+}
+
+} // namespace
 
 WasmEffectHost::WasmEffectHost(std::unique_ptr<IWasmRuntime> runtime)
     : runtime_(std::move(runtime)) {
@@ -30,7 +49,7 @@ WasmEffectHost::WasmEffectHost(std::unique_ptr<IWasmRuntime> runtime)
 
 bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
     if (!runtime_) {
-        SetError("WASM host runtime is null.");
+        SetLoadFailure("runtime", "runtime_unavailable", "WASM host runtime is null.");
         diagnostics_.pluginLoaded = false;
         diagnostics_.pluginApiVersion = 0;
         return false;
@@ -39,7 +58,10 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
     std::string error;
     if (!runtime_->LoadModuleFromFile(modulePath, &error)) {
         ClearActivePluginMetadata();
-        SetError(error.empty() ? "Failed to load WASM module." : error);
+        SetLoadFailure(
+            "load_module",
+            "module_load_failed",
+            error.empty() ? "Failed to load WASM module." : error);
         diagnostics_.pluginLoaded = false;
         diagnostics_.pluginApiVersion = 0;
         return false;
@@ -49,7 +71,10 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
     if (!runtime_->CallGetApiVersion(&apiVersion, &error)) {
         runtime_->UnloadModule();
         ClearActivePluginMetadata();
-        SetError(error.empty() ? "Failed to call mfx_plugin_get_api_version." : error);
+        SetLoadFailure(
+            "get_api_version",
+            "api_version_call_failed",
+            error.empty() ? "Failed to call mfx_plugin_get_api_version." : error);
         diagnostics_.pluginLoaded = false;
         diagnostics_.pluginApiVersion = 0;
         return false;
@@ -57,7 +82,7 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
     if (apiVersion != kPluginApiVersionV1) {
         runtime_->UnloadModule();
         ClearActivePluginMetadata();
-        SetError("Unsupported plugin api_version.");
+        SetLoadFailure("validate_api_version", "api_version_unsupported", "Unsupported plugin api_version.");
         diagnostics_.pluginLoaded = false;
         diagnostics_.pluginApiVersion = 0;
         return false;
@@ -66,6 +91,7 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
     diagnostics_.pluginLoaded = true;
     diagnostics_.pluginApiVersion = apiVersion;
     diagnostics_.activeWasmPath = modulePath;
+    ClearLoadFailure();
     ClearError();
     return true;
 }
@@ -73,16 +99,24 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
 bool WasmEffectHost::LoadPluginFromManifest(const std::wstring& manifestPath) {
     const PluginManifestLoadResult load = WasmPluginManifest::LoadFromFile(manifestPath);
     if (!load.ok) {
-        SetError(load.error);
+        const std::string loadError =
+            load.error.empty() ? "Failed to load plugin manifest." : load.error;
+        SetLoadFailure("manifest_load", ClassifyManifestLoadFailure(loadError), loadError);
         return false;
     }
     if (load.manifest.apiVersion != kPluginApiVersionV1) {
-        SetError("Manifest api_version is not supported by current host.");
+        SetLoadFailure(
+            "manifest_api_version",
+            "manifest_api_unsupported",
+            "Manifest api_version is not supported by current host.");
         return false;
     }
     const std::wstring wasmPath = WasmPluginPaths::ResolveEntryWasmPath(manifestPath, load.manifest);
     if (wasmPath.empty()) {
-        SetError("Cannot resolve entry wasm path from manifest.");
+        SetLoadFailure(
+            "resolve_entry_wasm",
+            "entry_wasm_path_invalid",
+            "Cannot resolve entry wasm path from manifest.");
         return false;
     }
 
@@ -306,6 +340,20 @@ EventInputV1 WasmEffectHost::BuildEventInputV1(const EventInvokeInput& input) co
 
 void WasmEffectHost::SetError(const std::string& error) {
     diagnostics_.lastError = error;
+}
+
+void WasmEffectHost::SetLoadFailure(
+    const std::string& stage,
+    const std::string& code,
+    const std::string& message) {
+    diagnostics_.lastLoadFailureStage = stage;
+    diagnostics_.lastLoadFailureCode = code;
+    SetError(message);
+}
+
+void WasmEffectHost::ClearLoadFailure() {
+    diagnostics_.lastLoadFailureStage.clear();
+    diagnostics_.lastLoadFailureCode.clear();
 }
 
 void WasmEffectHost::ClearError() {
