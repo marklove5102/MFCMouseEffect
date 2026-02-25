@@ -26,6 +26,53 @@ _mfx_core_http_json_escape() {
     printf '%s' "$value" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
+_mfx_core_http_wasm_load_manifest_http_code() {
+    local output_file="$1"
+    local base_url="$2"
+    local token="$3"
+    local manifest_path="$4"
+
+    local manifest_path_escaped
+    manifest_path_escaped="$(_mfx_core_http_json_escape "$manifest_path")"
+    mfx_http_code "$output_file" "$base_url/api/wasm/load-manifest" \
+        -X POST \
+        -H "x-mfcmouseeffect-token: $token" \
+        -H "Content-Type: application/json" \
+        -d "{\"manifest_path\":\"$manifest_path_escaped\"}"
+}
+
+_mfx_core_http_assert_wasm_load_manifest_ok() {
+    local output_file="$1"
+    local base_url="$2"
+    local token="$3"
+    local manifest_path="$4"
+    local context="$5"
+
+    local code
+    code="$(_mfx_core_http_wasm_load_manifest_http_code "$output_file" "$base_url" "$token" "$manifest_path")"
+    mfx_assert_eq "$code" "200" "$context status"
+    mfx_assert_file_contains "$output_file" "\"ok\":true" "$context ok"
+    mfx_assert_file_contains "$output_file" "\"last_load_failure_stage\":\"\"" "$context failure stage cleared"
+    mfx_assert_file_contains "$output_file" "\"last_load_failure_code\":\"\"" "$context failure code cleared"
+}
+
+_mfx_core_http_assert_wasm_load_manifest_failure() {
+    local output_file="$1"
+    local base_url="$2"
+    local token="$3"
+    local manifest_path="$4"
+    local expected_stage="$5"
+    local expected_code="$6"
+    local context="$7"
+
+    local code
+    code="$(_mfx_core_http_wasm_load_manifest_http_code "$output_file" "$base_url" "$token" "$manifest_path")"
+    mfx_assert_eq "$code" "200" "$context status"
+    mfx_assert_file_contains "$output_file" "\"ok\":false" "$context should fail"
+    mfx_assert_file_contains "$output_file" "\"last_load_failure_stage\":\"$expected_stage\"" "$context failure stage"
+    mfx_assert_file_contains "$output_file" "\"last_load_failure_code\":\"$expected_code\"" "$context failure code"
+}
+
 _mfx_core_http_first_catalog_process() {
     local file_path="$1"
     sed -n 's/.*"exe":"\([^"]*\)".*/\1/p' "$file_path" | head -n 1
@@ -387,6 +434,8 @@ mfx_run_core_http_contract_checks() {
     mfx_assert_file_contains "$tmp_dir/state.out" "\"last_throttled_render_commands\":" "core wasm throttled render diagnostics"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"last_throttled_by_capacity_render_commands\":" "core wasm throttled-by-capacity diagnostics"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"last_throttled_by_interval_render_commands\":" "core wasm throttled-by-interval diagnostics"
+    mfx_assert_file_contains "$tmp_dir/state.out" "\"last_load_failure_stage\":" "core wasm load-failure stage diagnostics"
+    mfx_assert_file_contains "$tmp_dir/state.out" "\"last_load_failure_code\":" "core wasm load-failure code diagnostics"
 
     local code_state_unauthorized
     code_state_unauthorized="$(mfx_http_code "$tmp_dir/state-unauth.out" "$base_url/api/state")"
@@ -576,19 +625,20 @@ mfx_run_core_http_contract_checks() {
         wasm_manifest_path="$(sed -n 's/.*"manifest_path":"\([^"]*\)".*/\1/p' "$tmp_dir/wasm-catalog.out" | head -n 1)"
     fi
     if [[ -n "$wasm_manifest_path" ]]; then
+        local code_wasm_import_selected
         local wasm_manifest_path_escaped
         wasm_manifest_path_escaped="$(_mfx_core_http_json_escape "$wasm_manifest_path")"
-
-        local code_wasm_import_selected
         code_wasm_import_selected="$(mfx_http_code "$tmp_dir/wasm-import-selected.out" "$base_url/api/wasm/import-selected" -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" -d "{\"manifest_path\":\"$wasm_manifest_path_escaped\"}")"
         mfx_assert_eq "$code_wasm_import_selected" "200" "core wasm import-selected status"
         mfx_assert_file_contains "$tmp_dir/wasm-import-selected.out" "\"ok\":true" "core wasm import-selected ok"
         mfx_assert_file_contains "$tmp_dir/wasm-import-selected.out" "\"manifest_path\":\"" "core wasm import-selected manifest_path"
 
-        local code_wasm_load_manifest
-        code_wasm_load_manifest="$(mfx_http_code "$tmp_dir/wasm-load-manifest.out" "$base_url/api/wasm/load-manifest" -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" -d "{\"manifest_path\":\"$wasm_manifest_path_escaped\"}")"
-        mfx_assert_eq "$code_wasm_load_manifest" "200" "core wasm load-manifest status"
-        mfx_assert_file_contains "$tmp_dir/wasm-load-manifest.out" "\"ok\":true" "core wasm load-manifest ok"
+        _mfx_core_http_assert_wasm_load_manifest_ok \
+            "$tmp_dir/wasm-load-manifest.out" \
+            "$base_url" \
+            "$token" \
+            "$wasm_manifest_path" \
+            "core wasm load-manifest"
 
         local code_wasm_enable
         code_wasm_enable="$(mfx_http_code "$tmp_dir/wasm-enable.out" "$base_url/api/wasm/enable" -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" -d '{}')"
@@ -601,6 +651,23 @@ mfx_run_core_http_contract_checks() {
         mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"ok\":true" "core wasm test-dispatch ok"
         mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"route_active\":true" "core wasm test-dispatch route_active"
         mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"invoke_ok\":true" "core wasm test-dispatch invoke_ok"
+
+        local invalid_manifest_path="${wasm_manifest_path}.missing"
+        _mfx_core_http_assert_wasm_load_manifest_failure \
+            "$tmp_dir/wasm-load-invalid.out" \
+            "$base_url" \
+            "$token" \
+            "$invalid_manifest_path" \
+            "manifest_load" \
+            "manifest_io_error" \
+            "core wasm load-manifest invalid path"
+
+        _mfx_core_http_assert_wasm_load_manifest_ok \
+            "$tmp_dir/wasm-load-manifest-reload.out" \
+            "$base_url" \
+            "$token" \
+            "$wasm_manifest_path" \
+            "core wasm load-manifest reload"
     else
         mfx_info "skip wasm dispatch test: no plugin manifest found"
     fi

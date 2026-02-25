@@ -169,6 +169,8 @@
   - 55s completed (acceptance): full POSIX suite (including macOS WASM selfcheck phase) remains green after stage-coverage expansion.
   - 55t completed (code): extracted shared WASM selfcheck helpers (`load-manifest` HTTP + stage/code assertions + JSON escaping) to dedicated manual-lib module, reducing duplication in the macOS runtime selfcheck script.
   - 55t completed (acceptance): script syntax checks and full POSIX suite remain green after helper split.
+  - 55u completed (code): core HTTP contract regression now asserts WASM load-failure diagnostics (`last_load_failure_stage/code`) across success, invalid-manifest failure, and reload-clear paths, with helperized load-manifest request/assert wrappers.
+  - 55u completed (acceptance): shell syntax checks and full POSIX suite remain green after core-http WASM contract expansion.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -260,6 +262,7 @@
 - macOS WASM selfcheck now enforces full manifest-failure classification semantics, reducing silent classifier drift risk.
 - macOS WASM selfcheck now also enforces non-manifest-load stage semantics and recovery cleanup semantics after valid reload.
 - macOS WASM selfcheck internals are now helper-split, reducing future extension/change risk while preserving existing contract assertions.
+- Core HTTP contract regression now enforces the same load-failure diagnostics semantics, reducing drift between manual selfcheck and CI-style contract gates.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:
