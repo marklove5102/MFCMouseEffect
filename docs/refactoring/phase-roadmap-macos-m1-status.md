@@ -233,6 +233,8 @@
   - 55zw completed (acceptance): full POSIX regression suite remains green after app-catalog workflow split.
   - 55zx completed (code): split macOS wasm renderer into parse/orchestration (`MacosWasmCommandRenderer.mm`), command dispatch (`MacosWasmCommandRenderDispatch.*`), and resolver helpers (`MacosWasmCommandRenderResolvers.*`).
   - 55zx completed (acceptance): full POSIX regression suite remains green after wasm renderer dispatch/resolver split.
+  - 55zy completed (code): split macOS scroll pulse effect into facade (`MacosScrollPulseEffect.mm`) and overlay renderer module (`MacosScrollPulseOverlayRenderer.*`) with window registry/animation internals extracted.
+  - 55zy completed (acceptance): full POSIX regression suite remains green after scroll pulse renderer split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
