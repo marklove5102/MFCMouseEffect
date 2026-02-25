@@ -214,6 +214,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/Platform/PlatformDisplayTopology.cpp"
             "${MFX_PROJECT_ROOT}/Platform/PlatformNativeFolderPicker.cpp"
             "${MFX_PROJECT_ROOT}/Platform/PlatformWasmRuntimeFactory.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Automation/InputAutomationDispatch.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Automation/InputAutomationEngine.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Automation/KeyChord.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Automation/ShortcutCaptureSession.cpp"

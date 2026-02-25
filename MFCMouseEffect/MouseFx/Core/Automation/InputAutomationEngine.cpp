@@ -2,8 +2,8 @@
 #include "InputAutomationEngine.h"
 
 #include "MouseFx/Core/Automation/AutomationActionIdNormalizer.h"
+#include "MouseFx/Core/Automation/InputAutomationDispatch.h"
 #include "MouseFx/Core/Automation/TriggerChainUtils.h"
-#include "MouseFx/Utils/StringUtils.h"
 
 #include <algorithm>
 
@@ -23,10 +23,6 @@ GestureRecognitionConfig BuildGestureConfig(const InputAutomationConfig& config)
     out.sampleStepPx = config.gesture.sampleStepPx;
     out.maxDirections = config.gesture.maxDirections;
     return out;
-}
-
-std::string NormalizeShortcutText(std::string value) {
-    return TrimAscii(value);
 }
 
 } // namespace
@@ -146,93 +142,33 @@ InputAutomationEngine::ChainTimingLimit InputAutomationEngine::BuildGestureChain
 }
 
 bool InputAutomationEngine::TriggerMouseAction(const std::string& actionId) {
-    if (!config_.enabled || actionId.empty() || !keyboardInjector_) {
+    if (!config_.enabled || actionId.empty()) {
         return false;
     }
-    const std::string normalizedActionId = automation_ids::NormalizeMouseActionId(actionId);
-    if (normalizedActionId.empty()) {
-        return false;
-    }
-
-    AppendActionHistory(&mouseActionHistory_, normalizedActionId, mouseChainCap_, mouseChainTimingLimit_);
-    const std::string processBaseName = foregroundProcessService_
-        ? foregroundProcessService_->CurrentProcessBaseName()
-        : std::string{};
-    const AutomationKeyBinding* binding =
-        FindEnabledBinding(
-            config_.mouseMappings,
-            mouseActionHistory_,
-            mouseChainTimingLimit_,
-            processBaseName,
-            automation_ids::NormalizeMouseActionId);
-    if (!binding) {
-        return false;
-    }
-    return keyboardInjector_->SendChord(NormalizeShortcutText(binding->keys));
+    return automation_dispatch::DispatchAction(
+        config_.mouseMappings,
+        &mouseActionHistory_,
+        mouseChainCap_,
+        mouseChainTimingLimit_,
+        actionId,
+        automation_ids::NormalizeMouseActionId,
+        foregroundProcessService_,
+        keyboardInjector_);
 }
 
 bool InputAutomationEngine::TriggerGesture(const std::string& gestureId) {
-    if (!config_.enabled || !config_.gesture.enabled || gestureId.empty() || !keyboardInjector_) {
+    if (!config_.enabled || !config_.gesture.enabled || gestureId.empty()) {
         return false;
     }
-    const std::string normalizedGestureId = automation_ids::NormalizeGestureId(gestureId);
-    if (normalizedGestureId.empty()) {
-        return false;
-    }
-
-    AppendActionHistory(&gestureHistory_, normalizedGestureId, gestureChainCap_, gestureChainTimingLimit_);
-    const std::string processBaseName = foregroundProcessService_
-        ? foregroundProcessService_->CurrentProcessBaseName()
-        : std::string{};
-    const AutomationKeyBinding* binding =
-        FindEnabledBinding(
-            config_.gesture.mappings,
-            gestureHistory_,
-            gestureChainTimingLimit_,
-            processBaseName,
-            automation_ids::NormalizeGestureId);
-    if (!binding) {
-        return false;
-    }
-    return keyboardInjector_->SendChord(NormalizeShortcutText(binding->keys));
-}
-
-void InputAutomationEngine::AppendActionHistory(
-    std::vector<ActionHistoryItem>* history,
-    const std::string& actionId,
-    size_t cap,
-    const ChainTimingLimit& timingLimit) {
-    if (!history || actionId.empty()) {
-        return;
-    }
-
-    const auto now = std::chrono::steady_clock::now();
-    const size_t targetCap = std::max<size_t>(1, cap);
-    history->push_back(ActionHistoryItem{ actionId, now });
-    while (history->size() > targetCap) {
-        history->erase(history->begin());
-    }
-    if (timingLimit.maxTotalInterval.count() > 0) {
-        const auto oldestAllowed = now - timingLimit.maxTotalInterval;
-        while (history->size() > 1 && history->front().timestamp < oldestAllowed) {
-            history->erase(history->begin());
-        }
-    }
-}
-
-const AutomationKeyBinding* InputAutomationEngine::FindEnabledBinding(
-    const std::vector<AutomationKeyBinding>& mappings,
-    const std::vector<ActionHistoryItem>& actionHistory,
-    const ChainTimingLimit& timingLimit,
-    const std::string& processBaseName,
-    automation_match::NormalizeActionIdFn normalizeActionId) const {
-    const automation_match::BindingMatchResult match = automation_match::FindBestEnabledBinding(
-        mappings,
-        actionHistory,
-        processBaseName,
-        timingLimit,
-        normalizeActionId);
-    return match.binding;
+    return automation_dispatch::DispatchAction(
+        config_.gesture.mappings,
+        &gestureHistory_,
+        gestureChainCap_,
+        gestureChainTimingLimit_,
+        gestureId,
+        automation_ids::NormalizeGestureId,
+        foregroundProcessService_,
+        keyboardInjector_);
 }
 
 } // namespace mousefx

@@ -45,19 +45,6 @@ private:
     bool TriggerMouseAction(const std::string& actionId);
     bool TriggerGesture(const std::string& gestureId);
 
-    void AppendActionHistory(
-        std::vector<ActionHistoryItem>* history,
-        const std::string& actionId,
-        size_t cap,
-        const ChainTimingLimit& timingLimit);
-
-    const AutomationKeyBinding* FindEnabledBinding(
-        const std::vector<AutomationKeyBinding>& mappings,
-        const std::vector<ActionHistoryItem>& actionHistory,
-        const ChainTimingLimit& timingLimit,
-        const std::string& processBaseName,
-        automation_match::NormalizeActionIdFn normalizeActionId) const;
-
     InputAutomationConfig config_{};
     GestureRecognizer gestureRecognizer_{};
     IKeyboardInjector* keyboardInjector_ = nullptr;
