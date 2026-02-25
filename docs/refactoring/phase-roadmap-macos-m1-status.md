@@ -177,6 +177,8 @@
   - 55w completed (acceptance): WebUI workspace build and full POSIX suite remain green after state-model dedup.
   - 55x completed (code): split core HTTP WASM load-manifest helper logic into dedicated regression module (`core_http_wasm_helpers.sh`) and reduced coupling in `core_http.sh`.
   - 55x completed (acceptance): shell syntax checks and full POSIX suite remain green after helper-module split.
+  - 55y completed (code): expanded core HTTP WASM helper module with transfer API contracts (`import-selected` success/failure and `export-all` success with minimum count assertion) and migrated inline assertions from `core_http.sh` to helperized calls.
+  - 55y completed (acceptance): core automation contract regression and full POSIX suite remain green after WASM transfer-contract expansion.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -269,6 +271,7 @@
 - macOS WASM selfcheck now also enforces non-manifest-load stage semantics and recovery cleanup semantics after valid reload.
 - macOS WASM selfcheck internals are now helper-split, reducing future extension/change risk while preserving existing contract assertions.
 - Core HTTP contract regression now enforces the same load-failure diagnostics semantics, reducing drift between manual selfcheck and CI-style contract gates.
+- Core HTTP contract regression now also enforces WASM transfer semantics (`import-selected` success/failure and `export-all` success count), reducing CI blind spots in plugin transfer paths.
 - Shared WebUI diagnostics now surfaces load-failure stage/code directly, closing backend-vs-UI observability gap for WASM load failures.
 - Shared WebUI WASM state normalization now has one source of truth, reducing future diagnostics-field drift in UI adapters.
 - Core HTTP regression helper responsibilities are now split by domain (core flow vs wasm helpers), reducing future maintenance risk in script-level contract evolution.

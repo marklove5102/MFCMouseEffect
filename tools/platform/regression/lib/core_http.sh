@@ -581,13 +581,19 @@ mfx_run_core_http_contract_checks() {
         wasm_manifest_path="$(sed -n 's/.*"manifest_path":"\([^"]*\)".*/\1/p' "$tmp_dir/wasm-catalog.out" | head -n 1)"
     fi
     if [[ -n "$wasm_manifest_path" ]]; then
-        local code_wasm_import_selected
-        local wasm_manifest_path_escaped
-        wasm_manifest_path_escaped="$(_mfx_core_http_json_escape "$wasm_manifest_path")"
-        code_wasm_import_selected="$(mfx_http_code "$tmp_dir/wasm-import-selected.out" "$base_url/api/wasm/import-selected" -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" -d "{\"manifest_path\":\"$wasm_manifest_path_escaped\"}")"
-        mfx_assert_eq "$code_wasm_import_selected" "200" "core wasm import-selected status"
-        mfx_assert_file_contains "$tmp_dir/wasm-import-selected.out" "\"ok\":true" "core wasm import-selected ok"
-        mfx_assert_file_contains "$tmp_dir/wasm-import-selected.out" "\"manifest_path\":\"" "core wasm import-selected manifest_path"
+        _mfx_core_http_assert_wasm_import_selected_ok \
+            "$tmp_dir/wasm-import-selected.out" \
+            "$base_url" \
+            "$token" \
+            "$wasm_manifest_path" \
+            "core wasm import-selected"
+
+        _mfx_core_http_assert_wasm_export_all_ok \
+            "$tmp_dir/wasm-export-all.out" \
+            "$base_url" \
+            "$token" \
+            "1" \
+            "core wasm export-all"
 
         _mfx_core_http_assert_wasm_load_manifest_ok \
             "$tmp_dir/wasm-load-manifest.out" \
@@ -609,6 +615,14 @@ mfx_run_core_http_contract_checks() {
         mfx_assert_file_contains "$tmp_dir/wasm-test-dispatch.out" "\"invoke_ok\":true" "core wasm test-dispatch invoke_ok"
 
         local invalid_manifest_path="${wasm_manifest_path}.missing"
+        _mfx_core_http_assert_wasm_import_selected_failure \
+            "$tmp_dir/wasm-import-selected-invalid.out" \
+            "$base_url" \
+            "$token" \
+            "$invalid_manifest_path" \
+            "manifest_path does not exist" \
+            "core wasm import-selected invalid path"
+
         _mfx_core_http_assert_wasm_load_manifest_failure \
             "$tmp_dir/wasm-load-invalid.out" \
             "$base_url" \

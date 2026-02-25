@@ -6,7 +6,7 @@
 - Constraints: no Windows regression; Linux follows compile + contract coverage.
 
 ## Current Program State
-- Branch baseline has completed Phase 50 -> Phase 55k code slices.
+- Branch baseline has completed Phase 50 -> Phase 55y code slices.
 - POSIX dual-lane guardrail exists:
   - scaffold lane remains default stable lane.
   - core lane is gated and iteratively enabled.
@@ -67,6 +67,7 @@
   - macOS WASM selfcheck now also covers stage-level load failures (`manifest_api_version`, `load_module`) and asserts load-failure field reset after a valid reload
   - macOS WASM selfcheck `load-manifest` request/assert logic is now helper-split (`tools/platform/manual/lib/wasm_selfcheck_common.sh`), reducing script duplication while preserving checks
   - core HTTP contract regression now asserts WASM load-failure diagnostics semantics (`last_load_failure_stage/code`) for success, invalid-manifest failure, and reload-clear paths
+  - core HTTP contract regression now also asserts WASM transfer semantics (`import-selected` success+failure and `export-all` success with minimum count guard)
   - shared Svelte WASM diagnostics panel now surfaces `last_load_failure_stage/code` with EN/ZH i18n labels and warning-state linkage
   - shared Svelte WASM state normalization is now deduplicated via `WebUIWorkspace/src/wasm/state-model.js`, reducing cross-file drift risk
   - core HTTP regression WASM load helpers are now split into `tools/platform/regression/lib/core_http_wasm_helpers.sh`, reducing coupling in `core_http.sh`
@@ -127,6 +128,7 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55v-webui-wasm-load-failure-diagnostics-surface.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55w-webui-wasm-state-model-dedup.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55x-core-http-wasm-helper-module-split.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55y-core-http-wasm-transfer-contract-assertions.md`
 
 ## AI-IDE Context Loading Rule
 - Read this file first for active truth.
