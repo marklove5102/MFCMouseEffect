@@ -215,6 +215,8 @@
   - 55zn completed (acceptance): full POSIX regression suite remains green after `rg` dependency fallback hardening.
   - 55zo completed (code): consolidated host-platform detection and `--platform` resolution into shared helpers (`mfx_detect_posix_host_platform`, `mfx_resolve_posix_platform`) and removed duplicated validation blocks across POSIX regression entry scripts.
   - 55zo completed (acceptance): full POSIX regression suite remains green after platform-arg helper consolidation.
+  - 55zp completed (docs): compacted top-level P0/P1 indexes (`docs/README*.md`, `docs/agent-context/current.md`) by replacing exhaustive 53x/55x lists with key-doc subsets and roadmap pointers.
+  - 55zp completed (acceptance): strict doc hygiene remains green after index compaction.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -329,6 +331,7 @@
 - macOS manual keep-running stop hints are now PID-scoped (`kill -TERM <pid>`) instead of broad process-pattern kill, reducing cross-run interference risk.
 - Regression file-content matching now has shared `rg -> grep` fallback helpers, reducing environment friction on hosts without `rg`.
 - POSIX regression entry scripts now share one platform-arg resolution path, reducing script-level drift risk in host detection and cross-host guards.
+- Top-level first-read doc indexes are now compacted (key-doc subsets + roadmap pointer), reducing ongoing token pressure as Phase 55 slices continue.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:
