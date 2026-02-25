@@ -173,6 +173,8 @@
   - 55u completed (acceptance): shell syntax checks and full POSIX suite remain green after core-http WASM contract expansion.
   - 55v completed (code): shared Svelte WASM diagnostics panel now renders load-failure stage/code fields and wires warning-state evaluation to non-empty failure signals; EN/ZH i18n keys are added for both labels.
   - 55v completed (acceptance): WebUI workspace build and full POSIX suite remain green after diagnostics-surface expansion.
+  - 55w completed (code): WebUI WASM state normalization is now deduplicated into shared `state-model` module used by both `wasm-main` and `WasmPluginFields`, removing duplicate normalization branches.
+  - 55w completed (acceptance): WebUI workspace build and full POSIX suite remain green after state-model dedup.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -266,6 +268,7 @@
 - macOS WASM selfcheck internals are now helper-split, reducing future extension/change risk while preserving existing contract assertions.
 - Core HTTP contract regression now enforces the same load-failure diagnostics semantics, reducing drift between manual selfcheck and CI-style contract gates.
 - Shared WebUI diagnostics now surfaces load-failure stage/code directly, closing backend-vs-UI observability gap for WASM load failures.
+- Shared WebUI WASM state normalization now has one source of truth, reducing future diagnostics-field drift in UI adapters.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:
