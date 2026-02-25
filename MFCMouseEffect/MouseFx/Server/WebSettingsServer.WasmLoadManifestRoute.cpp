@@ -18,6 +18,15 @@ using websettings_wasm_routes::ParseManifestPathUtf8;
 using websettings_wasm_routes::ParseObjectOrEmpty;
 using websettings_wasm_routes::SetJsonResponse;
 
+namespace {
+
+constexpr const char* kErrorCodeNoController = "no_controller";
+constexpr const char* kErrorCodeWasmHostUnavailable = "wasm_host_unavailable";
+constexpr const char* kErrorCodeManifestPathRequired = "manifest_path_required";
+constexpr const char* kErrorCodeLoadManifestFailed = "load_manifest_failed";
+
+} // namespace
+
 bool HandleWebSettingsWasmLoadManifestApiRoute(
     const HttpRequest& req,
     const std::string& path,
@@ -29,8 +38,10 @@ bool HandleWebSettingsWasmLoadManifestApiRoute(
 
     bool ok = false;
     std::string error = "no controller";
+    std::string errorCode = kErrorCodeNoController;
     if (controller && controller->WasmHost()) {
         error.clear();
+        errorCode.clear();
         const json payload = ParseObjectOrEmpty(req.body);
         const std::string manifestPathUtf8 = ParseManifestPathUtf8(payload);
         if (!manifestPathUtf8.empty()) {
@@ -46,14 +57,20 @@ bool HandleWebSettingsWasmLoadManifestApiRoute(
                 if (error.empty()) {
                     error = "manifest switch did not take effect";
                 }
+                errorCode = TrimAscii(diag.lastLoadFailureCode);
+                if (errorCode.empty()) {
+                    errorCode = kErrorCodeLoadManifestFailed;
+                }
             }
         } else {
             error = "manifest_path required";
+            errorCode = kErrorCodeManifestPathRequired;
         }
     } else if (controller) {
         error = "wasm host unavailable";
+        errorCode = kErrorCodeWasmHostUnavailable;
     }
-    SetJsonResponse(resp, BuildWasmActionResponse(controller, ok, error).dump());
+    SetJsonResponse(resp, BuildWasmActionResponse(controller, ok, error, errorCode).dump());
     return true;
 }
 

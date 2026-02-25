@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "MouseFx/Utils/StringUtils.h"
+
 using json = nlohmann::json;
 
 namespace mousefx::websettings_wasm_routes {
@@ -25,14 +27,14 @@ std::string ParseManifestPathUtf8(const json& payload) {
     if (!payload.contains("manifest_path") || !payload["manifest_path"].is_string()) {
         return {};
     }
-    return payload["manifest_path"].get<std::string>();
+    return TrimAscii(payload["manifest_path"].get<std::string>());
 }
 
 std::string ParseInitialPathUtf8(const json& payload) {
     if (!payload.contains("initial_path") || !payload["initial_path"].is_string()) {
         return {};
     }
-    return payload["initial_path"].get<std::string>();
+    return TrimAscii(payload["initial_path"].get<std::string>());
 }
 
 } // namespace mousefx::websettings_wasm_routes

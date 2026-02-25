@@ -62,23 +62,36 @@ json BuildWasmResponse(AppController* controller, bool ok) {
     return body;
 }
 
-json BuildWasmActionResponse(AppController* controller, bool ok, const std::string& defaultError) {
+json BuildWasmActionResponse(
+    AppController* controller,
+    bool ok,
+    const std::string& defaultError,
+    const std::string& defaultErrorCode) {
     json body = BuildWasmResponse(controller, ok);
     if (ok) {
+        body["error_code"] = "";
         return body;
     }
 
     std::string error = TrimAscii(defaultError);
+    std::string errorCode = TrimAscii(defaultErrorCode);
     if (error.empty() && controller && controller->WasmHost()) {
         const wasm::HostDiagnostics& diag = controller->WasmHost()->Diagnostics();
         error = TrimAscii(diag.lastError);
         if (error.empty()) {
             error = TrimAscii(diag.lastRenderError);
         }
+        if (errorCode.empty()) {
+            errorCode = TrimAscii(diag.lastLoadFailureCode);
+        }
     }
     if (!error.empty()) {
         body["error"] = error;
     }
+    if (errorCode.empty()) {
+        errorCode = "unknown_error";
+    }
+    body["error_code"] = errorCode;
     return body;
 }
 

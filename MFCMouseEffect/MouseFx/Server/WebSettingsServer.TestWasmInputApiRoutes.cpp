@@ -162,6 +162,34 @@ bool HandleWebSettingsTestWasmInputApiRoute(
         return true;
     }
 
+    if (req.method == "POST" && path == "/api/wasm/test-reset-runtime") {
+        if (!IsWasmTestDispatchApiEnabled()) {
+            SetPlainResponse(resp, 404, "not found");
+            return true;
+        }
+
+        if (!controller || !controller->WasmHost()) {
+            SetJsonResponse(resp, json({
+                {"ok", false},
+                {"error", "wasm host unavailable"},
+            }).dump());
+            return true;
+        }
+
+        wasm::WasmEffectHost* host = controller->WasmHost();
+        host->UnloadPlugin();
+        const wasm::HostDiagnostics& diag = host->Diagnostics();
+        SetJsonResponse(resp, json({
+            {"ok", true},
+            {"plugin_loaded", diag.pluginLoaded},
+            {"has_active_manifest_path", !diag.activeManifestPath.empty()},
+            {"has_active_wasm_path", !diag.activeWasmPath.empty()},
+            {"last_error", diag.lastError},
+            {"last_load_failure_code", diag.lastLoadFailureCode},
+        }).dump());
+        return true;
+    }
+
     return false;
 }
 

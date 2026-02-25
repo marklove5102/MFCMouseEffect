@@ -4,11 +4,8 @@
 #include "CommandHandler.h"
 #include "AppController.h"
 #include "MouseFx/Core/Protocol/JsonLite.h"
-#include "Platform/PlatformTarget.h"
-
-#if MFX_PLATFORM_WINDOWS
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
-#endif
+#include "Platform/PlatformTarget.h"
 #include "MouseFx/Core/Json/JsonFacade.h"
 #include "MouseFx/Utils/StringUtils.h"
 
@@ -122,11 +119,9 @@ void CommandHandler::HandleWasmDisableCommand(const std::string&) {
 }
 
 void CommandHandler::HandleWasmReloadCommand(const std::string&) {
-#if MFX_PLATFORM_WINDOWS
     if (auto* host = controller_->WasmHost()) {
         host->ReloadPlugin();
     }
-#endif
 }
 
 void CommandHandler::HandleWasmLoadManifestCommand(const std::string& jsonCmd) {
