@@ -15,6 +15,7 @@
 #include "MouseFx/Effects/TrailEffect.h"
 #elif MFX_PLATFORM_MACOS
 #include "Platform/macos/Effects/MacosClickPulseEffect.h"
+#include "Platform/macos/Effects/MacosScrollPulseEffect.h"
 #endif
 
 #if MFX_PLATFORM_WINDOWS
@@ -132,10 +133,14 @@ std::unique_ptr<IMouseEffect> EffectFactory::Create(EffectCategory category, con
 #endif
     return nullptr;
 #elif MFX_PLATFORM_MACOS
-    // M1 macOS scope: click-first baseline effect.
+    // M1 macOS scope: baseline visible click + scroll effects.
     if (category == EffectCategory::Click) {
         (void)type;
         return std::make_unique<MacosClickPulseEffect>(config.theme);
+    }
+    if (category == EffectCategory::Scroll) {
+        (void)type;
+        return std::make_unique<MacosScrollPulseEffect>(config.theme);
     }
     return nullptr;
 #else

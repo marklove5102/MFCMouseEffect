@@ -25,6 +25,8 @@
   - 52i completed (acceptance): core automation contract regression now simulates runtime regrant and asserts hot-recovery (`active=true`) without process restart.
   - 52j completed (code): startup-missing-permission retry recovery + startup degraded notify dedup landed.
   - 52j completed (acceptance): core automation contract regression now captures shell warnings and asserts startup degraded notify dedup + startup grant-after-start auto-recovery.
+  - 52l completed (code): macOS scroll baseline effect landed (`MacosScrollPulseEffect`) and factory mapping now enables native scroll-visible feedback in core lane.
+  - 52l completed (acceptance): full POSIX regression suite remains green after scroll-effect enablement and schema now reports `capabilities.effects.scroll=true` on macOS.
 - Phase 53 (automation mapping with unified shortcut semantics): in progress.
   - 53a completed (code): mac keyboard injector + foreground-process service landed and factory/build wiring completed.
   - 53a completed (acceptance-script): core automation contract regression now enforces non-empty `active-process`, `schema.capabilities.input.keyboard_injector=true`, and test-inject shortcut acceptance (`Cmd+C`) under explicit dry-run injector mode.
@@ -166,6 +168,7 @@
 - macOS core lane now has a real WASM backend (`wasm3_static`) instead of non-Windows forced no-op.
 - macOS permission degradation is now visible in both shell notification and Web settings status banner.
 - WebUI now consumes `schema.capabilities.effects` and disables unavailable effect categories on current platform.
+- macOS core lane now has baseline visible scroll effect (`MacosScrollPulseEffect`) in addition to click effect.
 - macOS click/indicator permission-on coordinate offset has been closed (manual verification passed).
 - Runtime revoke path is now code+script closed (degraded transition asserted through permission simulation and API state checks).
 - macOS indicator empty-label path is now code+script closed (`L/R/M` label probe assertions in core automation contracts).

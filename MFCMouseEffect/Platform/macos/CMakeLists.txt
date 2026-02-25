@@ -17,6 +17,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Control/MacosDispatchMessageCodec.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Control/MacosDispatchMessageHost.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosClickPulseEffect.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseEffect.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay/MacosOverlayCoordSpaceService.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay/MacosInputIndicatorOverlay.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderer.mm"
