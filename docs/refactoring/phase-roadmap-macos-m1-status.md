@@ -73,6 +73,8 @@
   - 53v completed (acceptance): full POSIX regression suite remains green after runtime automation route layer split.
   - 53w completed (code): split WebSettings WASM catalog routes into `catalog-query/import/export` modules and kept `WasmCatalogRoutes.cpp` as delegating entry.
   - 53w completed (acceptance): full POSIX regression suite remains green after WASM catalog route layer split.
+  - 53x completed (code): split WebSettings WASM runtime routes into `state/policy` + `action` modules and kept `WasmRuntimeRoutes.cpp` as delegating entry.
+  - 53x completed (acceptance): full POSIX regression suite remains green after WASM runtime route layer split.
 - Phase 54 (Linux compile-level + contract-level follow): in progress, compile gate currently passing in CI-style local commands.
   - 54a completed (code): Linux compile-level gate is now scriptized as one-command workflow (`run-posix-linux-compile-gate.sh`) with modular regression packaging.
   - 54a completed (acceptance): gate command executed and passed on current host.
@@ -176,6 +178,7 @@
 - phase53u WebSettings automation test routes are now split by contract ownership (`scope` vs `injection` vs `shortcut`) with shared parse/match helpers, reducing test-route coupling while preserving endpoint contracts.
 - phase53v WebSettings runtime automation routes are now split by ownership (`shortcut-capture` vs `process/catalog`) with shared parse/cache helpers, reducing route coupling while preserving endpoint contracts.
 - phase53w WebSettings WASM catalog routes are now split by ownership (`catalog-query` vs `import` vs `export`), reducing WASM control-plane route coupling while preserving endpoint contracts.
+- phase53x WebSettings WASM runtime routes are now split by ownership (`state/policy` vs `action`), reducing runtime control-plane route coupling while preserving endpoint contracts.
 - Linux compile gate now has a dedicated orchestration script, reducing manual command drift risk for cross-host follow.
 - Automation platform semantics now have script-level regression guard, reducing manual-only verification for `.app/.exe` behavior.
 - POSIX regression now has a single suite entrypoint with phase-level skip switches for faster diagnosis.
