@@ -243,6 +243,8 @@
   - 55zzb completed (acceptance): full POSIX regression suite remains green after tray service menu-factory/runtime-helper split.
   - 55zzc completed (code): further split app-catalog workflow by extracting scan roots (`MacosApplicationCatalogScanRoots.*`) and entry store (`MacosApplicationCatalogEntryStore.*`), keeping traversal orchestration in `MacosApplicationCatalogScanWorkflow.mm`.
   - 55zzc completed (acceptance): full POSIX regression suite remains green after app-catalog workflow secondary split.
+  - 55zzd completed (code): split wasm overlay runtime state internals into `MacosWasmOverlayState.*` and kept `MacosWasmOverlayRuntime.mm` as API/main-thread facade.
+  - 55zzd completed (acceptance): full POSIX regression suite remains green after wasm overlay runtime state split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
