@@ -411,6 +411,7 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClCompile Include="MouseFx\Core\Control\AppController.cpp" />
     <ClCompile Include="MouseFx\Core\Control\AppController.Wasm.cpp" />
     <ClCompile Include="MouseFx\Core\Control\AppController.ConfigUpdates.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\AppController.Effects.cpp" />
     <ClCompile Include="MouseFx\Core\Control\AppController.InputCapture.cpp" />
     <ClCompile Include="MouseFx\Core\Control\AppController.Lifecycle.cpp" />
     <ClCompile Include="MouseFx\Core\Control\AutomationDispatchFeature.cpp" />

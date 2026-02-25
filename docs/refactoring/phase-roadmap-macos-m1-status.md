@@ -91,6 +91,8 @@
   - 53ae completed (acceptance): full POSIX regression suite remains green after controller split, and Windows build-lane wiring is preserved in `MFCMouseEffect.vcxproj`.
   - 53af completed (code): extracted lifecycle orchestration (`Start/Stop/CreateDispatchWindow/DestroyDispatchWindow`) from `AppController.cpp` into `AppController.Lifecycle.cpp` and wired both CMake + Visual Studio build ownership.
   - 53af completed (acceptance): full POSIX regression suite remains green after lifecycle split, and Windows build-lane wiring is preserved in `MFCMouseEffect.vcxproj`.
+  - 53ag completed (code): extracted effect orchestration + VM suppression runtime (`SetEffect/ApplyConfiguredEffects/SetTheme/UpdateVmSuppressionState` and related helpers) from `AppController.cpp` into `AppController.Effects.cpp` and wired both CMake + Visual Studio build ownership.
+  - 53ag completed (acceptance): full POSIX regression suite remains green after effects/vm split, and Windows build-lane wiring is preserved in `MFCMouseEffect.vcxproj`.
 - Phase 54 (Linux compile-level + contract-level follow): in progress, compile gate currently passing in CI-style local commands.
   - 54a completed (code): Linux compile-level gate is now scriptized as one-command workflow (`run-posix-linux-compile-gate.sh`) with modular regression packaging.
   - 54a completed (acceptance): gate command executed and passed on current host.
@@ -205,6 +207,7 @@
 - phase53ad input-capture diagnostics now expose `effects_suspended`, making effect pipeline degradation/resume transitions explicit and regression-testable under permission revoke/regrant flows.
 - phase53ae input-capture runtime/state logic is now split into a dedicated controller unit (`AppController.InputCapture.cpp`), reducing `AppController.cpp` coupling while keeping POSIX/Windows build ownership aligned.
 - phase53af lifecycle runtime logic is now split into a dedicated controller unit (`AppController.Lifecycle.cpp`), reducing startup/teardown coupling in `AppController.cpp` while keeping POSIX/Windows build ownership aligned.
+- phase53ag effect orchestration and VM suppression runtime logic is now split into a dedicated controller unit (`AppController.Effects.cpp`), reducing effect/VM coupling in `AppController.cpp` while keeping POSIX/Windows build ownership aligned.
 - phase54h Linux compile gate now covers both scaffold-lane and core-runtime-lane compile contracts by default, reducing Linux drift risk while mac-first development continues.
 - Linux compile gate now has a dedicated orchestration script, reducing manual command drift risk for cross-host follow.
 - Automation platform semantics now have script-level regression guard, reducing manual-only verification for `.app/.exe` behavior.

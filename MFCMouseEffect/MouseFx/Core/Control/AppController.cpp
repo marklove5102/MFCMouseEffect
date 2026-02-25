@@ -6,9 +6,6 @@
 #include "CommandHandler.h"
 #include "DispatchRouter.h"
 #include "MouseFx/Core/Protocol/MouseFxMessages.h"
-#include "MouseFx/Core/Config/ConfigPathResolver.h"
-#include "MouseFx/Core/Config/EffectConfigInternal.h"
-#include "MouseFx/Core/Control/EffectFactory.h"
 #include "MouseFx/Core/Control/NullDispatchMessageHost.h"
 #include "MouseFx/Core/Control/NullDispatchMessageCodec.h"
 #include "MouseFx/Core/System/NullCursorPositionService.h"
@@ -22,7 +19,6 @@
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
 #include "MouseFx/Core/Wasm/WasmEventInvokeExecutor.h"
 #include "MouseFx/Effects/HoldRouteCatalog.h"
-#include "MouseFx/Renderers/Hold/Presentation/QuantumHaloPresenterSelection.h"
 #include "MouseFx/Core/Json/JsonFacade.h"
 #include "MouseFx/Utils/MathUtils.h"
 #include "MouseFx/Utils/StringUtils.h"
@@ -36,34 +32,10 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
 
 namespace mousefx {
 
 using json = nlohmann::json;
-
-static std::string NormalizeHoldFollowMode(std::string mode) {
-    mode = ToLowerAscii(mode);
-    if (mode == "precise") return "precise";
-    if (mode == "efficient") return "efficient";
-    return "smooth";
-}
-
-struct ActiveCategoryDescriptor {
-    EffectCategory category;
-    std::string ActiveEffectConfig::*slot;
-    bool themeSensitive = false;
-};
-
-constexpr std::array<ActiveCategoryDescriptor, 5> kActiveCategoryDescriptors{{
-    {EffectCategory::Click, &ActiveEffectConfig::click, false},
-    {EffectCategory::Trail, &ActiveEffectConfig::trail, false},
-    {EffectCategory::Scroll, &ActiveEffectConfig::scroll, true},
-    {EffectCategory::Hold, &ActiveEffectConfig::hold, true},
-    {EffectCategory::Hover, &ActiveEffectConfig::hover, true},
-}};
 
 
 AppController::AppController()
@@ -145,56 +117,6 @@ std::string AppController::ResolveRuntimeEffectType(
         *outReason = reason;
     }
     return normalizedType;
-}
-
-void AppController::NotifyGpuFallbackIfNeeded(const std::string& reason) {
-    if (gpuFallbackNotifiedThisSession_) return;
-    gpuFallbackNotifiedThisSession_ = true;
-    // UX decision: do not block runtime with modal dialogs.
-    // Fallback status is exposed through Web settings state and local diagnostics.
-#ifdef _DEBUG
-    std::wstring dbg = L"MouseFx: GPU route fallback detected. reason=";
-    dbg += Utf8ToWString(reason);
-    dbg += L"\n";
-    OutputDebugStringW(dbg.c_str());
-#else
-    (void)reason;
-#endif
-}
-
-void AppController::WriteGpuRouteStatusSnapshot(
-    EffectCategory category,
-    const std::string& requestedType,
-    const std::string& effectiveType,
-    const std::string& reason) const {
-    if (category != EffectCategory::Hold) {
-        return;
-    }
-    const std::wstring diagDir = ResolveLocalDiagDirectory();
-    if (diagDir.empty()) return;
-    std::error_code ec;
-    std::filesystem::create_directories(diagDir, ec);
-    if (ec) return;
-    const std::filesystem::path file = std::filesystem::path(diagDir) / L"gpu_route_status_auto.json";
-    std::ofstream out(file, std::ios::binary | std::ios::trunc);
-    if (!out.is_open()) return;
-    const std::string requestedNormalized = hold_route::NormalizeHoldEffectTypeAlias(requestedType);
-    std::ostringstream ss;
-    ss << "{"
-       << "\"category\":\"hold\","
-       << "\"requested\":\"" << requestedType << "\","
-       << "\"requested_normalized\":\"" << requestedNormalized << "\","
-       << "\"effective\":\"" << effectiveType << "\","
-       << "\"fallback_applied\":" << (requestedNormalized == effectiveType ? "false" : "true") << ","
-       << "\"reason\":\"" << reason << "\""
-       << "}";
-    out << ss.str();
-}
-
-void AppController::SetActiveEffectType(EffectCategory category, const std::string& type) {
-    if (auto* slot = MutableActiveTypeForCategory(category); slot != nullptr) {
-        *slot = type;
-    }
 }
 
 void AppController::OnDispatchActivity(DispatchMessageKind kind, uint32_t timerId) {
@@ -431,167 +353,6 @@ void AppController::LogDebugClick(const ClickEvent& ev) {
 }
 #endif
 
-// (Moved to top)
-// Hold renderers are included in HoldEffect.cpp, but safe to include here too if needed, 
-// though generally we rely on the creation site.
-// Actually, AppController creates the Effects, but Effects create the Renderers (mostly).
-// Except simpler effects might fallback?
-
-std::unique_ptr<IMouseEffect> AppController::CreateEffect(EffectCategory category, const std::string& type) {
-    return EffectFactory::Create(category, type, config_);
-}
-
-const std::string* AppController::ActiveTypeForCategory(EffectCategory category) const {
-    for (const auto& descriptor : kActiveCategoryDescriptors) {
-        if (descriptor.category != category) {
-            continue;
-        }
-        return &(config_.active.*(descriptor.slot));
-    }
-    return nullptr;
-}
-
-std::string* AppController::MutableActiveTypeForCategory(EffectCategory category) {
-    for (const auto& descriptor : kActiveCategoryDescriptors) {
-        if (descriptor.category != category) {
-            continue;
-        }
-        return &(config_.active.*(descriptor.slot));
-    }
-    return nullptr;
-}
-
-bool AppController::IsActiveEffectEnabled(EffectCategory category) const {
-    const std::string* activeType = ActiveTypeForCategory(category);
-    return (activeType != nullptr && !activeType->empty() && *activeType != "none");
-}
-
-void AppController::ReapplyActiveEffect(EffectCategory category) {
-    if (category == EffectCategory::Click) {
-        SetEffect(category, ResolveConfiguredClickType());
-        return;
-    }
-    const std::string* activeType = ActiveTypeForCategory(category);
-    if (activeType == nullptr) {
-        return;
-    }
-    SetEffect(category, *activeType);
-}
-
-std::string AppController::ResolveConfiguredClickType() const {
-    if (!config_.active.click.empty()) {
-        return config_.active.click;
-    }
-    if (!config_.defaultEffect.empty()) {
-        return config_.defaultEffect;
-    }
-    return "ripple";
-}
-
-void AppController::ApplyConfiguredEffects() {
-    for (const auto& descriptor : kActiveCategoryDescriptors) {
-        const std::string requestedType =
-            (descriptor.category == EffectCategory::Click)
-                ? ResolveConfiguredClickType()
-                : (config_.active.*(descriptor.slot));
-        SetEffect(descriptor.category, requestedType);
-    }
-}
-
-bool AppController::NormalizeActiveEffectTypes() {
-    bool normalizedChanged = false;
-    for (const auto& descriptor : kActiveCategoryDescriptors) {
-        std::string& slot = config_.active.*(descriptor.slot);
-        std::string reason;
-        const std::string effective = ResolveRuntimeEffectType(descriptor.category, slot, &reason);
-        if (slot == effective) {
-            continue;
-        }
-        slot = effective;
-        normalizedChanged = true;
-    }
-    return normalizedChanged;
-}
-
-void AppController::SetEffect(EffectCategory category, const std::string& type) {
-    size_t idx = static_cast<size_t>(category);
-    if (idx >= kCategoryCount) return;
-
-    std::string fallbackReason;
-    const std::string requestedNormalized =
-        (category == EffectCategory::Hold) ? hold_route::NormalizeHoldEffectTypeAlias(type) : type;
-    const std::string effectiveType = ResolveRuntimeEffectType(category, type, &fallbackReason);
-    if (!fallbackReason.empty() && effectiveType != requestedNormalized) {
-        NotifyGpuFallbackIfNeeded(fallbackReason);
-    }
-    WriteGpuRouteStatusSnapshot(category, type, effectiveType, fallbackReason);
-
-    // Shutdown existing effect for this category
-    if (effects_[idx]) {
-        effects_[idx]->Shutdown();
-        effects_[idx].reset();
-    }
-
-    // Create and initialize new effect
-    effects_[idx] = CreateEffect(category, effectiveType);
-    if (effects_[idx] && !vmEffectsSuppressed_) {
-        effects_[idx]->Initialize();
-    }
-
-#ifdef _DEBUG
-    wchar_t buf[256]{};
-    wsprintfW(buf, L"MouseFx: SetEffect category=%hs type=%hs\n", 
-              CategoryToString(category), effectiveType.c_str());
-    OutputDebugStringW(buf);
-#endif
-}
-
-void AppController::ClearEffect(EffectCategory category) {
-    SetEffect(category, "none");
-}
-
-void AppController::SetTheme(const std::string& theme) {
-    if (theme.empty()) return;
-    config_.theme = theme;
-    // Re-create themed effects to pick up new palette.
-    for (const auto& descriptor : kActiveCategoryDescriptors) {
-        if (!descriptor.themeSensitive) {
-            continue;
-        }
-        ReapplyActiveEffect(descriptor.category);
-    }
-    PersistConfig();
-}
-
-void AppController::SetHoldFollowMode(const std::string& mode) {
-    const std::string normalized = NormalizeHoldFollowMode(mode);
-    if (config_.holdFollowMode == normalized) return;
-    config_.holdFollowMode = normalized;
-    PersistConfig();
-    if (IsActiveEffectEnabled(EffectCategory::Hold)) {
-        ReapplyActiveEffect(EffectCategory::Hold);
-    }
-}
-
-void AppController::SetHoldPresenterBackend(const std::string& backend) {
-    const std::string normalized = config_internal::NormalizeHoldPresenterBackend(backend);
-    if (config_.holdPresenterBackend == normalized) {
-        return;
-    }
-    config_.holdPresenterBackend = normalized;
-    QuantumHaloPresenterSelection::SetConfiguredBackendPreference(config_.holdPresenterBackend);
-    PersistConfig();
-    if (IsActiveEffectEnabled(EffectCategory::Hold)) {
-        ReapplyActiveEffect(EffectCategory::Hold);
-    }
-}
-
-IMouseEffect* AppController::GetEffect(EffectCategory category) const {
-    size_t idx = static_cast<size_t>(category);
-    if (idx >= kCategoryCount) return nullptr;
-    return effects_[idx].get();
-}
-
 void AppController::HandleCommand(const std::string& jsonCmd) {
     if (!dispatchMessageHost_ || !dispatchMessageHost_->IsCreated()) return;
 
@@ -602,48 +363,6 @@ void AppController::HandleCommand(const std::string& jsonCmd) {
     }
 
     commandHandler_->Handle(jsonCmd);
-}
-
-void AppController::UpdateVmSuppressionState() {
-    if (!foregroundSuppressionService_) {
-        return;
-    }
-    const uint64_t now = CurrentTickMs();
-    const bool suppress = foregroundSuppressionService_->ShouldSuppress(now);
-    if (suppress == vmEffectsSuppressed_) return;
-    ApplyVmSuppression(suppress);
-}
-
-void AppController::ApplyVmSuppression(bool suppressed) {
-    if (suppressed) {
-        SuspendEffectsForVm();
-    } else {
-        ResumeEffectsAfterVm();
-    }
-    vmEffectsSuppressed_ = suppressed;
-}
-
-void AppController::SuspendEffectsForVm() {
-    if (dispatchMessageHost_ && dispatchMessageHost_->IsCreated()) {
-        dispatchMessageHost_->KillTimer(kHoldTimerId);
-    }
-    pendingHold_.active = false;
-    ignoreNextClick_ = false;
-    holdButtonDown_ = false;
-    holdDownTick_ = 0;
-    hovering_ = false;
-    inputIndicatorOverlay_->Hide();
-    inputAutomationEngine_.Reset();
-
-    for (auto& effect : effects_) {
-        if (effect) effect->Shutdown();
-    }
-}
-
-void AppController::ResumeEffectsAfterVm() {
-    for (auto& effect : effects_) {
-        if (effect) effect->Initialize();
-    }
 }
 
 intptr_t AppController::OnDispatchMessage(
