@@ -27,6 +27,8 @@ function normalizeWasmState(input) {
     last_command_truncated_by_budget: diagnostics.last_command_truncated_by_budget,
     last_budget_reason: diagnostics.last_budget_reason,
     last_parse_error: diagnostics.last_parse_error,
+    last_load_failure_stage: diagnostics.last_load_failure_stage,
+    last_load_failure_code: diagnostics.last_load_failure_code,
     runtime_backend: `${value.runtime_backend || ''}`.trim(),
     runtime_fallback_reason: `${value.runtime_fallback_reason || ''}`.trim(),
     plugin_loaded: !!value.plugin_loaded,

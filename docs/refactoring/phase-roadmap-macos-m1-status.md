@@ -171,6 +171,8 @@
   - 55t completed (acceptance): script syntax checks and full POSIX suite remain green after helper split.
   - 55u completed (code): core HTTP contract regression now asserts WASM load-failure diagnostics (`last_load_failure_stage/code`) across success, invalid-manifest failure, and reload-clear paths, with helperized load-manifest request/assert wrappers.
   - 55u completed (acceptance): shell syntax checks and full POSIX suite remain green after core-http WASM contract expansion.
+  - 55v completed (code): shared Svelte WASM diagnostics panel now renders load-failure stage/code fields and wires warning-state evaluation to non-empty failure signals; EN/ZH i18n keys are added for both labels.
+  - 55v completed (acceptance): WebUI workspace build and full POSIX suite remain green after diagnostics-surface expansion.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -263,6 +265,7 @@
 - macOS WASM selfcheck now also enforces non-manifest-load stage semantics and recovery cleanup semantics after valid reload.
 - macOS WASM selfcheck internals are now helper-split, reducing future extension/change risk while preserving existing contract assertions.
 - Core HTTP contract regression now enforces the same load-failure diagnostics semantics, reducing drift between manual selfcheck and CI-style contract gates.
+- Shared WebUI diagnostics now surfaces load-failure stage/code directly, closing backend-vs-UI observability gap for WASM load failures.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

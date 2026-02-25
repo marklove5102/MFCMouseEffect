@@ -26,6 +26,8 @@ export function normalizeWasmDiagnostics(input) {
     last_command_truncated_by_budget: normalizeBoolean(value.last_command_truncated_by_budget),
     last_budget_reason: normalizeText(value.last_budget_reason),
     last_parse_error: normalizeText(value.last_parse_error),
+    last_load_failure_stage: normalizeText(value.last_load_failure_stage),
+    last_load_failure_code: normalizeText(value.last_load_failure_code),
   };
 }
 
@@ -35,6 +37,8 @@ export function hasWasmDiagnosticWarning(diagnostics) {
   if (value.last_call_rejected_by_budget) return true;
   if (value.last_output_truncated_by_budget) return true;
   if (value.last_command_truncated_by_budget) return true;
+  if (normalizeText(value.last_load_failure_stage)) return true;
+  if (normalizeText(value.last_load_failure_code)) return true;
   const parseError = normalizeText(value.last_parse_error).toLowerCase();
   return parseError.length > 0 && parseError !== 'none';
 }

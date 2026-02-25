@@ -46,6 +46,8 @@
       last_command_truncated_by_budget: diagnostics.last_command_truncated_by_budget,
       last_budget_reason: diagnostics.last_budget_reason,
       last_parse_error: diagnostics.last_parse_error,
+      last_load_failure_stage: diagnostics.last_load_failure_stage,
+      last_load_failure_code: diagnostics.last_load_failure_code,
       runtime_backend: `${value.runtime_backend || ''}`.trim(),
       runtime_fallback_reason: `${value.runtime_fallback_reason || ''}`.trim(),
       plugin_loaded: !!value.plugin_loaded,
@@ -734,6 +736,16 @@
       <div class="wasm-label" data-i18n="label_wasm_parse_error">Parse error</div>
       <div class={`wasm-value wasm-text-block ${isDiagnosticWarning(current) ? 'is-warn' : ''}`}>
         {current.last_parse_error || '-'}
+      </div>
+
+      <div class="wasm-label" data-i18n="label_wasm_last_load_failure_stage">Last load failure stage</div>
+      <div class={`wasm-value wasm-text-block ${isDiagnosticWarning(current) ? 'is-warn' : ''}`}>
+        {current.last_load_failure_stage || '-'}
+      </div>
+
+      <div class="wasm-label" data-i18n="label_wasm_last_load_failure_code">Last load failure code</div>
+      <div class={`wasm-value wasm-text-block ${isDiagnosticWarning(current) ? 'is-warn' : ''}`}>
+        {current.last_load_failure_code || '-'}
       </div>
 
       <div class="wasm-label" data-i18n="label_wasm_last_render_error">Last render error</div>
