@@ -198,6 +198,38 @@ mfx_assert_file_contains "$invalid_file" "\"ok\":false" "selfcheck invalid manif
 mfx_assert_file_contains "$invalid_file" "\"last_load_failure_stage\":\"manifest_load\"" "selfcheck invalid manifest stage"
 mfx_assert_file_contains "$invalid_file" "\"last_load_failure_code\":\"manifest_io_error\"" "selfcheck invalid manifest code"
 
+invalid_json_manifest_path="$tmp_dir/manifest-invalid-json.json"
+printf '{' > "$invalid_json_manifest_path"
+invalid_json_manifest_escaped="$(json_escape "$invalid_json_manifest_path")"
+invalid_json_file="$tmp_dir/wasm-load-invalid-json.out"
+code_invalid_json="$(mfx_http_code "$invalid_json_file" "$MFX_MANUAL_BASE_URL/api/wasm/load-manifest" \
+    -X POST -H "${token_header[0]}" -H "Content-Type: application/json" \
+    -d "{\"manifest_path\":\"$invalid_json_manifest_escaped\"}")"
+mfx_assert_eq "$code_invalid_json" "200" "selfcheck invalid json manifest status"
+mfx_assert_file_contains "$invalid_json_file" "\"ok\":false" "selfcheck invalid json manifest should fail"
+mfx_assert_file_contains "$invalid_json_file" "\"last_load_failure_stage\":\"manifest_load\"" "selfcheck invalid json manifest stage"
+mfx_assert_file_contains "$invalid_json_file" "\"last_load_failure_code\":\"manifest_json_parse_error\"" "selfcheck invalid json manifest code"
+
+invalid_schema_manifest_path="$tmp_dir/manifest-invalid-schema.json"
+cat > "$invalid_schema_manifest_path" <<'EOF'
+{
+  "id": "",
+  "name": "invalid-schema",
+  "version": "1.0.0",
+  "api_version": 1,
+  "entry": "effect.wasm"
+}
+EOF
+invalid_schema_manifest_escaped="$(json_escape "$invalid_schema_manifest_path")"
+invalid_schema_file="$tmp_dir/wasm-load-invalid-schema.out"
+code_invalid_schema="$(mfx_http_code "$invalid_schema_file" "$MFX_MANUAL_BASE_URL/api/wasm/load-manifest" \
+    -X POST -H "${token_header[0]}" -H "Content-Type: application/json" \
+    -d "{\"manifest_path\":\"$invalid_schema_manifest_escaped\"}")"
+mfx_assert_eq "$code_invalid_schema" "200" "selfcheck invalid schema manifest status"
+mfx_assert_file_contains "$invalid_schema_file" "\"ok\":false" "selfcheck invalid schema manifest should fail"
+mfx_assert_file_contains "$invalid_schema_file" "\"last_load_failure_stage\":\"manifest_load\"" "selfcheck invalid schema manifest stage"
+mfx_assert_file_contains "$invalid_schema_file" "\"last_load_failure_code\":\"manifest_invalid\"" "selfcheck invalid schema manifest code"
+
 if ! kill -0 "$MFX_MANUAL_HOST_PID" 2>/dev/null; then
     tail -n 100 "$MFX_MANUAL_LOG_FILE" >&2 || true
     mfx_fail "host died after fallback-path check"
