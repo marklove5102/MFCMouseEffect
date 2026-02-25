@@ -509,6 +509,9 @@
     <ClCompile Include="MouseFx\Core\Control\AppController.InputCapture.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
+    <ClCompile Include="MouseFx\Core\Control\AppController.Lifecycle.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
     <ClCompile Include="MouseFx\Core\Control\AutomationDispatchFeature.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
