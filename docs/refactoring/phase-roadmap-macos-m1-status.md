@@ -221,6 +221,10 @@
   - 55zq completed (acceptance): full POSIX regression suite remains green after core workflow-helper consolidation.
   - 55zr completed (code): added retry-based WASM test-dispatch readiness assertions in both regression and manual selfcheck paths to absorb transient startup races (`invoke_ok`/`rendered_any` timing).
   - 55zr completed (acceptance): full POSIX regression suite remains green after dispatch-readiness retry hardening.
+  - 55zs completed (code): extracted macOS global-input helper modules (`MacosInputEventUtils`, `MacosInputPermissionState`) to remove event-mapping and permission-file parsing from `MacosGlobalInputHook.mm`.
+  - 55zs completed (acceptance): full POSIX regression suite remains green after helper extraction and CMake wiring update.
+  - 55zt completed (code): split `MacosGlobalInputHook` implementation into lifecycle (`.mm`), callback/probe (`.EventTap.mm`), and runloop (`.RunLoop.mm`) units with shared class-level constants.
+  - 55zt completed (acceptance): full POSIX regression suite remains green after implementation-unit split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.

@@ -31,6 +31,17 @@ public:
     void SetKeyboardCaptureExclusive(bool enabled) override;
 
 private:
+    static constexpr uint32_t kErrorSuccess = 0;
+    static constexpr uint32_t kErrorInvalidParameter = 22;
+    static constexpr uint32_t kErrorPermissionDenied = 13;
+    static constexpr uint32_t kErrorTapCreateFailed = 1001;
+    static constexpr uint32_t kErrorSourceCreateFailed = 1002;
+#if defined(__APPLE__)
+    static constexpr CFTimeInterval kPermissionProbeIntervalSeconds = 0.5;
+#endif
+    static constexpr uint32_t kPermissionSimulationPollIntervalMs = 120;
+
+private:
     void RunEventTapLoop();
     void OnPermissionProbeTimer();
 #if defined(__APPLE__)
