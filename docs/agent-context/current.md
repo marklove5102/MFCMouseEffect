@@ -24,6 +24,7 @@
   - test-gated `/api/automation/test-binding-priority` enables non-interactive priority contract checks (`process > all`, `longest chain > shorter chain`)
   - test-gated `/api/automation/test-match-and-inject` enables non-interactive matcher+injector integration checks (`history -> selected binding -> inject`)
   - test-gated `/api/automation/test-shortcut-from-mac-keycode` enables non-interactive `Cmd+V/Cmd+Tab` mapping contract checks
+  - shortcut test API now has explicit invalid-keycode contract (`supported=false`, `vk_code=0`, empty `shortcut`, reason code) with regression guard
   - test-gated `/api/automation/test-inject-shortcut` enables non-interactive injector call-path checks (`Cmd+C`) under dry-run mode
   - real injection manual acceptance (`left_click -> Cmd+C`) is user-verified on macOS via one-command selfcheck
   - Phase 53 automation mapping scope is now explicitly closed for M1 in `phase53ai-automation-mapping-phase-closure.md`
@@ -183,10 +184,11 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzh-wasm-dispatch-diagnostics-consistency-contract.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzi-macos-effect-overlay-lifecycle-observability.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzj-effect-overlay-probe-arithmetic-hardening.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzk-automation-shortcut-invalid-keycode-contract.md`
 - Phase closure docs:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54i-linux-follow-phase-closure.md`
-- For full Phase 55 sequence (`55h-55zzj`), read roadmap status doc above instead of loading all slice docs by default.
+- For full Phase 55 sequence (`55h-55zzk`), read roadmap status doc above instead of loading all slice docs by default.
 
 ## AI-IDE Context Loading Rule
 - Read this file first for active truth.

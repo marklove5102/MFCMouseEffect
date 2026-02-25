@@ -53,12 +53,14 @@ bool HandleWebSettingsTestAutomationShortcutApiRoute(
         event.meta = event.win;
         event.systemKey = event.alt || event.meta;
 
-        const std::string shortcut = shortcut_text::FormatShortcutText(event);
+        const bool supported = validMacKeyCode && event.vkCode != 0;
+        const std::string shortcut = supported ? shortcut_text::FormatShortcutText(event) : std::string{};
         SetJsonResponse(resp, json({
             {"ok", true},
             {"mac_key_code", rawMacKeyCode},
             {"vk_code", event.vkCode},
-            {"supported", validMacKeyCode && event.vkCode != 0},
+            {"supported", supported},
+            {"reason", supported ? std::string{} : std::string("invalid_or_unmapped_keycode")},
             {"shortcut", shortcut},
         }).dump());
         return true;

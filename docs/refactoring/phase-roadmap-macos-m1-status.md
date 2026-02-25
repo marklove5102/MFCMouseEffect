@@ -257,6 +257,8 @@
   - 55zzi completed (acceptance): full POSIX regression suite remains green after effect overlay lifecycle observability + contract probe expansion.
   - 55zzj completed (code): hardened effect overlay probe contracts with script-computed arithmetic checks from flattened counters (`total == click + scroll`) and removed redundant `effects_runtime.total_matches_components`.
   - 55zzj completed (acceptance): full POSIX regression suite remains green after effect overlay probe arithmetic hardening.
+  - 55zzk completed (code): hardened automation shortcut test route for invalid keycode path (`supported=false`, `vk_code=0`, empty `shortcut`, reason code) and added regression assertions.
+  - 55zzk completed (acceptance): full POSIX regression suite remains green after invalid-keycode shortcut contract hardening.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -377,6 +379,7 @@
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.
 - Effect overlay contracts now assert click/scroll overlay window lifecycle restore-to-baseline after probe emission, reducing silent overlay cleanup drift risk.
 - Effect overlay contracts now also assert raw counter arithmetic invariants (`before/after total == click + scroll`) at script level, reducing route-local false-green risk.
+- Automation shortcut test contracts now explicitly guard invalid/unmapped keycode semantics, reducing edge-path mapping drift risk.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:
