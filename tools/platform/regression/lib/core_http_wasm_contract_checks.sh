@@ -131,20 +131,20 @@ _mfx_core_http_run_wasm_contract_checks() {
     fi
 
     if [[ "$platform" == "macos" ]]; then
-        if ! rg -q --fixed-strings "\"runtime_backend\":\"wasm3_static\"" "$tmp_dir/state.out"; then
+        if ! mfx_file_contains_fixed "$tmp_dir/state.out" "\"runtime_backend\":\"wasm3_static\""; then
             mfx_fail "core wasm runtime backend on macos: expected wasm3_static"
         fi
-        if ! rg -q --fixed-strings "\"render_supported\":true" "$tmp_dir/state.out"; then
+        if ! mfx_file_contains_fixed "$tmp_dir/state.out" "\"render_supported\":true"; then
             mfx_fail "core wasm render capability on macos: expected render_supported=true"
         fi
-        if rg -q --fixed-strings "\"wasm_catalog_not_supported_on_this_platform\"" "$tmp_dir/wasm-catalog.out"; then
+        if mfx_file_contains_fixed "$tmp_dir/wasm-catalog.out" "\"wasm_catalog_not_supported_on_this_platform\""; then
             mfx_fail "core wasm catalog support on macos: unexpected unsupported marker"
         fi
-        if ! rg -q --fixed-strings "\"supported\":true" "$tmp_dir/wasm-import-dialog-probe.out"; then
+        if ! mfx_file_contains_fixed "$tmp_dir/wasm-import-dialog-probe.out" "\"supported\":true"; then
             mfx_fail "core wasm import dialog support on macos: expected supported=true"
         fi
         if [[ -f "$tmp_dir/wasm-test-dispatch.out" ]]; then
-            if ! rg -q --fixed-strings "\"rendered_any\":true" "$tmp_dir/wasm-test-dispatch.out"; then
+            if ! mfx_file_contains_fixed "$tmp_dir/wasm-test-dispatch.out" "\"rendered_any\":true"; then
                 mfx_fail "core wasm test-dispatch render on macos: expected rendered_any=true"
             fi
         fi

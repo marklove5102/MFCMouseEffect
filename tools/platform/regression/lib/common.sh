@@ -40,17 +40,31 @@ mfx_assert_eq() {
     fi
 }
 
+mfx_file_contains_fixed() {
+    local file_path="$1"
+    local pattern="$2"
+    if command -v rg >/dev/null 2>&1; then
+        rg -q --fixed-strings "$pattern" "$file_path"
+        return $?
+    fi
+    grep -Fq -- "$pattern" "$file_path"
+}
+
+mfx_file_contains_regex() {
+    local file_path="$1"
+    local pattern="$2"
+    if command -v rg >/dev/null 2>&1; then
+        rg -q "$pattern" "$file_path"
+        return $?
+    fi
+    grep -Eq -- "$pattern" "$file_path"
+}
+
 mfx_assert_file_contains() {
     local file_path="$1"
     local pattern="$2"
     local context="$3"
-    if command -v rg >/dev/null 2>&1; then
-        if ! rg -q --fixed-strings "$pattern" "$file_path"; then
-            mfx_fail "$context: missing pattern '$pattern' in $file_path"
-        fi
-        return 0
-    fi
-    if ! grep -Fq -- "$pattern" "$file_path"; then
+    if ! mfx_file_contains_fixed "$file_path" "$pattern"; then
         mfx_fail "$context: missing pattern '$pattern' in $file_path"
     fi
 }

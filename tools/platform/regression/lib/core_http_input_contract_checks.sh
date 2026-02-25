@@ -28,9 +28,9 @@ _mfx_core_http_wait_input_capture_state() {
         local code
         code="$(mfx_http_code "$output_file" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
         if [[ "$code" == "200" ]] && \
-           rg -q --fixed-strings "\"input_capture\"" "$output_file" && \
-           rg -q --fixed-strings "\"active\":$expected_active" "$output_file" && \
-           rg -q --fixed-strings "\"reason\":\"$expected_reason\"" "$output_file"; then
+           mfx_file_contains_fixed "$output_file" "\"input_capture\"" && \
+           mfx_file_contains_fixed "$output_file" "\"active\":$expected_active" && \
+           mfx_file_contains_fixed "$output_file" "\"reason\":\"$expected_reason\""; then
             return 0
         fi
         sleep 0.2

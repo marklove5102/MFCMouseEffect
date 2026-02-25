@@ -74,7 +74,6 @@ fi
 
 mfx_require_cmd cmake
 mfx_require_cmd curl
-mfx_require_cmd rg
 
 mfx_info "repo root: $REPO_ROOT"
 mfx_info "platform: $MFX_PLATFORM"

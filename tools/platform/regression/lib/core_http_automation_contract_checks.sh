@@ -232,19 +232,19 @@ _mfx_core_http_run_automation_contract_checks() {
     mfx_assert_file_contains "$tmp_dir/input-indicator-keyboard-labels.out" "\"labels\":[\"A\",\"Cmd+K9\",\"K6\"]" "core input-indicator keyboard labels probe labels"
 
     if [[ "$platform" == "macos" ]]; then
-        if rg -q --fixed-strings "\"count\":0" "$tmp_dir/app-catalog.out"; then
+        if mfx_file_contains_fixed "$tmp_dir/app-catalog.out" "\"count\":0"; then
             mfx_fail "core app-catalog non-empty on macos: unexpected count=0"
         fi
-        if ! rg -q "\"exe\":\"[^\"]+\\.app\"" "$tmp_dir/app-catalog.out"; then
+        if ! mfx_file_contains_regex "$tmp_dir/app-catalog.out" "\"exe\":\"[^\"]+\\.app\""; then
             mfx_fail "core app-catalog app suffix on macos: missing .app process entry"
         fi
-        if ! rg -q "\"process\":\"[^\"]+\"" "$tmp_dir/active-process.out"; then
+        if ! mfx_file_contains_regex "$tmp_dir/active-process.out" "\"process\":\"[^\"]+\""; then
             mfx_fail "core active-process non-empty on macos: expected non-empty process base name"
         fi
-        if ! rg -q --fixed-strings "\"keyboard_injector\":true" "$tmp_dir/schema.out"; then
+        if ! mfx_file_contains_fixed "$tmp_dir/schema.out" "\"keyboard_injector\":true"; then
             mfx_fail "core schema keyboard injector capability on macos: expected true"
         fi
-        if ! rg -q --fixed-strings "\"accepted\":true" "$tmp_dir/test-inject-shortcut.out"; then
+        if ! mfx_file_contains_fixed "$tmp_dir/test-inject-shortcut.out" "\"accepted\":true"; then
             mfx_fail "core test-inject-shortcut on macos: expected accepted=true (dry-run injector mode)"
         fi
     fi
