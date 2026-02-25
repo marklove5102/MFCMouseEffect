@@ -255,6 +255,8 @@
   - 55zzh completed (acceptance): full POSIX regression suite remains green after wasm dispatch diagnostics consistency contract expansion.
   - 55zzi completed (code): added macOS effect overlay lifecycle observability (`/api/state.effects_runtime`) and test-only effect probe route (`/api/effects/test-overlay-windows`) with emit/restore contract checks.
   - 55zzi completed (acceptance): full POSIX regression suite remains green after effect overlay lifecycle observability + contract probe expansion.
+  - 55zzj completed (code): hardened effect overlay probe contracts with script-computed arithmetic checks from flattened counters (`total == click + scroll`) and removed redundant `effects_runtime.total_matches_components`.
+  - 55zzj completed (acceptance): full POSIX regression suite remains green after effect overlay probe arithmetic hardening.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -374,6 +376,7 @@
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.
 - Effect overlay contracts now assert click/scroll overlay window lifecycle restore-to-baseline after probe emission, reducing silent overlay cleanup drift risk.
+- Effect overlay contracts now also assert raw counter arithmetic invariants (`before/after total == click + scroll`) at script level, reducing route-local false-green risk.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

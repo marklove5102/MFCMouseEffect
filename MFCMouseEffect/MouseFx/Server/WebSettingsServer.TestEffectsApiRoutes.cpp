@@ -140,8 +140,14 @@ bool HandleWebSettingsTestEffectsApiRoute(
             {"wait_for_clear_ms", waitForClearMs},
             {"before", before.ToJson()},
             {"after", after.ToJson()},
-            {"before_invariant_ok", before.InvariantOk()},
-            {"after_invariant_ok", after.InvariantOk()},
+            {"before_click_active_overlay_windows", before.click},
+            {"before_scroll_active_overlay_windows", before.scroll},
+            {"before_active_overlay_windows_total", before.Total()},
+            {"after_click_active_overlay_windows", after.click},
+            {"after_scroll_active_overlay_windows", after.scroll},
+            {"after_active_overlay_windows_total", after.Total()},
+            {"before_total_matches_components", before.InvariantOk()},
+            {"after_total_matches_components", after.InvariantOk()},
             {"restored_to_baseline", after.Total() <= before.Total()},
         }).dump());
         return true;

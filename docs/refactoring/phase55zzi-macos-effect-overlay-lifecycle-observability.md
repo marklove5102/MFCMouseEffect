@@ -34,7 +34,6 @@
   - `click_active_overlay_windows`
   - `scroll_active_overlay_windows`
   - `active_overlay_windows_total`
-  - `total_matches_components`
 
 ### 3) Test-only effect lifecycle probe route
 - Added:
@@ -46,6 +45,7 @@
 - New test endpoint:
   - `POST /api/effects/test-overlay-windows`
   - Supports optional emit (`click`/`scroll`) and wait-until-clear contract checks.
+  - Returns both nested snapshot (`before`/`after`) and flattened counter fields for script-level arithmetic assertions.
 
 ### 4) Regression contract hardening
 - Updated:

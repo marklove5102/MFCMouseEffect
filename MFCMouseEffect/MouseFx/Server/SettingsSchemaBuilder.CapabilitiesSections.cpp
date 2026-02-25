@@ -89,8 +89,7 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
         {"diagnostic_keys", json::array({
             "click_active_overlay_windows",
             "scroll_active_overlay_windows",
-            "active_overlay_windows_total",
-            "total_matches_components"
+            "active_overlay_windows_total"
         })}
     };
 

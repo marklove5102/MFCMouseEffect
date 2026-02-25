@@ -187,8 +187,6 @@ json BuildEffectsRuntimeState() {
     out["click_active_overlay_windows"] = clickActiveOverlayWindows;
     out["scroll_active_overlay_windows"] = scrollActiveOverlayWindows;
     out["active_overlay_windows_total"] = totalActiveOverlayWindows;
-    out["total_matches_components"] =
-        (totalActiveOverlayWindows == (clickActiveOverlayWindows + scrollActiveOverlayWindows));
     return out;
 }
 
