@@ -38,6 +38,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseOverlayRenderer.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseWindowRegistry.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseEffect.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseOverlayStyle.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseOverlayRenderer.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseEffect.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseOverlayStyle.mm"

@@ -433,6 +433,7 @@
 - macOS trail overlay renderer now splits trail-style normalization/color/path construction into `MacosTrailPulseOverlayStyle.*`, reducing renderer-file coupling while preserving trail overlay runtime semantics.
 - macOS click overlay renderer now delegates click-type normalization/star-path construction to `MacosClickPulseOverlayStyle.*`, reducing renderer-file coupling while preserving click overlay runtime semantics.
 - macOS scroll overlay renderer now delegates scroll-type normalization to `MacosScrollPulseOverlayStyle.*`, reducing renderer-file coupling while preserving scroll overlay runtime semantics.
+- macOS hover overlay renderer now delegates hover-type normalization and glow/tubes palette constants to `MacosHoverPulseOverlayStyle.*`, reducing renderer-file coupling while preserving hover overlay runtime semantics.
 - Shared lock owner-pid read path now tolerates transient `owner.env` races, so concurrent gate waits degrade to normal lock waiting rather than shell parse failure.
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.

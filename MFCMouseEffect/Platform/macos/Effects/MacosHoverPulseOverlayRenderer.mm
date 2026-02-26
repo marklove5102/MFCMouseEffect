@@ -1,8 +1,8 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosHoverPulseOverlayRenderer.h"
+#include "Platform/macos/Effects/MacosHoverPulseOverlayStyle.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
-#include "MouseFx/Utils/StringUtils.h"
 
 #if defined(__APPLE__)
 #import <AppKit/AppKit.h>
@@ -20,14 +20,6 @@ namespace {
 NSWindow*& ActiveHoverWindow() {
     static NSWindow* window = nil;
     return window;
-}
-
-std::string NormalizeHoverType(const std::string& effectType) {
-    const std::string value = ToLowerAscii(effectType);
-    if (value == "tubes" || value == "suspension") {
-        return "tubes";
-    }
-    return "glow";
 }
 
 void CloseHoverPulseOverlayOnMain() {
@@ -65,8 +57,8 @@ void ShowHoverPulseOverlayOnMain(
     CGPathRef ringPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, 20.0, 20.0), nullptr);
     ring.path = ringPath;
     CGPathRelease(ringPath);
-    ring.fillColor = [NSColor colorWithCalibratedRed:0.25 green:0.70 blue:1.0 alpha:0.10].CGColor;
-    ring.strokeColor = [NSColor colorWithCalibratedRed:0.25 green:0.70 blue:1.0 alpha:0.95].CGColor;
+    ring.fillColor = HoverGlowFillColor().CGColor;
+    ring.strokeColor = HoverGlowStrokeColor().CGColor;
     ring.lineWidth = 2.0;
     ring.opacity = static_cast<float>(profile.baseOpacity);
     [content.layer addSublayer:ring];
@@ -86,7 +78,7 @@ void ShowHoverPulseOverlayOnMain(
         ring2.path = ring2Path;
         CGPathRelease(ring2Path);
         ring2.fillColor = [NSColor clearColor].CGColor;
-        ring2.strokeColor = [NSColor colorWithCalibratedRed:0.47 green:0.90 blue:0.63 alpha:0.95].CGColor;
+        ring2.strokeColor = HoverTubesStrokeColor().CGColor;
         ring2.lineWidth = 1.8;
         ring2.opacity = static_cast<float>(std::max(0.1, profile.baseOpacity - 0.05));
         [content.layer addSublayer:ring2];
