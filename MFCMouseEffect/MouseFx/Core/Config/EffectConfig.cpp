@@ -5,6 +5,39 @@
 #include "MouseFx/Utils/StringUtils.h"
 
 namespace mousefx {
+namespace {
+
+bool ContainsTrailToken(const std::string& value, const char* token) {
+    return value.find(token) != std::string::npos;
+}
+
+std::string NormalizeTrailTypeAlias(std::string type) {
+    type = ToLowerAscii(type);
+    if (type == "scifi" || type == "sci-fi" || type == "sci_fi") {
+        return "tubes";
+    }
+    if (ContainsTrailToken(type, "meteor")) {
+        return "meteor";
+    }
+    if (ContainsTrailToken(type, "streamer") || ContainsTrailToken(type, "stream") || ContainsTrailToken(type, "neon")) {
+        return "streamer";
+    }
+    if (ContainsTrailToken(type, "electric") || ContainsTrailToken(type, "arc")) {
+        return "electric";
+    }
+    if (ContainsTrailToken(type, "tube") || ContainsTrailToken(type, "suspension")) {
+        return "tubes";
+    }
+    if (ContainsTrailToken(type, "line") || ContainsTrailToken(type, "default")) {
+        return "line";
+    }
+    if (type == "particle" || ContainsTrailToken(type, "spark")) {
+        return "particle";
+    }
+    return type;
+}
+
+} // namespace
 
 Argb ArgbFromHex(const std::string& hex) {
     if (hex.empty() || hex[0] != '#') {
@@ -32,10 +65,7 @@ EffectConfig EffectConfig::GetDefault() {
 }
 
 TrailHistoryProfile EffectConfig::GetTrailHistoryProfile(const std::string& type) const {
-    std::string normalized = ToLowerAscii(type);
-    if (normalized == "scifi" || normalized == "sci-fi" || normalized == "sci_fi") {
-        normalized = "tubes";
-    }
+    const std::string normalized = NormalizeTrailTypeAlias(type);
 
     if (normalized == "electric") {
         return config_internal::SanitizeTrailHistoryProfile(trailProfiles.electric);

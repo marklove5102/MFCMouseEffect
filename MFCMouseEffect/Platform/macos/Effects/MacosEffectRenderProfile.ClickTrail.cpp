@@ -26,7 +26,8 @@ ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
 
 TrailRenderProfile ResolveTrailRenderProfile(const EffectConfig& config, const std::string& trailType) {
     TrailRenderProfile profile{};
-    const TrailHistoryProfile history = config.GetTrailHistoryProfile(trailType);
+    const std::string normalizedTrailType = detail::NormalizeTrailTypeAlias(trailType);
+    const TrailHistoryProfile history = config.GetTrailHistoryProfile(normalizedTrailType);
     const int durationMs = ClampInt(static_cast<int>(std::lround(history.durationMs * 0.55)), 140, 900);
     profile.durationSec = static_cast<double>(durationMs) / 1000.0;
     profile.normalSizePx = ClampInt(56 + history.maxPoints / 3, 56, 112);
@@ -37,8 +38,9 @@ TrailRenderProfile ResolveTrailRenderProfile(const EffectConfig& config, const s
 }
 
 TrailThrottleProfile ResolveTrailThrottleProfile(const EffectConfig& config, const std::string& trailType) {
-    const TrailThrottleProfile base = detail::ResolveTrailThrottleProfileByType(trailType);
-    const TrailHistoryProfile history = config.GetTrailHistoryProfile(trailType);
+    const std::string normalizedTrailType = detail::NormalizeTrailTypeAlias(trailType);
+    const TrailThrottleProfile base = detail::ResolveTrailThrottleProfileByType(normalizedTrailType);
+    const TrailHistoryProfile history = config.GetTrailHistoryProfile(normalizedTrailType);
 
     TrailThrottleProfile result{};
     const double durationScale = detail::ClampDouble(static_cast<double>(history.durationMs) / 300.0, 0.5, 2.0);
