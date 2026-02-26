@@ -4,8 +4,6 @@
 
 #include "MouseFx/Utils/StringUtils.h"
 
-#include <algorithm>
-#include <chrono>
 #include <utility>
 
 namespace mousefx::wasm {
@@ -216,126 +214,6 @@ void WasmEffectHost::ResetPluginState() {
     if (runtime_ && diagnostics_.pluginLoaded) {
         runtime_->ResetPluginState();
     }
-}
-
-bool WasmEffectHost::InvokeEvent(const EventInvokeInput& input, std::vector<uint8_t>* outCommandBuffer) {
-    if (!outCommandBuffer) {
-        SetError("Output command buffer pointer is null.");
-        return false;
-    }
-    outCommandBuffer->clear();
-
-    diagnostics_.lastCallDurationMicros = 0;
-    diagnostics_.lastOutputBytes = 0;
-    diagnostics_.lastCommandCount = 0;
-    diagnostics_.lastCallExceededBudget = false;
-    diagnostics_.lastCallRejectedByBudget = false;
-    diagnostics_.lastOutputTruncatedByBudget = false;
-    diagnostics_.lastCommandTruncatedByBudget = false;
-    diagnostics_.lastBudgetReason.clear();
-    diagnostics_.lastParseError = CommandParseError::None;
-    diagnostics_.lastRenderedByWasm = false;
-    diagnostics_.lastExecutedTextCommands = 0;
-    diagnostics_.lastExecutedImageCommands = 0;
-    diagnostics_.lastThrottledRenderCommands = 0;
-    diagnostics_.lastThrottledByCapacityRenderCommands = 0;
-    diagnostics_.lastThrottledByIntervalRenderCommands = 0;
-    diagnostics_.lastDroppedRenderCommands = 0;
-    diagnostics_.lastRenderError.clear();
-
-    if (!enabled_) {
-        return false;
-    }
-    if (!diagnostics_.pluginLoaded || !runtime_) {
-        SetError("WASM plugin is not loaded.");
-        return false;
-    }
-    if (budget_.outputBufferBytes == 0) {
-        SetError("WASM output budget is zero.");
-        return false;
-    }
-
-    std::vector<uint8_t> output(budget_.outputBufferBytes, 0);
-    uint32_t writtenBytes = 0;
-    std::string error;
-    bool ok = false;
-
-    const auto start = std::chrono::steady_clock::now();
-    const EventInputV1 eventInput = BuildEventInputV1(input);
-    const auto payload = SerializeEventInputV1(eventInput);
-    ok = runtime_->CallOnEvent(
-        payload.data(),
-        static_cast<uint32_t>(payload.size()),
-        output.data(),
-        static_cast<uint32_t>(output.size()),
-        &writtenBytes,
-        &error);
-    const auto end = std::chrono::steady_clock::now();
-    diagnostics_.lastCallDurationMicros = static_cast<uint64_t>(
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
-
-    const double elapsedMs = static_cast<double>(diagnostics_.lastCallDurationMicros) / 1000.0;
-    diagnostics_.lastCallExceededBudget = elapsedMs > budget_.maxEventExecutionMs;
-
-    if (!ok) {
-        SetError(error.empty() ? "WASM plugin call failed." : error);
-        return false;
-    }
-
-    const uint32_t cappedBytes = std::min<uint32_t>(writtenBytes, static_cast<uint32_t>(output.size()));
-    output.resize(cappedBytes);
-    diagnostics_.lastOutputBytes = cappedBytes;
-    const CommandParseResult parseResult =
-        WasmCommandBufferParser::Parse(output.data(), output.size(), budget_.maxCommands);
-    diagnostics_.lastCommandCount = static_cast<uint32_t>(parseResult.commands.size());
-    diagnostics_.lastParseError = parseResult.error;
-    if (parseResult.error == CommandParseError::CommandLimitExceeded) {
-        output.resize(parseResult.consumedBytes);
-        diagnostics_.lastOutputBytes = parseResult.consumedBytes;
-    } else if (parseResult.error != CommandParseError::None) {
-        output.clear();
-        diagnostics_.lastOutputBytes = 0;
-        SetError(std::string("WASM command buffer parse failed: ") + CommandParseErrorToString(parseResult.error));
-        return false;
-    }
-
-    const BudgetCheckInput budgetInput{
-        budget_.outputBufferBytes,
-        budget_.maxCommands,
-        budget_.maxEventExecutionMs,
-        writtenBytes,
-        diagnostics_.lastCommandCount,
-        elapsedMs,
-        parseResult.error == CommandParseError::CommandLimitExceeded,
-    };
-    const BudgetCheckResult budgetResult = WasmExecutionBudgetGuard::Evaluate(budgetInput);
-    diagnostics_.lastCallRejectedByBudget = !budgetResult.accepted;
-    diagnostics_.lastOutputTruncatedByBudget = budgetResult.outputTruncated;
-    diagnostics_.lastCommandTruncatedByBudget = budgetResult.commandTruncated;
-    diagnostics_.lastBudgetReason = budgetResult.reason;
-    if (!budgetResult.accepted) {
-        output.clear();
-        diagnostics_.lastOutputBytes = 0;
-        SetError(std::string("WASM budget rejected event: ") + budgetResult.reason);
-        return false;
-    }
-
-    outCommandBuffer->swap(output);
-    ClearError();
-    return true;
-}
-
-EventInputV1 WasmEffectHost::BuildEventInputV1(const EventInvokeInput& input) const {
-    EventInputV1 payload{};
-    payload.x = input.x;
-    payload.y = input.y;
-    payload.delta = input.delta;
-    payload.holdMs = input.holdMs;
-    payload.kind = static_cast<uint8_t>(input.kind);
-    payload.button = input.button;
-    payload.flags = input.flags;
-    payload.eventTickMs = input.eventTickMs;
-    return payload;
 }
 
 void WasmEffectHost::SetError(const std::string& error) {

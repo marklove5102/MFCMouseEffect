@@ -263,6 +263,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmCommandRenderer.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmCommandBufferParser.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmEffectHost.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmEffectHost.Invoke.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmEventInvokeExecutor.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmExecutionBudgetGuard.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmPluginManifest.Load.cpp"
