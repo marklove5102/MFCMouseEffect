@@ -1,9 +1,8 @@
 #include "pch.h"
 
 #include "Platform/posix/Shell/ScaffoldSettingsRuntime.h"
+#include "Platform/posix/Shell/ScaffoldSettingsRuntime.Internal.h"
 
-#include "MouseFx/Server/HttpServer.h"
-#include "Platform/posix/Shell/ScaffoldSettingsRequestHandler.h"
 #include "Platform/posix/Shell/ScaffoldSettingsRouteConfig.h"
 #include "Platform/posix/Shell/ScaffoldSettingsWebUiAssets.h"
 
@@ -23,30 +22,7 @@ struct ScaffoldSettingsRuntime::Impl {
     }
 
     bool Start(const ScaffoldSettingsRuntime::WarningSink& warningSink) {
-        if (!requestHandler.Route().useEmbeddedServer) {
-            return true;
-        }
-
-        if (!requestHandler.HasWebUiBaseDir() && warningSink) {
-            warningSink("MFCMouseEffect", scaffold::BuildMissingWebUiMessage());
-        }
-
-        if (!server) {
-            server = std::make_unique<HttpServer>();
-        }
-        if (server->IsRunning()) {
-            return true;
-        }
-
-        const bool started = server->StartLoopbackOnPort(
-            requestHandler.Route().port,
-            [this](const HttpRequest& req, HttpResponse& resp) {
-                requestHandler.HandleRequest(req, resp);
-            });
-        if (!started && warningSink) {
-            warningSink("MFCMouseEffect", "Scaffold settings server failed to start.");
-        }
-        return started;
+        return scaffold::runtime_internal::StartEmbeddedServer(requestHandler, server, warningSink);
     }
 
     void Stop() {

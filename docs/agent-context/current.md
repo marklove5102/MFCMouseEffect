@@ -142,7 +142,7 @@
   - macOS global-input event-tap dispatch now splits tap-disabled recovery and mouse/key event dispatch into dedicated modules (`MacosGlobalInputHook.EventTapDispatch*.mm`), reducing input-ingress coupling while preserving dispatch semantics
   - macOS user notification service now splits AppleScript/test-capture helpers into dedicated module (`MacosUserNotificationService.AppleScript.cpp`), reducing warn-entry vs notification-backend coupling while preserving degraded-warning contracts
   - macOS event-loop service now splits runloop resource lifecycle into dedicated module (`MacosEventLoopService.RunLoop.cpp`), reducing service-flow vs runloop-resource coupling while preserving shell event-loop contracts
-  - `ScaffoldSettingsApi`/`ScaffoldSettingsRouteConfig` are now split by concern (`state-patch parser` and `route codec` modules), reducing scaffold settings coupling while preserving HTTP route/schema/state contracts
+  - `PosixSettingsLauncher` and `ScaffoldSettingsRuntime` are now split by concern (`capture/spawn` and `runtime-start orchestration` modules), reducing shell runtime coupling while preserving URL launch and scaffold server contracts
   - `AppController` VM suppression path is now isolated in `AppController.VmSuppression.cpp`, reducing suppression-vs-effects coupling while preserving suppression behavior contracts
   - macOS effect overlay lifecycle now exposes 5-category active-window diagnostics (`click/trail/scroll/hold/hover`) in `/api/state.effects_runtime`, and probe coverage (`/api/effects/test-overlay-windows`) now exercises all 5 categories with persistent-overlay close control
 
