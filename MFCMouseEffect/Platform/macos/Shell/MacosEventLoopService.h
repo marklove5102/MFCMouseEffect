@@ -24,6 +24,8 @@ private:
 #if defined(__APPLE__)
     static void RunLoopSourcePerform(void* info);
 
+    bool SetupRunLoopLocked();
+    void TeardownRunLoopLocked();
     void DrainTasksOnRunLoopThread();
     void SignalRunLoopLocked();
 

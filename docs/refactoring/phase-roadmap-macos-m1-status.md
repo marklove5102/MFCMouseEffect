@@ -331,6 +331,8 @@
   - 55zzzzp completed (acceptance): full POSIX regression suite remains green after event-tap dispatch domain split.
   - 55zzzzq completed (code): split input-permission parse helpers and simulation-file parsing flow into dedicated module (`MacosInputPermissionState.Parse.mm`) and kept state entry file focused on runtime trust-source selection.
   - 55zzzzq completed (acceptance): full POSIX regression suite remains green after input-permission parse split.
+  - 55zzzzr completed (code): split event-loop runloop resource lifecycle into dedicated module (`MacosEventLoopService.RunLoop.cpp`) and kept main service file focused on high-level run/task flow.
+  - 55zzzzr completed (acceptance): full POSIX regression suite remains green after event-loop runloop resource split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.

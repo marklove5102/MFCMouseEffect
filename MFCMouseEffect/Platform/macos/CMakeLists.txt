@@ -79,6 +79,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosDpiAwarenessService.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosEventLoopBridge.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosEventLoopService.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosEventLoopService.RunLoop.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosShellServicesFactory.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosSettingsLauncher.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosSingleInstanceGuard.cpp"

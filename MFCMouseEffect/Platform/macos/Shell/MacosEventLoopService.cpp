@@ -8,13 +8,6 @@ namespace mousefx {
 
 #if defined(__APPLE__)
 
-void MacosEventLoopService::RunLoopSourcePerform(void* info) {
-    auto* self = static_cast<MacosEventLoopService*>(info);
-    if (self != nullptr) {
-        self->DrainTasksOnRunLoopThread();
-    }
-}
-
 int MacosEventLoopService::Run() {
     platform::macos::EnsureMacosApplicationReady();
 
@@ -24,34 +17,9 @@ int MacosEventLoopService::Run() {
             return -1;
         }
 
-        running_ = true;
-        runLoop_ = CFRunLoopGetCurrent();
-        if (runLoop_ != nullptr) {
-            CFRetain(runLoop_);
-        }
-
-        CFRunLoopSourceContext context{};
-        context.version = 0;
-        context.info = this;
-        context.perform = &MacosEventLoopService::RunLoopSourcePerform;
-
-        runLoopSource_ = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context);
-        if (runLoop_ == nullptr || runLoopSource_ == nullptr) {
-            if (runLoopSource_ != nullptr) {
-                CFRelease(runLoopSource_);
-                runLoopSource_ = nullptr;
-            }
-            if (runLoop_ != nullptr) {
-                CFRelease(runLoop_);
-                runLoop_ = nullptr;
-            }
-            running_ = false;
-            exitRequested_ = false;
+        if (!SetupRunLoopLocked()) {
             return -1;
         }
-
-        CFRunLoopAddSource(runLoop_, runLoopSource_, kCFRunLoopDefaultMode);
-        CFRunLoopAddSource(runLoop_, runLoopSource_, kCFRunLoopCommonModes);
         if (exitRequested_ || !taskQueue_.empty()) {
             SignalRunLoopLocked();
         }
@@ -61,20 +29,7 @@ int MacosEventLoopService::Run() {
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (runLoop_ != nullptr && runLoopSource_ != nullptr) {
-            CFRunLoopRemoveSource(runLoop_, runLoopSource_, kCFRunLoopDefaultMode);
-            CFRunLoopRemoveSource(runLoop_, runLoopSource_, kCFRunLoopCommonModes);
-        }
-        if (runLoopSource_ != nullptr) {
-            CFRelease(runLoopSource_);
-            runLoopSource_ = nullptr;
-        }
-        if (runLoop_ != nullptr) {
-            CFRelease(runLoop_);
-            runLoop_ = nullptr;
-        }
-        exitRequested_ = false;
-        running_ = false;
+        TeardownRunLoopLocked();
     }
 
     return 0;
@@ -126,14 +81,6 @@ void MacosEventLoopService::DrainTasksOnRunLoopThread() {
         }
         break;
     }
-}
-
-void MacosEventLoopService::SignalRunLoopLocked() {
-    if (runLoop_ == nullptr || runLoopSource_ == nullptr) {
-        return;
-    }
-    CFRunLoopSourceSignal(runLoopSource_);
-    CFRunLoopWakeUp(runLoop_);
 }
 
 #else
