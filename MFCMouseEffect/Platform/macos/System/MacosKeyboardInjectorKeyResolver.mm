@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "Platform/macos/System/MacosKeyboardInjectorKeyResolver.Internal.h"
 #include "Platform/macos/System/MacosKeyboardInjectorKeyResolver.h"
 #include "Platform/macos/System/MacosKeyboardInjectorKeyTables.h"
 
@@ -23,17 +24,7 @@ bool ResolveKeyCode(uint32_t vkCode, uint16_t* outKeyCode, uint64_t* outModifier
         return true;
     }
 
-    if (key_tables::ResolvePrintableKeyCode(vkCode, outKeyCode)) {
-        return true;
-    }
-    if (key_tables::ResolveFunctionKeyCode(vkCode, outKeyCode)) {
-        return true;
-    }
-    if (key_tables::ResolveSpecialKeyCode(vkCode, outKeyCode)) {
-        return true;
-    }
-
-    return false;
+    return resolver_detail::ResolveNonModifierKeyCode(vkCode, outKeyCode);
 }
 
 } // namespace mousefx::macos_keyboard_injector

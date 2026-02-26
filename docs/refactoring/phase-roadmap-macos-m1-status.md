@@ -323,6 +323,8 @@
   - 55zzzzl completed (acceptance): full POSIX regression suite remains green after overlay-coordinate conversion split.
   - 55zzzzm completed (code): split global-input-hook runloop helpers (`init notify`, `permission simulation loop`, `event-tap mask`) into dedicated helper module (`MacosGlobalInputHook.RunLoopHelpers.mm`) and kept runloop file focused on lifecycle flow.
   - 55zzzzm completed (acceptance): full POSIX regression suite remains green after global-input-hook runloop helper split.
+  - 55zzzzn completed (code): split keyboard resolver non-modifier fallback chain into dedicated helper module (`MacosKeyboardInjectorKeyResolver.NonModifier.mm`) and kept resolver main file focused on modifier + route composition.
+  - 55zzzzn completed (acceptance): full POSIX regression suite remains green after key-resolver non-modifier split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
