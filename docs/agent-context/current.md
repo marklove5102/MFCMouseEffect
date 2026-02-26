@@ -110,7 +110,7 @@
   - core HTTP WASM contract execution is now isolated in `tools/platform/regression/lib/core_http_wasm_contract_checks.sh`, and `core_http.sh` now focuses on lifecycle + non-WASM orchestration boundaries
   - core HTTP non-WASM contracts are now isolated in `tools/platform/regression/lib/core_http_input_contract_checks.sh` and `tools/platform/regression/lib/core_http_automation_contract_checks.sh`, and input-capture helpers are split by concern (parse/permission/notification/state/steps) to reduce cross-domain coupling in `core_http.sh`
   - core regression entry scripts (`core-smoke`, `core-automation`, `core-wasm`) now share lock-guarded host resource scheduling (`mfx-entry-posix-host`) to avoid concurrent local run interference
-  - shared lock owner-pid read now tolerates transient `owner.env` file races in concurrent local runs (`mfx_read_lock_owner_pid`), preventing wait-path `sed` failures
+  - macOS hover renderer and effect creator registry are now split by responsibility (`MacosHoverPulseOverlayRendererCore.*`, `MacosEffectCreatorRegistry.Table.cpp` + `MacosEffectCreatorRegistry.Internal.h`), keeping wrapper/entry files small while preserving effect creation/render contracts
   - macOS manual core-entry scripts (`run-macos-core-websettings-manual.sh`, `run-macos-automation-injection-selfcheck.sh`, `run-macos-wasm-runtime-selfcheck.sh`) now share the same host lock guard with regression scripts
   - POSIX suite preflight is now detect-only for `mfx_entry_posix_host`; cleanup stays phase-local under `mfx-entry-posix-host` lock (no suite-level force kill)
   - stale entry-host cleanup now uses one shared helper (`mfx_terminate_stale_entry_host`) across core regression workflows and macOS manual host startup

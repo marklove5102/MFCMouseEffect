@@ -438,6 +438,7 @@
 - macOS effect profile resolution and state diagnostics are now multi-split by concern (`ClickTrail` + `ScrollHoldHover` + shared profile helper, plus dedicated wasm/input-capture diagnostics units), reducing monolithic-file change risk while preserving profile/diagnostics contracts.
 - macOS click/scroll renderers are now split into wrapper/core layers (`MacosClickPulseOverlayRendererCore.*`, `MacosScrollPulseOverlayRendererCore.*`), reducing renderer monolith risk while preserving runtime behavior contracts.
 - macOS hold/trail renderers are now split into wrapper/core layers (`MacosHoldPulseOverlayRendererCore.*`, `MacosTrailPulseOverlayRendererCore.*`), reducing renderer monolith risk while preserving runtime behavior contracts.
+- macOS hover renderer and effect creator registry are now fully split by responsibility (`MacosHoverPulseOverlayRendererCore.*`, `MacosEffectCreatorRegistry.Table.cpp` + internal contract header), reducing renderer/registry coupling while preserving effect creation/render behavior contracts.
 - Shared lock owner-pid read path now tolerates transient `owner.env` races, so concurrent gate waits degrade to normal lock waiting rather than shell parse failure.
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.
