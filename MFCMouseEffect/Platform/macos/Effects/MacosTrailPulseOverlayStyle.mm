@@ -10,15 +10,36 @@
 namespace mousefx::macos_trail_pulse::detail {
 
 #if defined(__APPLE__)
+namespace {
+
+bool ContainsTrailToken(const std::string& value, const char* token) {
+    return value.find(token) != std::string::npos;
+}
+
+} // namespace
+
 std::string NormalizeTrailType(const std::string& effectType) {
     const std::string value = ToLowerAscii(effectType);
-    if (value == "line" ||
-        value == "particle" ||
-        value == "meteor" ||
-        value == "streamer" ||
-        value == "electric" ||
-        value == "tubes") {
-        return value;
+    if (value.empty() || value == "none") {
+        return "line";
+    }
+    if (ContainsTrailToken(value, "meteor")) {
+        return "meteor";
+    }
+    if (ContainsTrailToken(value, "streamer") || ContainsTrailToken(value, "stream") || ContainsTrailToken(value, "neon")) {
+        return "streamer";
+    }
+    if (ContainsTrailToken(value, "electric") || ContainsTrailToken(value, "arc")) {
+        return "electric";
+    }
+    if (ContainsTrailToken(value, "tube") || ContainsTrailToken(value, "suspension")) {
+        return "tubes";
+    }
+    if (ContainsTrailToken(value, "particle") || ContainsTrailToken(value, "spark")) {
+        return "particle";
+    }
+    if (ContainsTrailToken(value, "line") || ContainsTrailToken(value, "default")) {
+        return "line";
     }
     return "line";
 }
