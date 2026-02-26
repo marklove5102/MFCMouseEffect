@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
+#include <string>
 #include <thread>
 
 #if defined(__APPLE__)
@@ -43,6 +44,9 @@ private:
 
 private:
     void RunEventTapLoop();
+    void NotifyInitResult(bool ok, uint32_t errorCode);
+    bool RunPermissionSimulationLoop(const std::string& simulationFilePath, bool trusted);
+    CGEventMask ComputeEventTapMask() const;
     void OnPermissionProbeTimer();
     void HandleTapDisabledEvent();
     void HandleMouseMoveEvent(CGEventRef event);

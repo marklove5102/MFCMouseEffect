@@ -321,6 +321,8 @@
   - 55zzzzk completed (acceptance): full POSIX regression suite remains green after input-indicator probe helper split.
   - 55zzzzl completed (code): split overlay coordinate conversion internals into dedicated module (`MacosOverlayCoordSpaceConversion.*`) and kept `MacosOverlayCoordSpaceService` focused on origin state/service API.
   - 55zzzzl completed (acceptance): full POSIX regression suite remains green after overlay-coordinate conversion split.
+  - 55zzzzm completed (code): split global-input-hook runloop helpers (`init notify`, `permission simulation loop`, `event-tap mask`) into dedicated helper module (`MacosGlobalInputHook.RunLoopHelpers.mm`) and kept runloop file focused on lifecycle flow.
+  - 55zzzzm completed (acceptance): full POSIX regression suite remains green after global-input-hook runloop helper split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.

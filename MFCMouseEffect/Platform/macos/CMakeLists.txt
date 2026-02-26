@@ -97,6 +97,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.EventTapDispatch.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.EventTap.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.RunLoop.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.RunLoopHelpers.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosInputEventUtils.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosInputPermissionState.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosKeyboardInjector.mm"
