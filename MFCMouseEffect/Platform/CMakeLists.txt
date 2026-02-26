@@ -244,6 +244,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/AppController.Effects.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/AppController.InputCapture.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/AppController.Lifecycle.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/AppController.VmSuppression.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/AppController.Wasm.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/AutomationDispatchFeature.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/CommandHandler.cpp"

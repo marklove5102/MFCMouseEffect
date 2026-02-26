@@ -447,6 +447,7 @@
 - `Wasm3Runtime` is now split by responsibility (`lifecycle/load`, `call/scratch`, `link/import`) with shared internal helpers, reducing runtime-path coupling while preserving WASM runtime contracts.
 - `WasmEffectHost` invoke-path is now split into a dedicated unit (`WasmEffectHost.Invoke.cpp`), reducing lifecycle-vs-invoke coupling while preserving WASM host execution contracts.
 - `DispatchRouter` is now split by responsibility (`Route` + click/key in main unit, pointer/button/timer in `DispatchRouter.Pointer.cpp`), reducing dispatch-path coupling while preserving routing behavior contracts.
+- `AppController` VM suppression path is now split into dedicated implementation unit (`AppController.VmSuppression.cpp`), reducing suppression-vs-effects coupling while preserving runtime suppression contracts.
 - Shared lock owner-pid read path now tolerates transient `owner.env` races, so concurrent gate waits degrade to normal lock waiting rather than shell parse failure.
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.

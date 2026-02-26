@@ -127,7 +127,7 @@
   - `DispatchRouter` is now split by responsibility (`DispatchRouter.cpp` + `DispatchRouter.Pointer.cpp` + shared helper boundary), reducing pointer/timer-vs-entry coupling while preserving dispatch behavior contracts
   - macOS wasm renderer now isolates command dispatch and resolver utilities (`MacosWasmCommandRenderDispatch.*`, `MacosWasmCommandRenderResolvers.*`) from top-level parse/orchestration
   - `WasmEffectHost` invoke path is now isolated in `WasmEffectHost.Invoke.cpp`, reducing lifecycle-vs-invoke coupling while preserving host execution contracts
-  - macOS dispatch host now isolates lifecycle, messaging worker, and timer management into separate implementation units (`MacosDispatchMessageHost.cpp`, `.Messaging.cpp`, `.Timers.cpp`)
+  - `AppController` VM suppression path is now isolated in `AppController.VmSuppression.cpp`, reducing suppression-vs-effects coupling while preserving suppression behavior contracts
   - macOS tray service now isolates menu/action bridge creation and runtime helpers into `MacosTrayMenuFactory.*` and `MacosTrayRuntimeHelpers.*`, keeping `MacosTrayService` as lifecycle facade
   - macOS scroll pulse overlay internals now isolate style and window-registry logic (`MacosScrollPulseOverlayStyle.*`, `MacosScrollPulseWindowRegistry.*`) while `MacosScrollPulseOverlayRenderer.mm` remains render/animation facade
   - macOS click pulse overlay internals now isolate style/renderer/window-registry modules (`MacosClickPulseOverlayStyle.*`, `MacosClickPulseOverlayRenderer.*`, `MacosClickPulseWindowRegistry.*`) while `MacosClickPulseEffect.mm` remains lifecycle/event-entry facade
