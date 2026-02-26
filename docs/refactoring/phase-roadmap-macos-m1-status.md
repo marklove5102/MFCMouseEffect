@@ -307,6 +307,8 @@
   - 55zzzzd completed (acceptance): full POSIX regression suite remains green after picker script responsibility split.
   - 55zzzze completed (code): split `MacosGlobalInputHook` event-tap dispatch responsibilities into callback routing (`.EventTap.mm`) and per-event handlers (`.EventTapDispatch.mm`) with class-private handler boundaries.
   - 55zzzze completed (acceptance): full POSIX regression suite remains green after event-tap dispatch split.
+  - 55zzzzf completed (code): split macOS input-indicator overlay style/layout helpers into dedicated module (`MacosInputIndicatorOverlay.Style.*`) and kept overlay file focused on lifecycle/config orchestration.
+  - 55zzzzf completed (acceptance): full POSIX regression suite remains green after input-indicator overlay style split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
