@@ -108,10 +108,10 @@ bool HandleWebSettingsTestEffectsApiRoute(
             y,
         };
         if (emitClick) {
-            macos_click_pulse::ShowClickPulseOverlay(overlayPoint, ParseMouseButton(button), "");
+            macos_click_pulse::ShowClickPulseOverlay(overlayPoint, ParseMouseButton(button), "ripple", "");
         }
         if (emitScroll) {
-            macos_scroll_pulse::ShowScrollPulseOverlay(overlayPoint, scrollHorizontal, scrollDelta, "");
+            macos_scroll_pulse::ShowScrollPulseOverlay(overlayPoint, scrollHorizontal, scrollDelta, "arrow", "");
         }
 #endif
 

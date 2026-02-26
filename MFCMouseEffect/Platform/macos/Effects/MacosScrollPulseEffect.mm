@@ -9,8 +9,12 @@
 
 namespace mousefx {
 
-MacosScrollPulseEffect::MacosScrollPulseEffect(std::string themeName)
-    : themeName_(std::move(themeName)) {
+MacosScrollPulseEffect::MacosScrollPulseEffect(std::string effectType, std::string themeName)
+    : effectType_(std::move(effectType)),
+      themeName_(std::move(themeName)) {
+    if (effectType_.empty()) {
+        effectType_ = "arrow";
+    }
 }
 
 MacosScrollPulseEffect::~MacosScrollPulseEffect() {
@@ -33,7 +37,7 @@ void MacosScrollPulseEffect::OnScroll(const ScrollEvent& event) {
     }
 
     const ScreenPoint pt = ScreenToOverlayPoint(event.pt);
-    macos_scroll_pulse::ShowScrollPulseOverlay(pt, event.horizontal, event.delta, themeName_);
+    macos_scroll_pulse::ShowScrollPulseOverlay(pt, event.horizontal, event.delta, effectType_, themeName_);
 }
 
 } // namespace mousefx

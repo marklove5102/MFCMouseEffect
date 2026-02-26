@@ -4,13 +4,12 @@
 
 #include <string>
 
-namespace mousefx::macos_click_pulse {
+namespace mousefx::macos_hover_pulse {
 
-void CloseAllClickPulseWindows();
-void ShowClickPulseOverlay(
+void ShowHoverPulseOverlay(
     const ScreenPoint& overlayPt,
-    MouseButton button,
     const std::string& effectType,
     const std::string& themeName);
+void CloseHoverPulseOverlay();
 
-} // namespace mousefx::macos_click_pulse
+} // namespace mousefx::macos_hover_pulse

@@ -6,17 +6,18 @@
 
 namespace mousefx {
 
-class MacosScrollPulseEffect final : public IMouseEffect {
+class MacosHoverPulseEffect final : public IMouseEffect {
 public:
-    MacosScrollPulseEffect(std::string effectType, std::string themeName);
-    ~MacosScrollPulseEffect() override;
+    MacosHoverPulseEffect(std::string effectType, std::string themeName);
+    ~MacosHoverPulseEffect() override;
 
-    EffectCategory Category() const override { return EffectCategory::Scroll; }
+    EffectCategory Category() const override { return EffectCategory::Hover; }
     const char* TypeName() const override { return effectType_.c_str(); }
 
     bool Initialize() override;
     void Shutdown() override;
-    void OnScroll(const ScrollEvent& event) override;
+    void OnHoverStart(const ScreenPoint& pt) override;
+    void OnHoverEnd() override;
 
 private:
     std::string effectType_{};

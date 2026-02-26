@@ -1,0 +1,34 @@
+#pragma once
+
+#include "MouseFx/Interfaces/IMouseEffect.h"
+
+#include <cstdint>
+#include <string>
+
+namespace mousefx {
+
+class MacosTrailPulseEffect final : public IMouseEffect {
+public:
+    MacosTrailPulseEffect(std::string effectType, std::string themeName);
+    ~MacosTrailPulseEffect() override;
+
+    EffectCategory Category() const override { return EffectCategory::Trail; }
+    const char* TypeName() const override { return effectType_.c_str(); }
+
+    bool Initialize() override;
+    void Shutdown() override;
+    void OnMouseMove(const ScreenPoint& pt) override;
+
+private:
+    static uint64_t CurrentTickMs();
+
+    std::string effectType_{};
+    std::string themeName_{};
+    bool initialized_ = false;
+
+    bool hasLastPoint_ = false;
+    ScreenPoint lastPoint_{};
+    uint64_t lastEmitTickMs_ = 0;
+};
+
+} // namespace mousefx

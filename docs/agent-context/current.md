@@ -59,7 +59,7 @@
   - AppController lifecycle orchestration (`Start/Stop/CreateDispatchWindow/DestroyDispatchWindow`) is now isolated in `AppController.Lifecycle.cpp`, with both CMake and Visual Studio build wiring updated to keep POSIX/Windows lanes aligned
   - AppController effect orchestration + VM suppression runtime (`SetEffect/ApplyConfiguredEffects/SetTheme/UpdateVmSuppressionState` etc.) is now isolated in `AppController.Effects.cpp`, with both CMake and Visual Studio build wiring updated to keep POSIX/Windows lanes aligned
   - AppController dispatch-state runtime helpers (`OnGlobalKey`, shortcut session lifecycle, hover/hold timers/state) are now isolated in `AppController.DispatchState.cpp`, with both CMake and Visual Studio build wiring updated to keep POSIX/Windows lanes aligned
-  - settings schema now reports `capabilities.effects.scroll=true` on macOS (aligned with runtime scroll-effect mapping)
+  - macOS effect routing now covers click/trail/scroll/hold/hover categories (GPU hold routes remain excluded), and settings schema reports `capabilities.effects.trail/scroll/hold/hover=true` on macOS
   - Linux compile gate now validates both default lane and core-runtime lane by default (`MFX_ENABLE_POSIX_CORE_RUNTIME=OFF/ON`) with optional fast-path skip flag
   - Phase 54 Linux follow scope is now explicitly closed for compile+contract boundary in `phase54i-linux-follow-phase-closure.md`
   - `SettingsStateMapper` is now split into `BaseSections.*` and `Diagnostics.*` with top-level composition kept in `SettingsStateMapper.cpp`
@@ -113,13 +113,11 @@
   - macOS `MacosGlobalInputHook` implementation is now split by responsibility (`MacosGlobalInputHook.mm`, `.EventTap.mm`, `.RunLoop.mm`) to lower file coupling without behavior changes
   - macOS input-indicator overlay path is now split into render/lifecycle (`MacosInputIndicatorOverlay.mm`), probe/event-entry (`MacosInputIndicatorOverlay.Probes.mm`), and shared internals (`MacosInputIndicatorOverlayInternals.*`)
   - macOS keyboard injection path now isolates resolver orchestration (`MacosKeyboardInjectorKeyResolver.*`) and vk->mac key tables (`MacosKeyboardInjectorKeyTables.*`) from event-post execution flow (`MacosKeyboardInjector.mm`)
-  - macOS app-catalog scanner now isolates root-scan workflow in `MacosApplicationCatalogScanWorkflow.*` and keeps `MacosApplicationCatalogScanner` as thin entry façade
   - macOS wasm renderer now isolates command dispatch and resolver utilities (`MacosWasmCommandRenderDispatch.*`, `MacosWasmCommandRenderResolvers.*`) from top-level parse/orchestration
   - macOS scroll pulse effect now isolates overlay rendering internals in `MacosScrollPulseOverlayRenderer.*`, keeping `MacosScrollPulseEffect` as lifecycle + entry façade
   - macOS wasm transient image overlay now isolates rendering internals in `MacosWasmImageOverlayRenderer.*`, keeping `MacosWasmTransientOverlay` as API facade
   - macOS dispatch host now isolates lifecycle, messaging worker, and timer management into separate implementation units (`MacosDispatchMessageHost.cpp`, `.Messaging.cpp`, `.Timers.cpp`)
   - macOS tray service now isolates menu/action bridge creation and runtime helpers into `MacosTrayMenuFactory.*` and `MacosTrayRuntimeHelpers.*`, keeping `MacosTrayService` as lifecycle facade
-  - macOS app-catalog workflow now isolates scan roots and entry-store logic (`MacosApplicationCatalogScanRoots.*`, `MacosApplicationCatalogEntryStore.*`) with traversal orchestration retained in `MacosApplicationCatalogScanWorkflow.mm`
   - macOS wasm overlay runtime now isolates state internals (`MacosWasmOverlayState.*`) while `MacosWasmOverlayRuntime.mm` remains API/main-thread facade
   - macOS scroll pulse overlay internals now isolate style and window-registry logic (`MacosScrollPulseOverlayStyle.*`, `MacosScrollPulseWindowRegistry.*`) while `MacosScrollPulseOverlayRenderer.mm` remains render/animation facade
   - macOS click pulse overlay internals now isolate style/renderer/window-registry modules (`MacosClickPulseOverlayStyle.*`, `MacosClickPulseOverlayRenderer.*`, `MacosClickPulseWindowRegistry.*`) while `MacosClickPulseEffect.mm` remains lifecycle/event-entry facade

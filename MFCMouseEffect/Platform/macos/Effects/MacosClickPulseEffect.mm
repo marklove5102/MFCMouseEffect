@@ -4,10 +4,16 @@
 #include "Platform/macos/Effects/MacosClickPulseOverlayRenderer.h"
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 
+#include <utility>
+
 namespace mousefx {
 
-MacosClickPulseEffect::MacosClickPulseEffect(std::string themeName)
-    : themeName_(std::move(themeName)) {
+MacosClickPulseEffect::MacosClickPulseEffect(std::string effectType, std::string themeName)
+    : effectType_(std::move(effectType)),
+      themeName_(std::move(themeName)) {
+    if (effectType_.empty()) {
+        effectType_ = "ripple";
+    }
 }
 
 MacosClickPulseEffect::~MacosClickPulseEffect() {
@@ -29,7 +35,7 @@ void MacosClickPulseEffect::OnClick(const ClickEvent& event) {
         return;
     }
     const ScreenPoint overlayPt = ScreenToOverlayPoint(event.pt);
-    macos_click_pulse::ShowClickPulseOverlay(overlayPt, event.button, themeName_);
+    macos_click_pulse::ShowClickPulseOverlay(overlayPt, event.button, effectType_, themeName_);
 }
 
 } // namespace mousefx

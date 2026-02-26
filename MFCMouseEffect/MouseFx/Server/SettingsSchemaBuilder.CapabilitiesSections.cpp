@@ -107,10 +107,10 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
         },
         {"effects", {
             {"click", true},
-            {"trail", MFX_PLATFORM_WINDOWS ? true : false},
+            {"trail", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false},
             {"scroll", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false},
-            {"hold", MFX_PLATFORM_WINDOWS ? true : false},
-            {"hover", MFX_PLATFORM_WINDOWS ? true : false}
+            {"hold", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false},
+            {"hover", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false}
         }},
         {"input", {
             {"global_hook", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false},

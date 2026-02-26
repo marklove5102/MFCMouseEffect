@@ -4,13 +4,14 @@
 
 #include <string>
 
-namespace mousefx::macos_click_pulse {
+namespace mousefx::macos_trail_pulse {
 
-void CloseAllClickPulseWindows();
-void ShowClickPulseOverlay(
+void CloseAllTrailPulseWindows();
+void ShowTrailPulseOverlay(
     const ScreenPoint& overlayPt,
-    MouseButton button,
+    double deltaX,
+    double deltaY,
     const std::string& effectType,
     const std::string& themeName);
 
-} // namespace mousefx::macos_click_pulse
+} // namespace mousefx::macos_trail_pulse

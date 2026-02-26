@@ -291,6 +291,8 @@
   - 55zzz completed (acceptance): full POSIX regression suite remains green after scaffold HTTP helper split.
   - 55zzza completed (code): split core smoke entry lifecycle helpers into `core_smoke_entry_helpers.sh` and keep `core_smoke.sh` focused on smoke checks.
   - 55zzza completed (acceptance): full POSIX regression suite remains green after core smoke helper split.
+  - 55zzzb completed (code): expanded macOS effect routing to click/trail/scroll/hold/hover and added macOS-native trail/hover/hold effect implementations with type-aware click/scroll rendering.
+  - 55zzzb completed (acceptance): full POSIX regression suite remains green after macOS effects category-parity baseline expansion.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
@@ -414,6 +416,7 @@
 - Core HTTP orchestrator is now helper-split (probe/entry/state), reducing lifecycle/probe coupling in `core_http.sh` while preserving contract flows.
 - Scaffold HTTP entry lifecycle helpers are now split into `http_entry_helpers.sh`, keeping route checks in `http.sh` focused and easier to extend.
 - Core smoke entry lifecycle helpers are now split into `core_smoke_entry_helpers.sh`, keeping smoke flow in `core_smoke.sh` focused and easier to extend.
+- macOS effect runtime now covers click/trail/scroll/hold/hover categories with macOS-native visible implementations (GPU hold routes still excluded by scope), reducing platform capability drift against Windows baseline.
 - Shared lock owner-pid read path now tolerates transient `owner.env` races, so concurrent gate waits degrade to normal lock waiting rather than shell parse failure.
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.
