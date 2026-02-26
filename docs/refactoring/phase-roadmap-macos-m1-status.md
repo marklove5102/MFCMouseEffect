@@ -357,6 +357,8 @@
   - 55zzzzad completed (acceptance): full POSIX regression suite remains green after shell responsibility split (macOS scaffold/core/automation/wasm + Linux compile gate + WebUI semantic tests).
   - 55zzzzae completed (code): split `PosixScaffoldAppShell` into `Actions`/`Stdin` modules and consolidated dual-lane stdin-exit parser via shared `PosixShellExitCommand`, reducing core/scaffold drift risk.
   - 55zzzzae completed (acceptance): full POSIX regression suite remains green after scaffold split + shared exit-command consolidation.
+  - 55zzzzaf completed (code): split scaffold settings responsibilities into dedicated modules (`ScaffoldSettingsApi.StatePatch.cpp` + `ScaffoldSettingsRouteCodec.*`), reducing API/route-coding coupling while preserving settings contracts.
+  - 55zzzzaf completed (acceptance): full POSIX regression suite remains green after scaffold settings API/route split (macOS scaffold/core/automation/wasm + Linux compile gate + WebUI semantic tests).
   - 55zzzzac completed (code): split WASM image overlay render-plan computation into dedicated module (`MacosWasmImageOverlayRendererCore.Plan.mm`) and kept core renderer file focused on rendering orchestration.
   - 55zzzzac completed (acceptance): full POSIX regression suite remains green after WASM image render-plan split.
 
