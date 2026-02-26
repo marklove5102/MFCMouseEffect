@@ -120,7 +120,7 @@
   - core regression entry scripts now share helperized workflow preparation and lock execution (`mfx_prepare_core_entry_runtime`, `mfx_run_with_entry_lock`)
   - wasm test-dispatch assertions in regression/manual selfchecks now use bounded retries to reduce transient invoke/render readiness flakiness
   - wasm test-dispatch checks now also assert diagnostics consistency against `/api/state` (`throttled total == capacity+interval`, and dispatch vs state counters/error snapshot match)
-  - macOS WASM image overlay renderer is now split into wrapper/core units (`MacosWasmImageOverlayRenderer.mm` + `MacosWasmImageOverlayRendererCore.*`), reducing render-path coupling while preserving WASM image overlay behavior contracts
+  - WASM plugin manifest path is now split into `Load` and `Validate` units (`WasmPluginManifest.Load.cpp`, `WasmPluginManifest.Validate.cpp`), reducing parse-vs-rule coupling while preserving manifest contracts
   - macOS WASM overlay state is now split into state operations and storage internals (`MacosWasmOverlayState.mm` + `MacosWasmOverlayState.Internals.*`), reducing state-path coupling while preserving admission/throttle behavior contracts
   - macOS `MacosGlobalInputHook` implementation is now split by responsibility (`MacosGlobalInputHook.mm`, `.EventTap.mm`, `.RunLoop.mm`) to lower file coupling without behavior changes
   - macOS input-indicator overlay path is now split into render/lifecycle (`MacosInputIndicatorOverlay.mm`), probe/event-entry (`MacosInputIndicatorOverlay.Probes.mm`), and shared internals (`MacosInputIndicatorOverlayInternals.*`)

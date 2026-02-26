@@ -443,6 +443,7 @@
 - macOS WASM image overlay renderer is now split into wrapper/core units (`MacosWasmImageOverlayRenderer.mm` + `MacosWasmImageOverlayRendererCore.*`), reducing render-path coupling while preserving WASM image overlay runtime behavior contracts.
 - macOS WASM overlay state is now split into state operations vs storage internals (`MacosWasmOverlayState.mm` + `MacosWasmOverlayState.Internals.*`), reducing state-path coupling while preserving overlay admission/throttle behavior contracts.
 - WASM plugin transfer service is now split by responsibility (`Common` helpers + `Import` flow + `Export` flow + thin delegator entry), reducing transfer-path coupling while preserving import/export error-code and response contracts.
+- WASM plugin manifest path is now split into `Load` and `Validate` units, reducing parse-vs-rule coupling while preserving manifest schema/validation contracts.
 - Shared lock owner-pid read path now tolerates transient `owner.env` races, so concurrent gate waits degrade to normal lock waiting rather than shell parse failure.
 - WASM test-dispatch assertions now use bounded retries (configurable timeout/interval), reducing flaky false negatives caused by transient invoke/render readiness races.
 - WASM dispatch contracts now additionally assert dispatch-response diagnostics and `/api/state` diagnostics consistency, reducing silent drift risk in throttle/error fields.
