@@ -309,6 +309,8 @@
   - 55zzzze completed (acceptance): full POSIX regression suite remains green after event-tap dispatch split.
   - 55zzzzf completed (code): split macOS input-indicator overlay style/layout helpers into dedicated module (`MacosInputIndicatorOverlay.Style.*`) and kept overlay file focused on lifecycle/config orchestration.
   - 55zzzzf completed (acceptance): full POSIX regression suite remains green after input-indicator overlay style split.
+  - 55zzzzg completed (code): split WASM image overlay utility responsibilities (`alpha/delay clamp`, motion check, path conversion) into dedicated support module (`MacosWasmImageOverlayRendererSupport.*`) and kept renderer core focused on render flow.
+  - 55zzzzg completed (acceptance): full POSIX regression suite remains green after image-overlay support split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.

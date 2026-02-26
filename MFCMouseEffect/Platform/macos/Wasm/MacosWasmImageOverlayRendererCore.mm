@@ -1,12 +1,12 @@
 #include "pch.h"
 
 #include "Platform/macos/Wasm/MacosWasmImageOverlayRendererCore.h"
+#include "Platform/macos/Wasm/MacosWasmImageOverlayRendererSupport.h"
 
 #include "Platform/macos/Wasm/MacosWasmOverlayRuntime.h"
 #include "Platform/macos/Wasm/MacosWasmOverlayRenderMath.h"
 
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
-#include "MouseFx/Utils/StringUtils.h"
 
 #if defined(__APPLE__)
 #import <AppKit/AppKit.h>
@@ -17,38 +17,6 @@
 #include <cmath>
 
 namespace mousefx::platform::macos {
-
-namespace {
-
-#if defined(__APPLE__)
-CGFloat ClampAlpha(float alpha) {
-    return wasm_overlay_render_math::ClampFloat((alpha > 0.0f) ? static_cast<CGFloat>(alpha) : 1.0, 0.15, 1.0);
-}
-
-uint32_t ClampDelayMs(uint32_t delayMs) {
-    return std::clamp<uint32_t>(delayMs, 0u, 60000u);
-}
-
-bool HasMotion(const WasmImageOverlayRequest& request) {
-    return std::abs(request.velocityX) > 0.001f ||
-           std::abs(request.velocityY) > 0.001f ||
-           std::abs(request.accelerationX) > 0.001f ||
-           std::abs(request.accelerationY) > 0.001f;
-}
-
-NSString* NsPathFromWide(const std::wstring& path) {
-    if (path.empty()) {
-        return nil;
-    }
-    const std::string utf8 = Utf16ToUtf8(path.c_str());
-    if (utf8.empty()) {
-        return nil;
-    }
-    return [NSString stringWithUTF8String:utf8.c_str()];
-}
-#endif
-
-} // namespace
 
 WasmOverlayRenderResult RenderWasmImageOverlayCore(const WasmImageOverlayRequest& request) {
 #if !defined(__APPLE__)
@@ -66,8 +34,8 @@ WasmOverlayRenderResult RenderWasmImageOverlayCore(const WasmImageOverlayRequest
     const CGFloat pulseScale = wasm_overlay_render_math::ClampScale(request.scale);
     const CGFloat size = wasm_overlay_render_math::ClampFloat(120.0 * pulseScale, 52.0, 420.0);
     const uint32_t durationMs = wasm_overlay_render_math::ClampLifeMs(request.lifeMs);
-    const uint32_t delayMs = ClampDelayMs(request.delayMs);
-    const CGFloat alphaScale = ClampAlpha(request.alpha);
+    const uint32_t delayMs = wasm_image_overlay_support::ClampDelayMs(request.delayMs);
+    const CGFloat alphaScale = wasm_image_overlay_support::ClampAlpha(request.alpha);
     const WasmImageOverlayRequest req = request;
 
     dispatch_after(
@@ -97,7 +65,7 @@ WasmOverlayRenderResult RenderWasmImageOverlayCore(const WasmImageOverlayRequest
 
           bool renderedImage = false;
           if (!req.assetPath.empty()) {
-              NSString* imagePath = NsPathFromWide(req.assetPath);
+              NSString* imagePath = wasm_image_overlay_support::NsPathFromWide(req.assetPath);
               if (imagePath != nil) {
                   NSImage* image = [[NSImage alloc] initWithContentsOfFile:imagePath];
                   if (image != nil) {
@@ -166,7 +134,7 @@ WasmOverlayRenderResult RenderWasmImageOverlayCore(const WasmImageOverlayRequest
           RegisterWasmOverlayWindow(reinterpret_cast<void*>(window));
           [window orderFrontRegardless];
 
-          if (HasMotion(req)) {
+          if (wasm_image_overlay_support::HasMotion(req)) {
               const double t = static_cast<double>(durationMs) / 1000.0;
               const CGFloat dx = static_cast<CGFloat>((req.velocityX * t) + (0.5 * req.accelerationX * t * t));
               const CGFloat dy = static_cast<CGFloat>((req.velocityY * t) + (0.5 * req.accelerationY * t * t));
