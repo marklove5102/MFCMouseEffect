@@ -2,6 +2,7 @@
 
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.h"
 
+#include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Internal.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayStyle.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 
@@ -14,32 +15,11 @@
 
 namespace mousefx::macos_hold_pulse {
 
-#if defined(__APPLE__)
-namespace {
-
-struct HoldOverlayState {
-    NSWindow* window = nil;
-    CAShapeLayer* ring = nil;
-    CAShapeLayer* accent = nil;
-    macos_effect_profile::HoldRenderProfile profile{};
-    detail::HoldStyle style = detail::HoldStyle::Charge;
-    std::string effectType{};
-    MouseButton button = MouseButton::Left;
-};
-
-HoldOverlayState& State() {
-    static HoldOverlayState state;
-    return state;
-}
-
-} // namespace
-#endif
-
 void CloseHoldPulseOverlayOnMain() {
 #if !defined(__APPLE__)
     return;
 #else
-    HoldOverlayState& state = State();
+    detail::HoldOverlayState& state = detail::State();
     if (state.window == nil) {
         return;
     }
@@ -119,7 +99,7 @@ void StartHoldPulseOverlayOnMain(
 
     [window orderFrontRegardless];
 
-    HoldOverlayState& state = State();
+    detail::HoldOverlayState& state = detail::State();
     state.window = window;
     state.ring = ring;
     state.accent = accent;
@@ -127,45 +107,6 @@ void StartHoldPulseOverlayOnMain(
     state.style = holdStyle;
     state.effectType = holdType;
     state.button = button;
-#endif
-}
-
-void UpdateHoldPulseOverlayOnMain(const ScreenPoint& overlayPt, uint32_t holdMs) {
-#if !defined(__APPLE__)
-    (void)overlayPt;
-    (void)holdMs;
-    return;
-#else
-    HoldOverlayState& state = State();
-    if (state.window == nil || state.ring == nil) {
-        return;
-    }
-
-    const NSRect frame = [state.window frame];
-    const CGFloat w = frame.size.width;
-    const CGFloat h = frame.size.height;
-    [state.window setFrameOrigin:NSMakePoint(overlayPt.x - w * 0.5, overlayPt.y - h * 0.5)];
-
-    const CGFloat progress = std::min<CGFloat>(
-        1.0,
-        static_cast<CGFloat>(holdMs) / std::max<CGFloat>(1.0f, static_cast<CGFloat>(state.profile.progressFullMs)));
-    const CGFloat scale = 1.0 + progress * 0.20;
-    state.ring.transform = CATransform3DMakeScale(scale, scale, 1.0);
-    state.ring.lineWidth = 2.4 + progress * 1.4;
-    const CGFloat baseOpacity = static_cast<CGFloat>(state.profile.baseOpacity);
-    state.ring.opacity = std::max<CGFloat>(0.2, baseOpacity - 0.18f + progress * 0.20f);
-
-    if (state.accent != nil) {
-        state.accent.opacity = std::max<CGFloat>(0.15, baseOpacity - 0.35f + progress * 0.35f);
-    }
-#endif
-}
-
-size_t GetActiveHoldPulseWindowCountOnMain() {
-#if !defined(__APPLE__)
-    return 0;
-#else
-    return (State().window == nil) ? 0 : 1;
 #endif
 }
 

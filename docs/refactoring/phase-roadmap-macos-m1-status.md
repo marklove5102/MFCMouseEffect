@@ -313,6 +313,8 @@
   - 55zzzzg completed (acceptance): full POSIX regression suite remains green after image-overlay support split.
   - 55zzzzh completed (code): split macOS app-catalog scan helper responsibilities into bundle-resolution and root-traversal modules (`MacosApplicationCatalogScanWorkflow.BundleResolve.mm`, `MacosApplicationCatalogScanWorkflow.RootScan.mm`) and removed the mixed helper file.
   - 55zzzzh completed (acceptance): full POSIX regression suite remains green after app-catalog scan helper split.
+  - 55zzzzi completed (code): split hold overlay core shared-state/update responsibilities into internal contract + dedicated state/update units (`MacosHoldPulseOverlayRendererCore.Internal/State/Update`), keeping start/close render path focused.
+  - 55zzzzi completed (acceptance): full POSIX regression suite remains green after hold-overlay core state/update split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
