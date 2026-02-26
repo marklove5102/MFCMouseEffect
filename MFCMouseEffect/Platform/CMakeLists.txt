@@ -250,6 +250,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/CommandHandler.ApplySettings.AutomationWasm.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/CommandHandler.ApplySettings.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/CommandHandler.ApplySettings.Visual.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/DispatchRouter.Pointer.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/DispatchRouter.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/EffectFactory.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/InputIndicatorDispatchFeature.cpp"
