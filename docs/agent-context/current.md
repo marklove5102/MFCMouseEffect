@@ -126,6 +126,7 @@
   - `DispatchRouter` is now split by responsibility (`DispatchRouter.cpp` + `DispatchRouter.Pointer.cpp` + shared helper boundary), reducing pointer/timer-vs-entry coupling while preserving dispatch behavior contracts
   - macOS wasm text/image overlays now share render math boundary (`MacosWasmOverlayRenderMath.*`) for clamp/color/lifetime rules, reducing duplicated tuning logic while preserving overlay behavior contracts
   - macOS wasm command dispatch is now split into entry + text + image/affine handlers (`MacosWasmCommandRenderDispatch.mm`, `.Text.mm`, `.Image.mm`) with shared internal contract, reducing single-file command-path coupling while preserving runtime behavior contracts
+  - macOS keyboard injector key tables are now split by mapping domain (`Printable`, `Function`, `Special`, `Modifier`) and no longer share one monolithic implementation file, reducing shortcut-mapping change blast radius
   - `WasmEffectHost` invoke path is now isolated in `WasmEffectHost.Invoke.cpp`, reducing lifecycle-vs-invoke coupling while preserving host execution contracts
   - `AppController` VM suppression path is now isolated in `AppController.VmSuppression.cpp`, reducing suppression-vs-effects coupling while preserving suppression behavior contracts
   - macOS app-catalog scan and AppleScript folder-picker are now split into workflow entry and helper/script units (`MacosApplicationCatalogScanWorkflow.*`, `MacosAppleScriptFolderPicker.*`), reducing system-workflow coupling while preserving scan/pick contracts
@@ -210,7 +211,6 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzt-wasm-selfcheck-helper-modularization.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzu-core-http-wasm-helper-modularization-and-lock-race-hardening.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzv-core-http-wasm-contract-check-modularization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzx-core-http-orchestrator-helper-split.md`
 - Phase closure docs: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`, `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54i-linux-follow-phase-closure.md`
 ## AI-IDE Context Loading Rule
 - Read this file first; read only one targeted phase/issue doc per task; avoid bulk historical lists.
