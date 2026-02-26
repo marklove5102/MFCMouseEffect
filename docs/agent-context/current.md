@@ -61,6 +61,7 @@
   - AppController dispatch-state runtime helpers (`OnGlobalKey`, shortcut session lifecycle, hover/hold timers/state) are now isolated in `AppController.DispatchState.cpp`, with both CMake and Visual Studio build wiring updated to keep POSIX/Windows lanes aligned
   - macOS effect routing now covers click/trail/scroll/hold/hover categories (GPU hold routes remain excluded), with pluggable creator registry + shared overlay render support (`main-thread dispatch`/`window setup`) and config-driven render profile mapping (`EffectConfig -> mac click/trail/scroll/hold/hover profile`) to reduce renderer duplication and magic constants drift; test-gated `/api/effects/test-render-profiles` now exposes resolved profile contracts for regression; settings schema reports `capabilities.effects.trail/scroll/hold/hover=true` on macOS
   - `/api/state` now exposes non-test diagnostics `effects_profile` (`active` + `config_basis` + resolved click/trail/scroll/hold/hover profile fields), effects settings UI now renders that snapshot in a read-only diagnostics card with one-click JSON copy, and core state regression asserts those fields to guard profile-mapping drift
+  - `SettingsStateMapper` effects diagnostics are now isolated in `SettingsStateMapper.EffectsDiagnostics.cpp` (runtime overlay counters + profile snapshot), keeping `SettingsStateMapper.Diagnostics.cpp` focused on GPU/WASM/input-capture diagnostics while preserving `/api/state.effects_runtime` and `/api/state.effects_profile` contracts
   - macOS effect probe route now accepts per-category type arguments (`click/trail/scroll/hold/hover`), and core automation contracts exercise non-default type matrix (`text/electric/helix/hold_quantum_halo_gpu_v2/tubes`)
   - Linux compile gate now validates both default lane and core-runtime lane by default (`MFX_ENABLE_POSIX_CORE_RUNTIME=OFF/ON`) with optional fast-path skip flag
   - Phase 54 Linux follow scope is now explicitly closed for compile+contract boundary in `phase54i-linux-follow-phase-closure.md`
@@ -208,10 +209,9 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzs-wasm-manifest-path-trim-contract-gate.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzt-wasm-selfcheck-helper-modularization.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzu-core-http-wasm-helper-modularization-and-lock-race-hardening.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzv-core-http-wasm-contract-check-modularization.md`, `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzw-core-http-automation-contract-check-modularization.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzv-core-http-wasm-contract-check-modularization.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzx-core-http-orchestrator-helper-split.md`
 - Phase closure docs: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`, `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54i-linux-follow-phase-closure.md`
-- For full Phase 55 sequence (`55h-55zzx`), read roadmap status doc above instead of loading all slice docs by default.
 ## AI-IDE Context Loading Rule
 - Read this file first; read only one targeted phase/issue doc per task; avoid bulk historical lists.
 ## Update Checklist (per capability change)

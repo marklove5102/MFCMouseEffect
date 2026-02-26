@@ -67,6 +67,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzb-macos-effects-category-parity-baseline.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzc-macos-effects-runtime-diagnostics-and-probe-expansion.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzd-macos-effect-type-probe-and-hold-style-mapping.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzze-settings-state-effects-diagnostics-split.md`
   - 完整 hardening 流水（`55h-55zzx`）见：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
 
 ## 定向检索命令
