@@ -303,6 +303,8 @@
   - 55zzzzb completed (acceptance): full POSIX regression suite remains green after command-dispatch responsibility split.
   - 55zzzzc completed (code): split macOS keyboard injector key table mappings into dedicated printable/function/special/modifier units and removed monolithic `MacosKeyboardInjectorKeyTables.mm`.
   - 55zzzzc completed (acceptance): full POSIX regression suite remains green after keyboard-mapping table responsibility split.
+  - 55zzzzd completed (code): split AppleScript folder-picker implementation into entry-thread dispatch (`.Script.mm`), string/path helpers (`.StringUtils.mm`), and source/execute pipeline (`.Execution.mm`) with shared helper contract.
+  - 55zzzzd completed (acceptance): full POSIX regression suite remains green after picker script responsibility split.
 
 ## Current truth (important)
 - `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
