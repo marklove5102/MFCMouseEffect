@@ -2,14 +2,11 @@
 
 #include "Platform/macos/System/MacosGlobalInputHook.h"
 
-#include "MouseFx/Core/Control/IDispatchMessageHost.h"
-#include "MouseFx/Core/Protocol/MouseFxMessages.h"
-#include "Platform/macos/Control/MacosDispatchMessageCodec.h"
 #include "Platform/macos/System/MacosInputEventUtils.h"
 #include "Platform/macos/System/MacosInputPermissionState.h"
-#include "Platform/macos/System/MacosVirtualKeyMapper.h"
 
-#include <new>
+#include "MouseFx/Core/Control/IDispatchMessageHost.h"
+
 #include <string>
 
 namespace mousefx {
@@ -26,21 +23,7 @@ CGEventRef MacosGlobalInputHook::EventTapCallback(CGEventTapProxy proxy,
     }
 
     if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
-        const bool trusted = AXIsProcessTrusted();
-        if (!trusted) {
-            self->lastError_.store(kErrorPermissionDenied, std::memory_order_release);
-            return event;
-        }
-
-        CFMachPortRef tap = nullptr;
-        {
-            std::lock_guard<std::mutex> lock(self->runLoopMutex_);
-            tap = static_cast<CFMachPortRef>(self->tapRef_);
-        }
-        if (tap) {
-            CGEventTapEnable(tap, true);
-            self->lastError_.store(kErrorSuccess, std::memory_order_release);
-        }
+        self->HandleTapDisabledEvent();
         return event;
     }
 
@@ -50,91 +33,27 @@ CGEventRef MacosGlobalInputHook::EventTapCallback(CGEventTapProxy proxy,
     self->lastError_.store(kErrorSuccess, std::memory_order_release);
 
     if (macos_input_event::IsMouseMoveType(type)) {
-        const ScreenPoint pt = macos_input_event::ToScreenPoint(CGEventGetLocation(event));
-        self->latestMoveX_.store(pt.x, std::memory_order_release);
-        self->latestMoveY_.store(pt.y, std::memory_order_release);
-        if (!self->movePending_.exchange(true, std::memory_order_acq_rel)) {
-            if (!self->dispatchHost_->PostAsync(
-                    WM_MFX_MOVE,
-                    static_cast<uintptr_t>(pt.x),
-                    static_cast<intptr_t>(pt.y))) {
-                self->movePending_.store(false, std::memory_order_release);
-            }
-        }
+        self->HandleMouseMoveEvent(event);
         return event;
     }
 
     if (type == kCGEventScrollWheel) {
-        const int32_t delta = static_cast<int32_t>(
-            CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1));
-        if (delta != 0) {
-            const ScreenPoint pt = macos_input_event::ToScreenPoint(CGEventGetLocation(event));
-            self->dispatchHost_->PostAsync(
-                WM_MFX_SCROLL,
-                static_cast<uintptr_t>(delta),
-                MacosDispatchMessageCodec::PackPointPayload(pt.x, pt.y));
-        }
+        self->HandleScrollEvent(event);
         return event;
     }
 
     if (macos_input_event::IsMouseDownType(type)) {
-        const ScreenPoint pt = macos_input_event::ToScreenPoint(CGEventGetLocation(event));
-        const MouseButton button = macos_input_event::MouseButtonFromEvent(event);
-        self->dispatchHost_->PostAsync(
-            WM_MFX_BUTTON_DOWN,
-            static_cast<uintptr_t>(button),
-            MacosDispatchMessageCodec::PackPointPayload(pt.x, pt.y));
+        self->HandleMouseDownEvent(event);
         return event;
     }
 
     if (macos_input_event::IsMouseUpType(type)) {
-        const ScreenPoint pt = macos_input_event::ToScreenPoint(CGEventGetLocation(event));
-        const MouseButton button = macos_input_event::MouseButtonFromEvent(event);
-        self->dispatchHost_->PostAsync(
-            WM_MFX_BUTTON_UP,
-            static_cast<uintptr_t>(button),
-            0);
-
-        auto* click = new (std::nothrow) ClickEvent();
-        if (click) {
-            click->pt = pt;
-            click->button = button;
-            if (!self->dispatchHost_->PostAsync(
-                    WM_MFX_CLICK,
-                    0,
-                    reinterpret_cast<intptr_t>(click))) {
-                delete click;
-            }
-        }
+        self->HandleMouseUpEvent(event);
         return event;
     }
 
     if (type == kCGEventKeyDown) {
-        auto* key = new (std::nothrow) KeyEvent();
-        if (key) {
-            const uint16_t macKeyCode = static_cast<uint16_t>(
-                CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode));
-            key->vkCode = macos_keymap::VirtualKeyFromMacKeyCode(macKeyCode);
-            key->pt = macos_input_event::ToScreenPoint(CGEventGetLocation(event));
-            const CGEventFlags flags = CGEventGetFlags(event);
-            key->ctrl = (flags & kCGEventFlagMaskControl) != 0;
-            key->shift = (flags & kCGEventFlagMaskShift) != 0;
-            key->alt = (flags & kCGEventFlagMaskAlternate) != 0;
-            key->win = (flags & kCGEventFlagMaskCommand) != 0;
-            key->meta = key->win;
-            key->systemKey = key->alt || key->meta;
-            if (!self->dispatchHost_->PostAsync(
-                    WM_MFX_KEY,
-                    0,
-                    reinterpret_cast<intptr_t>(key))) {
-                delete key;
-            }
-        }
-
-        if (self->keyboardCaptureExclusive_.load(std::memory_order_acquire)) {
-            return nullptr;
-        }
-        return event;
+        return self->HandleKeyDownEvent(event);
     }
 
     return event;

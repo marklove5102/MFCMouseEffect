@@ -44,6 +44,12 @@ private:
 private:
     void RunEventTapLoop();
     void OnPermissionProbeTimer();
+    void HandleTapDisabledEvent();
+    void HandleMouseMoveEvent(CGEventRef event);
+    void HandleScrollEvent(CGEventRef event);
+    void HandleMouseDownEvent(CGEventRef event);
+    void HandleMouseUpEvent(CGEventRef event);
+    CGEventRef HandleKeyDownEvent(CGEventRef event);
 #if defined(__APPLE__)
     static CGEventRef EventTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* userInfo);
     static void PermissionProbeTimerCallback(CFRunLoopTimerRef timer, void* userInfo);
