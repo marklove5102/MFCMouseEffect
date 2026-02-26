@@ -369,6 +369,8 @@
   - 55zzzzaj completed (acceptance): full POSIX regression suite remains green after route-config split.
   - 55zzzzak completed (code): consolidated duplicated launcher/probe capture-file atomic-write logic into shared `PosixKeyValueCaptureFile`, reducing POSIX diagnostics-path drift risk.
   - 55zzzzak completed (acceptance): full POSIX regression suite remains green after capture-writer consolidation.
+  - 55zzzzal completed (code): split `MacosWasmTextOverlay` into layout/style/helper modules with orchestration-only entry, reducing WASM text-overlay coupling without behavior changes.
+  - 55zzzzal completed (acceptance): full POSIX regression suite remains green after macOS WASM text overlay split.
   - 55zzzzac completed (code): split WASM image overlay render-plan computation into dedicated module (`MacosWasmImageOverlayRendererCore.Plan.mm`) and kept core renderer file focused on rendering orchestration.
   - 55zzzzac completed (acceptance): full POSIX regression suite remains green after WASM image render-plan split.
 

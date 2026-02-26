@@ -85,7 +85,7 @@ Use it as a pointer index, not a full historical catalog.
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzt-wasm-plugin-transfer-service-responsibility-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzu-wasm-plugin-manifest-load-validate-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzv-wasm3-runtime-responsibility-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzad-posix-core-appshell-responsibility-split.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzal-macos-wasm-text-overlay-layout-style-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzae-posix-shell-exit-command-and-scaffold-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzaf-scaffold-settings-api-and-routecodec-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzag-scaffold-request-handler-routing-split.md`

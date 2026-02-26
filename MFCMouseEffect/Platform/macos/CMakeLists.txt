@@ -82,6 +82,8 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmOverlayState.Internals.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmOverlayState.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmOverlayRuntime.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.Layout.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.Style.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTransientOverlay.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosDpiAwarenessService.cpp"
