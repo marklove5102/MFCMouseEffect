@@ -1,0 +1,83 @@
+#include "pch.h"
+
+#include "Platform/macos/Effects/MacosScrollPulseOverlayRendererSupport.h"
+
+#include "Platform/macos/Effects/MacosScrollPulseOverlayStyle.h"
+
+#if defined(__APPLE__)
+#import <QuartzCore/QuartzCore.h>
+#endif
+
+#include <algorithm>
+#include <cmath>
+
+namespace mousefx::macos_scroll_pulse::support {
+
+int ResolveStrengthLevel(int delta) {
+    int strengthLevel = static_cast<int>(std::abs(delta) / 120);
+    if (strengthLevel < 1) {
+        strengthLevel = 1;
+    }
+    if (strengthLevel > 6) {
+        strengthLevel = 6;
+    }
+    return strengthLevel;
+}
+
+CGRect BuildBodyRect(CGFloat size, bool horizontal, int strengthLevel) {
+    const CGFloat bodyThickness = 18.0;
+    const CGFloat bodyLength = 56.0 + static_cast<CGFloat>(strengthLevel) * 8.0;
+    return horizontal
+        ? CGRectMake((size - bodyLength) * 0.5, (size - bodyThickness) * 0.5, bodyLength, bodyThickness)
+        : CGRectMake((size - bodyThickness) * 0.5, (size - bodyLength) * 0.5, bodyThickness, bodyLength);
+}
+
+CFTimeInterval BuildPulseDuration(
+    const macos_effect_profile::ScrollRenderProfile& profile,
+    int strengthLevel) {
+    return profile.baseDurationSec + static_cast<CFTimeInterval>(strengthLevel) * profile.perStrengthStepSec;
+}
+
+int BuildCloseAfterMs(
+    const macos_effect_profile::ScrollRenderProfile& profile,
+    CFTimeInterval duration) {
+    return static_cast<int>(duration * 1000.0) + profile.closePaddingMs;
+}
+
+#if defined(__APPLE__)
+CAShapeLayer* CreateBodyLayer(
+    CGRect bounds,
+    CGRect bodyRect,
+    bool horizontal,
+    int delta,
+    double baseOpacity) {
+    CAShapeLayer* body = [CAShapeLayer layer];
+    body.frame = bounds;
+    CGPathRef bodyPath = CGPathCreateWithRoundedRect(bodyRect, 9.0, 9.0, nullptr);
+    body.path = bodyPath;
+    CGPathRelease(bodyPath);
+    body.fillColor = [ScrollPulseFillColor(horizontal, delta) CGColor];
+    body.strokeColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
+    body.lineWidth = 2.0;
+    body.opacity = static_cast<float>(baseOpacity);
+    return body;
+}
+
+CAShapeLayer* CreateArrowLayer(
+    CGRect bounds,
+    CGRect bodyRect,
+    bool horizontal,
+    int delta,
+    double baseOpacity) {
+    CAShapeLayer* arrow = [CAShapeLayer layer];
+    arrow.frame = bounds;
+    CGPathRef arrowPath = CreateScrollPulseDirectionArrowPath(bodyRect, horizontal, delta);
+    arrow.path = arrowPath;
+    CGPathRelease(arrowPath);
+    arrow.fillColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
+    arrow.opacity = static_cast<float>(std::min(1.0, baseOpacity + 0.02));
+    return arrow;
+}
+#endif
+
+} // namespace mousefx::macos_scroll_pulse::support

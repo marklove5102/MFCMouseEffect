@@ -3,6 +3,7 @@
 #include "Platform/macos/Effects/MacosScrollPulseOverlayRendererCore.h"
 
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
+#include "Platform/macos/Effects/MacosScrollPulseOverlayRendererSupport.h"
 #include "Platform/macos/Effects/MacosScrollPulseOverlayStyle.h"
 #include "Platform/macos/Effects/MacosScrollPulseWindowRegistry.h"
 
@@ -12,7 +13,6 @@
 #import <dispatch/dispatch.h>
 #endif
 
-#include <algorithm>
 #include <cmath>
 
 namespace mousefx::macos_scroll_pulse {
@@ -42,13 +42,7 @@ void ShowScrollPulseOverlayOnMain(
     const bool helixMode = (normalizedType == "helix");
     const bool twinkleMode = (normalizedType == "twinkle");
 
-    int strengthLevel = static_cast<int>(std::abs(delta) / 120);
-    if (strengthLevel < 1) {
-        strengthLevel = 1;
-    }
-    if (strengthLevel > 6) {
-        strengthLevel = 6;
-    }
+    const int strengthLevel = support::ResolveStrengthLevel(delta);
 
     const CGFloat size = horizontal ? static_cast<CGFloat>(profile.horizontalSizePx) : static_cast<CGFloat>(profile.verticalSizePx);
     const NSRect frame = NSMakeRect(overlayPt.x - size * 0.5, overlayPt.y - size * 0.5, size, size);
@@ -60,30 +54,11 @@ void ShowScrollPulseOverlayOnMain(
     NSView* content = [window contentView];
     [content setWantsLayer:YES];
 
-    const CGFloat bodyThickness = 18.0;
-    const CGFloat bodyLength = 56.0 + static_cast<CGFloat>(strengthLevel) * 8.0;
-    const CGRect bodyRect = horizontal
-        ? CGRectMake((size - bodyLength) * 0.5, (size - bodyThickness) * 0.5, bodyLength, bodyThickness)
-        : CGRectMake((size - bodyThickness) * 0.5, (size - bodyLength) * 0.5, bodyThickness, bodyLength);
-
-    CAShapeLayer* body = [CAShapeLayer layer];
-    body.frame = content.bounds;
-    CGPathRef bodyPath = CGPathCreateWithRoundedRect(bodyRect, bodyThickness * 0.5, bodyThickness * 0.5, nullptr);
-    body.path = bodyPath;
-    CGPathRelease(bodyPath);
-    body.fillColor = [ScrollPulseFillColor(horizontal, delta) CGColor];
-    body.strokeColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
-    body.lineWidth = 2.0;
-    body.opacity = static_cast<float>(profile.baseOpacity);
+    const CGRect bodyRect = support::BuildBodyRect(size, horizontal, strengthLevel);
+    CAShapeLayer* body = support::CreateBodyLayer(content.bounds, bodyRect, horizontal, delta, profile.baseOpacity);
     [content.layer addSublayer:body];
 
-    CAShapeLayer* arrow = [CAShapeLayer layer];
-    arrow.frame = content.bounds;
-    CGPathRef arrowPath = CreateScrollPulseDirectionArrowPath(bodyRect, horizontal, delta);
-    arrow.path = arrowPath;
-    CGPathRelease(arrowPath);
-    arrow.fillColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
-    arrow.opacity = static_cast<float>(std::min(1.0, profile.baseOpacity + 0.02));
+    CAShapeLayer* arrow = support::CreateArrowLayer(content.bounds, bodyRect, horizontal, delta, profile.baseOpacity);
     [content.layer addSublayer:arrow];
 
     if (helixMode) {
@@ -121,7 +96,7 @@ void ShowScrollPulseOverlayOnMain(
         [content.layer addSublayer:twinkle];
     }
 
-    const CFTimeInterval duration = profile.baseDurationSec + static_cast<CFTimeInterval>(strengthLevel) * profile.perStrengthStepSec;
+    const CFTimeInterval duration = support::BuildPulseDuration(profile, strengthLevel);
     CABasicAnimation* scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     scale.fromValue = @0.72;
     scale.toValue = @1.04;
@@ -145,7 +120,7 @@ void ShowScrollPulseOverlayOnMain(
     RegisterScrollPulseWindow(reinterpret_cast<void*>(window));
     [window orderFrontRegardless];
 
-    const int closeAfterMs = static_cast<int>(duration * 1000.0) + profile.closePaddingMs;
+    const int closeAfterMs = support::BuildCloseAfterMs(profile, duration);
     dispatch_after(
         dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(closeAfterMs) * NSEC_PER_MSEC),
         dispatch_get_main_queue(),

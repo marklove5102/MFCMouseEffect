@@ -133,6 +133,7 @@
   - macOS wasm image overlay renderer now splits utility helpers into support module (`MacosWasmImageOverlayRendererSupport.*`), reducing renderer-core utility coupling while preserving render behavior contracts
   - macOS app-catalog scan workflow now splits bundle-resolution and root-traversal responsibilities (`MacosApplicationCatalogScanWorkflow.BundleResolve.mm`, `MacosApplicationCatalogScanWorkflow.RootScan.mm`), reducing scan helper coupling while preserving app-catalog semantics
   - macOS hold effect core now splits shared state and update responsibilities (`MacosHoldPulseOverlayRendererCore.Internal/State/Update`), reducing hold-renderer core coupling while preserving visual behavior contracts
+  - macOS scroll effect core now splits strength/timing/layer construction helpers into support module (`MacosScrollPulseOverlayRendererSupport.*`), reducing scroll-renderer core utility coupling while preserving visual behavior contracts
   - `WasmEffectHost` invoke path is now isolated in `WasmEffectHost.Invoke.cpp`, reducing lifecycle-vs-invoke coupling while preserving host execution contracts
   - `AppController` VM suppression path is now isolated in `AppController.VmSuppression.cpp`, reducing suppression-vs-effects coupling while preserving suppression behavior contracts
   - macOS app-catalog scan and AppleScript folder-picker are now split into workflow entry and helper/script units (`MacosApplicationCatalogScanWorkflow.*`, `MacosAppleScriptFolderPicker.*`), reducing system-workflow coupling while preserving scan/pick contracts
@@ -197,7 +198,6 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zp-doc-index-compaction-p0-p1.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zq-core-regression-workflow-helper-consolidation.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zr-wasm-dispatch-readiness-retry-hardening.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zx-macos-wasm-command-renderer-dispatch-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zz-macos-wasm-image-overlay-renderer-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zza-macos-dispatch-message-host-impl-split.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzb-macos-tray-service-menu-factory-split.md`
