@@ -27,8 +27,8 @@ HoldRenderProfile ResolveHoldRenderProfile(const EffectConfig& config) {
     profile.sizePx = ClampInt(config.ripple.windowSize + 68, 140, 260);
     profile.progressFullMs = ClampInt(static_cast<int>(std::lround(rippleDurationMs * 4.0)), 800, 3000);
     profile.breatheDurationSec =
-        detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 2.2, 0.45, 2.5);
-    profile.rotateDurationSec = detail::ClampDouble(profile.breatheDurationSec * 2.2, 1.0, 3.5);
+        detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 2.57, 0.55, 2.8);
+    profile.rotateDurationSec = detail::ClampDouble(profile.breatheDurationSec * 2.44, 1.2, 4.0);
     profile.rotateDurationFastSec = detail::ClampDouble(profile.rotateDurationSec * 0.68, 0.7, 2.4);
     profile.baseOpacity = 0.92;
     return profile;
@@ -39,8 +39,8 @@ HoverRenderProfile ResolveHoverRenderProfile(const EffectConfig& config) {
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     profile.sizePx = ClampInt(config.ripple.windowSize + 52, 120, 240);
     profile.breatheDurationSec =
-        detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 2.1, 0.45, 2.4);
-    profile.spinDurationSec = detail::ClampDouble(profile.breatheDurationSec * 2.0, 0.9, 3.6);
+        detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 2.43, 0.55, 2.6);
+    profile.spinDurationSec = detail::ClampDouble(profile.breatheDurationSec * 1.88, 1.0, 3.8);
     profile.baseOpacity = 0.9;
     return profile;
 }

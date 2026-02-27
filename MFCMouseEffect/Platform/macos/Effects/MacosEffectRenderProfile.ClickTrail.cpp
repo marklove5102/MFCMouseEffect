@@ -28,7 +28,7 @@ TrailRenderProfile ResolveTrailRenderProfile(const EffectConfig& config, const s
     TrailRenderProfile profile{};
     const std::string normalizedTrailType = detail::NormalizeTrailTypeAlias(trailType);
     const TrailHistoryProfile history = config.GetTrailHistoryProfile(normalizedTrailType);
-    const int durationMs = ClampInt(static_cast<int>(std::lround(history.durationMs * 0.55)), 140, 900);
+    const int durationMs = ClampInt(static_cast<int>(std::lround(history.durationMs * 0.73)), 180, 1000);
     profile.durationSec = static_cast<double>(durationMs) / 1000.0;
     profile.normalSizePx = ClampInt(56 + history.maxPoints / 3, 56, 112);
     profile.particleSizePx = ClampInt(40 + history.maxPoints / 6, 40, 72);
