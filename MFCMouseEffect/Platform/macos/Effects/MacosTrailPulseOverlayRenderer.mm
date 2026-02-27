@@ -1,37 +1,13 @@
 #include "pch.h"
 
 #include "MouseFx/Core/Effects/TrailEffectCompute.h"
+#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosTrailPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosTrailPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosTrailPulseWindowRegistry.h"
 
 namespace mousefx::macos_trail_pulse {
-namespace {
-
-TrailEffectProfile BuildComputeProfile(const macos_effect_profile::TrailRenderProfile& profile) {
-    TrailEffectProfile out{};
-    out.normalSizePx = profile.normalSizePx;
-    out.particleSizePx = profile.particleSizePx;
-    out.durationSec = profile.durationSec;
-    out.closePaddingMs = profile.closePaddingMs;
-    out.baseOpacity = profile.baseOpacity;
-    out.line = {profile.line.fillArgb, profile.line.strokeArgb};
-    out.streamer = {profile.streamer.fillArgb, profile.streamer.strokeArgb};
-    out.electric = {profile.electric.fillArgb, profile.electric.strokeArgb};
-    out.meteor = {profile.meteor.fillArgb, profile.meteor.strokeArgb};
-    out.tubes = {profile.tubes.fillArgb, profile.tubes.strokeArgb};
-    out.particle = {profile.particle.fillArgb, profile.particle.strokeArgb};
-    out.lineTempo = {profile.lineTempo.durationScale, profile.lineTempo.sizeScale};
-    out.streamerTempo = {profile.streamerTempo.durationScale, profile.streamerTempo.sizeScale};
-    out.electricTempo = {profile.electricTempo.durationScale, profile.electricTempo.sizeScale};
-    out.meteorTempo = {profile.meteorTempo.durationScale, profile.meteorTempo.sizeScale};
-    out.tubesTempo = {profile.tubesTempo.durationScale, profile.tubesTempo.sizeScale};
-    out.particleTempo = {profile.particleTempo.durationScale, profile.particleTempo.sizeScale};
-    return out;
-}
-
-} // namespace
 
 void CloseAllTrailPulseWindows() {
 #if !defined(__APPLE__)
@@ -74,7 +50,12 @@ void ShowTrailPulseOverlay(
     return;
 #else
     const TrailEffectRenderCommand command =
-        ComputeTrailEffectRenderCommand(overlayPt, deltaX, deltaY, effectType, BuildComputeProfile(profile));
+        ComputeTrailEffectRenderCommand(
+            overlayPt,
+            deltaX,
+            deltaY,
+            effectType,
+            macos_effect_compute_profile::BuildTrailProfile(profile));
     ShowTrailPulseOverlay(command, themeName);
 #endif
 }

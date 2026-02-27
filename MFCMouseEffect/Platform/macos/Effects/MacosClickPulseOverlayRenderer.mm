@@ -1,29 +1,13 @@
 #include "pch.h"
 
 #include "MouseFx/Core/Effects/ClickEffectCompute.h"
+#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosClickPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosClickPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosClickPulseWindowRegistry.h"
 
 namespace mousefx::macos_click_pulse {
-namespace {
-
-ClickEffectProfile BuildComputeProfile(const macos_effect_profile::ClickRenderProfile& profile) {
-    ClickEffectProfile out{};
-    out.normalSizePx = profile.normalSizePx;
-    out.textSizePx = profile.textSizePx;
-    out.normalDurationSec = profile.normalDurationSec;
-    out.textDurationSec = profile.textDurationSec;
-    out.closePaddingMs = profile.closePaddingMs;
-    out.baseOpacity = profile.baseOpacity;
-    out.left = {profile.leftButton.fillArgb, profile.leftButton.strokeArgb, profile.leftButton.glowArgb};
-    out.right = {profile.rightButton.fillArgb, profile.rightButton.strokeArgb, profile.rightButton.glowArgb};
-    out.middle = {profile.middleButton.fillArgb, profile.middleButton.strokeArgb, profile.middleButton.glowArgb};
-    return out;
-}
-
-} // namespace
 
 void CloseAllClickPulseWindows() {
 #if !defined(__APPLE__)
@@ -67,7 +51,7 @@ void ShowClickPulseOverlay(
         overlayPt,
         button,
         effectType,
-        BuildComputeProfile(profile));
+        macos_effect_compute_profile::BuildClickProfile(profile));
     ShowClickPulseOverlay(command, themeName);
 #endif
 }

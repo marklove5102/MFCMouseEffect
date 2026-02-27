@@ -1,34 +1,12 @@
 #include "pch.h"
 
 #include "MouseFx/Core/Effects/HoldEffectCompute.h"
+#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 
 namespace mousefx::macos_hold_pulse {
-namespace {
-
-HoldEffectProfile BuildComputeProfile(const macos_effect_profile::HoldRenderProfile& profile) {
-    HoldEffectProfile out{};
-    out.sizePx = profile.sizePx;
-    out.progressFullMs = profile.progressFullMs;
-    out.breatheDurationSec = profile.breatheDurationSec;
-    out.rotateDurationSec = profile.rotateDurationSec;
-    out.rotateDurationFastSec = profile.rotateDurationFastSec;
-    out.baseOpacity = profile.baseOpacity;
-    out.colors.leftBaseStrokeArgb = profile.colors.leftBaseStrokeArgb;
-    out.colors.rightBaseStrokeArgb = profile.colors.rightBaseStrokeArgb;
-    out.colors.middleBaseStrokeArgb = profile.colors.middleBaseStrokeArgb;
-    out.colors.lightningStrokeArgb = profile.colors.lightningStrokeArgb;
-    out.colors.hexStrokeArgb = profile.colors.hexStrokeArgb;
-    out.colors.hologramStrokeArgb = profile.colors.hologramStrokeArgb;
-    out.colors.quantumHaloStrokeArgb = profile.colors.quantumHaloStrokeArgb;
-    out.colors.fluxFieldStrokeArgb = profile.colors.fluxFieldStrokeArgb;
-    out.colors.techNeonStrokeArgb = profile.colors.techNeonStrokeArgb;
-    return out;
-}
-
-} // namespace
 
 void StartHoldPulseOverlay(const HoldEffectStartCommand& command, const std::string& themeName) {
 #if !defined(__APPLE__)
@@ -73,7 +51,11 @@ void StartHoldPulseOverlay(
     return;
 #else
     const HoldEffectStartCommand command =
-        ComputeHoldEffectStartCommand(overlayPt, button, effectType, BuildComputeProfile(profile));
+        ComputeHoldEffectStartCommand(
+            overlayPt,
+            button,
+            effectType,
+            macos_effect_compute_profile::BuildHoldProfile(profile));
     StartHoldPulseOverlay(command, themeName);
 #endif
 }

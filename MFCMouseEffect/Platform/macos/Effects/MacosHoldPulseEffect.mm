@@ -2,6 +2,7 @@
 
 #include "MouseFx/Core/Effects/HoldEffectCompute.h"
 #include "Platform/macos/Effects/MacosHoldPulseEffect.h"
+#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Utils/StringUtils.h"
@@ -12,30 +13,6 @@
 #include <utility>
 
 namespace mousefx {
-namespace {
-
-HoldEffectProfile BuildComputeProfile(const macos_effect_profile::HoldRenderProfile& profile) {
-    HoldEffectProfile out{};
-    out.sizePx = profile.sizePx;
-    out.progressFullMs = profile.progressFullMs;
-    out.breatheDurationSec = profile.breatheDurationSec;
-    out.rotateDurationSec = profile.rotateDurationSec;
-    out.rotateDurationFastSec = profile.rotateDurationFastSec;
-    out.baseOpacity = profile.baseOpacity;
-    out.colors.leftBaseStrokeArgb = profile.colors.leftBaseStrokeArgb;
-    out.colors.rightBaseStrokeArgb = profile.colors.rightBaseStrokeArgb;
-    out.colors.middleBaseStrokeArgb = profile.colors.middleBaseStrokeArgb;
-    out.colors.lightningStrokeArgb = profile.colors.lightningStrokeArgb;
-    out.colors.hexStrokeArgb = profile.colors.hexStrokeArgb;
-    out.colors.hologramStrokeArgb = profile.colors.hologramStrokeArgb;
-    out.colors.quantumHaloStrokeArgb = profile.colors.quantumHaloStrokeArgb;
-    out.colors.fluxFieldStrokeArgb = profile.colors.fluxFieldStrokeArgb;
-    out.colors.techNeonStrokeArgb = profile.colors.techNeonStrokeArgb;
-    return out;
-}
-
-} // namespace
-
 MacosHoldPulseEffect::MacosHoldPulseEffect(
     std::string effectType,
     std::string themeName,
@@ -85,7 +62,7 @@ void MacosHoldPulseEffect::OnHoldStart(const ScreenPoint& pt, int button) {
         ScreenToOverlayPoint(pt),
         holdButton_,
         effectType_,
-        BuildComputeProfile(renderProfile_));
+        macos_effect_compute_profile::BuildHoldProfile(renderProfile_));
     macos_hold_pulse::StartHoldPulseOverlay(command, themeName_);
     running_ = true;
     followState_ = HoldEffectFollowState{};

@@ -1,36 +1,13 @@
 #include "pch.h"
 
 #include "MouseFx/Core/Effects/ScrollEffectCompute.h"
+#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosScrollPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosScrollPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosScrollPulseWindowRegistry.h"
 
 namespace mousefx::macos_scroll_pulse {
-namespace {
-
-ScrollEffectProfile BuildComputeProfile(const macos_effect_profile::ScrollRenderProfile& profile) {
-    ScrollEffectProfile out{};
-    out.verticalSizePx = profile.verticalSizePx;
-    out.horizontalSizePx = profile.horizontalSizePx;
-    out.baseDurationSec = profile.baseDurationSec;
-    out.perStrengthStepSec = profile.perStrengthStepSec;
-    out.closePaddingMs = profile.closePaddingMs;
-    out.baseOpacity = profile.baseOpacity;
-    out.defaultDurationScale = profile.defaultDurationScale;
-    out.helixDurationScale = profile.helixDurationScale;
-    out.twinkleDurationScale = profile.twinkleDurationScale;
-    out.defaultSizeScale = profile.defaultSizeScale;
-    out.helixSizeScale = profile.helixSizeScale;
-    out.twinkleSizeScale = profile.twinkleSizeScale;
-    out.horizontalPositive = {profile.horizontalPositive.fillArgb, profile.horizontalPositive.strokeArgb};
-    out.horizontalNegative = {profile.horizontalNegative.fillArgb, profile.horizontalNegative.strokeArgb};
-    out.verticalPositive = {profile.verticalPositive.fillArgb, profile.verticalPositive.strokeArgb};
-    out.verticalNegative = {profile.verticalNegative.fillArgb, profile.verticalNegative.strokeArgb};
-    return out;
-}
-
-} // namespace
 
 void CloseAllScrollPulseWindows() {
 #if !defined(__APPLE__)
@@ -73,7 +50,12 @@ void ShowScrollPulseOverlay(
     return;
 #else
     const ScrollEffectRenderCommand command =
-        ComputeScrollEffectRenderCommand(overlayPt, horizontal, delta, effectType, BuildComputeProfile(profile));
+        ComputeScrollEffectRenderCommand(
+            overlayPt,
+            horizontal,
+            delta,
+            effectType,
+            macos_effect_compute_profile::BuildScrollProfile(profile));
     ShowScrollPulseOverlay(command, themeName);
 #endif
 }
