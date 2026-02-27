@@ -119,6 +119,11 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 # 文档体积治理（建议每周执行）
 ./tools/docs/doc-hygiene-check.sh --strict
 
+# macOS 一键快捷入口（仓库根目录）
+./mfx start
+./mfx fast
+./mfx effects
+
 # macOS core 手测一键入口（自动解析 URL/token）
 ./tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60
 

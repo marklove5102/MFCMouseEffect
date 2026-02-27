@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repo_root="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  ./mfx <command> [options]
+
+Commands:
+  start [--minutes N]
+      Build + run macOS core host and print settings URL.
+      Default auto stop: 30 minutes.
+
+  fast [--minutes N]
+      Run macOS core host without rebuilding.
+      Default auto stop: 30 minutes.
+
+  effects [--skip-build]
+      Run macOS effects type parity selfcheck.
+
+  help
+      Show this help.
+EOF
+}
+
+to_seconds() {
+    local minutes="$1"
+    if ! [[ "$minutes" =~ ^[0-9]+$ ]]; then
+        echo "invalid minutes: $minutes" >&2
+        exit 2
+    fi
+    echo $((minutes * 60))
+}
+
+run_start() {
+    local skip_build="$1"
+    shift
+    local minutes=30
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --minutes)
+            [[ $# -ge 2 ]] || { echo "missing value for --minutes" >&2; exit 2; }
+            minutes="$2"
+            shift 2
+            ;;
+        *)
+            echo "unknown option for start/fast: $1" >&2
+            exit 2
+            ;;
+        esac
+    done
+
+    local stop_seconds
+    stop_seconds="$(to_seconds "$minutes")"
+    local -a args
+    args=(--auto-stop-seconds "$stop_seconds")
+    if [[ "$skip_build" == "1" ]]; then
+        args+=(--skip-build)
+    fi
+
+    exec "$repo_root/tools/platform/manual/run-macos-core-websettings-manual.sh" "${args[@]}"
+}
+
+run_effects() {
+    shift
+    exec "$repo_root/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh" "$@"
+}
+
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+command="$1"
+case "$command" in
+start)
+    shift
+    run_start 0 "$@"
+    ;;
+fast)
+    shift
+    run_start 1 "$@"
+    ;;
+effects)
+    run_effects "$@"
+    ;;
+help|-h|--help)
+    usage
+    ;;
+*)
+    echo "unknown command: $command" >&2
+    usage
+    exit 2
+    ;;
+esac

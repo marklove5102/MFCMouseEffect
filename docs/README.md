@@ -119,6 +119,11 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 # Token hygiene check (weekly)
 ./tools/docs/doc-hygiene-check.sh --strict
 
+# macOS one-command shortcuts (repo root)
+./mfx start
+./mfx fast
+./mfx effects
+
 # macOS core manual runner (URL/token auto-resolved)
 ./tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60
 

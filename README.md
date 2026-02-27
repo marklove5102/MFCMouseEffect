@@ -49,6 +49,10 @@
 - 背景模式：无托盘/界面，完全由父进程通过 stdin JSON 控制。
 
 ## 🧪 POSIX 回归（macOS/Linux 开发）
+- macOS 一键入口（仓库根目录执行）：
+  - `./mfx start`（编译+运行，默认 30 分钟自动退出）
+  - `./mfx fast`（不编译直接运行）
+  - `./mfx effects`（特效类型等价自检）
 - 一键命令（仓库根目录执行）：
   - `./tools/platform/regression/run-posix-scaffold-regression.sh --platform auto`
 - 用于校验：平台包构建、background 退出兼容、scaffold HTTP 路由行为（macOS 会额外跑 smoke 可执行）。
