@@ -51,6 +51,8 @@ struct TrailEffectRenderCommand {
     bool glowMode = false;
     double deltaX = 0.0;
     double deltaY = 0.0;
+    double speedPx = 0.0;
+    double intensity = 0.0;
     int sizePx = 64;
     double durationSec = 0.22;
     int closeAfterMs = 40;

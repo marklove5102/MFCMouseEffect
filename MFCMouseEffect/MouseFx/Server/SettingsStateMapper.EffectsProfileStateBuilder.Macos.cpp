@@ -40,6 +40,8 @@ nlohmann::json BuildTrailCommandJson(const TrailEffectRenderCommand& command) {
         {"stroke_argb", command.strokeArgb},
         {"delta_x", command.deltaX},
         {"delta_y", command.deltaY},
+        {"speed_px", command.speedPx},
+        {"intensity", command.intensity},
         {"tubes_mode", command.tubesMode},
         {"particle_mode", command.particleMode},
         {"glow_mode", command.glowMode},

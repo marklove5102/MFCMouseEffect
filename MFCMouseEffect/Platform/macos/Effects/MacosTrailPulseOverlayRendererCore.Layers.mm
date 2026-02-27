@@ -37,7 +37,12 @@ void ConfigureTrailCoreLayer(
         CGPathRelease(outer);
         core.fillColor = [NSColor clearColor].CGColor;
         core.strokeColor = [ArgbToNsColor(plan.command.strokeArgb) CGColor];
-        core.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 3.2, 160.0, 1.2, 6.0);
+        core.lineWidth = macos_overlay_support::ScaleOverlayMetric(
+            size,
+            3.2 + static_cast<CGFloat>(plan.command.intensity) * 1.4,
+            160.0,
+            1.2,
+            7.8);
     } else if (plan.command.particleMode) {
         const CGFloat dotInset = macos_overlay_support::ScaleOverlayMetric(size, 16.0, 160.0, 8.0, 34.0);
         CGPathRef dot = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, dotInset, dotInset), nullptr);
@@ -45,7 +50,12 @@ void ConfigureTrailCoreLayer(
         CGPathRelease(dot);
         core.fillColor = [ArgbToNsColor(plan.command.strokeArgb) CGColor];
         core.strokeColor = [ArgbToNsColor(plan.command.strokeArgb) CGColor];
-        core.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 1.2, 160.0, 0.8, 2.4);
+        core.lineWidth = macos_overlay_support::ScaleOverlayMetric(
+            size,
+            1.2 + static_cast<CGFloat>(plan.command.intensity) * 0.8,
+            160.0,
+            0.8,
+            3.0);
     } else {
         CGPathRef line = detail::CreateTrailLinePath(content.bounds, deltaX, deltaY, trailType);
         core.path = line;
@@ -56,14 +66,17 @@ void ConfigureTrailCoreLayer(
         core.lineJoin = kCALineJoinRound;
         core.lineWidth = macos_overlay_support::ScaleOverlayMetric(
             size,
-            (trailType == "meteor") ? 4.0 : 3.0,
+            ((trailType == "meteor") ? 4.0 : 3.0) + static_cast<CGFloat>(plan.command.intensity) * 1.6,
             160.0,
             1.2,
-            7.0);
+            8.6);
     }
 
     core.opacity = static_cast<float>(
-        macos_overlay_support::ResolveOverlayOpacity(plan.command.baseOpacity, 0.0, 0.0));
+        macos_overlay_support::ResolveOverlayOpacity(
+            plan.command.baseOpacity,
+            static_cast<double>(plan.command.intensity) * 0.05,
+            0.0));
 }
 
 void AddTrailGlowLayer(NSView* content, const TrailPulseRenderPlan& plan) {
@@ -81,7 +94,10 @@ void AddTrailGlowLayer(NSView* content, const TrailPulseRenderPlan& plan) {
     glow.fillColor = [ArgbToNsColor(plan.command.fillArgb) CGColor];
     glow.strokeColor = [NSColor clearColor].CGColor;
     glow.opacity = static_cast<float>(
-        macos_overlay_support::ResolveOverlayOpacity(plan.command.baseOpacity, -0.08, 0.0));
+        macos_overlay_support::ResolveOverlayOpacity(
+            plan.command.baseOpacity,
+            -0.08 + static_cast<double>(plan.command.intensity) * 0.05,
+            0.0));
     [content.layer addSublayer:glow];
 }
 

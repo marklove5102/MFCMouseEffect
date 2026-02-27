@@ -144,6 +144,7 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"size_px\":" "core effect render profile probe command size field"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"duration_sec\":" "core effect render profile probe command duration field"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"stroke_argb\":" "core effect render profile probe command color field"
+    mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"speed_px\":" "core effect render profile probe trail speed sample field"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"hold\":\"" "core effect render profile probe active hold field"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"hover\":\"" "core effect render profile probe active hover field"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"profiles\":" "core effect render profile probe profiles"

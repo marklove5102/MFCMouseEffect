@@ -31,6 +31,10 @@ bool ContainsToken(const std::string& value, const char* token) {
     return value.find(token) != std::string::npos;
 }
 
+double Clamp01(double value) {
+    return std::clamp(value, 0.0, 1.0);
+}
+
 } // namespace
 
 std::string NormalizeTrailEffectType(const std::string& effectType) {
@@ -83,13 +87,17 @@ TrailEffectRenderCommand ComputeTrailEffectRenderCommand(
     command.glowMode = (command.normalizedType == "meteor" || command.normalizedType == "streamer");
     command.deltaX = deltaX;
     command.deltaY = deltaY;
+    command.speedPx = std::sqrt(deltaX * deltaX + deltaY * deltaY);
+    command.intensity = Clamp01(command.speedPx / 24.0);
 
     const auto& tempo = ResolveTempoProfile(command.normalizedType, profile);
     const auto& color = ResolveColorProfile(command.normalizedType, profile);
     const double baseSize = command.particleMode ? static_cast<double>(profile.particleSizePx)
                                                  : static_cast<double>(profile.normalSizePx);
-    command.sizePx = static_cast<int>(std::lround(std::clamp(baseSize * tempo.sizeScale, 28.0, 180.0)));
-    command.durationSec = std::clamp(profile.durationSec * tempo.durationScale, 0.08, 3.0);
+    const double speedSizeScale = 0.85 + command.intensity * 0.35;
+    const double speedDurationScale = 0.90 + command.intensity * 0.25;
+    command.sizePx = static_cast<int>(std::lround(std::clamp(baseSize * tempo.sizeScale * speedSizeScale, 28.0, 180.0)));
+    command.durationSec = std::clamp(profile.durationSec * tempo.durationScale * speedDurationScale, 0.08, 3.0);
     command.closeAfterMs = static_cast<int>(command.durationSec * 1000.0) + profile.closePaddingMs;
     command.baseOpacity = std::clamp(profile.baseOpacity, 0.05, 1.0);
     command.fillArgb = color.fillArgb;
