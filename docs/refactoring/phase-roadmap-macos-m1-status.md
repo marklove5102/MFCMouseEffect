@@ -351,6 +351,10 @@
   - 55zzzzy completed (acceptance): full POSIX regression suite remains green after notification AppleScript helper split.
   - 55zzzzbj completed (code): switched macOS warning-notification dispatch to Swift bridge (`MacosUserNotificationBridge.swift` via C ABI) while keeping C++ service interface and test-capture/fallback semantics unchanged.
   - 55zzzzbj completed (acceptance): scaffold regression + core automation contract regression + POSIX suite (scaffold phase) remain green after Swift bridge build/runtime wiring.
+  - 55zzzzbk completed (code): switched macOS native folder-picker path to Swift bridge first (`MacosNativeFolderPickerBridge.swift`) with existing Objective-C++ picker chain as fallback under the same `platform::PickFolder` contract.
+  - 55zzzzbk completed (acceptance): scaffold regression + core automation contract regression + POSIX suite (scaffold phase) remain green after Swift-first picker bridge wiring.
+  - 55zzzzbl completed (code): switched macOS settings launcher normal path to Swift bridge (`NSWorkspace.open`) while preserving capture-mode POSIX launcher semantics for existing regression probes.
+  - 55zzzzbl completed (acceptance): scaffold tray/settings-launch contract smoke and core automation contract regression remain green after Swift settings-launcher bridge wiring.
   - 55zzzzz completed (code): split input-indicator show-plan computation into dedicated module (`MacosInputIndicatorOverlay.ShowPlan.*`) and kept overlay file focused on lifecycle and presentation dispatch.
   - 55zzzzz completed (acceptance): full POSIX regression suite remains green after input-indicator show-plan split.
   - 55zzzzaa completed (code): split keyboard-injector dry-run/event-post internals into dedicated module (`MacosKeyboardInjector.EventPost.mm`) and kept injector file focused on chord orchestration.
@@ -565,6 +569,7 @@
 - POSIX core/scaffold/linux entry scripts now uniformly fail fast on missing value flags (for example `--platform --skip-*`) instead of deferring to late-stage ambiguous errors.
 - macOS warning notification dispatch now uses a Swift bridge (`MacosUserNotificationBridge.swift`) behind C ABI while preserving existing C++ interface/capture/fallback contracts, reducing further `.mm` dependency growth in shell notification path.
 - macOS native folder-picker route now uses Swift bridge first with existing Objective-C++ picker fallback (same `platform::PickFolder` contract), enabling Swift-first migration without import-dialog behavior risk.
+- macOS settings launcher now uses Swift bridge (`NSWorkspace.open`) in normal mode with POSIX `open` fallback, while capture-mode launcher contracts remain unchanged for regression probes.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

@@ -14,6 +14,7 @@ set(MFX_MACOS_TRAY_MENU_FACTORY_ACTION_BRIDGE_SOURCE "")
 set(MFX_MACOS_TRAY_MENU_FACTORY_ITEMS_SOURCE "")
 set(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT "")
 set(MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT "")
+set(MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT "")
 if(APPLE)
     set(MFX_MACOS_TRAY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayService.mm")
     set(MFX_MACOS_TRAY_LOCALIZATION_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuLocalization.mm")
@@ -28,6 +29,8 @@ if(APPLE)
     set(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosUserNotificationBridge.swift.o")
     set(MFX_MACOS_FOLDER_PICKER_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosNativeFolderPickerBridge.swift")
     set(MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosNativeFolderPickerBridge.swift.o")
+    set(MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosSettingsLauncherBridge.swift")
+    set(MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosSettingsLauncherBridge.swift.o")
     set(MFX_SWIFT_DEPLOYMENT_TARGET "${CMAKE_OSX_DEPLOYMENT_TARGET}")
     if(NOT MFX_SWIFT_DEPLOYMENT_TARGET)
         execute_process(
@@ -71,6 +74,19 @@ if(APPLE)
     )
     set_source_files_properties(
         "${MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT}"
+        PROPERTIES
+            GENERATED TRUE
+            EXTERNAL_OBJECT TRUE
+    )
+    add_custom_command(
+        OUTPUT "${MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT}"
+        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_COMMON_ARGS} "${MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_SOURCE}" -o "${MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT}"
+        DEPENDS "${MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_SOURCE}"
+        COMMENT "Compile Swift settings launcher bridge"
+        VERBATIM
+    )
+    set_source_files_properties(
+        "${MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT}"
         PROPERTIES
             GENERATED TRUE
             EXTERNAL_OBJECT TRUE
@@ -207,6 +223,9 @@ if(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT)
 endif()
 if(MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT)
     target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT}")
+endif()
+if(MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT)
+    target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_SETTINGS_LAUNCHER_SWIFT_OBJECT}")
 endif()
 
 target_link_libraries(mfx_shell_macos
