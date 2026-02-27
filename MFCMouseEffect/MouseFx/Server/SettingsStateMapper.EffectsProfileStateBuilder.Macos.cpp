@@ -111,6 +111,8 @@ nlohmann::json BuildHoldUpdateCommandJson(const HoldEffectUpdateCommand& command
 nlohmann::json BuildAliasMatrixJson() {
     const nlohmann::json click = nlohmann::json::array({
         {{"input", "TEXT"}, {"normalized", NormalizeClickEffectType("TEXT")}},
+        {{"input", "icon"}, {"normalized", NormalizeClickEffectType("icon")}},
+        {{"input", "textclick"}, {"normalized", NormalizeClickEffectType("textclick")}},
         {{"input", "star"}, {"normalized", NormalizeClickEffectType("star")}},
         {{"input", "ripple_custom"}, {"normalized", NormalizeClickEffectType("ripple_custom")}},
     });
@@ -137,6 +139,8 @@ nlohmann::json BuildAliasMatrixJson() {
     const nlohmann::json hold = nlohmann::json::array({
         {{"input", "hold_neon3d_gpu_v2"}, {"normalized", NormalizeHoldEffectType("hold_neon3d_gpu_v2")}},
         {{"input", "hold_fluxfield_gpu_v2"}, {"normalized", NormalizeHoldEffectType("hold_fluxfield_gpu_v2")}},
+        {{"input", "scifi3d"}, {"normalized", NormalizeHoldEffectType("scifi3d")}},
+        {{"input", "neon3d"}, {"normalized", NormalizeHoldEffectType("neon3d")}},
         {{"input", "charge"}, {"normalized", NormalizeHoldEffectType("charge")}},
     });
 

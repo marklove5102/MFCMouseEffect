@@ -1,13 +1,21 @@
 #include "pch.h"
 #include "HoldRouteCatalog.h"
+#include "MouseFx/Utils/StringUtils.h"
 
 namespace mousefx::hold_route {
 
 std::string NormalizeHoldEffectTypeAlias(const std::string& type) {
-    if (type == kTypeQuantumHaloGpuV2Legacy) {
+    const std::string lowered = ToLowerAscii(type);
+    if (lowered == kTypeQuantumHaloGpuV2Legacy) {
         return kTypeQuantumHaloGpuV2;
     }
-    return type;
+    if (lowered == kTypeHologramLegacy) {
+        return kTypeHologram;
+    }
+    if (lowered == kTypeNeon3DLegacy) {
+        return kTypeNeon3D;
+    }
+    return lowered;
 }
 
 bool IsGpuV2RouteType(const std::string& type) {
