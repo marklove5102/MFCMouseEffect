@@ -1,5 +1,6 @@
 #include "Platform/macos/Shell/MacosUserNotificationService.h"
 #include "Platform/macos/Shell/MacosUserNotificationService.Internal.h"
+#include "Platform/macos/Shell/MacosUserNotificationSwiftBridge.h"
 
 #include <cstdio>
 #include <string>
@@ -15,7 +16,7 @@ void MacosUserNotificationService::ShowWarning(
         messageUtf8.empty() ? "(empty)" : messageUtf8);
     macos_notification_detail::AppendTestNotificationCapture(safeTitle, safeMessage);
 
-    if (macos_notification_detail::ShowWarningViaAppleScript(safeTitle, safeMessage)) {
+    if (mfx_macos_show_warning_notification(safeTitle.c_str(), safeMessage.c_str())) {
         return;
     }
 

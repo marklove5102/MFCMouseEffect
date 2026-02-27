@@ -9,7 +9,7 @@ Implemented in this stage:
 - `EventLoopService` (`CFRunLoopSource` + task queue dispatch on Apple host; non-Apple cross-host scaffolding build falls back to POSIX blocking loop)
 - `TrayService` (Apple host: native `NSStatusBar` + menu actions `Settings` / `Exit`, shortcuts `Cmd+,` and `Cmd+Q`; non-Apple cross-host scaffolding build keeps stub)
 - `Tray menu localization` (auto-select Chinese labels when macOS preferred language is `zh*`)
-- `UserNotificationService` (`osascript` notification + stderr fallback)
+- `UserNotificationService` (Swift bridge dispatch via `osascript` + stderr fallback)
 - smoke executables for host validation:
   - `MacosShellSmokeMain.cpp` (event-loop/task/exit chain)
   - `MacosTraySmokeMain.mm` (tray bootstrap + host exit callback)

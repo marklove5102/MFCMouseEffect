@@ -12,6 +12,7 @@ set(MFX_MACOS_TRAY_RUNTIME_HELPERS_SOURCE "")
 set(MFX_MACOS_TRAY_MENU_FACTORY_SOURCE "")
 set(MFX_MACOS_TRAY_MENU_FACTORY_ACTION_BRIDGE_SOURCE "")
 set(MFX_MACOS_TRAY_MENU_FACTORY_ITEMS_SOURCE "")
+set(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT "")
 if(APPLE)
     set(MFX_MACOS_TRAY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayService.mm")
     set(MFX_MACOS_TRAY_LOCALIZATION_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuLocalization.mm")
@@ -19,6 +20,51 @@ if(APPLE)
     set(MFX_MACOS_TRAY_MENU_FACTORY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuFactory.mm")
     set(MFX_MACOS_TRAY_MENU_FACTORY_ACTION_BRIDGE_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuFactory.ActionBridge.mm")
     set(MFX_MACOS_TRAY_MENU_FACTORY_ITEMS_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuFactory.Items.mm")
+
+    find_program(MFX_SWIFTC_EXECUTABLE swiftc REQUIRED)
+    set(MFX_MACOS_NOTIFICATION_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosUserNotificationBridge.swift")
+    set(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosUserNotificationBridge.swift.o")
+    set(MFX_SWIFTC_NOTIFICATION_ARGS
+        -parse-as-library
+        -c
+        "${MFX_MACOS_NOTIFICATION_SWIFT_SOURCE}"
+        -o
+        "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
+    )
+    set(MFX_SWIFT_DEPLOYMENT_TARGET "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    if(NOT MFX_SWIFT_DEPLOYMENT_TARGET)
+        execute_process(
+            COMMAND /usr/bin/xcrun --sdk macosx --show-sdk-platform-version
+            OUTPUT_VARIABLE MFX_MACOS_SDK_PLATFORM_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+        if(MFX_MACOS_SDK_PLATFORM_VERSION)
+            string(REGEX MATCH "^[0-9]+(\\.[0-9]+)?" MFX_SWIFT_DEPLOYMENT_TARGET "${MFX_MACOS_SDK_PLATFORM_VERSION}")
+        endif()
+    endif()
+    if(MFX_SWIFT_DEPLOYMENT_TARGET)
+        set(MFX_SWIFT_TARGET_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+        if(CMAKE_OSX_ARCHITECTURES)
+            list(GET CMAKE_OSX_ARCHITECTURES 0 MFX_SWIFT_TARGET_ARCH)
+        endif()
+        if(MFX_SWIFT_TARGET_ARCH)
+            list(PREPEND MFX_SWIFTC_NOTIFICATION_ARGS -target "${MFX_SWIFT_TARGET_ARCH}-apple-macosx${MFX_SWIFT_DEPLOYMENT_TARGET}")
+        endif()
+    endif()
+    add_custom_command(
+        OUTPUT "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
+        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_NOTIFICATION_ARGS}
+        DEPENDS "${MFX_MACOS_NOTIFICATION_SWIFT_SOURCE}"
+        COMMENT "Compile Swift notification bridge"
+        VERBATIM
+    )
+    set_source_files_properties(
+        "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
+        PROPERTIES
+            GENERATED TRUE
+            EXTERNAL_OBJECT TRUE
+    )
 endif()
 
 add_library(mfx_shell_macos STATIC
@@ -145,6 +191,10 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosUserNotificationService.AppleScript.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosUserNotificationService.cpp"
 )
+
+if(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT)
+    target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}")
+endif()
 
 target_link_libraries(mfx_shell_macos
     PUBLIC

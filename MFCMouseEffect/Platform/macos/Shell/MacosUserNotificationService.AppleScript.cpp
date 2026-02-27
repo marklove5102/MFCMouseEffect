@@ -14,21 +14,6 @@ namespace {
 
 constexpr std::string_view kNotificationCaptureFileEnv = "MFX_TEST_NOTIFICATION_CAPTURE_FILE";
 
-std::string ShellSingleQuote(const std::string& value) {
-    std::string out;
-    out.reserve(value.size() + 8);
-    out.push_back('\'');
-    for (char c : value) {
-        if (c == '\'') {
-            out += "'\\''";
-        } else {
-            out.push_back(c);
-        }
-    }
-    out.push_back('\'');
-    return out;
-}
-
 bool EnsureParentDirectory(const std::filesystem::path& filePath) {
     const std::filesystem::path parentPath = filePath.parent_path();
     if (parentPath.empty()) {
@@ -80,14 +65,6 @@ void AppendTestNotificationCapture(const std::string& titleUtf8, const std::stri
         return;
     }
     out << "title=" << titleUtf8 << '\t' << "message=" << messageUtf8 << '\n';
-}
-
-bool ShowWarningViaAppleScript(const std::string& safeTitle, const std::string& safeMessage) {
-    const std::string script =
-        "display notification \"" + safeMessage + "\" with title \"" + safeTitle + "\"";
-    const std::string command =
-        "osascript -e " + ShellSingleQuote(script) + " >/dev/null 2>&1";
-    return std::system(command.c_str()) == 0;
 }
 
 } // namespace mousefx::macos_notification_detail
