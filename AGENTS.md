@@ -39,6 +39,13 @@ Include short evidence (code path/config/runtime behavior). If user-visible beha
 - Keep Windows behavior regression-free.
 - Linux follows compile-level + contract-level unless explicitly expanded.
 
+### macOS native stack evolution (Decision: 2026-02-27)
+- Do not expand `.mm` surface area for new feature modules by default.
+- Existing Objective-C++ files are maintained with SRP refactors and bug fixes only; avoid large new `.mm` subsystems.
+- New macOS capabilities (new UI panels, new system integrations) should prefer Swift-first modules.
+- Adopt strangler migration: keep old `.mm` paths stable, route new capability entrypoints to Swift incrementally.
+- Prefer Swift <-> C++ interop path for new modules; keep Objective-C++ as thin bridge only where legacy AppKit glue is unavoidable.
+
 ### Windows build fallback (when needed)
 - Prefer MSBuild absolute paths if `msbuild` is not directly available.
 - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\MSBuild.exe`
