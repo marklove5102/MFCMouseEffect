@@ -12,6 +12,32 @@
 namespace mousefx::macos_click_pulse {
 
 #if defined(__APPLE__)
+namespace {
+
+NSColor* ArgbToNsColor(uint32_t argb) {
+    const CGFloat alpha = static_cast<CGFloat>((argb >> 24) & 0xFFu) / 255.0;
+    const CGFloat red = static_cast<CGFloat>((argb >> 16) & 0xFFu) / 255.0;
+    const CGFloat green = static_cast<CGFloat>((argb >> 8) & 0xFFu) / 255.0;
+    const CGFloat blue = static_cast<CGFloat>(argb & 0xFFu) / 255.0;
+    return [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+}
+
+const macos_effect_profile::ClickButtonColorProfile& ResolveClickButtonColorProfile(
+    MouseButton button,
+    const macos_effect_profile::ClickRenderProfile& profile) {
+    switch (button) {
+    case MouseButton::Right:
+        return profile.rightButton;
+    case MouseButton::Middle:
+        return profile.middleButton;
+    case MouseButton::Left:
+    default:
+        return profile.leftButton;
+    }
+}
+
+} // namespace
+
 std::string NormalizeClickType(const std::string& effectType) {
     const std::string value = ToLowerAscii(effectType);
     if (value == "star" || value == "text") {
@@ -20,30 +46,16 @@ std::string NormalizeClickType(const std::string& effectType) {
     return "ripple";
 }
 
-NSColor* ClickPulseStrokeColor(MouseButton button) {
-    switch (button) {
-    case MouseButton::Left:
-        return [NSColor colorWithCalibratedRed:0.22 green:0.70 blue:1 alpha:0.95];
-    case MouseButton::Right:
-        return [NSColor colorWithCalibratedRed:1.0 green:0.63 blue:0.22 alpha:0.95];
-    case MouseButton::Middle:
-        return [NSColor colorWithCalibratedRed:0.44 green:0.90 blue:0.57 alpha:0.95];
-    default:
-        return [NSColor colorWithCalibratedWhite:0.95 alpha:0.9];
-    }
+NSColor* ClickPulseStrokeColor(
+    MouseButton button,
+    const macos_effect_profile::ClickRenderProfile& profile) {
+    return ArgbToNsColor(ResolveClickButtonColorProfile(button, profile).strokeArgb);
 }
 
-NSColor* ClickPulseFillColor(MouseButton button) {
-    switch (button) {
-    case MouseButton::Left:
-        return [NSColor colorWithCalibratedRed:0.22 green:0.70 blue:1 alpha:0.22];
-    case MouseButton::Right:
-        return [NSColor colorWithCalibratedRed:1.0 green:0.63 blue:0.22 alpha:0.22];
-    case MouseButton::Middle:
-        return [NSColor colorWithCalibratedRed:0.44 green:0.90 blue:0.57 alpha:0.22];
-    default:
-        return [NSColor colorWithCalibratedWhite:0.95 alpha:0.18];
-    }
+NSColor* ClickPulseFillColor(
+    MouseButton button,
+    const macos_effect_profile::ClickRenderProfile& profile) {
+    return ArgbToNsColor(ResolveClickButtonColorProfile(button, profile).fillArgb);
 }
 
 CGPathRef CreateClickPulseStarPath(CGRect bounds, int points) {

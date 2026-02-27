@@ -22,6 +22,15 @@ ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
         detail::ClampDouble(static_cast<double>(textDurationMs) / 1000.0 * 0.50, 0.28, 1.35);
     profile.closePaddingMs = 60;
     profile.baseOpacity = 0.95;
+    profile.leftButton.fillArgb = config.ripple.leftClick.fill.value;
+    profile.leftButton.strokeArgb = config.ripple.leftClick.stroke.value;
+    profile.leftButton.glowArgb = config.ripple.leftClick.glow.value;
+    profile.rightButton.fillArgb = config.ripple.rightClick.fill.value;
+    profile.rightButton.strokeArgb = config.ripple.rightClick.stroke.value;
+    profile.rightButton.glowArgb = config.ripple.rightClick.glow.value;
+    profile.middleButton.fillArgb = config.ripple.middleClick.fill.value;
+    profile.middleButton.strokeArgb = config.ripple.middleClick.stroke.value;
+    profile.middleButton.glowArgb = config.ripple.middleClick.glow.value;
     return profile;
 }
 

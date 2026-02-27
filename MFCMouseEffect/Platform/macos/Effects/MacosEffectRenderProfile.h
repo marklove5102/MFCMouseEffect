@@ -7,6 +7,12 @@
 
 namespace mousefx::macos_effect_profile {
 
+struct ClickButtonColorProfile {
+    uint32_t fillArgb = 0x594FC3F7u;
+    uint32_t strokeArgb = 0xFF0288D1u;
+    uint32_t glowArgb = 0x660288D1u;
+};
+
 struct ClickRenderProfile {
     int normalSizePx = 138;
     int textSizePx = 152;
@@ -14,6 +20,9 @@ struct ClickRenderProfile {
     double textDurationSec = 0.36;
     int closePaddingMs = 60;
     double baseOpacity = 0.95;
+    ClickButtonColorProfile leftButton{};
+    ClickButtonColorProfile rightButton{0x50FFB74Du, 0xFFFF6F00u, 0x55FF6F00u};
+    ClickButtonColorProfile middleButton{0x5033D17Au, 0xFF0B8043u, 0x550B8043u};
 };
 
 struct TrailRenderProfile {
