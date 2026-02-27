@@ -11,16 +11,16 @@ namespace mousefx::macos_hover_pulse {
 #if defined(__APPLE__)
 namespace {
 
-double ResolveHoverSizeScale(bool tubesMode) {
-    return tubesMode ? 1.08 : 0.96;
+double ResolveHoverSizeScale(bool tubesMode, const macos_effect_profile::HoverRenderProfile& profile) {
+    return tubesMode ? profile.tubesSizeScale : profile.glowSizeScale;
 }
 
-double ResolveHoverBreatheScale(bool tubesMode) {
-    return tubesMode ? 1.15 : 0.92;
+double ResolveHoverBreatheScale(bool tubesMode, const macos_effect_profile::HoverRenderProfile& profile) {
+    return tubesMode ? profile.tubesBreatheScale : profile.glowBreatheScale;
 }
 
-double ResolveHoverSpinScale(bool tubesMode) {
-    return tubesMode ? 0.82 : 1.0;
+double ResolveHoverSpinScale(bool tubesMode, const macos_effect_profile::HoverRenderProfile& profile) {
+    return tubesMode ? profile.tubesSpinScale : 1.0;
 }
 
 } // namespace
@@ -33,13 +33,13 @@ HoverPulseRenderPlan BuildHoverPulseRenderPlan(
     plan.hoverType = NormalizeHoverType(effectType);
     plan.tubesMode = (plan.hoverType == "tubes");
     plan.size = static_cast<CGFloat>(
-        std::clamp<double>(profile.sizePx * ResolveHoverSizeScale(plan.tubesMode), 96.0, 260.0));
+        std::clamp<double>(profile.sizePx * ResolveHoverSizeScale(plan.tubesMode, profile), 96.0, 260.0));
     plan.breatheDurationSec = std::clamp<CFTimeInterval>(
-        profile.breatheDurationSec * ResolveHoverBreatheScale(plan.tubesMode),
+        profile.breatheDurationSec * ResolveHoverBreatheScale(plan.tubesMode, profile),
         0.35,
         4.2);
     plan.tubesSpinDurationSec = std::clamp<CFTimeInterval>(
-        profile.spinDurationSec * ResolveHoverSpinScale(plan.tubesMode),
+        profile.spinDurationSec * ResolveHoverSpinScale(plan.tubesMode, profile),
         0.65,
         5.2);
     const NSRect rawFrame = NSMakeRect(

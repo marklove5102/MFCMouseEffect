@@ -26,6 +26,11 @@ struct ClickRenderProfile {
 };
 
 struct TrailRenderProfile {
+    struct TypeTempoProfile {
+        double durationScale = 1.0;
+        double sizeScale = 1.0;
+    };
+
     struct TypeColorProfile {
         uint32_t fillArgb = 0x3D66C2FFu;
         uint32_t strokeArgb = 0xF566C2FFu;
@@ -42,6 +47,12 @@ struct TrailRenderProfile {
     TypeColorProfile meteor{0x3DFFA44Du, 0xF5FFA44Du};
     TypeColorProfile tubes{0x3D6EDB84u, 0xF56EDB84u};
     TypeColorProfile particle{0x3DFFD657u, 0xF5FFD657u};
+    TypeTempoProfile lineTempo{};
+    TypeTempoProfile streamerTempo{0.94, 1.0};
+    TypeTempoProfile electricTempo{0.82, 0.92};
+    TypeTempoProfile meteorTempo{1.18, 1.08};
+    TypeTempoProfile tubesTempo{1.06, 1.05};
+    TypeTempoProfile particleTempo{0.78, 0.86};
 };
 
 struct TrailThrottleProfile {
@@ -61,6 +72,12 @@ struct ScrollRenderProfile {
     double perStrengthStepSec = 0.018;
     int closePaddingMs = 90;
     double baseOpacity = 0.96;
+    double defaultDurationScale = 1.0;
+    double helixDurationScale = 1.14;
+    double twinkleDurationScale = 0.88;
+    double defaultSizeScale = 1.0;
+    double helixSizeScale = 1.06;
+    double twinkleSizeScale = 0.94;
     DirectionColor horizontalPositive{};
     DirectionColor horizontalNegative{0x3D9ECCFFu, 0xF59ECCFFu};
     DirectionColor verticalPositive{0x3D6BEA8Fu, 0xF56BEA8Fu};
@@ -100,6 +117,11 @@ struct HoverRenderProfile {
     double breatheDurationSec = 0.85;
     double spinDurationSec = 1.6;
     double baseOpacity = 0.9;
+    double glowSizeScale = 0.96;
+    double tubesSizeScale = 1.08;
+    double glowBreatheScale = 0.92;
+    double tubesBreatheScale = 1.15;
+    double tubesSpinScale = 0.82;
     ColorProfile colors{};
 };
 

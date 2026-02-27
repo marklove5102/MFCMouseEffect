@@ -11,21 +11,15 @@ namespace mousefx::macos_trail_pulse {
 #if defined(__APPLE__)
 namespace {
 
-double ResolveTrailDurationScale(const std::string& trailType) {
-    if (trailType == "meteor") return 1.18;
-    if (trailType == "streamer") return 0.94;
-    if (trailType == "electric") return 0.82;
-    if (trailType == "tubes") return 1.06;
-    if (trailType == "particle") return 0.78;
-    return 1.0;
-}
-
-double ResolveTrailSizeScale(const std::string& trailType) {
-    if (trailType == "meteor") return 1.08;
-    if (trailType == "electric") return 0.92;
-    if (trailType == "tubes") return 1.05;
-    if (trailType == "particle") return 0.86;
-    return 1.0;
+const macos_effect_profile::TrailRenderProfile::TypeTempoProfile& ResolveTrailTempoProfile(
+    const std::string& trailType,
+    const macos_effect_profile::TrailRenderProfile& profile) {
+    if (trailType == "meteor") return profile.meteorTempo;
+    if (trailType == "streamer") return profile.streamerTempo;
+    if (trailType == "electric") return profile.electricTempo;
+    if (trailType == "tubes") return profile.tubesTempo;
+    if (trailType == "particle") return profile.particleTempo;
+    return profile.lineTempo;
 }
 
 } // namespace
@@ -40,8 +34,9 @@ TrailPulseRenderPlan BuildTrailPulseRenderPlan(
     plan.particleMode = (plan.trailType == "particle");
     plan.glowMode = (plan.trailType == "meteor" || plan.trailType == "streamer");
 
-    plan.durationScale = ResolveTrailDurationScale(plan.trailType);
-    const double sizeScale = ResolveTrailSizeScale(plan.trailType);
+    const auto& tempo = ResolveTrailTempoProfile(plan.trailType, profile);
+    plan.durationScale = tempo.durationScale;
+    const double sizeScale = tempo.sizeScale;
     const CGFloat baseSize = plan.particleMode
         ? static_cast<CGFloat>(profile.particleSizePx)
         : static_cast<CGFloat>(profile.normalSizePx);
