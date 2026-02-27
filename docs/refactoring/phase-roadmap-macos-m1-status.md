@@ -559,6 +559,8 @@
 - POSIX regression suite now supports explicit ObjC++ edit policy gate (`--enforce-no-objcxx-edits` / `MFX_ENFORCE_NO_OBJCXX_EDITS=1`) to fail fast when closure iterations contain `.mm/.m` edits.
 - POSIX regression suite entry is now split into dedicated options and phase modules (`posix_suite_options.sh`, `posix_suite_phases.sh`), reducing orchestration coupling while preserving phase order and CLI compatibility.
 - POSIX regression suite now validates required option values and build-jobs type at parse stage, reducing silent misconfiguration drift during manual/CI runs.
+- POSIX regression/script common layer now provides shared CLI contract helpers (`mfx_require_option_value`, `mfx_require_positive_integer`), reducing per-script parse drift.
+- POSIX core/scaffold/linux entry scripts now uniformly fail fast on missing value flags (for example `--platform --skip-*`) instead of deferring to late-stage ambiguous errors.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

@@ -14,10 +14,12 @@ MFX_INCLUDE_CORE_RUNTIME=1
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --build-dir)
+            mfx_require_option_value "$1" "${2:-}"
             MFX_BUILD_DIR="${2:-}"
             shift 2
             ;;
         --jobs)
+            mfx_require_option_value "$1" "${2:-}"
             MFX_BUILD_JOBS="${2:-}"
             shift 2
             ;;
@@ -44,6 +46,10 @@ USAGE
             ;;
     esac
 done
+
+if [[ -n "${MFX_BUILD_JOBS:-}" ]]; then
+    mfx_require_positive_integer "$MFX_BUILD_JOBS" "--jobs"
+fi
 
 mfx_require_cmd cmake
 

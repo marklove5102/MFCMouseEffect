@@ -16,10 +16,12 @@ MFX_HOST_PLATFORM="$(mfx_detect_posix_host_platform)"
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --platform)
+            mfx_require_option_value "$1" "${2:-}"
             MFX_PLATFORM="${2:-}"
             shift 2
             ;;
         --build-dir)
+            mfx_require_option_value "$1" "${2:-}"
             MFX_BUILD_DIR="${2:-}"
             shift 2
             ;;

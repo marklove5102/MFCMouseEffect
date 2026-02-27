@@ -2,13 +2,6 @@
 
 set -euo pipefail
 
-_mfx_posix_suite_require_value() {
-    local flag="$1"
-    if [[ $# -lt 2 || -z "${2:-}" ]]; then
-        mfx_fail "missing value for $flag"
-    fi
-}
-
 _mfx_posix_suite_normalize_toggle() {
     local raw="$1"
     case "$raw" in
@@ -68,32 +61,32 @@ mfx_posix_suite_parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --platform)
-                _mfx_posix_suite_require_value "$1" "${2:-}"
+                mfx_require_option_value "$1" "${2:-}"
                 MFX_PLATFORM="$2"
                 shift 2
                 ;;
             --scaffold-build-dir)
-                _mfx_posix_suite_require_value "$1" "${2:-}"
+                mfx_require_option_value "$1" "${2:-}"
                 MFX_SCAFFOLD_BUILD_DIR="$2"
                 shift 2
                 ;;
             --core-build-dir)
-                _mfx_posix_suite_require_value "$1" "${2:-}"
+                mfx_require_option_value "$1" "${2:-}"
                 MFX_CORE_BUILD_DIR="$2"
                 shift 2
                 ;;
             --core-automation-build-dir)
-                _mfx_posix_suite_require_value "$1" "${2:-}"
+                mfx_require_option_value "$1" "${2:-}"
                 MFX_CORE_AUTOMATION_BUILD_DIR="$2"
                 shift 2
                 ;;
             --linux-build-dir)
-                _mfx_posix_suite_require_value "$1" "${2:-}"
+                mfx_require_option_value "$1" "${2:-}"
                 MFX_LINUX_BUILD_DIR="$2"
                 shift 2
                 ;;
             --jobs)
-                _mfx_posix_suite_require_value "$1" "${2:-}"
+                mfx_require_option_value "$1" "${2:-}"
                 MFX_BUILD_JOBS_VALUE="$2"
                 shift 2
                 ;;
@@ -156,9 +149,7 @@ mfx_posix_suite_export_build_jobs() {
     if [[ -z "$MFX_BUILD_JOBS_VALUE" ]]; then
         return
     fi
-    if ! [[ "$MFX_BUILD_JOBS_VALUE" =~ ^[0-9]+$ ]] || [[ "$MFX_BUILD_JOBS_VALUE" -le 0 ]]; then
-        mfx_fail "invalid --jobs value: $MFX_BUILD_JOBS_VALUE"
-    fi
+    mfx_require_positive_integer "$MFX_BUILD_JOBS_VALUE" "--jobs"
     export MFX_BUILD_JOBS="$MFX_BUILD_JOBS_VALUE"
 }
 

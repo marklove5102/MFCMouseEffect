@@ -31,6 +31,24 @@ mfx_require_cmd() {
     fi
 }
 
+mfx_require_option_value() {
+    local option_name="$1"
+    local option_value="${2:-}"
+
+    if [[ -z "$option_value" || "$option_value" == --* ]]; then
+        mfx_fail "missing value for $option_name"
+    fi
+}
+
+mfx_require_positive_integer() {
+    local raw_value="$1"
+    local context_name="$2"
+
+    if ! [[ "$raw_value" =~ ^[0-9]+$ ]] || [[ "$raw_value" -le 0 ]]; then
+        mfx_fail "invalid $context_name value: $raw_value (expected positive integer)"
+    fi
+}
+
 mfx_detect_posix_host_platform() {
     case "$(uname -s)" in
         Darwin) echo "macos" ;;
