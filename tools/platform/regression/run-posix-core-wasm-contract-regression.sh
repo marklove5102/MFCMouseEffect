@@ -35,6 +35,7 @@ Env tuning:
   MFX_CORE_HTTP_CHECK_SCOPE             forced to wasm by this script
   MFX_CORE_HTTP_START_WAIT_SECONDS      wait time before startup alive check (default: 1)
   MFX_CORE_HTTP_PROBE_TIMEOUT_SECONDS   wait time for websettings probe file (default: 8)
+  MFX_CORE_HTTP_ALLOW_BIND_EACCES_SKIP  when 1, treat bind EACCES startup failures as skipped in constrained runtimes (default: 1)
   MFX_ENABLE_WASM_TEST_DISPATCH_API     enable test dispatch endpoint during regression (default: 1 in script)
   MFX_CORE_HTTP_WASM_DISPATCH_TIMEOUT_SECONDS max wait for invoke/render ready in test-dispatch assertion (default: 5)
   MFX_CORE_HTTP_WASM_DISPATCH_RETRY_INTERVAL_SECONDS retry interval for test-dispatch assertion (default: 0.2)
@@ -57,6 +58,8 @@ fi
 if [[ -z "$MFX_BUILD_DIR" ]]; then
     MFX_BUILD_DIR="/tmp/mfx-platform-${MFX_PLATFORM}-core-wasm-contract-build"
 fi
+
+export MFX_CORE_HTTP_ALLOW_BIND_EACCES_SKIP="${MFX_CORE_HTTP_ALLOW_BIND_EACCES_SKIP:-1}"
 
 mfx_require_cmd cmake
 mfx_require_cmd curl
