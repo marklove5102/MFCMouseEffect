@@ -564,6 +564,7 @@
 - POSIX regression/script common layer now provides shared CLI contract helpers (`mfx_require_option_value`, `mfx_require_positive_integer`), reducing per-script parse drift.
 - POSIX core/scaffold/linux entry scripts now uniformly fail fast on missing value flags (for example `--platform --skip-*`) instead of deferring to late-stage ambiguous errors.
 - macOS warning notification dispatch now uses a Swift bridge (`MacosUserNotificationBridge.swift`) behind C ABI while preserving existing C++ interface/capture/fallback contracts, reducing further `.mm` dependency growth in shell notification path.
+- macOS native folder-picker route now uses Swift bridge first with existing Objective-C++ picker fallback (same `platform::PickFolder` contract), enabling Swift-first migration without import-dialog behavior risk.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

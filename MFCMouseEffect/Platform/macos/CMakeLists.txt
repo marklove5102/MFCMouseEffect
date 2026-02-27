@@ -13,6 +13,7 @@ set(MFX_MACOS_TRAY_MENU_FACTORY_SOURCE "")
 set(MFX_MACOS_TRAY_MENU_FACTORY_ACTION_BRIDGE_SOURCE "")
 set(MFX_MACOS_TRAY_MENU_FACTORY_ITEMS_SOURCE "")
 set(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT "")
+set(MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT "")
 if(APPLE)
     set(MFX_MACOS_TRAY_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayService.mm")
     set(MFX_MACOS_TRAY_LOCALIZATION_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuLocalization.mm")
@@ -22,15 +23,11 @@ if(APPLE)
     set(MFX_MACOS_TRAY_MENU_FACTORY_ITEMS_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosTrayMenuFactory.Items.mm")
 
     find_program(MFX_SWIFTC_EXECUTABLE swiftc REQUIRED)
+    set(MFX_SWIFTC_COMMON_ARGS -parse-as-library -c)
     set(MFX_MACOS_NOTIFICATION_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosUserNotificationBridge.swift")
     set(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosUserNotificationBridge.swift.o")
-    set(MFX_SWIFTC_NOTIFICATION_ARGS
-        -parse-as-library
-        -c
-        "${MFX_MACOS_NOTIFICATION_SWIFT_SOURCE}"
-        -o
-        "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
-    )
+    set(MFX_MACOS_FOLDER_PICKER_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosNativeFolderPickerBridge.swift")
+    set(MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosNativeFolderPickerBridge.swift.o")
     set(MFX_SWIFT_DEPLOYMENT_TARGET "${CMAKE_OSX_DEPLOYMENT_TARGET}")
     if(NOT MFX_SWIFT_DEPLOYMENT_TARGET)
         execute_process(
@@ -49,18 +46,31 @@ if(APPLE)
             list(GET CMAKE_OSX_ARCHITECTURES 0 MFX_SWIFT_TARGET_ARCH)
         endif()
         if(MFX_SWIFT_TARGET_ARCH)
-            list(PREPEND MFX_SWIFTC_NOTIFICATION_ARGS -target "${MFX_SWIFT_TARGET_ARCH}-apple-macosx${MFX_SWIFT_DEPLOYMENT_TARGET}")
+            list(PREPEND MFX_SWIFTC_COMMON_ARGS -target "${MFX_SWIFT_TARGET_ARCH}-apple-macosx${MFX_SWIFT_DEPLOYMENT_TARGET}")
         endif()
     endif()
     add_custom_command(
         OUTPUT "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
-        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_NOTIFICATION_ARGS}
+        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_COMMON_ARGS} "${MFX_MACOS_NOTIFICATION_SWIFT_SOURCE}" -o "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
         DEPENDS "${MFX_MACOS_NOTIFICATION_SWIFT_SOURCE}"
         COMMENT "Compile Swift notification bridge"
         VERBATIM
     )
     set_source_files_properties(
         "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}"
+        PROPERTIES
+            GENERATED TRUE
+            EXTERNAL_OBJECT TRUE
+    )
+    add_custom_command(
+        OUTPUT "${MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT}"
+        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_COMMON_ARGS} "${MFX_MACOS_FOLDER_PICKER_SWIFT_SOURCE}" -o "${MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT}"
+        DEPENDS "${MFX_MACOS_FOLDER_PICKER_SWIFT_SOURCE}"
+        COMMENT "Compile Swift folder picker bridge"
+        VERBATIM
+    )
+    set_source_files_properties(
+        "${MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT}"
         PROPERTIES
             GENERATED TRUE
             EXTERNAL_OBJECT TRUE
@@ -194,6 +204,9 @@ add_library(mfx_shell_macos STATIC
 
 if(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT)
     target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_NOTIFICATION_SWIFT_OBJECT}")
+endif()
+if(MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT)
+    target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_FOLDER_PICKER_SWIFT_OBJECT}")
 endif()
 
 target_link_libraries(mfx_shell_macos
