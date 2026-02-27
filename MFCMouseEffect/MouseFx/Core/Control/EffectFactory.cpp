@@ -5,6 +5,7 @@
 #include "Platform/PlatformTarget.h"
 
 #if MFX_PLATFORM_WINDOWS
+#include "MouseFx/Core/Effects/ClickEffectCompute.h"
 #include "MouseFx/Core/Effects/HoldEffectCompute.h"
 #include "MouseFx/Core/Effects/HoverEffectCompute.h"
 #include "MouseFx/Core/Effects/ScrollEffectCompute.h"
@@ -42,6 +43,23 @@ constexpr size_t CategoryIndex(EffectCategory category) {
     return static_cast<size_t>(category);
 }
 
+std::string NormalizeRequestedEffectType(EffectCategory category, const std::string& type) {
+    switch (category) {
+    case EffectCategory::Click:
+        return NormalizeClickEffectType(type);
+    case EffectCategory::Trail:
+        return NormalizeTrailEffectType(type);
+    case EffectCategory::Scroll:
+        return NormalizeScrollEffectType(type);
+    case EffectCategory::Hold:
+        return NormalizeHoldEffectType(type);
+    case EffectCategory::Hover:
+        return NormalizeHoverEffectType(type);
+    default:
+        return type;
+    }
+}
+
 std::unique_ptr<IMouseEffect> CreateClickRipple(const std::string&, const EffectConfig& config) {
     return std::make_unique<RippleEffect>(config.theme);
 }
@@ -59,30 +77,29 @@ std::unique_ptr<IMouseEffect> CreateTrailParticle(const std::string&, const Effe
 }
 
 std::unique_ptr<IMouseEffect> CreateTrailGeneric(const std::string& type, const EffectConfig& config) {
-    const std::string normalizedType = NormalizeTrailEffectType(type);
-    const auto profile = config.GetTrailHistoryProfile(normalizedType);
+    const auto profile = config.GetTrailHistoryProfile(type);
     return std::make_unique<TrailEffect>(
         config.theme,
-        normalizedType,
+        type,
         profile.durationMs,
         profile.maxPoints,
         config.trailParams);
 }
 
 std::unique_ptr<IMouseEffect> CreateScroll(const std::string& type, const EffectConfig& config) {
-    return std::make_unique<ScrollEffect>(config.theme, NormalizeScrollEffectType(type));
+    return std::make_unique<ScrollEffect>(config.theme, type);
 }
 
 std::unique_ptr<IMouseEffect> CreateHold(const std::string& type, const EffectConfig& config) {
     return std::make_unique<HoldEffect>(
         config.theme,
-        NormalizeHoldEffectType(type),
+        type,
         config.holdFollowMode,
         config.holdPresenterBackend);
 }
 
 std::unique_ptr<IMouseEffect> CreateHover(const std::string& type, const EffectConfig& config) {
-    return std::make_unique<HoverEffect>(config.theme, NormalizeHoverEffectType(type));
+    return std::make_unique<HoverEffect>(config.theme, type);
 }
 
 const std::array<CategoryRegistryEntry, CategoryIndex(EffectCategory::Count)>& RegistryTable() {
@@ -121,6 +138,14 @@ std::unique_ptr<IMouseEffect> EffectFactory::Create(EffectCategory category, con
     if (type == "none" || type.empty()) {
         return nullptr;
     }
+#if MFX_PLATFORM_WINDOWS
+    const std::string normalizedType = NormalizeRequestedEffectType(category, type);
+#else
+    const std::string normalizedType = type;
+#endif
+    if (normalizedType == "none" || normalizedType.empty()) {
+        return nullptr;
+    }
 
 #if MFX_PLATFORM_WINDOWS
     const size_t idx = CategoryIndex(category);
@@ -129,15 +154,15 @@ std::unique_ptr<IMouseEffect> EffectFactory::Create(EffectCategory category, con
         return nullptr;
     }
     const auto& categoryRegistry = registryTable[idx];
-    if (const auto it = categoryRegistry.typedCreators.find(type); it != categoryRegistry.typedCreators.end()) {
-        return it->second(type, config);
+    if (const auto it = categoryRegistry.typedCreators.find(normalizedType); it != categoryRegistry.typedCreators.end()) {
+        return it->second(normalizedType, config);
     }
     if (categoryRegistry.fallbackCreator != nullptr) {
-        return categoryRegistry.fallbackCreator(type, config);
+        return categoryRegistry.fallbackCreator(normalizedType, config);
     }
 
 #ifdef _DEBUG
-    OutputDebugStringA(("MouseFx: unknown effect type: " + type + "\n").c_str());
+    OutputDebugStringA(("MouseFx: unknown effect type: " + normalizedType + " (raw: " + type + ")\n").c_str());
 #endif
     return nullptr;
 #elif MFX_PLATFORM_MACOS
