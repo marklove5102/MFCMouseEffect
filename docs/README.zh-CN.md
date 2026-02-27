@@ -37,7 +37,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53f-macos-automation-scope-ui-platform-semantics.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53i-macos-automation-injection-selfcheck-and-match-inject-contract.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`
-  - 完整模块拆分链（`53j-53ah`）见：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53aj-macos-automation-app-scope-selfcheck-script.md`
 - Linux 跟随门禁（54x）：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54c-posix-regression-suite-orchestrator.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54f-core-automation-http-contract-regression.md`
@@ -128,8 +128,8 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 # macOS core wasm 聚焦 HTTP 合同门禁（比全量 automation 合同更快）
 ./tools/platform/regression/run-posix-core-wasm-contract-regression.sh --platform auto
 
-# macOS core wasm 路径裁剪合同门禁（快速验证路由路径语义）
-./tools/platform/regression/run-posix-core-wasm-path-contract-regression.sh --platform auto
+# macOS 自动化 app_scope 别名自检（`code.exe/code/code.app`）
+./tools/platform/manual/run-macos-automation-app-scope-selfcheck.sh --skip-build
 
 # macOS 自动化注入自检（默认真实注入；加 --dry-run 为确定性测试模式）
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build

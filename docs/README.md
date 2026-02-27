@@ -37,7 +37,7 @@ Use it as a pointer index, not a full historical catalog.
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53f-macos-automation-scope-ui-platform-semantics.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53i-macos-automation-injection-selfcheck-and-match-inject-contract.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`
-  - Full split-chain detail (`53j-53ah`) is summarized in `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53aj-macos-automation-app-scope-selfcheck-script.md`
 - Linux follow gates (54x):
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54c-posix-regression-suite-orchestrator.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54f-core-automation-http-contract-regression.md`
@@ -128,8 +128,8 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 # macOS core wasm-focused HTTP contract gate (faster than full automation contract run)
 ./tools/platform/regression/run-posix-core-wasm-contract-regression.sh --platform auto
 
-# macOS core wasm path-trim contract gate (fast route path-semantics check)
-./tools/platform/regression/run-posix-core-wasm-path-contract-regression.sh --platform auto
+# macOS automation app-scope alias selfcheck (`code.exe/code/code.app`)
+./tools/platform/manual/run-macos-automation-app-scope-selfcheck.sh --skip-build
 
 # macOS automation injection selfcheck (real dispatch by default; add --dry-run for deterministic mode)
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build

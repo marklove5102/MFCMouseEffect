@@ -48,6 +48,8 @@
   - 53h completed (acceptance): core automation contract regression now asserts priority contracts (`process` over `all` on same chain length, and longest-chain-first over scope specificity).
   - 53i completed (code): added test-gated matcher+inject endpoint (`/api/automation/test-match-and-inject`) and one-command macOS injection selfcheck script (real dispatch + dry-run mode).
   - 53i completed (acceptance): core automation contract regression now asserts `history -> binding -> inject` path, and full POSIX suite remains green after endpoint/script landing.
+  - 53aj completed (code): added one-command macOS app-scope alias selfcheck script (`run-macos-automation-app-scope-selfcheck.sh`) that reuses existing automation scope-match contract helpers.
+  - 53aj completed (acceptance): manual selfcheck now validates `.exe/.app/none` alias hit consistency (`code`, `code.exe`, `code.app`) without ad-hoc curl/token setup.
   - 53j completed (code): split WebSettings test-only API routes into dedicated module (`WebSettingsServer.TestApiRoutes.*`) and reduced main routing file coupling.
   - 53j completed (acceptance): core automation contracts + full POSIX suite remain green after route-module split.
   - 53k completed (code): split WebSettings production WASM API routes into dedicated module (`WebSettingsServer.WasmRoutes.*`) and reduced main routing file coupling further.
