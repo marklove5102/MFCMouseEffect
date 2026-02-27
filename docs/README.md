@@ -133,6 +133,9 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 
 # macOS automation injection selfcheck (real dispatch by default; add --dry-run for deterministic mode)
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
+
+# macOS effects type parity selfcheck (5 categories + alias normalization)
+./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
 ```
 
 ## Archive

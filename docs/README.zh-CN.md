@@ -133,6 +133,9 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 
 # macOS 自动化注入自检（默认真实注入；加 --dry-run 为确定性测试模式）
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
+
+# macOS 特效类型等价自检（5 类特效 + 别名归一化）
+./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
 ```
 
 ## 归档区

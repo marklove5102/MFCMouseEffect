@@ -23,49 +23,6 @@ std::string WStringToUtf8(const std::wstring& ws) {
     return Utf16ToUtf8(ws.c_str());
 }
 
-bool TryNormalizeHoldFollowMode(const std::string& mode, std::string* outMode) {
-    if (!outMode) {
-        return false;
-    }
-
-    std::string normalized = ToLowerAscii(TrimAscii(mode));
-    std::replace(normalized.begin(), normalized.end(), '-', '_');
-    std::replace(normalized.begin(), normalized.end(), ' ', '_');
-
-    if (normalized == "precise" ||
-        normalized == "low_latency" ||
-        normalized == "latency_first" ||
-        normalized == "raw") {
-        *outMode = "precise";
-        return true;
-    }
-    if (normalized == "smooth" ||
-        normalized == "cursor_priority" ||
-        normalized == "cursor_first" ||
-        normalized == "recommended") {
-        *outMode = "smooth";
-        return true;
-    }
-    if (normalized == "efficient" ||
-        normalized == "performance_first" ||
-        normalized == "cpu_saver" ||
-        normalized == "powersave" ||
-        normalized == "power_save") {
-        *outMode = "efficient";
-        return true;
-    }
-
-    return false;
-}
-
-std::string NormalizeHoldFollowMode(std::string mode) {
-    std::string normalized = "smooth";
-    if (TryNormalizeHoldFollowMode(mode, &normalized)) {
-        return normalized;
-    }
-    return "smooth";
-}
-
 std::string NormalizeHoldPresenterBackend(std::string backend) {
     backend = ToLowerAscii(TrimAscii(backend));
     if (backend.empty()) {
