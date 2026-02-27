@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "Platform/macos/Effects/MacosEffectRenderProfile.h"
 #include "MouseFx/Core/Protocol/InputTypes.h"
 
 #if defined(__APPLE__)
@@ -25,7 +26,10 @@ enum class HoldStyle {
 
 std::string NormalizeHoldType(const std::string& effectType);
 HoldStyle ResolveHoldStyle(const std::string& holdType);
-NSColor* HoldBaseColor(MouseButton button, HoldStyle style);
+NSColor* HoldBaseColor(
+    MouseButton button,
+    HoldStyle style,
+    const macos_effect_profile::HoldRenderProfile& profile);
 void ConfigureHoldAccentLayer(CAShapeLayer* accent, CGRect bounds, HoldStyle holdStyle, NSColor* baseColor);
 #endif
 

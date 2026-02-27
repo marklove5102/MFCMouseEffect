@@ -80,6 +80,19 @@ HoldRenderProfile ResolveHoldRenderProfile(const EffectConfig& config) {
     profile.rotateDurationSec = detail::ClampDouble(profile.breatheDurationSec * 2.44, 1.2, 4.0);
     profile.rotateDurationFastSec = detail::ClampDouble(profile.rotateDurationSec * 0.68, 0.7, 2.4);
     profile.baseOpacity = 0.92;
+
+    profile.colors.leftBaseStrokeArgb = config.ripple.leftClick.stroke.value;
+    profile.colors.rightBaseStrokeArgb = config.ripple.rightClick.stroke.value;
+    profile.colors.middleBaseStrokeArgb = config.ripple.middleClick.stroke.value;
+
+    profile.colors.lightningStrokeArgb = ScaleArgbBrightness(config.ripple.leftClick.stroke.value, 1.12);
+    profile.colors.hexStrokeArgb = ScaleArgbBrightness(config.ripple.middleClick.stroke.value, 1.08);
+    profile.colors.hologramStrokeArgb =
+        BlendArgb(config.ripple.leftClick.stroke.value, config.ripple.middleClick.stroke.value, 0.42);
+    profile.colors.quantumHaloStrokeArgb = ScaleArgbBrightness(config.ripple.leftClick.stroke.value, 1.20);
+    profile.colors.fluxFieldStrokeArgb = ScaleArgbBrightness(config.ripple.middleClick.stroke.value, 1.14);
+    profile.colors.techNeonStrokeArgb =
+        BlendArgb(config.ripple.leftClick.stroke.value, config.ripple.rightClick.stroke.value, 0.20);
     return profile;
 }
 

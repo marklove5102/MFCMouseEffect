@@ -44,7 +44,7 @@ void StartHoldPulseOverlayOnMain(
     NSView* content = [window contentView];
     macos_overlay_support::ApplyOverlayContentScale(content, overlayPt);
 
-    NSColor* baseColor = detail::HoldBaseColor(button, holdStyle);
+    NSColor* baseColor = detail::HoldBaseColor(button, holdStyle, profile);
     const CGFloat ringInset = macos_overlay_support::ScaleOverlayMetric(size, 24.0, 160.0, 10.0, 44.0);
     const CGFloat ringLineWidth = macos_overlay_support::ScaleOverlayMetric(size, 2.4, 160.0, 1.2, 4.8);
 

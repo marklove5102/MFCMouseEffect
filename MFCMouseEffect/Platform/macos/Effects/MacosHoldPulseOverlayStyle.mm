@@ -5,6 +5,7 @@
 #include "MouseFx/Utils/StringUtils.h"
 
 #if defined(__APPLE__)
+#include <cmath>
 #include <utility>
 #endif
 
@@ -56,32 +57,43 @@ HoldStyle ResolveHoldStyle(const std::string& holdType) {
     return HoldStyle::Charge;
 }
 
-NSColor* HoldBaseColor(MouseButton button, HoldStyle style) {
+NSColor* ArgbToNsColor(uint32_t argb) {
+    const CGFloat alpha = static_cast<CGFloat>((argb >> 24) & 0xFFu) / 255.0;
+    const CGFloat red = static_cast<CGFloat>((argb >> 16) & 0xFFu) / 255.0;
+    const CGFloat green = static_cast<CGFloat>((argb >> 8) & 0xFFu) / 255.0;
+    const CGFloat blue = static_cast<CGFloat>(argb & 0xFFu) / 255.0;
+    return [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+}
+
+NSColor* HoldBaseColor(
+    MouseButton button,
+    HoldStyle style,
+    const macos_effect_profile::HoldRenderProfile& profile) {
     if (style == HoldStyle::Lightning) {
-        return [NSColor colorWithCalibratedRed:0.56 green:0.73 blue:1.0 alpha:0.96];
+        return ArgbToNsColor(profile.colors.lightningStrokeArgb);
     }
     if (style == HoldStyle::Hex) {
-        return [NSColor colorWithCalibratedRed:0.44 green:0.90 blue:0.60 alpha:0.96];
+        return ArgbToNsColor(profile.colors.hexStrokeArgb);
     }
     if (style == HoldStyle::Hologram) {
-        return [NSColor colorWithCalibratedRed:0.42 green:0.95 blue:0.90 alpha:0.96];
+        return ArgbToNsColor(profile.colors.hologramStrokeArgb);
     }
     if (style == HoldStyle::QuantumHalo) {
-        return [NSColor colorWithCalibratedRed:0.66 green:0.70 blue:1.0 alpha:0.96];
+        return ArgbToNsColor(profile.colors.quantumHaloStrokeArgb);
     }
     if (style == HoldStyle::FluxField) {
-        return [NSColor colorWithCalibratedRed:0.45 green:0.95 blue:0.62 alpha:0.96];
+        return ArgbToNsColor(profile.colors.fluxFieldStrokeArgb);
     }
     if (style == HoldStyle::TechRing || style == HoldStyle::Neon) {
-        return [NSColor colorWithCalibratedRed:0.50 green:0.78 blue:1.0 alpha:0.96];
+        return ArgbToNsColor(profile.colors.techNeonStrokeArgb);
     }
     if (button == MouseButton::Right) {
-        return [NSColor colorWithCalibratedRed:1.0 green:0.62 blue:0.26 alpha:0.96];
+        return ArgbToNsColor(profile.colors.rightBaseStrokeArgb);
     }
     if (button == MouseButton::Middle) {
-        return [NSColor colorWithCalibratedRed:0.42 green:0.88 blue:0.54 alpha:0.96];
+        return ArgbToNsColor(profile.colors.middleBaseStrokeArgb);
     }
-    return [NSColor colorWithCalibratedRed:0.26 green:0.74 blue:1.0 alpha:0.96];
+    return ArgbToNsColor(profile.colors.leftBaseStrokeArgb);
 }
 
 void ConfigureHoldAccentLayer(CAShapeLayer* accent, CGRect bounds, HoldStyle holdStyle, NSColor* baseColor) {

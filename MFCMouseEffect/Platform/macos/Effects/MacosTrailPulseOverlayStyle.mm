@@ -16,6 +16,25 @@ bool ContainsTrailToken(const std::string& value, const char* token) {
     return value.find(token) != std::string::npos;
 }
 
+NSColor* ArgbToNsColor(uint32_t argb) {
+    const CGFloat alpha = static_cast<CGFloat>((argb >> 24) & 0xFFu) / 255.0;
+    const CGFloat red = static_cast<CGFloat>((argb >> 16) & 0xFFu) / 255.0;
+    const CGFloat green = static_cast<CGFloat>((argb >> 8) & 0xFFu) / 255.0;
+    const CGFloat blue = static_cast<CGFloat>(argb & 0xFFu) / 255.0;
+    return [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+}
+
+const macos_effect_profile::TrailRenderProfile::TypeColorProfile& ResolveTrailTypeColor(
+    const std::string& trailType,
+    const macos_effect_profile::TrailRenderProfile& profile) {
+    if (trailType == "meteor") return profile.meteor;
+    if (trailType == "streamer") return profile.streamer;
+    if (trailType == "electric") return profile.electric;
+    if (trailType == "tubes") return profile.tubes;
+    if (trailType == "particle") return profile.particle;
+    return profile.line;
+}
+
 } // namespace
 
 std::string NormalizeTrailType(const std::string& effectType) {
@@ -44,28 +63,16 @@ std::string NormalizeTrailType(const std::string& effectType) {
     return "line";
 }
 
-NSColor* TrailStrokeColor(const std::string& trailType) {
-    if (trailType == "meteor") {
-        return [NSColor colorWithCalibratedRed:1.0 green:0.64 blue:0.30 alpha:0.95];
-    }
-    if (trailType == "streamer") {
-        return [NSColor colorWithCalibratedRed:0.32 green:0.95 blue:0.92 alpha:0.95];
-    }
-    if (trailType == "electric") {
-        return [NSColor colorWithCalibratedRed:0.58 green:0.73 blue:1.0 alpha:0.95];
-    }
-    if (trailType == "tubes") {
-        return [NSColor colorWithCalibratedRed:0.43 green:0.88 blue:0.52 alpha:0.95];
-    }
-    if (trailType == "particle") {
-        return [NSColor colorWithCalibratedRed:1.0 green:0.84 blue:0.34 alpha:0.95];
-    }
-    return [NSColor colorWithCalibratedRed:0.40 green:0.76 blue:1.0 alpha:0.95];
+NSColor* TrailStrokeColor(
+    const std::string& trailType,
+    const macos_effect_profile::TrailRenderProfile& profile) {
+    return ArgbToNsColor(ResolveTrailTypeColor(trailType, profile).strokeArgb);
 }
 
-NSColor* TrailFillColor(const std::string& trailType) {
-    NSColor* stroke = TrailStrokeColor(trailType);
-    return [stroke colorWithAlphaComponent:0.24];
+NSColor* TrailFillColor(
+    const std::string& trailType,
+    const macos_effect_profile::TrailRenderProfile& profile) {
+    return ArgbToNsColor(ResolveTrailTypeColor(trailType, profile).fillArgb);
 }
 
 CGPathRef CreateTrailLinePath(CGRect bounds, double deltaX, double deltaY, const std::string& trailType) {

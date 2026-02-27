@@ -23,22 +23,22 @@ void ConfigureTrailCoreLayer(
         core.path = outer;
         CGPathRelease(outer);
         core.fillColor = [NSColor clearColor].CGColor;
-        core.strokeColor = [detail::TrailStrokeColor(plan.trailType) CGColor];
+        core.strokeColor = [detail::TrailStrokeColor(plan.trailType, profile) CGColor];
         core.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 3.2, 160.0, 1.2, 6.0);
     } else if (plan.particleMode) {
         const CGFloat dotInset = macos_overlay_support::ScaleOverlayMetric(size, 16.0, 160.0, 8.0, 34.0);
         CGPathRef dot = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, dotInset, dotInset), nullptr);
         core.path = dot;
         CGPathRelease(dot);
-        core.fillColor = [detail::TrailStrokeColor(plan.trailType) CGColor];
-        core.strokeColor = [detail::TrailStrokeColor(plan.trailType) CGColor];
+        core.fillColor = [detail::TrailStrokeColor(plan.trailType, profile) CGColor];
+        core.strokeColor = [detail::TrailStrokeColor(plan.trailType, profile) CGColor];
         core.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 1.2, 160.0, 0.8, 2.4);
     } else {
         CGPathRef line = detail::CreateTrailLinePath(content.bounds, deltaX, deltaY, plan.trailType);
         core.path = line;
         CGPathRelease(line);
         core.fillColor = [NSColor clearColor].CGColor;
-        core.strokeColor = [detail::TrailStrokeColor(plan.trailType) CGColor];
+        core.strokeColor = [detail::TrailStrokeColor(plan.trailType, profile) CGColor];
         core.lineCap = kCALineCapRound;
         core.lineJoin = kCALineJoinRound;
         core.lineWidth = macos_overlay_support::ScaleOverlayMetric(
@@ -67,7 +67,7 @@ void AddTrailGlowLayer(
     CGPathRef glowPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, glowInset, glowInset), nullptr);
     glow.path = glowPath;
     CGPathRelease(glowPath);
-    glow.fillColor = [detail::TrailFillColor(plan.trailType) CGColor];
+    glow.fillColor = [detail::TrailFillColor(plan.trailType, profile) CGColor];
     glow.strokeColor = [NSColor clearColor].CGColor;
     glow.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, -0.08, 0.0));
     [content.layer addSublayer:glow];

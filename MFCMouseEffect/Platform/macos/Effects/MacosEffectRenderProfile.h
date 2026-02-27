@@ -26,11 +26,22 @@ struct ClickRenderProfile {
 };
 
 struct TrailRenderProfile {
+    struct TypeColorProfile {
+        uint32_t fillArgb = 0x3D66C2FFu;
+        uint32_t strokeArgb = 0xF566C2FFu;
+    };
+
     int normalSizePx = 64;
     int particleSizePx = 48;
     double durationSec = 0.22;
     int closePaddingMs = 40;
     double baseOpacity = 0.95;
+    TypeColorProfile line{};
+    TypeColorProfile streamer{0x3D52F2EBu, 0xF552F2EBu};
+    TypeColorProfile electric{0x3D94BAFFu, 0xF594BAFFu};
+    TypeColorProfile meteor{0x3DFFA44Du, 0xF5FFA44Du};
+    TypeColorProfile tubes{0x3D6EDB84u, 0xF56EDB84u};
+    TypeColorProfile particle{0x3DFFD657u, 0xF5FFD657u};
 };
 
 struct TrailThrottleProfile {
@@ -57,12 +68,25 @@ struct ScrollRenderProfile {
 };
 
 struct HoldRenderProfile {
+    struct ColorProfile {
+        uint32_t leftBaseStrokeArgb = 0xF542BDFFu;
+        uint32_t rightBaseStrokeArgb = 0xF5FF9E42u;
+        uint32_t middleBaseStrokeArgb = 0xF56ADB89u;
+        uint32_t lightningStrokeArgb = 0xF58FB9FFu;
+        uint32_t hexStrokeArgb = 0xF570E59Au;
+        uint32_t hologramStrokeArgb = 0xF56CF2E8u;
+        uint32_t quantumHaloStrokeArgb = 0xF5A8B3FFu;
+        uint32_t fluxFieldStrokeArgb = 0xF573F2A0u;
+        uint32_t techNeonStrokeArgb = 0xF580C7FFu;
+    };
+
     int sizePx = 188;
     int progressFullMs = 1400;
     double breatheDurationSec = 0.9;
     double rotateDurationSec = 2.2;
     double rotateDurationFastSec = 1.5;
     double baseOpacity = 0.92;
+    ColorProfile colors{};
 };
 
 struct HoverRenderProfile {
