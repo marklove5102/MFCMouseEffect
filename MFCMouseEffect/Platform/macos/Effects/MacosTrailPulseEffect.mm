@@ -21,9 +21,7 @@ MacosTrailPulseEffect::MacosTrailPulseEffect(
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile),
       throttleProfile_(throttleProfile) {
-    if (effectType_.empty()) {
-        effectType_ = "line";
-    }
+    effectType_ = NormalizeTrailEffectType(effectType_);
 }
 
 MacosTrailPulseEffect::~MacosTrailPulseEffect() {

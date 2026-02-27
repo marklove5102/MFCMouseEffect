@@ -17,9 +17,7 @@ MacosHoverPulseEffect::MacosHoverPulseEffect(
     : effectType_(std::move(effectType)),
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile) {
-    if (effectType_.empty()) {
-        effectType_ = "glow";
-    }
+    effectType_ = NormalizeHoverEffectType(effectType_);
 }
 
 MacosHoverPulseEffect::~MacosHoverPulseEffect() {

@@ -22,9 +22,7 @@ MacosHoldPulseEffect::MacosHoldPulseEffect(
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile),
       followMode_(ParseHoldEffectFollowMode(followMode)) {
-    if (effectType_.empty()) {
-        effectType_ = "charge";
-    }
+    effectType_ = NormalizeHoldEffectType(effectType_);
 }
 
 MacosHoldPulseEffect::~MacosHoldPulseEffect() {

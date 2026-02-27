@@ -18,9 +18,7 @@ MacosScrollPulseEffect::MacosScrollPulseEffect(
     : effectType_(std::move(effectType)),
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile) {
-    if (effectType_.empty()) {
-        effectType_ = "arrow";
-    }
+    effectType_ = NormalizeScrollEffectType(effectType_);
 }
 
 MacosScrollPulseEffect::~MacosScrollPulseEffect() {

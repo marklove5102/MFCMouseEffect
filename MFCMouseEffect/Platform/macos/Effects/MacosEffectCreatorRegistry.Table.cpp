@@ -2,7 +2,6 @@
 
 #include "Platform/macos/Effects/MacosEffectCreatorRegistry.Internal.h"
 
-#include "MouseFx/Effects/HoldRouteCatalog.h"
 #include "Platform/macos/Effects/MacosClickPulseEffect.h"
 #include "Platform/macos/Effects/MacosEffectRenderProfile.h"
 #include "Platform/macos/Effects/MacosHoldPulseEffect.h"
@@ -37,7 +36,7 @@ std::unique_ptr<IMouseEffect> CreateScroll(const std::string& type, const Effect
 
 std::unique_ptr<IMouseEffect> CreateHold(const std::string& type, const EffectConfig& config) {
     return std::make_unique<MacosHoldPulseEffect>(
-        hold_route::NormalizeHoldEffectTypeAlias(type),
+        type,
         config.theme,
         config.holdFollowMode,
         macos_effect_profile::ResolveHoldRenderProfile(config));

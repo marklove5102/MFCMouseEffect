@@ -17,9 +17,7 @@ MacosClickPulseEffect::MacosClickPulseEffect(
     : effectType_(std::move(effectType)),
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile) {
-    if (effectType_.empty()) {
-        effectType_ = "ripple";
-    }
+    effectType_ = NormalizeClickEffectType(effectType_);
 }
 
 MacosClickPulseEffect::~MacosClickPulseEffect() {
