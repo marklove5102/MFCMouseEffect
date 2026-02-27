@@ -23,7 +23,12 @@ void ConfigureClickPulseBaseLayer(
     CGPathRelease(ringPath);
     base.fillColor = [ClickPulseFillColor(button) CGColor];
     base.strokeColor = [ClickPulseStrokeColor(button) CGColor];
-    base.lineWidth = plan.textMode ? 2.1 : 2.4;
+    base.lineWidth = macos_overlay_support::ScaleOverlayMetric(
+        plan.size,
+        plan.textMode ? 2.1 : 2.4,
+        160.0,
+        1.2,
+        4.8);
     base.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity));
 }
 
@@ -35,25 +40,28 @@ void AddClickPulseExtraLayers(
     if (plan.starMode) {
         CAShapeLayer* star = [CAShapeLayer layer];
         star.frame = content.bounds;
-        const CGRect starBounds = CGRectInset(content.bounds, 38.0, 38.0);
+        const CGFloat starInset = macos_overlay_support::ScaleOverlayMetric(plan.size, 38.0, 160.0, 18.0, 74.0);
+        const CGRect starBounds = CGRectInset(content.bounds, starInset, starInset);
         CGPathRef starPath = CreateClickPulseStarPath(starBounds, 5);
         star.path = starPath;
         CGPathRelease(starPath);
         star.fillColor = [ClickPulseStrokeColor(button) CGColor];
         star.strokeColor = [ClickPulseStrokeColor(button) CGColor];
-        star.lineWidth = 1.0;
+        star.lineWidth = macos_overlay_support::ScaleOverlayMetric(plan.size, 1.0, 160.0, 0.8, 2.2);
         star.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity + 0.03));
         [content.layer addSublayer:star];
     }
 
     if (plan.textMode) {
         CATextLayer* text = [CATextLayer layer];
-        text.frame = CGRectMake(0.0, plan.size * 0.30, plan.size, 36.0);
+        const CGFloat textHeight = macos_overlay_support::ScaleOverlayMetric(plan.size, 36.0, 160.0, 24.0, 60.0);
+        text.frame = CGRectMake(0.0, plan.size * 0.30, plan.size, textHeight);
         text.alignmentMode = kCAAlignmentCenter;
         text.foregroundColor = [ClickPulseStrokeColor(button) CGColor];
         text.contentsScale = std::max<CGFloat>(1.0, content.layer.contentsScale);
-        text.fontSize = 24.0;
-        text.font = (__bridge CFTypeRef)[NSFont boldSystemFontOfSize:24.0];
+        const CGFloat fontSize = macos_overlay_support::ScaleOverlayMetric(plan.size, 24.0, 160.0, 14.0, 42.0);
+        text.fontSize = fontSize;
+        text.font = (__bridge CFTypeRef)[NSFont boldSystemFontOfSize:fontSize];
         switch (button) {
         case MouseButton::Right:
             text.string = @"RIGHT";

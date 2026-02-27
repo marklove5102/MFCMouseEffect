@@ -32,12 +32,13 @@ void ConfigureHoverRingLayer(
     const HoverPulseRenderPlan& plan,
     const macos_effect_profile::HoverRenderProfile& profile) {
     ring.frame = content.bounds;
-    CGPathRef ringPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, 20.0, 20.0), nullptr);
+    const CGFloat ringInset = macos_overlay_support::ScaleOverlayMetric(plan.size, 20.0, 160.0, 10.0, 40.0);
+    CGPathRef ringPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, ringInset, ringInset), nullptr);
     ring.path = ringPath;
     CGPathRelease(ringPath);
     ring.fillColor = HoverGlowFillColor().CGColor;
     ring.strokeColor = HoverGlowStrokeColor().CGColor;
-    ring.lineWidth = 2.0;
+    ring.lineWidth = macos_overlay_support::ScaleOverlayMetric(plan.size, 2.0, 160.0, 1.0, 4.2);
     ring.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity));
 }
 

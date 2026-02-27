@@ -17,16 +17,18 @@ void AddScrollPulseDecorations(
     bool horizontal,
     int delta,
     const macos_effect_profile::ScrollRenderProfile& profile) {
+    const CGFloat size = CGRectGetWidth(content.bounds);
     if (plan.helixMode) {
         CAShapeLayer* helix = [CAShapeLayer layer];
         helix.frame = content.bounds;
-        const CGRect helixRect = CGRectInset(plan.bodyRect, -9.0, -9.0);
+        const CGFloat helixExpand = macos_overlay_support::ScaleOverlayMetric(size, 9.0, 160.0, 4.0, 18.0);
+        const CGRect helixRect = CGRectInset(plan.bodyRect, -helixExpand, -helixExpand);
         CGPathRef helixPath = CGPathCreateWithEllipseInRect(helixRect, nullptr);
         helix.path = helixPath;
         CGPathRelease(helixPath);
         helix.fillColor = [NSColor clearColor].CGColor;
         helix.strokeColor = [ScrollPulseStrokeColor(horizontal, -delta) CGColor];
-        helix.lineWidth = 1.6;
+        helix.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 1.6, 160.0, 0.8, 3.2);
         helix.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity - 0.14));
         [content.layer addSublayer:helix];
 
@@ -41,13 +43,14 @@ void AddScrollPulseDecorations(
     if (plan.twinkleMode) {
         CAShapeLayer* twinkle = [CAShapeLayer layer];
         twinkle.frame = content.bounds;
-        const CGRect twinkleRect = CGRectInset(plan.bodyRect, -20.0, -20.0);
+        const CGFloat twinkleExpand = macos_overlay_support::ScaleOverlayMetric(size, 20.0, 160.0, 8.0, 36.0);
+        const CGRect twinkleRect = CGRectInset(plan.bodyRect, -twinkleExpand, -twinkleExpand);
         CGPathRef twinklePath = CGPathCreateWithEllipseInRect(twinkleRect, nullptr);
         twinkle.path = twinklePath;
         CGPathRelease(twinklePath);
         twinkle.fillColor = [NSColor clearColor].CGColor;
         twinkle.strokeColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
-        twinkle.lineWidth = 1.0;
+        twinkle.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 1.0, 160.0, 0.8, 2.4);
         twinkle.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity - 0.38));
         [content.layer addSublayer:twinkle];
     }

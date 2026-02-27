@@ -45,15 +45,17 @@ void StartHoldPulseOverlayOnMain(
     macos_overlay_support::ApplyOverlayContentScale(content, overlayPt);
 
     NSColor* baseColor = detail::HoldBaseColor(button, holdStyle);
+    const CGFloat ringInset = macos_overlay_support::ScaleOverlayMetric(size, 24.0, 160.0, 10.0, 44.0);
+    const CGFloat ringLineWidth = macos_overlay_support::ScaleOverlayMetric(size, 2.4, 160.0, 1.2, 4.8);
 
     CAShapeLayer* ring = [CAShapeLayer layer];
     ring.frame = content.bounds;
-    CGPathRef ringPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, 24.0, 24.0), nullptr);
+    CGPathRef ringPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, ringInset, ringInset), nullptr);
     ring.path = ringPath;
     CGPathRelease(ringPath);
     ring.fillColor = [[baseColor colorWithAlphaComponent:0.16] CGColor];
     ring.strokeColor = [baseColor CGColor];
-    ring.lineWidth = 2.4;
+    ring.lineWidth = ringLineWidth;
     ring.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity));
     [content.layer addSublayer:ring];
 

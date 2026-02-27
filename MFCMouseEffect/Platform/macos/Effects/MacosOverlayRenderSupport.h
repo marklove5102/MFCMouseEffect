@@ -23,6 +23,12 @@ CAAnimationGroup* CreateScaleFadeAnimationGroup(
     CGFloat toScale,
     CGFloat fromOpacity,
     CFTimeInterval duration);
+CGFloat ScaleOverlayMetric(
+    CGFloat referenceSize,
+    CGFloat baseValue,
+    CGFloat baseReference,
+    CGFloat minValue,
+    CGFloat maxValue);
 #endif
 
 } // namespace mousefx::macos_overlay_support

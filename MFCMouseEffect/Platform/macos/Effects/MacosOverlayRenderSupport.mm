@@ -161,6 +161,18 @@ CAAnimationGroup* CreateScaleFadeAnimationGroup(
     group.removedOnCompletion = NO;
     return group;
 }
+
+CGFloat ScaleOverlayMetric(
+    CGFloat referenceSize,
+    CGFloat baseValue,
+    CGFloat baseReference,
+    CGFloat minValue,
+    CGFloat maxValue) {
+    const CGFloat safeReference = std::max<CGFloat>(1.0, baseReference);
+    const CGFloat safeSize = std::max<CGFloat>(1.0, referenceSize);
+    const CGFloat scaled = baseValue * (safeSize / safeReference);
+    return ClampCoordinate(scaled, minValue, maxValue);
+}
 #endif
 
 } // namespace mousefx::macos_overlay_support
