@@ -12,10 +12,10 @@ namespace mousefx::macos_effect_profile {
 ScrollRenderProfile ResolveScrollRenderProfile(const EffectConfig& config) {
     ScrollRenderProfile profile{};
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
-    profile.baseDurationSec = detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 0.8, 0.2, 1.0);
-    profile.perStrengthStepSec = detail::ClampDouble(profile.baseDurationSec * 0.065, 0.010, 0.060);
-    profile.horizontalSizePx = ClampInt(config.ripple.windowSize + 28, 112, 220);
-    profile.verticalSizePx = ClampInt(config.ripple.windowSize + 18, 102, 210);
+    profile.baseDurationSec = detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 0.92, 0.24, 1.12);
+    profile.perStrengthStepSec = detail::ClampDouble(profile.baseDurationSec * 0.072, 0.012, 0.065);
+    profile.horizontalSizePx = ClampInt(config.ripple.windowSize + 34, 116, 236);
+    profile.verticalSizePx = ClampInt(config.ripple.windowSize + 24, 108, 224);
     profile.closePaddingMs = 90;
     profile.baseOpacity = 0.96;
     return profile;

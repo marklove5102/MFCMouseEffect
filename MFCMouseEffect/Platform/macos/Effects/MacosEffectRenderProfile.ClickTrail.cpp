@@ -14,11 +14,12 @@ ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     const int textDurationMs = ClampInt(config.textClick.durationMs, 220, 1800);
     const int baseWindowSize = ClampInt(config.ripple.windowSize, 80, 220);
-    profile.normalSizePx = baseWindowSize + 18;
-    profile.textSizePx = baseWindowSize + 32;
-    profile.normalDurationSec = static_cast<double>(rippleDurationMs) / 1000.0;
+    profile.normalSizePx = baseWindowSize + 22;
+    profile.textSizePx = baseWindowSize + 38;
+    profile.normalDurationSec =
+        detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 1.06, 0.20, 1.30);
     profile.textDurationSec =
-        detail::ClampDouble(static_cast<double>(textDurationMs) / 1000.0 * 0.45, 0.24, 1.2);
+        detail::ClampDouble(static_cast<double>(textDurationMs) / 1000.0 * 0.50, 0.28, 1.35);
     profile.closePaddingMs = 60;
     profile.baseOpacity = 0.95;
     return profile;
