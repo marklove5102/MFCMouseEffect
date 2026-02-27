@@ -78,19 +78,33 @@ _mfx_core_http_start_entry() {
         tail -f /dev/null >"$_mfx_core_http_fifo_path" &
         _mfx_core_http_fifo_writer_pid="$!"
 
-        MFX_CORE_WEB_SETTINGS_PROBE_FILE="$probe_file" \
-        MFX_CORE_WEB_SETTINGS_LAUNCH_PROBE_FILE="$launch_probe_file" \
-        MFX_TEST_SETTINGS_LAUNCH_CAPTURE_FILE="$launch_capture_file" \
-        MFX_TEST_INPUT_CAPTURE_PERMISSION_SIM_FILE="$permission_sim_file" \
-        MFX_TEST_NOTIFICATION_CAPTURE_FILE="$notification_capture_file" \
-        MFX_ENABLE_AUTOMATION_SCOPE_TEST_API="${MFX_ENABLE_AUTOMATION_SCOPE_TEST_API:-1}" \
-        MFX_ENABLE_AUTOMATION_SHORTCUT_TEST_API="${MFX_ENABLE_AUTOMATION_SHORTCUT_TEST_API:-1}" \
-        MFX_ENABLE_AUTOMATION_INJECTION_TEST_API="${MFX_ENABLE_AUTOMATION_INJECTION_TEST_API:-1}" \
-        MFX_ENABLE_EFFECT_OVERLAY_TEST_API="${MFX_ENABLE_EFFECT_OVERLAY_TEST_API:-1}" \
-        MFX_ENABLE_INPUT_INDICATOR_TEST_API="${MFX_ENABLE_INPUT_INDICATOR_TEST_API:-1}" \
-        MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN="${MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN:-1}" \
-        MFX_ENABLE_WASM_TEST_DISPATCH_API="${MFX_ENABLE_WASM_TEST_DISPATCH_API:-1}" \
-            "$entry_bin" -mode=background <"$_mfx_core_http_fifo_path" >"$log_file" 2>&1 &
+        if [[ "$require_launch_probe" == "1" ]]; then
+            MFX_CORE_WEB_SETTINGS_PROBE_FILE="$probe_file" \
+            MFX_CORE_WEB_SETTINGS_LAUNCH_PROBE_FILE="$launch_probe_file" \
+            MFX_TEST_SETTINGS_LAUNCH_CAPTURE_FILE="$launch_capture_file" \
+            MFX_TEST_INPUT_CAPTURE_PERMISSION_SIM_FILE="$permission_sim_file" \
+            MFX_TEST_NOTIFICATION_CAPTURE_FILE="$notification_capture_file" \
+            MFX_ENABLE_AUTOMATION_SCOPE_TEST_API="${MFX_ENABLE_AUTOMATION_SCOPE_TEST_API:-1}" \
+            MFX_ENABLE_AUTOMATION_SHORTCUT_TEST_API="${MFX_ENABLE_AUTOMATION_SHORTCUT_TEST_API:-1}" \
+            MFX_ENABLE_AUTOMATION_INJECTION_TEST_API="${MFX_ENABLE_AUTOMATION_INJECTION_TEST_API:-1}" \
+            MFX_ENABLE_EFFECT_OVERLAY_TEST_API="${MFX_ENABLE_EFFECT_OVERLAY_TEST_API:-1}" \
+            MFX_ENABLE_INPUT_INDICATOR_TEST_API="${MFX_ENABLE_INPUT_INDICATOR_TEST_API:-1}" \
+            MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN="${MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN:-1}" \
+            MFX_ENABLE_WASM_TEST_DISPATCH_API="${MFX_ENABLE_WASM_TEST_DISPATCH_API:-1}" \
+                "$entry_bin" -mode=background <"$_mfx_core_http_fifo_path" >"$log_file" 2>&1 &
+        else
+            MFX_CORE_WEB_SETTINGS_PROBE_FILE="$probe_file" \
+            MFX_TEST_INPUT_CAPTURE_PERMISSION_SIM_FILE="$permission_sim_file" \
+            MFX_TEST_NOTIFICATION_CAPTURE_FILE="$notification_capture_file" \
+            MFX_ENABLE_AUTOMATION_SCOPE_TEST_API="${MFX_ENABLE_AUTOMATION_SCOPE_TEST_API:-1}" \
+            MFX_ENABLE_AUTOMATION_SHORTCUT_TEST_API="${MFX_ENABLE_AUTOMATION_SHORTCUT_TEST_API:-1}" \
+            MFX_ENABLE_AUTOMATION_INJECTION_TEST_API="${MFX_ENABLE_AUTOMATION_INJECTION_TEST_API:-1}" \
+            MFX_ENABLE_EFFECT_OVERLAY_TEST_API="${MFX_ENABLE_EFFECT_OVERLAY_TEST_API:-1}" \
+            MFX_ENABLE_INPUT_INDICATOR_TEST_API="${MFX_ENABLE_INPUT_INDICATOR_TEST_API:-1}" \
+            MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN="${MFX_TEST_KEYBOARD_INJECTOR_DRY_RUN:-1}" \
+            MFX_ENABLE_WASM_TEST_DISPATCH_API="${MFX_ENABLE_WASM_TEST_DISPATCH_API:-1}" \
+                "$entry_bin" -mode=background <"$_mfx_core_http_fifo_path" >"$log_file" 2>&1 &
+        fi
         _mfx_core_http_entry_pid="$!"
 
         sleep "$start_wait_seconds"

@@ -40,7 +40,6 @@ bool PosixCoreAppShell::SetupRegressionWebSettingsProbe() {
         const std::string settingsUrl = webSettings_->Url();
         const bool opened = services_.settingsLauncher && services_.settingsLauncher->OpenUrlUtf8(settingsUrl);
         ok = WriteCoreWebSettingsLaunchProbeFile(launchProbeFilePath, settingsUrl, opened) && ok;
-        ok = opened && ok;
     }
 
     return ok;
