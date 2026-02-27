@@ -357,6 +357,15 @@ nlohmann::json BuildMacosEffectRenderCommandSamplesJson(const EffectConfig& cfg)
         {"update", BuildHoldUpdateCommandJson(holdUpdateCommand)},
     };
     out["alias_matrix"] = BuildAliasMatrixJson();
+    out["effective_timing"] = {
+        {"click_duration_sec", clickCommand.animationDurationSec},
+        {"trail_duration_sec", trailCommand.durationSec},
+        {"scroll_duration_sec", scrollCommand.durationSec},
+        {"hover_breathe_duration_sec", hoverCommand.breatheDurationSec},
+        {"hover_spin_duration_sec", hoverCommand.tubesSpinDurationSec},
+        {"hold_progress_full_ms", holdStartCommand.progressFullMs},
+        {"hold_breathe_duration_sec", holdStartCommand.breatheDurationSec},
+    };
     return out;
 }
 
