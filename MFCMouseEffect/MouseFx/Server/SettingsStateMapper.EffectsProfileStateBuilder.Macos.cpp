@@ -3,6 +3,7 @@
 #include "SettingsStateMapper.EffectsProfileStateBuilder.Macos.h"
 
 #include "MouseFx/Core/Config/EffectConfig.h"
+#include "MouseFx/Core/Config/EffectConfigInternal.h"
 #include "MouseFx/Core/Effects/ClickEffectCompute.h"
 #include "MouseFx/Core/Effects/HoldEffectCompute.h"
 #include "MouseFx/Core/Effects/HoverEffectCompute.h"
@@ -143,6 +144,12 @@ nlohmann::json BuildAliasMatrixJson() {
         {{"input", "neon3d"}, {"normalized", NormalizeHoldEffectType("neon3d")}},
         {{"input", "charge"}, {"normalized", NormalizeHoldEffectType("charge")}},
     });
+    const nlohmann::json holdFollowMode = nlohmann::json::array({
+        {{"input", "precise"}, {"normalized", config_internal::NormalizeHoldFollowMode("precise")}},
+        {{"input", "cursor_priority"}, {"normalized", config_internal::NormalizeHoldFollowMode("cursor_priority")}},
+        {{"input", "performance_first"}, {"normalized", config_internal::NormalizeHoldFollowMode("performance_first")}},
+        {{"input", "cpu_saver"}, {"normalized", config_internal::NormalizeHoldFollowMode("cpu_saver")}},
+    });
 
     return {
         {"click", click},
@@ -150,6 +157,7 @@ nlohmann::json BuildAliasMatrixJson() {
         {"scroll", scroll},
         {"hover", hover},
         {"hold", hold},
+        {"hold_follow_mode", holdFollowMode},
     };
 }
 

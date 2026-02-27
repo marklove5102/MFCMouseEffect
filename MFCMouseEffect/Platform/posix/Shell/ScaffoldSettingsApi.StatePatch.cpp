@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "Platform/posix/Shell/ScaffoldSettingsApi.h"
+#include "MouseFx/Core/Config/EffectConfigInternal.h"
 
 #include <utility>
 
@@ -16,7 +17,8 @@ bool IsSupportedTheme(const std::string& value) {
 }
 
 bool IsSupportedHoldFollowMode(const std::string& value) {
-    return value == "precise" || value == "smooth" || value == "efficient";
+    std::string normalized;
+    return config_internal::TryNormalizeHoldFollowMode(value, &normalized);
 }
 
 } // namespace
@@ -101,7 +103,7 @@ bool ParseStatePatch(
             }
             return false;
         }
-        next.holdFollowMode = value;
+        next.holdFollowMode = config_internal::NormalizeHoldFollowMode(value);
     }
 
     *outState = std::move(next);

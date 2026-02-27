@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "MouseFx/Core/Effects/HoldEffectCompute.h"
+#include "MouseFx/Core/Config/EffectConfigInternal.h"
 #include "MouseFx/Effects/HoldRouteCatalog.h"
 #include "MouseFx/Utils/StringUtils.h"
 
@@ -26,11 +27,11 @@ std::string NormalizeHoldEffectType(const std::string& effectType) {
 }
 
 HoldEffectFollowMode ParseHoldEffectFollowMode(const std::string& mode) {
-    const std::string lowered = ToLowerAscii(mode);
-    if (lowered == "precise") {
+    const std::string normalized = config_internal::NormalizeHoldFollowMode(mode);
+    if (normalized == "precise") {
         return HoldEffectFollowMode::Precise;
     }
-    if (lowered == "efficient") {
+    if (normalized == "efficient") {
         return HoldEffectFollowMode::Efficient;
     }
     return HoldEffectFollowMode::Smooth;

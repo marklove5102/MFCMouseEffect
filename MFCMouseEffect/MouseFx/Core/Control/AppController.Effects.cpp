@@ -16,13 +16,6 @@
 namespace mousefx {
 namespace {
 
-static std::string NormalizeHoldFollowMode(std::string mode) {
-    mode = ToLowerAscii(mode);
-    if (mode == "precise") return "precise";
-    if (mode == "efficient") return "efficient";
-    return "smooth";
-}
-
 struct ActiveCategoryDescriptor {
     EffectCategory category;
     std::string ActiveEffectConfig::*slot;
@@ -216,7 +209,7 @@ void AppController::SetTheme(const std::string& theme) {
 }
 
 void AppController::SetHoldFollowMode(const std::string& mode) {
-    const std::string normalized = NormalizeHoldFollowMode(mode);
+    const std::string normalized = config_internal::NormalizeHoldFollowMode(mode);
     if (config_.holdFollowMode == normalized) return;
     config_.holdFollowMode = normalized;
     PersistConfig();
