@@ -557,6 +557,8 @@
 - macOS non-GPU one-shot effect durations now also share bounded size normalization (`ScaleOverlayDurationBySize`), with scroll keeping existing strength mapping and applying size normalization on top.
 - macOS non-GPU effect alpha computation now also shares one policy helper (`ResolveOverlayOpacity`) across click/trail/scroll/hold/hover, reducing category-level clamp/floor drift while preserving per-style deltas.
 - POSIX regression suite now supports explicit ObjC++ edit policy gate (`--enforce-no-objcxx-edits` / `MFX_ENFORCE_NO_OBJCXX_EDITS=1`) to fail fast when closure iterations contain `.mm/.m` edits.
+- POSIX regression suite entry is now split into dedicated options and phase modules (`posix_suite_options.sh`, `posix_suite_phases.sh`), reducing orchestration coupling while preserving phase order and CLI compatibility.
+- POSIX regression suite now validates required option values and build-jobs type at parse stage, reducing silent misconfiguration drift during manual/CI runs.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:
