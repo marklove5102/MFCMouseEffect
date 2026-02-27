@@ -54,6 +54,7 @@ _mfx_core_http_start_entry() {
     local launch_capture_file="$5"
     local permission_sim_file="$6"
     local notification_capture_file="$7"
+    local require_launch_probe="${8:-1}"
 
     _mfx_core_http_probe_file="$probe_file"
     _mfx_core_http_launch_probe_file="$launch_probe_file"
@@ -93,11 +94,19 @@ _mfx_core_http_start_entry() {
         _mfx_core_http_entry_pid="$!"
 
         sleep "$start_wait_seconds"
-        if kill -0 "$_mfx_core_http_entry_pid" >/dev/null 2>&1 && \
-           _mfx_core_http_wait_launch_probe_file "$launch_probe_file"; then
-            if _mfx_core_http_wait_probe_file "$probe_file" || \
-               _mfx_core_http_try_recover_probe_file_from_launch_probe "$probe_file" "$launch_probe_file"; then
-                return 0
+        if kill -0 "$_mfx_core_http_entry_pid" >/dev/null 2>&1; then
+            local launch_probe_ready=1
+            if [[ "$require_launch_probe" == "1" ]]; then
+                launch_probe_ready=0
+                if _mfx_core_http_wait_launch_probe_file "$launch_probe_file"; then
+                    launch_probe_ready=1
+                fi
+            fi
+            if [[ "$launch_probe_ready" == "1" ]]; then
+                if _mfx_core_http_wait_probe_file "$probe_file" || \
+                   _mfx_core_http_try_recover_probe_file_from_launch_probe "$probe_file" "$launch_probe_file"; then
+                    return 0
+                fi
             fi
         fi
 
@@ -110,7 +119,10 @@ _mfx_core_http_start_entry() {
             if [[ ! -s "$probe_file" ]]; then
                 mfx_fail "core web settings probe file not ready: $probe_file"
             fi
-            mfx_fail "core web settings launch probe file not ready: $launch_probe_file"
+            if [[ "$require_launch_probe" == "1" ]]; then
+                mfx_fail "core web settings launch probe file not ready: $launch_probe_file"
+            fi
+            mfx_fail "core web settings probe file not ready after startup retries: $probe_file"
         fi
 
         attempt=$((attempt + 1))

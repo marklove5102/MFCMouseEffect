@@ -40,6 +40,10 @@ mfx_run_core_http_contract_checks() {
     local launch_capture_file="$tmp_dir/settings-launch-capture.env"
     local permission_sim_file="$tmp_dir/input-capture-permission.env"
     local notification_capture_file="$tmp_dir/notifications-capture.log"
+    local require_launch_probe="0"
+    if [[ "$check_scope" == "all" ]]; then
+        require_launch_probe="1"
+    fi
     trap "_mfx_core_http_stop_entry; rm -rf '$tmp_dir'" EXIT
 
     local initial_permission_state="0"
@@ -54,7 +58,8 @@ mfx_run_core_http_contract_checks() {
         "$launch_probe_file" \
         "$launch_capture_file" \
         "$permission_sim_file" \
-        "$notification_capture_file"
+        "$notification_capture_file" \
+        "$require_launch_probe"
 
     local settings_url
     local token
