@@ -553,6 +553,7 @@
 - macOS non-GPU effect overlays now also share animation/opacity policy helpers (`CreateScaleFadeAnimationGroup` / `ClampOverlayOpacity`) across click/trail/scroll/hold/hover, reducing cross-category curve/alpha drift while keeping per-effect style parameters.
 - macOS non-GPU effect overlays now also share geometry metric scaling helper (`ScaleOverlayMetric`) across click/trail/scroll/hold/hover, reducing fixed-pixel ratio drift on small/large overlay sizes while preserving style semantics.
 - macOS non-GPU one-shot effect durations now also share bounded size normalization (`ScaleOverlayDurationBySize`), with scroll keeping existing strength mapping and applying size normalization on top.
+- macOS non-GPU effect alpha computation now also shares one policy helper (`ResolveOverlayOpacity`) across click/trail/scroll/hold/hover, reducing category-level clamp/floor drift while preserving per-style deltas.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

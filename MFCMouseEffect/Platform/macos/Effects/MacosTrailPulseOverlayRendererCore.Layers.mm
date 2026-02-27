@@ -49,7 +49,7 @@ void ConfigureTrailCoreLayer(
             7.0);
     }
 
-    core.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity));
+    core.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, 0.0, 0.0));
 }
 
 void AddTrailGlowLayer(
@@ -69,7 +69,7 @@ void AddTrailGlowLayer(
     CGPathRelease(glowPath);
     glow.fillColor = [detail::TrailFillColor(plan.trailType) CGColor];
     glow.strokeColor = [NSColor clearColor].CGColor;
-    glow.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity - 0.08));
+    glow.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, -0.08, 0.0));
     [content.layer addSublayer:glow];
 }
 

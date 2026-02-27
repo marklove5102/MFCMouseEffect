@@ -29,7 +29,7 @@ void AddScrollPulseDecorations(
         helix.fillColor = [NSColor clearColor].CGColor;
         helix.strokeColor = [ScrollPulseStrokeColor(horizontal, -delta) CGColor];
         helix.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 1.6, 160.0, 0.8, 3.2);
-        helix.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity - 0.14));
+        helix.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, -0.14, 0.0));
         [content.layer addSublayer:helix];
 
         CABasicAnimation* spin = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
@@ -51,7 +51,7 @@ void AddScrollPulseDecorations(
         twinkle.fillColor = [NSColor clearColor].CGColor;
         twinkle.strokeColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
         twinkle.lineWidth = macos_overlay_support::ScaleOverlayMetric(size, 1.0, 160.0, 0.8, 2.4);
-        twinkle.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity - 0.38));
+        twinkle.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, -0.38, 0.0));
         [content.layer addSublayer:twinkle];
     }
 }

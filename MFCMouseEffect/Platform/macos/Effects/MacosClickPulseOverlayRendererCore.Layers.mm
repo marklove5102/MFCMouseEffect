@@ -29,7 +29,7 @@ void ConfigureClickPulseBaseLayer(
         160.0,
         1.2,
         4.8);
-    base.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity));
+    base.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, 0.0, 0.0));
 }
 
 void AddClickPulseExtraLayers(
@@ -48,7 +48,7 @@ void AddClickPulseExtraLayers(
         star.fillColor = [ClickPulseStrokeColor(button) CGColor];
         star.strokeColor = [ClickPulseStrokeColor(button) CGColor];
         star.lineWidth = macos_overlay_support::ScaleOverlayMetric(plan.size, 1.0, 160.0, 0.8, 2.2);
-        star.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity + 0.03));
+        star.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, 0.03, 0.0));
         [content.layer addSublayer:star];
     }
 
@@ -74,7 +74,7 @@ void AddClickPulseExtraLayers(
             text.string = @"LEFT";
             break;
         }
-        text.opacity = static_cast<float>(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity + 0.03));
+        text.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, 0.03, 0.0));
         [content.layer addSublayer:text];
     }
 }

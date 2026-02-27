@@ -68,7 +68,7 @@ CAShapeLayer* CreateBodyLayer(
     body.fillColor = [ScrollPulseFillColor(horizontal, delta) CGColor];
     body.strokeColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
     body.lineWidth = 2.0;
-    body.opacity = static_cast<float>(baseOpacity);
+    body.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(baseOpacity, 0.0, 0.0));
     return body;
 }
 
@@ -84,7 +84,7 @@ CAShapeLayer* CreateArrowLayer(
     arrow.path = arrowPath;
     CGPathRelease(arrowPath);
     arrow.fillColor = [ScrollPulseStrokeColor(horizontal, delta) CGColor];
-    arrow.opacity = static_cast<float>(std::min(1.0, baseOpacity + 0.02));
+    arrow.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(baseOpacity, 0.02, 0.0));
     return arrow;
 }
 #endif

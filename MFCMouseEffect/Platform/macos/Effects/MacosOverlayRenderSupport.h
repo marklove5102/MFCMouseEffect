@@ -18,6 +18,7 @@ NSRect ClampOverlayFrameToScreenBounds(const NSRect& desiredFrame, const ScreenP
 CGFloat ResolveOverlayContentsScale(const ScreenPoint& overlayPt);
 void ApplyOverlayContentScale(NSView* content, const ScreenPoint& overlayPt);
 CGFloat ClampOverlayOpacity(CGFloat value);
+CGFloat ResolveOverlayOpacity(CGFloat baseOpacity, CGFloat delta, CGFloat minOpacity);
 CAAnimationGroup* CreateScaleFadeAnimationGroup(
     CGFloat fromScale,
     CGFloat toScale,

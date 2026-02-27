@@ -68,7 +68,7 @@ void ShowHoverPulseOverlayOnMain(
 
     CABasicAnimation* breathe = [CABasicAnimation animationWithKeyPath:@"opacity"];
     breathe.fromValue = @0.25;
-    breathe.toValue = @(macos_overlay_support::ClampOverlayOpacity(profile.baseOpacity + 0.05));
+    breathe.toValue = @(macos_overlay_support::ResolveOverlayOpacity(profile.baseOpacity, 0.05, 0.0));
     breathe.duration = profile.breatheDurationSec;
     breathe.autoreverses = YES;
     breathe.repeatCount = HUGE_VALF;

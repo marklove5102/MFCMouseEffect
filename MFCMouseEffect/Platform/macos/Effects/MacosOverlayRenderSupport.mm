@@ -136,6 +136,12 @@ CGFloat ClampOverlayOpacity(CGFloat value) {
     return ClampCoordinate(value, 0.0, 1.0);
 }
 
+CGFloat ResolveOverlayOpacity(CGFloat baseOpacity, CGFloat delta, CGFloat minOpacity) {
+    const CGFloat clamped = ClampOverlayOpacity(baseOpacity + delta);
+    const CGFloat floor = ClampOverlayOpacity(minOpacity);
+    return std::max(clamped, floor);
+}
+
 CAAnimationGroup* CreateScaleFadeAnimationGroup(
     CGFloat fromScale,
     CGFloat toScale,
