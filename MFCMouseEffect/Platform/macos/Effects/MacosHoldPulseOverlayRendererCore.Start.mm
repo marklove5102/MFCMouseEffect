@@ -34,7 +34,8 @@ void StartHoldPulseOverlayOnMain(
     const std::string holdType = detail::NormalizeHoldType(effectType);
     const detail::HoldStyle holdStyle = detail::ResolveHoldStyle(holdType);
     const CGFloat size = static_cast<CGFloat>(profile.sizePx);
-    const NSRect frame = NSMakeRect(overlayPt.x - size * 0.5, overlayPt.y - size * 0.5, size, size);
+    const NSRect rawFrame = NSMakeRect(overlayPt.x - size * 0.5, overlayPt.y - size * 0.5, size, size);
+    const NSRect frame = macos_overlay_support::ClampOverlayFrameToScreenBounds(rawFrame, overlayPt);
     NSWindow* window = macos_overlay_support::CreateOverlayWindow(frame);
     if (window == nil) {
         return;

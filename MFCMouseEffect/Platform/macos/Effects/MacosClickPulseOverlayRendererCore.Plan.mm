@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosClickPulseOverlayRendererCore.Internal.h"
+#include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosClickPulseOverlayStyle.h"
 
 namespace mousefx::macos_click_pulse {
@@ -19,11 +20,12 @@ ClickPulseRenderPlan BuildClickPulseRenderPlan(
         ? static_cast<CGFloat>(profile.textSizePx)
         : static_cast<CGFloat>(profile.normalSizePx);
     plan.inset = plan.textMode ? 12.0 : 18.0;
-    plan.frame = NSMakeRect(
+    const NSRect rawFrame = NSMakeRect(
         overlayPt.x - plan.size * 0.5,
         overlayPt.y - plan.size * 0.5,
         plan.size,
         plan.size);
+    plan.frame = macos_overlay_support::ClampOverlayFrameToScreenBounds(rawFrame, overlayPt);
     plan.animationDuration = plan.textMode ? profile.textDurationSec : profile.normalDurationSec;
     return plan;
 }

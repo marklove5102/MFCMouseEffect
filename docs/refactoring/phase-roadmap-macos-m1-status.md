@@ -548,6 +548,7 @@
 - Effect overlay contracts now assert click/scroll overlay window lifecycle restore-to-baseline after probe emission, reducing silent overlay cleanup drift risk.
 - Effect overlay contracts now also assert raw counter arithmetic invariants (`before/after total == click + scroll`) at script level, reducing route-local false-green risk.
 - Automation shortcut test contracts now explicitly guard invalid/unmapped keycode semantics, reducing edge-path mapping drift risk.
+- macOS non-GPU effect overlays now share one frame clamp policy (`ClampOverlayFrameToScreenBounds`) across click/trail/scroll/hold/hover, reducing edge-of-screen and multi-screen placement drift without changing effect API/schema contracts.
 
 ## Next slice
 - Continue Phase 55+ hardening with macOS-first and Linux compile follow:

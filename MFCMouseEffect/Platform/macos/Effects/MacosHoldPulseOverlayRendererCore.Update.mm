@@ -2,6 +2,7 @@
 
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Internal.h"
+#include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 
 #if defined(__APPLE__)
 #import <AppKit/AppKit.h>
@@ -26,7 +27,9 @@ void UpdateHoldPulseOverlayOnMain(const ScreenPoint& overlayPt, uint32_t holdMs)
     const NSRect frame = [state.window frame];
     const CGFloat w = frame.size.width;
     const CGFloat h = frame.size.height;
-    [state.window setFrameOrigin:NSMakePoint(overlayPt.x - w * 0.5, overlayPt.y - h * 0.5)];
+    const NSRect rawFrame = NSMakeRect(overlayPt.x - w * 0.5, overlayPt.y - h * 0.5, w, h);
+    const NSRect clampedFrame = macos_overlay_support::ClampOverlayFrameToScreenBounds(rawFrame, overlayPt);
+    [state.window setFrameOrigin:clampedFrame.origin];
 
     const CGFloat progress = std::min<CGFloat>(
         1.0,
