@@ -18,6 +18,8 @@ struct HoverPulseRenderPlan {
     bool tubesMode = false;
     CGFloat size = 0;
     NSRect frame = NSZeroRect;
+    CFTimeInterval breatheDurationSec = 0;
+    CFTimeInterval tubesSpinDurationSec = 0;
 };
 
 HoverPulseRenderPlan BuildHoverPulseRenderPlan(

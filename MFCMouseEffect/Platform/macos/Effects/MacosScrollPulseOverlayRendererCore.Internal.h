@@ -24,6 +24,7 @@ struct ScrollPulseRenderPlan {
     NSRect frame = NSZeroRect;
     CFTimeInterval duration = 0;
     int closeAfterMs = 0;
+    double durationScale = 1.0;
 };
 
 ScrollPulseRenderPlan BuildScrollPulseRenderPlan(

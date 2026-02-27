@@ -365,6 +365,8 @@
   - 55zzzzbp completed (acceptance): scaffold regression + core automation contract regression remain green after trail/hold color profile parity update.
   - 55zzzzbq completed (code): expanded effects-profile API/state contracts with color profile fields (`trail/scroll/hold/hover`) and added regression assertions for representative color keys in effect-profile probe checks.
   - 55zzzzbq completed (acceptance): scaffold regression + core automation contract regression remain green after effects-profile color contract expansion.
+  - 55zzzzbr completed (code): added type-aware tempo/size scaling in macOS render plans for trail/scroll/hover, so effect types have distinct runtime pacing instead of near-uniform defaults.
+  - 55zzzzbr completed (acceptance): scaffold regression + core automation contract regression remain green after type-tempo variant tuning.
   - 55zzzzz completed (code): split input-indicator show-plan computation into dedicated module (`MacosInputIndicatorOverlay.ShowPlan.*`) and kept overlay file focused on lifecycle and presentation dispatch.
   - 55zzzzz completed (acceptance): full POSIX regression suite remains green after input-indicator show-plan split.
   - 55zzzzaa completed (code): split keyboard-injector dry-run/event-post internals into dedicated module (`MacosKeyboardInjector.EventPost.mm`) and kept injector file focused on chord orchestration.
@@ -583,6 +585,7 @@
 - macOS scroll/hover overlay colors are now profile-driven from runtime config/theme resolution (instead of hardcoded constants), reducing cross-platform visual drift under theme/config changes.
 - macOS trail/hold overlay colors are now profile-driven from runtime config resolution (instead of hardcoded constants), reducing cross-platform visual drift under effect config changes.
 - effects profile contracts now include color-profile fields (`*_stroke_argb` / `*_fill_argb`) and core automation regression asserts representative keys, reducing false-green risk for future color-path regressions.
+- macOS trail/scroll/hover render plans now apply type-aware tempo/size scaling (runtime behavior only), reducing cross-type motion similarity and improving parity with Windows type semantics.
 - macOS native folder-picker route now uses Swift bridge first with existing Objective-C++ picker fallback (same `platform::PickFolder` contract), enabling Swift-first migration without import-dialog behavior risk.
 - macOS settings launcher now uses Swift bridge (`NSWorkspace.open`) in normal mode with POSIX `open` fallback, while capture-mode launcher contracts remain unchanged for regression probes.
 

@@ -22,6 +22,7 @@ struct TrailPulseRenderPlan {
     NSRect frame = NSZeroRect;
     CFTimeInterval durationSec = 0;
     int closeAfterMs = 0;
+    double durationScale = 1.0;
 };
 
 TrailPulseRenderPlan BuildTrailPulseRenderPlan(

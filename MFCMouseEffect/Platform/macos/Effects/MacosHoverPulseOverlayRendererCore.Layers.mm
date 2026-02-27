@@ -33,7 +33,7 @@ void AddHoverExtraLayersAndAnimations(
     CABasicAnimation* spin = [CABasicAnimation animationWithKeyPath:@"transform.rotation"];
     spin.fromValue = @0.0;
     spin.toValue = @(M_PI * 2.0);
-    spin.duration = profile.spinDurationSec;
+    spin.duration = plan.tubesSpinDurationSec;
     spin.repeatCount = HUGE_VALF;
     [ring2 addAnimation:spin forKey:@"mfx_hover_spin"];
 }
