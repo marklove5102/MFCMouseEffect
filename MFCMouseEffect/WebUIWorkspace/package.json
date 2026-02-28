@@ -19,7 +19,8 @@
     "dev": "vite",
     "test:automation-platform": "node scripts/test-automation-platform.mjs",
     "test:effects-profile-model": "node scripts/test-effects-profile-model.mjs",
-    "test:wasm-error-model": "node scripts/test-wasm-action-error-model.mjs"
+    "test:wasm-error-model": "node scripts/test-wasm-action-error-model.mjs",
+    "test:wasm-state-model": "node scripts/test-wasm-state-model.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^4.0.0",

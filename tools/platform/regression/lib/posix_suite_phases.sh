@@ -189,5 +189,6 @@ mfx_posix_suite_run_webui_semantic_phase() {
         pnpm --dir MFCMouseEffect/WebUIWorkspace run test:automation-platform
         pnpm --dir MFCMouseEffect/WebUIWorkspace run test:effects-profile-model
         pnpm --dir MFCMouseEffect/WebUIWorkspace run test:wasm-error-model
+        pnpm --dir MFCMouseEffect/WebUIWorkspace run test:wasm-state-model
     )
 }
