@@ -1,11 +1,12 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
+#include "Platform/macos/Effects/MacosOverlayRenderSupportSwiftBridge.h"
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import <dispatch/dispatch.h>
+#include <pthread.h>
 #endif
 
 #include <algorithm>
@@ -14,25 +15,6 @@ namespace mousefx::macos_overlay_support {
 
 #if defined(__APPLE__)
 namespace {
-
-NSScreen* ResolveTargetScreen(const ScreenPoint& overlayPt) {
-    NSArray<NSScreen*>* screens = [NSScreen screens];
-    if (screens == nil || [screens count] == 0) {
-        return nil;
-    }
-    const NSPoint point = NSMakePoint(static_cast<CGFloat>(overlayPt.x), static_cast<CGFloat>(overlayPt.y));
-    for (NSScreen* screen in screens) {
-        if (NSPointInRect(point, [screen frame])) {
-            return screen;
-        }
-    }
-
-    NSScreen* fallback = [NSScreen mainScreen];
-    if (fallback != nil) {
-        return fallback;
-    }
-    return [screens objectAtIndex:0];
-}
 
 CGFloat ClampCoordinate(CGFloat value, CGFloat minValue, CGFloat maxValue) {
     if (maxValue < minValue) {
@@ -47,7 +29,7 @@ void RunOnMainThreadSync(dispatch_block_t block) {
     if (!block) {
         return;
     }
-    if ([NSThread isMainThread]) {
+    if (pthread_main_np() != 0) {
         block();
         return;
     }
@@ -62,32 +44,17 @@ void RunOnMainThreadAsync(dispatch_block_t block) {
 }
 
 NSWindow* CreateOverlayWindow(const NSRect& frame) {
-    NSWindow* window = [[NSWindow alloc] initWithContentRect:frame
-                                                    styleMask:NSWindowStyleMaskBorderless
-                                                      backing:NSBackingStoreBuffered
-                                                        defer:NO];
-    if (window == nil) {
-        return nil;
-    }
-    [window setOpaque:NO];
-    [window setBackgroundColor:[NSColor clearColor]];
-    [window setHasShadow:NO];
-    [window setIgnoresMouseEvents:YES];
-    [window setLevel:NSStatusWindowLevel];
-    [window setCollectionBehavior:(NSWindowCollectionBehaviorCanJoinAllSpaces |
-                                   NSWindowCollectionBehaviorTransient)];
-    return window;
+    void* handle = mfx_macos_overlay_create_window_v1(
+        static_cast<double>(frame.origin.x),
+        static_cast<double>(frame.origin.y),
+        static_cast<double>(frame.size.width),
+        static_cast<double>(frame.size.height));
+    return reinterpret_cast<NSWindow*>(handle);
 }
 
 NSRect ClampOverlayFrameToScreenBounds(const NSRect& desiredFrame, const ScreenPoint& overlayPt) {
-    NSScreen* screen = ResolveTargetScreen(overlayPt);
-    if (screen == nil) {
-        return desiredFrame;
-    }
-
-    const NSRect bounds = [screen frame];
-    if (bounds.size.width <= 0.0 || bounds.size.height <= 0.0 ||
-        desiredFrame.size.width <= 0.0 || desiredFrame.size.height <= 0.0) {
+    (void)overlayPt;
+    if (desiredFrame.size.width <= 0.0 || desiredFrame.size.height <= 0.0) {
         return desiredFrame;
     }
     // Keep effect anchor at the real input point. If the window goes partially
@@ -96,27 +63,18 @@ NSRect ClampOverlayFrameToScreenBounds(const NSRect& desiredFrame, const ScreenP
 }
 
 CGFloat ResolveOverlayContentsScale(const ScreenPoint& overlayPt) {
-    NSScreen* screen = ResolveTargetScreen(overlayPt);
-    if (screen == nil) {
-        return 1.0;
-    }
-    return ClampCoordinate([screen backingScaleFactor], 1.0, 4.0);
+    const double scale = mfx_macos_overlay_resolve_content_scale_v1(overlayPt.x, overlayPt.y);
+    return ClampCoordinate(static_cast<CGFloat>(scale), 1.0, 4.0);
 }
 
 void ApplyOverlayContentScale(NSView* content, const ScreenPoint& overlayPt) {
     if (content == nil) {
         return;
     }
-    [content setWantsLayer:YES];
-    CALayer* root = [content layer];
-    if (root == nil) {
-        return;
-    }
-    const CGFloat scale = ResolveOverlayContentsScale(overlayPt);
-    root.contentsScale = scale;
-    for (CALayer* layer in [root sublayers]) {
-        layer.contentsScale = scale;
-    }
+    mfx_macos_overlay_apply_content_scale_v1(
+        reinterpret_cast<void*>(content),
+        overlayPt.x,
+        overlayPt.y);
 }
 
 CGFloat ClampOverlayOpacity(CGFloat value) {
