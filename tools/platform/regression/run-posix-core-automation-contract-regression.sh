@@ -58,6 +58,9 @@ Env tuning:
   MFX_CORE_HTTP_INPUT_CAPTURE_TIMEOUT_SECONDS timeout for permission transition waits (default: 10)
   MFX_CORE_HTTP_WASM_DISPATCH_TIMEOUT_SECONDS max wait for invoke/render ready in test-dispatch assertion (default: 5)
   MFX_CORE_HTTP_WASM_DISPATCH_RETRY_INTERVAL_SECONDS retry interval for test-dispatch assertion (default: 0.2)
+  MFX_MACOS_WASM_OVERLAY_MAX_INFLIGHT macOS wasm overlay max in-flight test value (default: 77)
+  MFX_MACOS_WASM_IMAGE_MIN_INTERVAL_MS macOS wasm image overlay min interval test value (default: 9)
+  MFX_MACOS_WASM_TEXT_MIN_INTERVAL_MS macOS wasm text overlay min interval test value (default: 11)
 USAGE
             exit 0
             ;;
@@ -81,6 +84,14 @@ fi
 
 mfx_require_cmd cmake
 mfx_require_cmd curl
+
+# Keep wasm overlay policy test values deterministic in core-state contracts.
+export MFX_MACOS_WASM_OVERLAY_MAX_INFLIGHT="${MFX_MACOS_WASM_OVERLAY_MAX_INFLIGHT:-77}"
+export MFX_MACOS_WASM_IMAGE_MIN_INTERVAL_MS="${MFX_MACOS_WASM_IMAGE_MIN_INTERVAL_MS:-9}"
+export MFX_MACOS_WASM_TEXT_MIN_INTERVAL_MS="${MFX_MACOS_WASM_TEXT_MIN_INTERVAL_MS:-11}"
+export MFX_EXPECT_MACOS_WASM_OVERLAY_MAX_INFLIGHT="${MFX_EXPECT_MACOS_WASM_OVERLAY_MAX_INFLIGHT:-$MFX_MACOS_WASM_OVERLAY_MAX_INFLIGHT}"
+export MFX_EXPECT_MACOS_WASM_IMAGE_MIN_INTERVAL_MS="${MFX_EXPECT_MACOS_WASM_IMAGE_MIN_INTERVAL_MS:-$MFX_MACOS_WASM_IMAGE_MIN_INTERVAL_MS}"
+export MFX_EXPECT_MACOS_WASM_TEXT_MIN_INTERVAL_MS="${MFX_EXPECT_MACOS_WASM_TEXT_MIN_INTERVAL_MS:-$MFX_MACOS_WASM_TEXT_MIN_INTERVAL_MS}"
 
 mfx_info "repo root: $REPO_ROOT"
 mfx_info "platform: $MFX_PLATFORM"

@@ -52,6 +52,15 @@ _mfx_core_http_run_state_checks() {
         mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_max_inflight\":" "core wasm overlay policy max in-flight"
         mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_min_image_interval_ms\":" "core wasm overlay policy image interval"
         mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_min_text_interval_ms\":" "core wasm overlay policy text interval"
+        if [[ -n "${MFX_EXPECT_MACOS_WASM_OVERLAY_MAX_INFLIGHT:-}" ]]; then
+            mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_max_inflight\":${MFX_EXPECT_MACOS_WASM_OVERLAY_MAX_INFLIGHT}" "core wasm overlay policy max in-flight value"
+        fi
+        if [[ -n "${MFX_EXPECT_MACOS_WASM_IMAGE_MIN_INTERVAL_MS:-}" ]]; then
+            mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_min_image_interval_ms\":${MFX_EXPECT_MACOS_WASM_IMAGE_MIN_INTERVAL_MS}" "core wasm overlay policy image interval value"
+        fi
+        if [[ -n "${MFX_EXPECT_MACOS_WASM_TEXT_MIN_INTERVAL_MS:-}" ]]; then
+            mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_min_text_interval_ms\":${MFX_EXPECT_MACOS_WASM_TEXT_MIN_INTERVAL_MS}" "core wasm overlay policy text interval value"
+        fi
     else
         mfx_assert_file_contains "$tmp_dir/state.out" "\"platform\":\"non_macos\"" "core effects profile platform non-macos"
     fi
