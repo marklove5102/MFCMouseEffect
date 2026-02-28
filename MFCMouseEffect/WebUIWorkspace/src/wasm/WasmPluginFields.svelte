@@ -8,6 +8,8 @@
   import {
     buildWasmBudgetFlagsText,
     buildWasmCallMetricsText,
+    buildWasmLifetimeInvokeText,
+    buildWasmLifetimeRenderText,
     hasWasmDiagnosticWarning,
   } from './diagnostics-model.js';
   import {
@@ -113,6 +115,16 @@
   function renderBudgetFlagsText(snapshot) {
     const s = snapshot || normalizeWasmState({});
     return buildWasmBudgetFlagsText(s, text);
+  }
+
+  function renderLifetimeInvokeText(snapshot) {
+    const s = snapshot || normalizeWasmState({});
+    return buildWasmLifetimeInvokeText(s, text);
+  }
+
+  function renderLifetimeRenderText(snapshot) {
+    const s = snapshot || normalizeWasmState({});
+    return buildWasmLifetimeRenderText(s, text);
   }
 
   function isDiagnosticWarning(snapshot) {
@@ -690,6 +702,12 @@
     <div class="grid wasm-grid">
       <div class="wasm-label" data-i18n="label_wasm_last_render_stats">Last render stats</div>
       <div class="wasm-value wasm-text-block">{renderStatsText(current)}</div>
+
+      <div class="wasm-label" data-i18n="label_wasm_lifetime_invoke_stats">Lifetime invoke stats</div>
+      <div class="wasm-value wasm-text-block">{renderLifetimeInvokeText(current)}</div>
+
+      <div class="wasm-label" data-i18n="label_wasm_lifetime_render_stats">Lifetime render stats</div>
+      <div class="wasm-value wasm-text-block">{renderLifetimeRenderText(current)}</div>
 
       <div class="wasm-label" data-i18n="label_wasm_throttled_capacity">Throttled by capacity</div>
       <div class="wasm-value">{current.last_throttled_by_capacity_render_commands}</div>

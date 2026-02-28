@@ -62,3 +62,25 @@ export function buildWasmBudgetFlagsText(diagnostics, translate) {
     + `${t('label_wasm_budget_flag_output_truncated', 'OutputTrunc')}=${boolText(value.last_output_truncated_by_budget)}, `
     + `${t('label_wasm_budget_flag_command_truncated', 'CommandTrunc')}=${boolText(value.last_command_truncated_by_budget)}`;
 }
+
+export function buildWasmLifetimeInvokeText(snapshot, translate) {
+  const value = snapshot || {};
+  const t = typeof translate === 'function' ? translate : (_key, fallback) => fallback;
+  return `${t('label_wasm_metric_total', 'Total')}=${value.lifetime_invoke_calls || 0}, `
+    + `${t('label_wasm_metric_success', 'Success')}=${value.lifetime_invoke_success_calls || 0}, `
+    + `${t('label_wasm_metric_failed', 'Failed')}=${value.lifetime_invoke_failed_calls || 0}, `
+    + `${t('label_wasm_metric_exceeded_budget', 'ExceededBudget')}=${value.lifetime_invoke_exceeded_budget_calls || 0}, `
+    + `${t('label_wasm_metric_rejected_budget', 'RejectedBudget')}=${value.lifetime_invoke_rejected_by_budget_calls || 0}`;
+}
+
+export function buildWasmLifetimeRenderText(snapshot, translate) {
+  const value = snapshot || {};
+  const t = typeof translate === 'function' ? translate : (_key, fallback) => fallback;
+  return `${t('label_wasm_metric_total', 'Total')}=${value.lifetime_render_dispatches || 0}, `
+    + `${t('label_wasm_metric_rendered', 'Rendered')}=${value.lifetime_rendered_by_wasm_dispatches || 0}, `
+    + `${t('label_wasm_metric_text_commands', 'TextCmd')}=${value.lifetime_executed_text_commands || 0}, `
+    + `${t('label_wasm_metric_image_commands', 'ImgCmd')}=${value.lifetime_executed_image_commands || 0}, `
+    + `${t('label_wasm_metric_throttled', 'Throttled')}=${value.lifetime_throttled_render_commands || 0} `
+    + `(cap=${value.lifetime_throttled_by_capacity_render_commands || 0}, int=${value.lifetime_throttled_by_interval_render_commands || 0}), `
+    + `${t('label_wasm_metric_dropped', 'Dropped')}=${value.lifetime_dropped_render_commands || 0}`;
+}

@@ -30,6 +30,7 @@
 - `/api/state.wasm` and `/api/wasm/state` now expose lifetime WASM dispatch diagnostics (`lifetime_invoke_*`, `lifetime_render_dispatches`, `lifetime_executed_*`, `lifetime_throttled_*`, `lifetime_dropped_render_commands`) in addition to `last_*` snapshot fields.
 - core WASM dispatch contract checks (regression + manual selfcheck) now enforce lifetime counter invariants (`invoke_success + invoke_failed == invoke_calls`, throttle subtotal consistency, and lifetime counters not below dispatch snapshot), and schema/state checks assert `lifetime_*` key exposure.
 - WebUI semantic phase now includes `pnpm --dir MFCMouseEffect/WebUIWorkspace run test:wasm-state-model` to gate `normalizeWasmState` passthrough for lifetime WASM diagnostics.
+- WebUI WASM diagnostics panel now renders both `last_*` and `lifetime_*` summaries (invoke/render), and WebUI semantic phase now includes `pnpm --dir MFCMouseEffect/WebUIWorkspace run test:wasm-diagnostics-model` to gate label coverage and formatting contracts.
 - Validation passed:
   - `cmake -S MFCMouseEffect/Platform -B /tmp/mfx-platform-macos-legacy-mm-build -DMFX_PACKAGE_PLATFORM=macos -DMFX_ENABLE_POSIX_CORE_RUNTIME=ON -DMFX_ENABLE_ENTRY_RUNTIME_TARGETS=ON`
   - `cmake --build /tmp/mfx-platform-macos-legacy-mm-build --target mfx_shell_macos mfx_entry_posix_host -j8`
