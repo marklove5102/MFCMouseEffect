@@ -81,7 +81,10 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
             "last_render_error",
             "last_load_failure_stage",
             "last_load_failure_code",
-            "last_error"
+            "last_error",
+            "overlay_max_inflight",
+            "overlay_min_image_interval_ms",
+            "overlay_min_text_interval_ms"
         })}
     };
 

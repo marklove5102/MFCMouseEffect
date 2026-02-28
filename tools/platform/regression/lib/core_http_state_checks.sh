@@ -49,6 +49,9 @@ _mfx_core_http_run_state_checks() {
         mfx_assert_file_contains "$tmp_dir/state.out" "\"progress_full_ms\":" "core effects profile hold progress field"
         mfx_assert_file_contains "$tmp_dir/state.out" "\"hover\":{" "core effects profile hover section"
         mfx_assert_file_contains "$tmp_dir/state.out" "\"spin_duration_sec\":" "core effects profile hover spin field"
+        mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_max_inflight\":" "core wasm overlay policy max in-flight"
+        mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_min_image_interval_ms\":" "core wasm overlay policy image interval"
+        mfx_assert_file_contains "$tmp_dir/state.out" "\"overlay_min_text_interval_ms\":" "core wasm overlay policy text interval"
     else
         mfx_assert_file_contains "$tmp_dir/state.out" "\"platform\":\"non_macos\"" "core effects profile platform non-macos"
     fi

@@ -6,6 +6,9 @@
 #include "MouseFx/Core/Wasm/WasmCommandRenderer.h"
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
 #include "MouseFx/Utils/StringUtils.h"
+#if MFX_PLATFORM_MACOS
+#include "Platform/macos/Wasm/MacosWasmOverlayPolicy.h"
+#endif
 
 using json = nlohmann::json;
 
@@ -75,6 +78,12 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["last_load_failure_stage"] = diag.lastLoadFailureStage;
     out["last_load_failure_code"] = diag.lastLoadFailureCode;
     out["last_error"] = diag.lastError;
+#if MFX_PLATFORM_MACOS
+    const auto& overlayPolicy = platform::macos::GetMacosWasmOverlayPolicy();
+    out["overlay_max_inflight"] = overlayPolicy.maxInFlightOverlays;
+    out["overlay_min_image_interval_ms"] = overlayPolicy.minImageIntervalMs;
+    out["overlay_min_text_interval_ms"] = overlayPolicy.minTextIntervalMs;
+#endif
     return out;
 }
 

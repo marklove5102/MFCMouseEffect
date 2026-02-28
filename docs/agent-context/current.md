@@ -25,6 +25,7 @@
 - Overlay runtime implementation is now promoted from `legacy/Overlay` to `Overlay` main path (`MacosInputIndicatorOverlay*`, `MacosOverlayCoordSpace*`), with source wiring switched to main-path files.
 - WASM overlay/runtime implementation is now promoted from `legacy/Wasm` to `Wasm` main path (`MacosWasmCommandRenderer*`, `MacosWasmOverlayState*`, `MacosWasmTextOverlay*`, `MacosWasmImageOverlayRenderer*`), with source wiring switched to main-path files.
 - Effects runtime implementation is now promoted from `legacy/Effects` to `Effects` main path (`MacosClick/Trail/Scroll/Hover/Hold*`, `MacosOverlayRenderSupport*`, `MacosTextEffectFallback*`), with source wiring switched to main-path files.
+- `/api/state.wasm` now exposes macOS overlay throttle-policy diagnostics (`overlay_max_inflight`, `overlay_min_image_interval_ms`, `overlay_min_text_interval_ms`), and core HTTP state contracts assert these fields on macOS.
 - Validation passed:
   - `cmake -S MFCMouseEffect/Platform -B /tmp/mfx-platform-macos-legacy-mm-build -DMFX_PACKAGE_PLATFORM=macos -DMFX_ENABLE_POSIX_CORE_RUNTIME=ON -DMFX_ENABLE_ENTRY_RUNTIME_TARGETS=ON`
   - `cmake --build /tmp/mfx-platform-macos-legacy-mm-build --target mfx_shell_macos mfx_entry_posix_host -j8`
