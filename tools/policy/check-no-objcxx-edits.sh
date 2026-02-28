@@ -17,7 +17,7 @@ while [[ $# -gt 0 ]]; do
             cat <<'USAGE'
 Usage: check-no-objcxx-edits.sh [--repo-root <path>]
 Fail when tracked/staged/untracked edits include .mm or .m files.
-Set MFX_ALLOW_OBJCXX_EDITS=1 to bypass.
+Set MFX_ALLOW_OBJCXX_EDITS=1 to bypass (approval-only exception).
 USAGE
             exit 0
             ;;

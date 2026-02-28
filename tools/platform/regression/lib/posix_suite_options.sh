@@ -33,7 +33,7 @@ mfx_posix_suite_init_defaults() {
     MFX_SKIP_MACOS_WASM_SELFCHECK=0
     MFX_SCAFFOLD_SKIP_SMOKE=0
     MFX_SCAFFOLD_SKIP_HTTP=0
-    MFX_ENFORCE_NO_OBJCXX_EDITS="$(_mfx_posix_suite_normalize_toggle "${MFX_ENFORCE_NO_OBJCXX_EDITS:-0}")"
+    MFX_ENFORCE_NO_OBJCXX_EDITS="$(_mfx_posix_suite_normalize_toggle "${MFX_ENFORCE_NO_OBJCXX_EDITS:-1}")"
 }
 
 mfx_posix_suite_print_usage() {
@@ -57,7 +57,8 @@ Usage: run-posix-regression-suite.sh [options]
   --skip-macos-wasm-selfcheck     skip macOS wasm runtime selfcheck phase
   --scaffold-skip-smoke           forward: skip scaffold smoke checks
   --scaffold-skip-http            forward: skip scaffold HTTP checks
-  --enforce-no-objcxx-edits       fail when workspace edits contain .mm/.m (policy gate)
+  --enforce-no-objcxx-edits       fail when workspace edits contain .mm/.m (policy gate, default: on)
+  --allow-objcxx-edits            disable objcxx edit gate for this run (approval-only exception)
 USAGE
 }
 
@@ -149,6 +150,10 @@ mfx_posix_suite_parse_args() {
                 ;;
             --enforce-no-objcxx-edits)
                 MFX_ENFORCE_NO_OBJCXX_EDITS=1
+                shift
+                ;;
+            --allow-objcxx-edits)
+                MFX_ENFORCE_NO_OBJCXX_EDITS=0
                 shift
                 ;;
             -h|--help)
