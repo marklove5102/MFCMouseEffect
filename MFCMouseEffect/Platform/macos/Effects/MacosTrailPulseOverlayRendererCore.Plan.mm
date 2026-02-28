@@ -12,11 +12,32 @@ TrailPulseRenderPlan BuildTrailPulseRenderPlan(const TrailEffectRenderCommand& c
     TrailPulseRenderPlan plan{};
     plan.command = command;
     plan.size = static_cast<CGFloat>(plan.command.sizePx);
+    const bool elongatedTrail =
+        !plan.command.tubesMode &&
+        !plan.command.particleMode;
+    const CGFloat halfBase = std::max<CGFloat>(plan.size * 0.5, 12.0);
+    CGFloat halfWidth = halfBase;
+    CGFloat halfHeight = halfBase;
+    if (elongatedTrail) {
+        const CGFloat framePadding = macos_overlay_support::ScaleOverlayMetric(
+            plan.size,
+            10.0,
+            160.0,
+            6.0,
+            22.0);
+        halfWidth = std::max(
+            halfWidth,
+            static_cast<CGFloat>(std::abs(plan.command.deltaX)) + framePadding);
+        halfHeight = std::max(
+            halfHeight,
+            static_cast<CGFloat>(std::abs(plan.command.deltaY)) + framePadding);
+    }
+
     const NSRect rawFrame = NSMakeRect(
-        plan.command.overlayPoint.x - plan.size * 0.5,
-        plan.command.overlayPoint.y - plan.size * 0.5,
-        plan.size,
-        plan.size);
+        plan.command.overlayPoint.x - halfWidth,
+        plan.command.overlayPoint.y - halfHeight,
+        halfWidth * 2.0,
+        halfHeight * 2.0);
     plan.frame = macos_overlay_support::ClampOverlayFrameToScreenBounds(rawFrame, plan.command.overlayPoint);
     plan.durationSec = macos_overlay_support::ScaleOverlayDurationBySize(
         plan.command.durationSec,

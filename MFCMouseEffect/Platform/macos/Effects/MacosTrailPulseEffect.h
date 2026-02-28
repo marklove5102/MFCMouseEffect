@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MouseFx/Interfaces/IMouseEffect.h"
+#include "MouseFx/Core/Config/EffectConfig.h"
 #include "Platform/macos/Effects/MacosEffectRenderProfile.h"
 
 #include <cstdint>
@@ -14,7 +15,9 @@ public:
         std::string effectType,
         std::string themeName,
         macos_effect_profile::TrailRenderProfile renderProfile,
-        macos_effect_profile::TrailThrottleProfile throttleProfile);
+        macos_effect_profile::TrailThrottleProfile throttleProfile,
+        IdleFadeParams idleFade,
+        float lineWidth);
     ~MacosTrailPulseEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Trail; }
@@ -31,6 +34,8 @@ private:
     std::string themeName_{};
     macos_effect_profile::TrailRenderProfile renderProfile_{};
     macos_effect_profile::TrailThrottleProfile throttleProfile_{};
+    IdleFadeParams idleFade_{};
+    float lineWidth_ = 4.0f;
     bool initialized_ = false;
 
     bool hasLastPoint_ = false;

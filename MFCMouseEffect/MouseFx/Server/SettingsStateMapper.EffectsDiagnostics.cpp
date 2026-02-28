@@ -9,6 +9,7 @@
 #include "Platform/macos/Effects/MacosHoverPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosScrollPulseWindowRegistry.h"
 #include "Platform/macos/Effects/MacosTrailPulseWindowRegistry.h"
+#include "MouseFx/Core/Diagnostics/TextEffectRuntimeDiagnostics.h"
 #endif
 
 using json = nlohmann::json;
@@ -41,6 +42,23 @@ json BuildEffectsRuntimeState() {
         scrollActiveOverlayWindows +
         holdActiveOverlayWindows +
         hoverActiveOverlayWindows;
+
+#if MFX_PLATFORM_MACOS
+    const auto textDiag = diagnostics::GetTextEffectRuntimeSnapshot();
+    out["text_effect"] = {
+        {"click_count", textDiag.clickCount},
+        {"fallback_show_count", textDiag.fallbackShowCount},
+        {"fallback_panel_created", textDiag.fallbackPanelCreated},
+        {"fallback_error_count", textDiag.fallbackErrorCount},
+        {"fallback_active_panels", textDiag.fallbackActivePanels},
+        {"last_click_ms", textDiag.lastClickMs},
+        {"last_fallback_ms", textDiag.lastFallbackMs},
+        {"last_click_pt", {{"x", textDiag.lastClickPt.x}, {"y", textDiag.lastClickPt.y}}},
+        {"last_fallback_pt", {{"x", textDiag.lastFallbackPt.x}, {"y", textDiag.lastFallbackPt.y}}},
+        {"last_text_preview", textDiag.lastTextPreview},
+        {"last_error", textDiag.lastError},
+    };
+#endif
     return out;
 }
 

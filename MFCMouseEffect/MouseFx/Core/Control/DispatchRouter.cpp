@@ -5,6 +5,8 @@
 #include "DispatchRouter.h"
 
 #include "DispatchRouter.Internal.h"
+#include "MouseFx/Core/Effects/ClickEffectCompute.h"
+#include "MouseFx/Interfaces/IMouseEffect.h"
 
 namespace mousefx {
 
@@ -79,14 +81,24 @@ intptr_t DispatchRouter::OnClick(const DispatchMessage& message) {
     }
 
     if (ev) {
+        const IMouseEffect* clickEffect = ctrl_->GetEffect(EffectCategory::Click);
+        const bool effectIsText = (clickEffect != nullptr) &&
+            (NormalizeClickEffectType(clickEffect->TypeName()) == "text");
+        const bool configIsText =
+            (NormalizeClickEffectType(ctrl_->Config().active.click) == "text");
+        const bool forceBuiltinTextClick = effectIsText || configIsText;
         bool renderedByWasm = false;
-        const bool wasmRouteActive = wasmFeature_.RouteClick(*ctrl_, *ev, &renderedByWasm);
+        bool wasmRouteActive = false;
+        if (!forceBuiltinTextClick) {
+            wasmRouteActive = wasmFeature_.RouteClick(*ctrl_, *ev, &renderedByWasm);
+        }
         automationFeature_.OnClick(*ctrl_, *ev);
         indicatorFeature_.OnClick(*ctrl_, *ev);
         ctrl_->LogDebugClick(*ev);
         const bool shouldFallbackToBuiltin =
-            (!wasmRouteActive) || ctrl_->ShouldFallbackToBuiltinClickWhenWasmActive();
-        if (!renderedByWasm && shouldFallbackToBuiltin) {
+            forceBuiltinTextClick ||
+            ((!wasmRouteActive) || ctrl_->ShouldFallbackToBuiltinClickWhenWasmActive());
+        if (shouldFallbackToBuiltin && (forceBuiltinTextClick || !renderedByWasm)) {
             if (auto* effect = ctrl_->GetEffect(EffectCategory::Click)) {
                 effect->OnClick(*ev);
             }

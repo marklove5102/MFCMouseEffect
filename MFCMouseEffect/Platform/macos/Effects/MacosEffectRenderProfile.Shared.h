@@ -43,6 +43,9 @@ inline TrailThrottleProfile ResolveTrailThrottleProfileByType(const std::string&
     if (type == "tubes") {
         return {18, 8.0};
     }
+    if (type == "line") {
+        return {5, 1.5};
+    }
     return {};
 }
 

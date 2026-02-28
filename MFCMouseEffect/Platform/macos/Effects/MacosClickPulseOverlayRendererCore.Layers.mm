@@ -72,7 +72,13 @@ void AddClickPulseExtraLayers(NSView* content, const ClickPulseRenderPlan& plan)
         text.contentsScale = std::max<CGFloat>(1.0, content.layer.contentsScale);
         const CGFloat fontSize = macos_overlay_support::ScaleOverlayMetric(plan.size, 24.0, 160.0, 14.0, 42.0);
         text.fontSize = fontSize;
-        text.font = (__bridge CFTypeRef)[NSFont boldSystemFontOfSize:fontSize];
+        NSFont* font = [NSFont boldSystemFontOfSize:fontSize];
+        NSString* fontName = font ? [font fontName] : nil;
+        if (fontName != nil) {
+            text.font = (__bridge CFTypeRef)fontName;
+        } else {
+            text.font = (__bridge CFTypeRef)@"Helvetica-Bold";
+        }
         text.string = [NSString stringWithUTF8String:plan.command.textLabel.c_str()];
         text.opacity = static_cast<float>(
             macos_overlay_support::ResolveOverlayOpacity(plan.command.baseOpacity, 0.03, 0.0));

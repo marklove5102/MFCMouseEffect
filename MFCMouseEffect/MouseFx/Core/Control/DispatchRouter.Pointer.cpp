@@ -5,6 +5,8 @@
 #include "DispatchRouter.h"
 
 #include "DispatchRouter.Internal.h"
+#include "MouseFx/Core/Effects/TrailEffectCompute.h"
+#include "MouseFx/Interfaces/IMouseEffect.h"
 
 namespace mousefx {
 
@@ -20,10 +22,17 @@ intptr_t DispatchRouter::OnMove(const DispatchMessage& message) {
 
     automationFeature_.OnMouseMove(*ctrl_, pt);
 
+    IMouseEffect* trailEffect = ctrl_->GetEffect(EffectCategory::Trail);
+    const bool forceBuiltinLineTrail = (trailEffect != nullptr) &&
+        (NormalizeTrailEffectType(trailEffect->TypeName()) == "line");
+
     bool moveRenderedByWasm = false;
-    const bool moveRouteActive = wasmFeature_.RouteMove(*ctrl_, pt, &moveRenderedByWasm);
-    if ((!moveRouteActive || !moveRenderedByWasm) && (ctrl_->GetEffect(EffectCategory::Trail) != nullptr)) {
-        if (auto* effect = ctrl_->GetEffect(EffectCategory::Trail)) {
+    bool moveRouteActive = false;
+    if (!forceBuiltinLineTrail) {
+        moveRouteActive = wasmFeature_.RouteMove(*ctrl_, pt, &moveRenderedByWasm);
+    }
+    if ((!moveRouteActive || !moveRenderedByWasm) && (trailEffect != nullptr)) {
+        if (auto* effect = trailEffect) {
             effect->OnMouseMove(pt);
         }
     }

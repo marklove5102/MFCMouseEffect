@@ -17,6 +17,7 @@
     const params = value.trail_params || {};
     return {
       trail_style: value.trail_style || 'default',
+      trail_line_width: toNumber(value.trail_line_width, 0),
       p_streamer_duration: toNumber(profile.streamer?.duration_ms, 0),
       p_streamer_max: toNumber(profile.streamer?.max_points, 0),
       p_electric_duration: toNumber(profile.electric?.duration_ms, 0),
@@ -43,6 +44,7 @@
     const value = form || normalizeTrail({});
     return {
       trail_style: value.trail_style || 'default',
+      trail_line_width: toNumber(value.trail_line_width, 0),
       trail_profiles: {
         line: { duration_ms: toNumber(value.p_line_duration, 0), max_points: toNumber(value.p_line_max, 0) },
         streamer: { duration_ms: toNumber(value.p_streamer_duration, 0), max_points: toNumber(value.p_streamer_max, 0) },
@@ -93,6 +95,11 @@
     </select>
 
     <div class="hint span2" data-i18n="hint_trail_preset">Preset name only; values below are what actually apply.</div>
+
+    <label for="trail_line_width" data-i18n="label_trail_line_width">Line width (px)</label>
+    <input id="trail_line_width" type="number" step="0.5" min="1" max="18" bind:value={form.trail_line_width} />
+
+    <div class="hint span2" data-i18n="hint_trail_line_width">Applies to line trail thickness (non-particle).</div>
 
     <label for="k_idle_fade_start" data-i18n="label_idle_fade">Idle fade start/end (ms)</label>
     <div class="pair">

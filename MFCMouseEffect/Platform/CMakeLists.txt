@@ -219,6 +219,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
 
         target_sources(mfx_entry_runtime_common PRIVATE
             "${MFX_PROJECT_ROOT}/Platform/PlatformRuntimeEnvironment.cpp"
+            "${MFX_PROJECT_ROOT}/Platform/PlatformEffectFallbackFactory.cpp"
             "${MFX_PROJECT_ROOT}/Platform/PlatformTextEncoding.cpp"
             "${MFX_PROJECT_ROOT}/Platform/PlatformApplicationCatalog.cpp"
             "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosApplicationCatalogScanner.mm"
@@ -276,6 +277,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/EffectFactory.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/InputIndicatorDispatchFeature.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Control/WasmDispatchFeature.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Diagnostics/TextEffectRuntimeDiagnostics.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Overlay/OverlayCoordSpace.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Overlay/OverlayHostService.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Protocol/JsonLite.cpp"
@@ -301,7 +303,9 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/Wasm3Runtime.Linking.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/Wasm3Runtime.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRuntimeFactory.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Effects/TextEffect.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Effects/HoldRouteCatalog.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Styles/ThemeStyle.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Renderers/Hold/Presentation/QuantumHaloPresenterBackendRegistry.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Renderers/Hold/Presentation/QuantumHaloPresenterSelection.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Server/SettingsSchemaBuilder.CapabilitiesSections.cpp"

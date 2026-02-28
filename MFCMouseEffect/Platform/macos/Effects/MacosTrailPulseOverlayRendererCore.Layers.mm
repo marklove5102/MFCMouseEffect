@@ -27,7 +27,7 @@ void ConfigureTrailCoreLayer(
     double deltaX,
     double deltaY) {
     core.frame = content.bounds;
-    const CGFloat size = CGRectGetWidth(content.bounds);
+    const CGFloat size = static_cast<CGFloat>(std::max(plan.command.sizePx, 1));
     const std::string& trailType = plan.command.normalizedType;
 
     if (plan.command.tubesMode) {
@@ -86,7 +86,7 @@ void AddTrailGlowLayer(NSView* content, const TrailPulseRenderPlan& plan) {
 
     CAShapeLayer* glow = [CAShapeLayer layer];
     glow.frame = content.bounds;
-    const CGFloat size = CGRectGetWidth(content.bounds);
+    const CGFloat size = static_cast<CGFloat>(std::max(plan.command.sizePx, 1));
     const CGFloat glowInset = macos_overlay_support::ScaleOverlayMetric(size, 18.0, 160.0, 8.0, 36.0);
     CGPathRef glowPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, glowInset, glowInset), nullptr);
     glow.path = glowPath;

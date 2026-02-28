@@ -182,10 +182,14 @@ void ApplyTrailTuningSettings(const json& payload, AppController* controller) {
     std::string style = cfg.trailStyle.empty() ? "default" : cfg.trailStyle;
     TrailProfilesConfig profiles = cfg.trailProfiles;
     TrailRendererParamsConfig params = cfg.trailParams;
+    float lineWidth = cfg.trail.lineWidth;
 
     if (payload.contains("trail_style") && payload["trail_style"].is_string()) {
         style = payload["trail_style"].get<std::string>();
         trailTouched = true;
+    }
+    if (payload.contains("trail_line_width") && payload["trail_line_width"].is_number()) {
+        lineWidth = ClampFloat(payload["trail_line_width"].get<float>(), 1.0f, 18.0f);
     }
 
     auto applyProfile = [&](const char* key, TrailHistoryProfile* dst) {
@@ -277,6 +281,9 @@ void ApplyTrailTuningSettings(const json& payload, AppController* controller) {
 
     if (trailTouched) {
         controller->SetTrailTuning(style, profiles, params);
+    }
+    if (std::fabs(cfg.trail.lineWidth - lineWidth) > 0.01f) {
+        controller->SetTrailLineWidth(lineWidth);
     }
 }
 

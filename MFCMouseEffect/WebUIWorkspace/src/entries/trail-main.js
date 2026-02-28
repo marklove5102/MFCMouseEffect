@@ -3,6 +3,7 @@ import { createLazyMountBridge } from './lazy-mount.js';
 
 let currentState = {
   trail_style: 'default',
+  trail_line_width: 0,
   trail_profiles: {
     line: { duration_ms: 0, max_points: 0 },
     streamer: { duration_ms: 0, max_points: 0 },
@@ -31,6 +32,7 @@ function normalizeTrail(input) {
   const params = value.trail_params || {};
   return {
     trail_style: value.trail_style || 'default',
+    trail_line_width: toNumber(value.trail_line_width, 0),
     trail_profiles: {
       line: {
         duration_ms: toNumber(profile.line?.duration_ms, 0),

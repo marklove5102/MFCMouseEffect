@@ -4,6 +4,7 @@
 #include "AppController.h"
 
 #include "MouseFx/Core/Config/EffectConfigInternal.h"
+#include "MouseFx/Core/Effects/ClickEffectCompute.h"
 #include "MouseFx/Renderers/Hold/Presentation/QuantumHaloPresenterSelection.h"
 #include "MouseFx/Utils/MathUtils.h"
 
@@ -25,7 +26,7 @@ void AppController::SetTextEffectContent(const std::vector<std::wstring>& texts)
     // TextEffect::Initialize() builds the pool.
     // We should probably re-initialize the text effect if it's active.
     // Simple way: re-set it to trigger re-init.
-    if (config_.active.click == "text") {
+    if (NormalizeClickEffectType(config_.active.click) == "text") {
         SetEffect(EffectCategory::Click, "text");
     }
 }
@@ -35,7 +36,7 @@ void AppController::SetTextEffectFontSize(float sizePt) {
     if (std::fabs(config_.textClick.fontSize - clamped) < 0.01f) return;
     config_.textClick.fontSize = clamped;
     PersistConfig();
-    if (config_.active.click == "text") {
+    if (NormalizeClickEffectType(config_.active.click) == "text") {
         SetEffect(EffectCategory::Click, "text");
     }
 }
@@ -59,6 +60,18 @@ void AppController::SetTrailTuning(const std::string& style, const TrailProfiles
     PersistConfig();
 
     // Recreate current trail effect to apply immediately (if any).
+    if (IsActiveEffectEnabled(EffectCategory::Trail)) {
+        ReapplyActiveEffect(EffectCategory::Trail);
+    }
+}
+
+void AppController::SetTrailLineWidth(float lineWidth) {
+    const float clamped = ClampFloat(lineWidth, 1.0f, 18.0f);
+    if (std::fabs(config_.trail.lineWidth - clamped) < 0.01f) {
+        return;
+    }
+    config_.trail.lineWidth = clamped;
+    PersistConfig();
     if (IsActiveEffectEnabled(EffectCategory::Trail)) {
         ReapplyActiveEffect(EffectCategory::Trail);
     }

@@ -37,6 +37,7 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
     (*out)["text_font_size"] = cfg.textClick.fontSize;
 
     (*out)["trail_style"] = EnsureUtf8(cfg.trailStyle);
+    (*out)["trail_line_width"] = cfg.trail.lineWidth;
     (*out)["trail_profiles"] = {
         {"line", {{"duration_ms", cfg.trailProfiles.line.durationMs}, {"max_points", cfg.trailProfiles.line.maxPoints}}},
         {"streamer", {{"duration_ms", cfg.trailProfiles.streamer.durationMs}, {"max_points", cfg.trailProfiles.streamer.maxPoints}}},

@@ -1,20 +1,42 @@
 #include "pch.h"
 #include "TextEffect.h"
 #include "MouseFx/Core/Overlay/OverlayHostService.h"
+#include "MouseFx/Core/Diagnostics/TextEffectRuntimeDiagnostics.h"
 #include "MouseFx/Styles/ThemeStyle.h"
 #include "Platform/PlatformEffectFallbackFactory.h"
 #include "Settings/EmojiUtils.h"
 #include <random>
 
 namespace mousefx {
+namespace {
 
-static int RandomRange(int min, int max) {
+int RandomRange(int min, int max) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(min, max);
     return dis(gen);
 }
 
+std::wstring ResolveDefaultLabel(MouseButton button) {
+    switch (button) {
+    case MouseButton::Right:
+        return L"RIGHT";
+    case MouseButton::Middle:
+        return L"MIDDLE";
+    case MouseButton::Left:
+    default:
+        return L"LEFT";
+    }
+}
+
+std::wstring ResolveClickText(const TextConfig& config, MouseButton button) {
+    if (!config.texts.empty()) {
+        return config.texts[RandomRange(0, static_cast<int>(config.texts.size()) - 1)];
+    }
+    return ResolveDefaultLabel(button);
+}
+
+} // namespace
 
 TextEffect::TextEffect(const TextConfig& config, const std::string& themeName)
     : config_(config),
@@ -48,10 +70,12 @@ void TextEffect::Shutdown() {
 }
 
 void TextEffect::OnClick(const ClickEvent& event) {
-    if (config_.texts.empty()) return;
+    const std::wstring text = ResolveClickText(config_, event.button);
+    if (text.empty()) {
+        return;
+    }
 
-    // Pick random text and color
-    const std::wstring& text = config_.texts[RandomRange(0, (int)config_.texts.size() - 1)];
+    diagnostics::RecordTextEffectClick(event.pt, text);
     
     Argb color = { 0xFFFF69B4 }; // Default
     if (isChromatic_) {
@@ -66,6 +90,13 @@ void TextEffect::OnClick(const ClickEvent& event) {
         fallback_->ShowText(event.pt, text, color, config_);
         return;
     }
+
+#if defined(__APPLE__)
+    if (fallback_ && fallback_->EnsureInitialized(8)) {
+        fallback_->ShowText(event.pt, text, color, config_);
+        return;
+    }
+#endif
 
     if (OverlayHostService::Instance().ShowText(event.pt, text, color, config_)) {
         return;

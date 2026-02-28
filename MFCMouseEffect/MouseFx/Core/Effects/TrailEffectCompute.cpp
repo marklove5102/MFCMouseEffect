@@ -39,8 +39,11 @@ double Clamp01(double value) {
 
 std::string NormalizeTrailEffectType(const std::string& effectType) {
     const std::string lowered = ToLowerAscii(effectType);
-    if (lowered.empty() || lowered == "none") {
+    if (lowered.empty()) {
         return "line";
+    }
+    if (lowered == "none") {
+        return "none";
     }
     if (lowered == "scifi" || lowered == "sci-fi" || lowered == "sci_fi") {
         return "tubes";

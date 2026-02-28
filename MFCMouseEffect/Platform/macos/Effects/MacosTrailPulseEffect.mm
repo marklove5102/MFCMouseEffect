@@ -5,22 +5,29 @@
 #include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
+#include "Platform/macos/Effects/MacosLineTrailOverlay.h"
 #include "Platform/macos/Effects/MacosTrailPulseOverlayRenderer.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <utility>
 
 namespace mousefx {
+
 MacosTrailPulseEffect::MacosTrailPulseEffect(
     std::string effectType,
     std::string themeName,
     macos_effect_profile::TrailRenderProfile renderProfile,
-    macos_effect_profile::TrailThrottleProfile throttleProfile)
+    macos_effect_profile::TrailThrottleProfile throttleProfile,
+    IdleFadeParams idleFade,
+    float lineWidth)
     : effectType_(std::move(effectType)),
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile),
-      throttleProfile_(throttleProfile) {
+      throttleProfile_(throttleProfile),
+      idleFade_(idleFade),
+      lineWidth_(lineWidth) {
     effectType_ = NormalizeTrailEffectType(effectType_);
 }
 
@@ -39,6 +46,7 @@ void MacosTrailPulseEffect::Shutdown() {
     initialized_ = false;
     hasLastPoint_ = false;
     lastEmitTickMs_ = 0;
+    macos_line_trail::ResetLineTrail();
     macos_trail_pulse::CloseAllTrailPulseWindows();
 }
 
@@ -54,26 +62,65 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
     }
 
     const uint64_t now = CurrentTickMs();
-    const TrailEffectEmissionResult emission = ComputeTrailEffectEmission(
+    const std::string normalizedType = NormalizeTrailEffectType(effectType_);
+    const bool lineTrail = (normalizedType == "line");
+
+    if (lineTrail) {
+        macos_line_trail::LineTrailConfig config{};
+        config.durationMs = std::clamp(
+            static_cast<int>(std::lround(renderProfile_.durationSec * 1000.0)),
+            120,
+            2000);
+        config.lineWidth = std::clamp(lineWidth_, 1.0f, 18.0f);
+        config.strokeArgb = renderProfile_.line.strokeArgb;
+        config.idleFade = idleFade_;
+        macos_line_trail::UpdateLineTrail(pt, config);
+        lastPoint_ = pt;
+        return;
+    }
+    const auto throttleProfile =
+        macos_effect_compute_profile::BuildTrailThrottleProfile(throttleProfile_);
+    TrailEffectEmissionResult emission = ComputeTrailEffectEmission(
         pt,
         lastPoint_,
         now,
         lastEmitTickMs_,
-        macos_effect_compute_profile::BuildTrailThrottleProfile(throttleProfile_));
+        throttleProfile);
     if (!emission.shouldEmit) {
-        return;
+        const double forceDistance =
+            std::max(12.0, throttleProfile.minDistancePx * 2.0);
+        if (emission.distancePx < forceDistance) {
+            return;
+        }
+        emission.shouldEmit = true;
     }
 
     lastEmitTickMs_ = now;
+    const TrailEffectProfile profile =
+        macos_effect_compute_profile::BuildTrailProfile(renderProfile_);
+    const double distance = std::max(0.0, emission.distancePx);
+    const double segmentStep = std::max(8.0, throttleProfile.minDistancePx);
+    const int segmentCount = static_cast<int>(std::clamp(std::ceil(distance / segmentStep), 1.0, 12.0));
+    ScreenPoint prev = lastPoint_;
+    for (int i = 1; i <= segmentCount; ++i) {
+        const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
+        ScreenPoint segPt{};
+        segPt.x = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.x) +
+                                                   (static_cast<double>(pt.x - lastPoint_.x) * t)));
+        segPt.y = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.y) +
+                                                   (static_cast<double>(pt.y - lastPoint_.y) * t)));
+        const double dx = static_cast<double>(segPt.x - prev.x);
+        const double dy = static_cast<double>(segPt.y - prev.y);
+        const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
+            ScreenToOverlayPoint(segPt),
+            dx,
+            dy,
+            normalizedType,
+            profile);
+        macos_trail_pulse::ShowTrailPulseOverlay(command, themeName_);
+        prev = segPt;
+    }
     lastPoint_ = pt;
-
-    const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
-        ScreenToOverlayPoint(pt),
-        emission.deltaX,
-        emission.deltaY,
-        effectType_,
-        macos_effect_compute_profile::BuildTrailProfile(renderProfile_));
-    macos_trail_pulse::ShowTrailPulseOverlay(command, themeName_);
 }
 
 uint64_t MacosTrailPulseEffect::CurrentTickMs() {

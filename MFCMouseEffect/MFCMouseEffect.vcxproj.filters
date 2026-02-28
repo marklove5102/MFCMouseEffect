@@ -60,6 +60,9 @@
     <ClInclude Include="MouseFx\Core\Control\WasmDispatchFeature.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
+    <ClInclude Include="MouseFx\Core\Diagnostics\TextEffectRuntimeDiagnostics.h">
+      <Filter>头文件\MouseFx</Filter>
+    </ClInclude>
     <ClInclude Include="MouseFx\Core\Control\IDispatchMessageHandler.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
@@ -525,6 +528,9 @@
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Core\Control\WasmDispatchFeature.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Core\Diagnostics\TextEffectRuntimeDiagnostics.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Core\Automation\InputAutomationEngine.cpp">

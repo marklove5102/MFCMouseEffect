@@ -117,6 +117,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosEffectRenderProfile.ClickTrail.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosEffectRenderProfile.ScrollHoldHover.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosOverlayRenderSupport.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosLineTrailOverlay.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseEffect.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayStyle.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayRenderer.mm"
@@ -146,6 +147,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Start.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.State.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Update.mm"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTextEffectFallback.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay/MacosOverlayCoordSpaceConversion.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay/MacosOverlayCoordSpaceService.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay/MacosInputIndicatorOverlay.mm"
@@ -222,6 +224,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosVirtualKeyMapper.KeyPairs.mm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosUserNotificationService.AppleScript.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosUserNotificationService.cpp"
+    "${MFX_PROJECT_ROOT}/Settings/EmojiUtils.cpp"
 )
 
 if(MFX_MACOS_NOTIFICATION_SWIFT_OBJECT)

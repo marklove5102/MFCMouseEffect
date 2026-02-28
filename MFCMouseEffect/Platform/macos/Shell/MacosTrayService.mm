@@ -71,7 +71,23 @@ void MacosTrayService::Stop() {
 }
 
 void MacosTrayService::RequestExit() {
-    // AppShellCore controls run-loop shutdown; tray exit action routes through host callback.
+    if (!impl_ || !impl_->started) {
+        return;
+    }
+
+    macos_tray::RunOnMainThreadSync(^{
+      // Remove the status item immediately so users do not see a stale tray icon
+      // while shutdown is draining.
+      macos_tray::ReleaseMacosTrayMenu(&impl_->tray);
+#if defined(__APPLE__)
+      if (NSApp != nil) {
+          [NSApp terminate:nil];
+      }
+#endif
+    });
+
+    impl_->host = nullptr;
+    impl_->started = false;
 }
 
 #else

@@ -90,22 +90,9 @@ NSRect ClampOverlayFrameToScreenBounds(const NSRect& desiredFrame, const ScreenP
         desiredFrame.size.width <= 0.0 || desiredFrame.size.height <= 0.0) {
         return desiredFrame;
     }
-
-    NSRect clamped = desiredFrame;
-    if (clamped.size.width > bounds.size.width) {
-        clamped.size.width = bounds.size.width;
-    }
-    if (clamped.size.height > bounds.size.height) {
-        clamped.size.height = bounds.size.height;
-    }
-
-    const CGFloat minX = NSMinX(bounds);
-    const CGFloat maxX = NSMaxX(bounds) - clamped.size.width;
-    const CGFloat minY = NSMinY(bounds);
-    const CGFloat maxY = NSMaxY(bounds) - clamped.size.height;
-    clamped.origin.x = ClampCoordinate(clamped.origin.x, minX, maxX);
-    clamped.origin.y = ClampCoordinate(clamped.origin.y, minY, maxY);
-    return clamped;
+    // Keep effect anchor at the real input point. If the window goes partially
+    // out of screen near edges, clipping is preferred over anchor drift.
+    return desiredFrame;
 }
 
 CGFloat ResolveOverlayContentsScale(const ScreenPoint& overlayPt) {

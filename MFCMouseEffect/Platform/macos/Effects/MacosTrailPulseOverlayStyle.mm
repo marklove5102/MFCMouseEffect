@@ -4,7 +4,9 @@
 #include "MouseFx/Utils/StringUtils.h"
 
 #if defined(__APPLE__)
+#include <algorithm>
 #include <cmath>
+#include <limits>
 #endif
 
 namespace mousefx::macos_trail_pulse::detail {
@@ -78,27 +80,45 @@ NSColor* TrailFillColor(
 CGPathRef CreateTrailLinePath(CGRect bounds, double deltaX, double deltaY, const std::string& trailType) {
     const CGFloat cx = CGRectGetMidX(bounds);
     const CGFloat cy = CGRectGetMidY(bounds);
-    const CGFloat len = (trailType == "particle") ? 10.0 : 20.0;
-    const CGFloat width = (trailType == "particle") ? 2.0 : 3.0;
-
     CGFloat dx = static_cast<CGFloat>(deltaX);
     CGFloat dy = static_cast<CGFloat>(deltaY);
-    const CGFloat norm = std::sqrt(dx * dx + dy * dy);
-    if (norm < 0.0001) {
-        dx = 1.0;
+    const CGFloat distance = std::sqrt(dx * dx + dy * dy);
+
+    const bool lineTrail = (trailType == "line");
+    const bool electricTrail = (trailType == "electric");
+    const bool meteorTrail = (trailType == "meteor");
+    const CGFloat minSegment = lineTrail ? 1.0 : (meteorTrail ? 20.0 : 12.0);
+    const CGFloat maxSegment = lineTrail ? std::numeric_limits<CGFloat>::max() : (meteorTrail ? 260.0 : 220.0);
+
+    if (distance < 0.0001) {
+        dx = minSegment;
         dy = 0.0;
     } else {
-        dx /= norm;
-        dy /= norm;
+        const CGFloat targetLength = lineTrail ? distance : std::clamp(distance, minSegment, maxSegment);
+        const CGFloat scale = targetLength / distance;
+        dx *= scale;
+        dy *= scale;
     }
 
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, nullptr, cx - dx * len, cy - dy * len);
-    if (trailType == "electric") {
-        CGPathAddLineToPoint(path, nullptr, cx - dy * width, cy + dx * width);
-        CGPathAddLineToPoint(path, nullptr, cx + dy * width, cy - dx * width);
+    CGPathMoveToPoint(path, nullptr, cx - dx, cy - dy);
+    if (electricTrail) {
+        const CGFloat scaledLength = std::max<CGFloat>(std::sqrt(dx * dx + dy * dy), 1.0);
+        const CGFloat nx = -dy / scaledLength;
+        const CGFloat ny = dx / scaledLength;
+        const CGFloat kink = std::clamp(scaledLength * 0.20, 3.0, 14.0);
+        CGPathAddLineToPoint(
+            path,
+            nullptr,
+            cx - dx * 0.56 + nx * kink,
+            cy - dy * 0.56 + ny * kink);
+        CGPathAddLineToPoint(
+            path,
+            nullptr,
+            cx - dx * 0.28 - nx * (kink * 0.85),
+            cy - dy * 0.28 - ny * (kink * 0.85));
     }
-    CGPathAddLineToPoint(path, nullptr, cx + dx * len, cy + dy * len);
+    CGPathAddLineToPoint(path, nullptr, cx, cy);
     return path;
 }
 #endif

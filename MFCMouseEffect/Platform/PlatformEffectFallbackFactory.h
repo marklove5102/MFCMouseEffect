@@ -2,9 +2,11 @@
 
 #include <memory>
 
-#include "MouseFx/Interfaces/IParticleTrailEffectFallback.h"
-#include "MouseFx/Interfaces/ITextEffectFallback.h"
-#include "MouseFx/Interfaces/ITrailEffectFallback.h"
+namespace mousefx {
+class ITextEffectFallback;
+class ITrailEffectFallback;
+class IParticleTrailEffectFallback;
+}
 
 namespace mousefx::platform {
 

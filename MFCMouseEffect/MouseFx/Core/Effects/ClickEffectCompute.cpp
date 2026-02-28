@@ -36,14 +36,15 @@ const char* ResolveTextLabel(MouseButton button) {
 } // namespace
 
 std::string NormalizeClickEffectType(const std::string& effectType) {
-    const std::string lowered = ToLowerAscii(effectType);
+    const std::string lowered = ToLowerAscii(TrimAscii(effectType));
     if (lowered.empty() || lowered == "none") {
         return "ripple";
     }
     if (lowered == "star" || lowered == "icon" || lowered == "icon_star") {
         return "star";
     }
-    if (lowered == "text" || lowered == "textclick" || lowered == "text_click") {
+    if (lowered == "text" || lowered == "textclick" || lowered == "text_click" ||
+        lowered.find("text") != std::string::npos) {
         return "text";
     }
     return "ripple";
