@@ -73,6 +73,7 @@
 - Removed unreferenced non-engineering docs in `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/install` and `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing`; retained `trail-profiles-config*` as an active configuration contract and re-linked it in top-level indexes.
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.md` and `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.zh-CN.md` were compacted into architecture-contract summaries; low-value phase narrative was removed in favor of targeted issue docs.
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md` was compacted to a contract-oriented checklist (coverage groups + gate flags + ownership boundaries), removing verbose endpoint-by-endpoint prose.
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-template-quickstart.md` and `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-template-quickstart.zh-CN.md` were reduced to minimal operator-oriented guidance (build/place/load/ABI/troubleshooting).
 - Current docs focus is now:
   - `P0`: `AGENTS.md`
   - `P1`: this file + roadmap snapshot
