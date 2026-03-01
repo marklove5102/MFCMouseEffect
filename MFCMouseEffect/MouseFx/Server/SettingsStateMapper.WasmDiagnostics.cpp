@@ -3,8 +3,8 @@
 #include "SettingsStateMapper.Diagnostics.h"
 
 #include "MouseFx/Core/Control/AppController.h"
-#include "MouseFx/Core/Wasm/WasmCommandRenderer.h"
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
+#include "MouseFx/Server/SettingsWasmCapabilities.h"
 #include "MouseFx/Utils/StringUtils.h"
 #if MFX_PLATFORM_MACOS
 #include "Platform/macos/Wasm/MacosWasmOverlayPolicy.h"
@@ -13,17 +13,6 @@
 using json = nlohmann::json;
 
 namespace mousefx {
-namespace {
-
-bool IsWasmRenderSupportedOnCurrentPlatform() {
-    static const bool supported = [] {
-        auto renderer = wasm::CreatePlatformWasmCommandRenderer();
-        return renderer && renderer->SupportsRendering();
-    }();
-    return supported;
-}
-
-} // namespace
 
 json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     if (!controller) {
@@ -51,7 +40,7 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["configured_output_buffer_bytes"] = cfg.wasm.outputBufferBytes;
     out["configured_max_commands"] = cfg.wasm.maxCommands;
     out["configured_max_execution_ms"] = cfg.wasm.maxEventExecutionMs;
-    out["invoke_supported"] = true;
+    out["invoke_supported"] = IsWasmInvokeSupportedOnCurrentPlatform();
     out["render_supported"] = IsWasmRenderSupportedOnCurrentPlatform();
     out["runtime_output_buffer_bytes"] = runtimeBudget.outputBufferBytes;
     out["runtime_max_commands"] = runtimeBudget.maxCommands;

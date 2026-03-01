@@ -2,23 +2,12 @@
 #include "SettingsSchemaBuilder.CapabilitiesSections.h"
 
 #include "MouseFx/Core/Config/EffectConfig.h"
-#include "MouseFx/Core/Wasm/WasmCommandRenderer.h"
+#include "MouseFx/Server/SettingsWasmCapabilities.h"
 #include "Platform/PlatformTarget.h"
 
 using json = nlohmann::json;
 
 namespace mousefx {
-namespace {
-
-bool IsWasmRenderSupportedOnCurrentPlatform() {
-    static const bool supported = [] {
-        auto renderer = wasm::CreatePlatformWasmCommandRenderer();
-        return renderer && renderer->SupportsRendering();
-    }();
-    return supported;
-}
-
-} // namespace
 
 void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, json* out) {
     if (!out) {
@@ -155,7 +144,7 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
             {"keyboard_injector", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false}
         }},
         {"wasm", {
-            {"invoke", (MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS) ? true : false},
+            {"invoke", IsWasmInvokeSupportedOnCurrentPlatform()},
             {"render", IsWasmRenderSupportedOnCurrentPlatform()}
         }}
     };

@@ -311,6 +311,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Server/SettingsStateMapper.InputCaptureDiagnostics.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Server/SettingsStateMapper.WasmDiagnostics.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Server/SettingsStateMapper.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Server/SettingsWasmCapabilities.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Server/WebSettingsServer.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Server/WebSettingsServer.AutomationRoutes.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Server/WebSettingsServer.AutomationCatalogRoutes.cpp"
