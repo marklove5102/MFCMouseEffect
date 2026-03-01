@@ -424,7 +424,6 @@ if(APPLE)
     # modules are fully migrated to Swift bridges.
     set(MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosClickPulseOverlayRendererCore.Layers.cpp"
-        "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosClickPulseOverlayRendererCore.cpp"
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosOverlayRenderSupport.cpp"
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayRendererCore.Layers.cpp"
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseOverlayRendererCore.Layers.cpp"

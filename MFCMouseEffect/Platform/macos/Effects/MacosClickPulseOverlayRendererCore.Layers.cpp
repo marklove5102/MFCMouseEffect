@@ -1,12 +1,15 @@
 #include "pch.h"
 
+#include "Platform/macos/Effects/MacosClickPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosClickPulseOverlayRendererCore.Internal.h"
+#include "Platform/macos/Effects/MacosClickPulseWindowRegistry.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosClickPulseOverlayStyle.h"
 
 #if defined(__APPLE__)
 #import <AppKit/AppKit.h>
 #import <QuartzCore/QuartzCore.h>
+#import <dispatch/dispatch.h>
 #endif
 
 #include <algorithm>
@@ -99,6 +102,44 @@ void StartClickPulseAnimation(CAShapeLayer* base, const ClickPulseRenderPlan& pl
         static_cast<CGFloat>(plan.command.baseOpacity),
         plan.animationDuration);
     [base addAnimation:group forKey:@"mfx_click_pulse"];
+}
+
+void ShowClickPulseOverlayOnMain(
+    const ClickEffectRenderCommand& command,
+    const std::string& themeName) {
+    (void)themeName;
+
+    const ClickPulseRenderPlan plan = BuildClickPulseRenderPlan(command);
+    NSWindow* window = macos_overlay_support::CreateOverlayWindow(plan.frame);
+    if (window == nil) {
+        return;
+    }
+
+    NSView* content = [window contentView];
+    macos_overlay_support::ApplyOverlayContentScale(content, command.overlayPoint);
+
+    CAShapeLayer* base = [CAShapeLayer layer];
+    base.frame = content.bounds;
+    ConfigureClickPulseBaseLayer(base, content, plan);
+    [content.layer addSublayer:base];
+
+    AddClickPulseExtraLayers(content, plan);
+    StartClickPulseAnimation(base, plan);
+
+    RegisterClickPulseWindow(reinterpret_cast<void*>(window));
+    macos_overlay_support::ShowOverlayWindow(reinterpret_cast<void*>(window));
+
+    dispatch_after(
+        dispatch_time(
+            DISPATCH_TIME_NOW,
+            ComputeClickPulseCloseDelayNs(plan)),
+        dispatch_get_main_queue(),
+        ^{
+          if (!TakeClickPulseWindow(reinterpret_cast<void*>(window))) {
+              return;
+          }
+          macos_overlay_support::ReleaseOverlayWindow(reinterpret_cast<void*>(window));
+        });
 }
 
 #endif
