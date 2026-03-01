@@ -55,59 +55,19 @@ for pattern in "${BANNED_WILDCARD_PATTERNS[@]}"; do
     fi
 done
 
-if ! grep -Fq 'set(MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST' "$CMAKE_FILE"; then
-    mfx_fail "missing explicit ObjC++ allowlist declaration in CMake"
+if grep -Fq 'set(MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST' "$CMAKE_FILE"; then
+    mfx_fail "obsolete ObjC++ allowlist block is still present in CMake"
 fi
-if ! grep -Fq 'if(MFX_MACOS_SOURCE IN_LIST MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST)' "$CMAKE_FILE"; then
-    mfx_fail "ObjC++ source selection is not using explicit allowlist"
-fi
-
-objcxx_flag_count="$(grep -c 'COMPILE_FLAGS "-x objective-c++"' "$CMAKE_FILE" || true)"
-if [[ "$objcxx_flag_count" -ne 1 ]]; then
-    mfx_fail "expected exactly one ObjC++ compile-flag assignment in CMake, got: $objcxx_flag_count"
+if grep -Fq 'if(MFX_MACOS_SOURCE IN_LIST MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST)' "$CMAKE_FILE"; then
+    mfx_fail "obsolete ObjC++ allowlist source loop is still present in CMake"
 fi
 
-mapfile -t ALLOWLIST_ENTRIES < <(
-    awk '
-        /set\(MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST/ {in_list=1; next}
-        in_list && /^[[:space:]]*\)/ {in_list=0; next}
-        in_list {
-            line=$0
-            gsub(/^[[:space:]]*"/, "", line)
-            gsub(/"[[:space:]]*$/, "", line)
-            if (line != "") {
-                print line
-            }
-        }
-    ' "$CMAKE_FILE"
-)
+if grep -Fq 'COMPILE_FLAGS "-x objective-c++"' "$CMAKE_FILE"; then
+    mfx_fail "obsolete ObjC++ compile flag assignment is still present in CMake"
+fi
 
-if [[ "${#ALLOWLIST_ENTRIES[@]}" -eq 0 ]]; then
-    mfx_info "ObjC++ allowlist is empty (all macOS sources are Swift/C++ mode)"
-else
-    mapfile -t DUP_ALLOWLIST < <(printf '%s\n' "${ALLOWLIST_ENTRIES[@]}" | sort | uniq -d)
-    if [[ "${#DUP_ALLOWLIST[@]}" -gt 0 ]]; then
-        printf '[mfx:fail] duplicated ObjC++ allowlist entries:\n' >&2
-        printf '  %s\n' "${DUP_ALLOWLIST[@]}" >&2
-        exit 1
-    fi
-
-    for entry in "${ALLOWLIST_ENTRIES[@]}"; do
-        case "$entry" in
-            '${MFX_PROJECT_ROOT}/Platform/macos/Effects/'* | \
-            '${MFX_PROJECT_ROOT}/Platform/macos/Overlay/'* | \
-            '${MFX_PROJECT_ROOT}/Platform/macos/Wasm/'*)
-                ;;
-            *)
-                mfx_fail "ObjC++ allowlist entry is outside macOS target scope: $entry"
-                ;;
-        esac
-
-        resolved_path="${entry//'${MFX_PROJECT_ROOT}'/$REPO_ROOT/MFCMouseEffect}"
-        if [[ ! -f "$resolved_path" ]]; then
-            mfx_fail "ObjC++ allowlist entry points to missing file: $entry -> $resolved_path"
-        fi
-    done
+if grep -Eq 'objective-c\+\+|OBJCXX|LANGUAGE[[:space:]]+OBJCXX' "$CMAKE_FILE"; then
+    mfx_fail "CMake still contains Objective-C++ specific compile rules"
 fi
 
 mfx_ok "macos objcxx surface regression passed"

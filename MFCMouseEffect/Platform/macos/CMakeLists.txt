@@ -529,28 +529,6 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Settings/EmojiUtils.cpp"
 )
 
-if(APPLE)
-    # Explicit ObjC++ allowlist. Keep this list tight and prune entries when
-    # modules are fully migrated to Swift bridges.
-    set(MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST
-    )
-
-    get_target_property(MFX_MACOS_TARGET_SOURCES mfx_shell_macos SOURCES)
-    set(MFX_MACOS_OBJCXX_CPP_SOURCES "")
-    foreach(MFX_MACOS_SOURCE IN LISTS MFX_MACOS_TARGET_SOURCES)
-        if(MFX_MACOS_SOURCE IN_LIST MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST)
-            list(APPEND MFX_MACOS_OBJCXX_CPP_SOURCES "${MFX_MACOS_SOURCE}")
-        endif()
-    endforeach()
-    if(MFX_MACOS_OBJCXX_CPP_SOURCES)
-        set_source_files_properties(
-            ${MFX_MACOS_OBJCXX_CPP_SOURCES}
-            PROPERTIES
-                COMPILE_FLAGS "-x objective-c++"
-        )
-    endif()
-endif()
-
 set(MFX_MACOS_PLATFORM_HEADER_DIRS
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay"
