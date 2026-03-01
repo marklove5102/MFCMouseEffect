@@ -123,6 +123,28 @@ mfx_posix_suite_run_macos_automation_injection_selfcheck_phase() {
     "$repo_root/tools/platform/manual/run-macos-automation-injection-selfcheck.sh" "${args[@]}"
 }
 
+mfx_posix_suite_run_macos_automation_app_scope_selfcheck_phase() {
+    local repo_root="$1"
+    if [[ "$MFX_SKIP_MACOS_AUTOMATION_APP_SCOPE_SELFCHECK" -eq 1 ]]; then
+        mfx_info "skip macos automation app-scope selfcheck phase"
+        return
+    fi
+    if ! mfx_posix_suite_is_macos_host; then
+        mfx_info "skip macos automation app-scope selfcheck phase (non-macos host)"
+        return
+    fi
+
+    local args=("--skip-build")
+    local resolved_build_dir
+    resolved_build_dir="$(_mfx_posix_suite_resolve_core_build_dir)"
+    if [[ -n "$resolved_build_dir" ]]; then
+        args+=("--build-dir" "$resolved_build_dir")
+    fi
+
+    mfx_info "run macos automation app-scope selfcheck phase"
+    "$repo_root/tools/platform/manual/run-macos-automation-app-scope-selfcheck.sh" "${args[@]}"
+}
+
 mfx_posix_suite_run_macos_effects_tuning_selfcheck_phase() {
     local repo_root="$1"
     if [[ "$MFX_SKIP_MACOS_EFFECTS_TUNING_SELFCHECK" -eq 1 ]]; then

@@ -23,6 +23,7 @@
 - POSIX Linux 编译门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
 ## 近期问题文档
+- POSIX 套件接入 macOS automation app-scope 自检门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp6-posix-suite-macos-automation-app-scope-selfcheck-gate.md`
 - macOS 拖尾 Swift 桥接 fail-closed 类型保护：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp5-macos-trail-swift-bridge-fail-closed-type-guard.md`
 - WASM schema/state 能力一致性门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp4-wasm-capability-schema-state-contract-parity.md`
 - WASM 能力判定单一来源：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp3-wasm-capability-resolver-single-source.md`
