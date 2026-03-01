@@ -29,6 +29,7 @@ mfx_posix_suite_init_defaults() {
     MFX_SKIP_MACOS_AUTOMATION_INJECTION_SELFCHECK=0
     MFX_SKIP_MACOS_AUTOMATION_APP_SCOPE_SELFCHECK=0
     MFX_SKIP_MACOS_VM_SUPPRESSION_SELFCHECK=0
+    MFX_SKIP_MACOS_EFFECTS_TYPE_PARITY_SELFCHECK=0
     MFX_SKIP_MACOS_EFFECTS_TUNING_SELFCHECK=0
     MFX_SKIP_LINUX_GATE=0
     MFX_LINUX_SKIP_CORE_RUNTIME=0
@@ -56,6 +57,7 @@ Usage: run-posix-regression-suite.sh [options]
   --skip-macos-automation-injection-selfcheck skip macOS automation injection selfcheck phase
   --skip-macos-automation-app-scope-selfcheck skip macOS automation app-scope selfcheck phase
   --skip-macos-vm-suppression-selfcheck skip macOS VM foreground suppression selfcheck phase
+  --skip-macos-effects-type-parity-selfcheck skip macOS effects type parity selfcheck phase
   --skip-macos-effects-tuning-selfcheck skip macOS effects tuning selfcheck phase
   --skip-linux-gate               skip linux compile gate phase
   --linux-skip-core-runtime       forward: linux gate skips core-runtime lane compile
@@ -136,6 +138,10 @@ mfx_posix_suite_parse_args() {
                 ;;
             --skip-macos-vm-suppression-selfcheck)
                 MFX_SKIP_MACOS_VM_SUPPRESSION_SELFCHECK=1
+                shift
+                ;;
+            --skip-macos-effects-type-parity-selfcheck)
+                MFX_SKIP_MACOS_EFFECTS_TYPE_PARITY_SELFCHECK=1
                 shift
                 ;;
             --skip-macos-effects-tuning-selfcheck)

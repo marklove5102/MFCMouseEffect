@@ -15,5 +15,6 @@ exec "$SCRIPT_DIR/run-posix-regression-suite.sh" \
     --skip-macos-automation-injection-selfcheck \
     --skip-macos-automation-app-scope-selfcheck \
     --skip-macos-vm-suppression-selfcheck \
+    --skip-macos-effects-type-parity-selfcheck \
     --skip-macos-effects-tuning-selfcheck \
     "$@"

@@ -6,6 +6,7 @@
 - Constraints: no Windows regression; Linux follows compile + contract coverage.
 
 ## Latest Delta (2026-03-01)
+- POSIX regression suite now gates macOS effects type parity selfcheck (`run-macos-effects-type-parity-selfcheck.sh --skip-build`) as a default phase, with explicit skip flag `--skip-macos-effects-type-parity-selfcheck`; wasm-focused suite defaults to skipping it.
 - `input_capture.effects_suspended_vm` is now schema-declared (`/api/schema.input_capture.diagnostic_keys`) and state contracts assert both key presence and boolean shape, preventing silent mapper/schema drift.
 - Input-capture degraded notice copy is now behavior-consistent on macOS: permission-missing guidance no longer says "restart app"; it explicitly states automatic hot-recovery after permissions are restored.
 - POSIX regression suite now gates macOS VM foreground suppression selfcheck as a first-class phase (`run-macos-vm-foreground-suppression-selfcheck.sh --skip-build`) with explicit CLI skip flag `--skip-macos-vm-suppression-selfcheck`; wasm-focused suite defaults to skipping this phase.
@@ -372,6 +373,11 @@ Use this one-command entry for automation injection selfcheck (`left_click -> Cm
 Use this one-command entry for VM foreground suppression selfcheck (force on/off state parity):
 ```bash
 ./tools/platform/manual/run-macos-vm-foreground-suppression-selfcheck.sh --skip-build
+```
+
+Use this one-command entry for effects type parity selfcheck (5-category type/alias/state/overlay checks):
+```bash
+./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
 ```
 
 Use this one-command entry for effects profile tuning selfcheck (test-only `duration/size/opacity/trail-throttle` overrides):
