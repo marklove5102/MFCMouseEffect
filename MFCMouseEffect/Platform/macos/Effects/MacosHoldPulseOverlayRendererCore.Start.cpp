@@ -3,6 +3,7 @@
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Internal.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayStyle.h"
+#include "Platform/macos/Effects/MacosHoldPulseOverlayStyle.Internal.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 
 #if defined(__APPLE__)
@@ -13,6 +14,65 @@
 #include <algorithm>
 
 namespace mousefx::macos_hold_pulse {
+
+namespace {
+
+#if defined(__APPLE__)
+NSColor* ArgbToNsColor(uint32_t argb) {
+    const CGFloat alpha = static_cast<CGFloat>((argb >> 24) & 0xFFu) / 255.0;
+    const CGFloat red = static_cast<CGFloat>((argb >> 16) & 0xFFu) / 255.0;
+    const CGFloat green = static_cast<CGFloat>((argb >> 8) & 0xFFu) / 255.0;
+    const CGFloat blue = static_cast<CGFloat>(argb & 0xFFu) / 255.0;
+    return [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+}
+
+NSColor* HoldBaseColor(
+    MouseButton button,
+    detail::HoldStyle style,
+    const macos_effect_profile::HoldRenderProfile& profile) {
+    if (style == detail::HoldStyle::Lightning) {
+        return ArgbToNsColor(profile.colors.lightningStrokeArgb);
+    }
+    if (style == detail::HoldStyle::Hex) {
+        return ArgbToNsColor(profile.colors.hexStrokeArgb);
+    }
+    if (style == detail::HoldStyle::Hologram) {
+        return ArgbToNsColor(profile.colors.hologramStrokeArgb);
+    }
+    if (style == detail::HoldStyle::QuantumHalo) {
+        return ArgbToNsColor(profile.colors.quantumHaloStrokeArgb);
+    }
+    if (style == detail::HoldStyle::FluxField) {
+        return ArgbToNsColor(profile.colors.fluxFieldStrokeArgb);
+    }
+    if (style == detail::HoldStyle::TechRing || style == detail::HoldStyle::Neon) {
+        return ArgbToNsColor(profile.colors.techNeonStrokeArgb);
+    }
+    if (button == MouseButton::Right) {
+        return ArgbToNsColor(profile.colors.rightBaseStrokeArgb);
+    }
+    if (button == MouseButton::Middle) {
+        return ArgbToNsColor(profile.colors.middleBaseStrokeArgb);
+    }
+    return ArgbToNsColor(profile.colors.leftBaseStrokeArgb);
+}
+
+void ConfigureHoldAccentLayer(CAShapeLayer* accent, CGRect bounds, detail::HoldStyle holdStyle, NSColor* baseColor) {
+    if (detail::ConfigureSpecialHoldAccentLayer(accent, bounds, holdStyle, baseColor)) {
+        return;
+    }
+
+    CGPathRef path = CGPathCreateWithEllipseInRect(CGRectInset(bounds, 44.0, 44.0), nullptr);
+    accent.path = path;
+    CGPathRelease(path);
+    accent.fillColor = [NSColor clearColor].CGColor;
+    accent.strokeColor = [[baseColor colorWithAlphaComponent:0.85] CGColor];
+    accent.lineWidth = 1.4;
+    accent.lineDashPattern = @[@6, @6];
+}
+#endif
+
+} // namespace
 
 void StartHoldPulseOverlayOnMain(const HoldEffectStartCommand& command, const std::string& themeName) {
 #if !defined(__APPLE__)
@@ -54,7 +114,7 @@ void StartHoldPulseOverlayOnMain(const HoldEffectStartCommand& command, const st
     profile.colors.fluxFieldStrokeArgb = command.colors.fluxFieldStrokeArgb;
     profile.colors.techNeonStrokeArgb = command.colors.techNeonStrokeArgb;
 
-    NSColor* baseColor = detail::HoldBaseColor(command.button, holdStyle, profile);
+    NSColor* baseColor = HoldBaseColor(command.button, holdStyle, profile);
     const CGFloat ringInset = macos_overlay_support::ScaleOverlayMetric(size, 24.0, 160.0, 10.0, 44.0);
     const CGFloat ringLineWidth = macos_overlay_support::ScaleOverlayMetric(size, 2.4, 160.0, 1.2, 4.8);
 
@@ -71,7 +131,7 @@ void StartHoldPulseOverlayOnMain(const HoldEffectStartCommand& command, const st
 
     CAShapeLayer* accent = [CAShapeLayer layer];
     accent.frame = content.bounds;
-    detail::ConfigureHoldAccentLayer(accent, content.bounds, holdStyle, baseColor);
+    ConfigureHoldAccentLayer(accent, content.bounds, holdStyle, baseColor);
     accent.opacity = static_cast<float>(macos_overlay_support::ResolveOverlayOpacity(command.baseOpacity, -0.06, 0.1));
     [content.layer addSublayer:accent];
 

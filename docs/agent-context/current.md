@@ -1,11 +1,11 @@
-# Agent Current Context (2026-02-25)
+# Agent Current Context (2026-03-01)
 
 ## Scope and Priority
 - Primary dev host: macOS.
 - Primary target: macOS usable loop first.
 - Constraints: no Windows regression; Linux follows compile + contract coverage.
 
-## Latest Delta (2026-02-28)
+## Latest Delta (2026-03-01)
 - macOS active source ownership is now fully promoted to main paths under `Platform/macos/{Effects,Overlay,Shell,System,Wasm}`; `Platform/macos/legacy` no longer contains active source files.
 - macOS build wiring now uses explicit ObjC++ allowlist compilation in `Platform/macos/CMakeLists.txt` (replacing directory wildcard matching) so migration scope is mechanically auditable and prunable per-file.
 - macOS Swift bridge build now uses explicit latest-stable language mode policy via `MFX_SWIFT_LANGUAGE_MODE` (`auto|5|6`, default `auto`; auto resolves to Swift 6 on Swift 6 toolchains, else Swift 5).
@@ -55,6 +55,7 @@
 - `MacosWasmOverlayRenderMath.cpp` is now pure math-only (no `AppKit`/`NSColor` contract), with ARGB->`NSColor` conversion moved to wasm renderer leaf files (`ImageOverlayRendererCore.Window`, `TextOverlay.Style`), and the file is removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST` with full scaffold/core-automation/surface-gate regression pass.
 - `MacosWasmImageOverlayRendererSupport.cpp` now exposes pure C++ UTF-8 path helpers (`Utf8PathFromWide`) instead of Objective-C `NSString*` contracts, with `NSString` conversion moved to `ImageOverlayRendererCore.Window` leaf rendering path, and the file is removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST` with full scaffold/core-automation/surface-gate regression pass.
 - `MacosHoverPulseOverlayRendererCore.Plan.cpp` is now constrained to pure plan-building logic (ring-layer configuration moved to `Core.Layers.cpp`), hover internal header now supports non-ObjC compile aliases (`NSView`/`CAShapeLayer`/`NSRect`) with `CGRectZero` init, and `Core.Plan.cpp` is removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST` with full scaffold/core-automation/surface-gate regression pass.
+- `MacosHoldPulseOverlayStyle.cpp` is now pure compute-only (`NormalizeHoldType`/`ResolveHoldStyle`), while `NSColor` conversion and hold accent layer rendering are moved to `MacosHoldPulseOverlayRendererCore.Start.cpp` (already ObjC++ leaf). `MacosHoldPulseOverlayStyle.cpp` is removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST`; current allowlist count is `16`.
 - Validation passed:
   - `cmake -S MFCMouseEffect/Platform -B /tmp/mfx-platform-macos-legacy-mm-build -DMFX_PACKAGE_PLATFORM=macos -DMFX_ENABLE_POSIX_CORE_RUNTIME=ON -DMFX_ENABLE_ENTRY_RUNTIME_TARGETS=ON`
   - `cmake --build /tmp/mfx-platform-macos-legacy-mm-build --target mfx_shell_macos mfx_entry_posix_host -j8`
