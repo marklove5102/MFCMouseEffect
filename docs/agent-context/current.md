@@ -70,11 +70,12 @@
   - non-referenced historical docs in issues/refactoring/architecture/root were removed
   - first-read docs were compacted for low-token navigation
   - WASM architecture/operator docs were rewritten as contract/checklist format
+  - phase52-phase54 standalone refactoring notes were merged back into roadmap + git history and removed from active docs
 - Current inventory (after cleanup):
   - `docs/architecture`: 16
-  - `docs/refactoring`: 10
+  - `docs/refactoring`: 2
   - `docs/issues`: 19
-  - `docs` total markdown: 49
+  - `docs` total markdown: 41
 
 ## Where to Read History
 - For full chronological details, use:

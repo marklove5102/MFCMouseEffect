@@ -67,14 +67,6 @@ This file intentionally excludes low-value historical step logs.
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build`
 
 ## Active Supporting Docs (Small Set)
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52e-macos-coordinate-space-unification.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52f-macos-runtime-permission-revocation-hardening.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52g-macos-input-indicator-label-lifetime-fix.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52h-macos-startup-permission-degraded-convergence.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52i-macos-runtime-permission-hot-recovery-and-notify.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52j-macos-startup-missing-permission-retry-and-notify-dedup.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`
-- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54i-linux-follow-phase-closure.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbm-macos-user-notification-native-center.md`
 
 ## Completion Criteria for Current Milestone
@@ -85,4 +77,5 @@ This file intentionally excludes low-value historical step logs.
 
 ## Notes
 - Historical granular phase logs were intentionally removed from this file to keep first-read token usage low.
-- If deep history is required, use git history on this file and targeted surviving phase docs.
+- Phase52-54 closure details are retained in git history and regression scripts; separate phase documents were removed to reduce stale-doc maintenance.
+- If deep history is required, use git history on this file and prior commits.
