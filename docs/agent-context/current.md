@@ -44,6 +44,7 @@
 - macOS click/trail/scroll window registries now detach from ObjC++ compile dependency by consuming `MacosOverlayRenderSupportSwiftBridge.h` C ABI directly, and all three `*WindowRegistry.cpp` files are removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST`.
 - macOS effects pure compute/registry modules are now detached from ObjC++ allowlist (`MacosEffectCreatorRegistry*`, `MacosEffectComputeProfileAdapter.cpp`, `MacosEffectRenderProfile*`), keeping allowlist focused on true AppKit/ObjC dependent runtime paths.
 - macOS overlay coordinate conversion/service modules are now also detached from ObjC++ allowlist (`MacosOverlayCoordSpaceConversion.cpp`, `MacosOverlayCoordSpaceService.cpp`) since both paths are pure C++ wrappers over Swift bridge/C++ logic.
+- macOS ObjC++ allowlist is further pruned by compiler-level probe (`compile_commands` per entry with `-x c++ -fsyntax-only`), removing 26 additional pure-C++ wrappers across effects entry files, input-indicator overlays, and WASM command/state wrappers while preserving build/regression pass gates.
 - Validation passed:
   - `cmake -S MFCMouseEffect/Platform -B /tmp/mfx-platform-macos-legacy-mm-build -DMFX_PACKAGE_PLATFORM=macos -DMFX_ENABLE_POSIX_CORE_RUNTIME=ON -DMFX_ENABLE_ENTRY_RUNTIME_TARGETS=ON`
   - `cmake --build /tmp/mfx-platform-macos-legacy-mm-build --target mfx_shell_macos mfx_entry_posix_host -j8`

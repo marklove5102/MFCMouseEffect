@@ -30,6 +30,7 @@ Use it as a pointer index, not a full historical catalog.
 - macOS window-registry ObjC++ detach: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zd-macos-window-registry-objcxx-detach.md`
 - macOS effects compute/registry ObjC++ prune: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56ze-macos-effects-compute-registry-objcxx-prune.md`
 - macOS overlay-coord ObjC++ prune: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zf-macos-overlay-coord-objcxx-prune.md`
+- macOS ObjC++ allowlist compiler-probe prune: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zg-macos-objcxx-allowlist-compiler-probe-prune.md`
 
 ## Current macOS Mainline (Phases 50-55)
 - Dual-lane guardrails: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`
