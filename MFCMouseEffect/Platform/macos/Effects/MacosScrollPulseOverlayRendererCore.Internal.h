@@ -8,8 +8,16 @@
 #include <string>
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
-#import <QuartzCore/QuartzCore.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
+@class CAShapeLayer;
+@class NSView;
+#else
+struct objc_object;
+using CAShapeLayer = objc_object;
+using NSView = objc_object;
+#endif
 #endif
 
 namespace mousefx::macos_scroll_pulse {
@@ -19,7 +27,7 @@ struct ScrollPulseRenderPlan {
     ScrollEffectRenderCommand command{};
     CGFloat size = 0;
     CGRect bodyRect = CGRectZero;
-    NSRect frame = NSZeroRect;
+    CGRect frame = CGRectZero;
     CFTimeInterval duration = 0;
     int closeAfterMs = 0;
 };

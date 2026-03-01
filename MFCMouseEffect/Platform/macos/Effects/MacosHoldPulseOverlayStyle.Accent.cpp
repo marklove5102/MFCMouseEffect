@@ -2,6 +2,11 @@
 
 #include "Platform/macos/Effects/MacosHoldPulseOverlayStyle.Internal.h"
 
+#if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#import <QuartzCore/QuartzCore.h>
+#endif
+
 #include <algorithm>
 #include <cmath>
 

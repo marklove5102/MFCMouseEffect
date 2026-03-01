@@ -4,6 +4,11 @@
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosClickPulseOverlayStyle.h"
 
+#if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#import <QuartzCore/QuartzCore.h>
+#endif
+
 #include <algorithm>
 
 namespace mousefx::macos_click_pulse {

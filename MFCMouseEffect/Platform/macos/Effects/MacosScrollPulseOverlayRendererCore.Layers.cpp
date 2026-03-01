@@ -5,6 +5,11 @@
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosScrollPulseOverlayStyle.h"
 
+#if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#import <QuartzCore/QuartzCore.h>
+#endif
+
 #include <algorithm>
 #include <cmath>
 

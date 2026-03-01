@@ -1,18 +1,31 @@
 #pragma once
 
 #if defined(__APPLE__)
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
 #import <AppKit/AppKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import <dispatch/dispatch.h>
+#else
+struct objc_object;
+using NSWindow = objc_object;
+using NSView = objc_object;
+using CAAnimationGroup = objc_object;
+using NSRect = CGRect;
+#endif
 #endif
 
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 
 namespace mousefx::macos_overlay_support {
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && defined(__OBJC__)
 void RunOnMainThreadSync(dispatch_block_t block);
 void RunOnMainThreadAsync(dispatch_block_t block);
+#endif
+
+#if defined(__APPLE__)
 NSWindow* CreateOverlayWindow(const NSRect& frame);
 void ReleaseOverlayWindow(void* windowHandle);
 void ShowOverlayWindow(void* windowHandle);

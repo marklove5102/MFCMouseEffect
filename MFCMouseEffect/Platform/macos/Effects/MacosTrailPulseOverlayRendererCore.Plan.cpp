@@ -33,7 +33,7 @@ TrailPulseRenderPlan BuildTrailPulseRenderPlan(const TrailEffectRenderCommand& c
             static_cast<CGFloat>(std::abs(plan.command.deltaY)) + framePadding);
     }
 
-    const NSRect rawFrame = NSMakeRect(
+    const CGRect rawFrame = CGRectMake(
         plan.command.overlayPoint.x - halfWidth,
         plan.command.overlayPoint.y - halfHeight,
         halfWidth * 2.0,

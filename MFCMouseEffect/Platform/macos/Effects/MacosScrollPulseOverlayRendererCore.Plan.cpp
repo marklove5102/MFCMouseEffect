@@ -14,7 +14,7 @@ ScrollPulseRenderPlan BuildScrollPulseRenderPlan(const ScrollEffectRenderCommand
     ScrollPulseRenderPlan plan{};
     plan.command = command;
     plan.size = static_cast<CGFloat>(plan.command.sizePx);
-    const NSRect rawFrame = NSMakeRect(
+    const CGRect rawFrame = CGRectMake(
         plan.command.overlayPoint.x - plan.size * 0.5,
         plan.command.overlayPoint.y - plan.size * 0.5,
         plan.size,

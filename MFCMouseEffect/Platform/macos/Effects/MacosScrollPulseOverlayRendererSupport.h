@@ -4,8 +4,14 @@
 #include "MouseFx/Core/Protocol/InputTypes.h"
 
 #if defined(__APPLE__)
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
 @class CAShapeLayer;
-#import <CoreGraphics/CoreGraphics.h>
+#else
+struct objc_object;
+using CAShapeLayer = objc_object;
+#endif
 #endif
 
 namespace mousefx::macos_scroll_pulse::support {

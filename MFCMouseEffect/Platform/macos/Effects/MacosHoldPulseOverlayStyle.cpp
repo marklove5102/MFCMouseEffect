@@ -6,6 +6,8 @@
 #include "MouseFx/Utils/StringUtils.h"
 
 #if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#import <QuartzCore/QuartzCore.h>
 #include <cmath>
 #include <utility>
 #endif

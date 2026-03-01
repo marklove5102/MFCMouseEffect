@@ -7,8 +7,16 @@
 #include <string>
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
-#import <QuartzCore/QuartzCore.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
+@class CAShapeLayer;
+@class NSView;
+#else
+struct objc_object;
+using CAShapeLayer = objc_object;
+using NSView = objc_object;
+#endif
 #endif
 
 namespace mousefx::macos_trail_pulse {
@@ -17,7 +25,7 @@ namespace mousefx::macos_trail_pulse {
 struct TrailPulseRenderPlan {
     TrailEffectRenderCommand command{};
     CGFloat size = 0;
-    NSRect frame = NSZeroRect;
+    CGRect frame = CGRectZero;
     CFTimeInterval durationSec = 0;
     int closeAfterMs = 0;
 };

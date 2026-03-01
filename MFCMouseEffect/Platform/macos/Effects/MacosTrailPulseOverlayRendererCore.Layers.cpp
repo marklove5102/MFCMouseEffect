@@ -5,6 +5,11 @@
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Effects/MacosTrailPulseOverlayStyle.h"
 
+#if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#import <QuartzCore/QuartzCore.h>
+#endif
+
 namespace mousefx::macos_trail_pulse {
 
 #if defined(__APPLE__)
