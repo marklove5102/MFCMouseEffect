@@ -33,6 +33,7 @@
 - macOS ObjC++ 白名单编译器探测式收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zg-macos-objcxx-allowlist-compiler-probe-prune.md`
 - macOS 特效 Plan/State 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zh-macos-effects-plan-state-objcxx-prune.md`
 - macOS WASM Plan/Layout 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zi-macos-wasm-plan-layout-objcxx-prune.md`
+- macOS Hold Core 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zj-macos-hold-core-objcxx-prune.md`
 
 ## 当前 macOS 主线（Phase 50-55）
 - 双车道护栏：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`

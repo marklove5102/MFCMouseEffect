@@ -12,13 +12,13 @@ void CloseHoldPulseOverlayOnMain() {
     return;
 #else
     detail::HoldOverlayState& state = detail::State();
-    if (state.window == nil) {
+    if (state.window == nullptr) {
         return;
     }
     macos_overlay_support::ReleaseOverlayWindow(reinterpret_cast<void*>(state.window));
-    state.window = nil;
-    state.ring = nil;
-    state.accent = nil;
+    state.window = nullptr;
+    state.ring = nullptr;
+    state.accent = nullptr;
     state.effectType.clear();
 #endif
 }
