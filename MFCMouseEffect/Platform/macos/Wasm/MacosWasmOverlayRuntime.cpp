@@ -2,17 +2,34 @@
 
 #include "Platform/macos/Wasm/MacosWasmOverlayRuntime.h"
 
+#include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
 #include "Platform/macos/Wasm/MacosWasmOverlayState.h"
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
-#import <dispatch/dispatch.h>
+#include <dispatch/dispatch.h>
+#include <pthread.h>
 #endif
 
 #include <functional>
+#include <memory>
 #include <vector>
 
 namespace mousefx::platform::macos {
+
+#if defined(__APPLE__)
+namespace {
+
+void InvokeStdFunction(void* context) {
+    std::unique_ptr<std::function<void()>> task(
+        static_cast<std::function<void()>*>(context));
+    if (!task || !(*task)) {
+        return;
+    }
+    (*task)();
+}
+
+} // namespace
+#endif
 
 void RunWasmOverlayOnMainThreadSync(std::function<void()> task) {
 #if !defined(__APPLE__)
@@ -21,14 +38,12 @@ void RunWasmOverlayOnMainThreadSync(std::function<void()> task) {
     if (!task) {
         return;
     }
-    std::function<void()> copiedTask = std::move(task);
-    if ([NSThread isMainThread]) {
-        copiedTask();
+    if (pthread_main_np() != 0) {
+        task();
         return;
     }
-    dispatch_sync(dispatch_get_main_queue(), ^{
-      copiedTask();
-    });
+    auto* copiedTask = new std::function<void()>(std::move(task));
+    dispatch_sync_f(dispatch_get_main_queue(), copiedTask, &InvokeStdFunction);
 #endif
 }
 
@@ -39,10 +54,8 @@ void RunWasmOverlayOnMainThreadAsync(std::function<void()> task) {
     if (!task) {
         return;
     }
-    std::function<void()> copiedTask = std::move(task);
-    dispatch_async(dispatch_get_main_queue(), ^{
-      copiedTask();
-    });
+    auto* copiedTask = new std::function<void()>(std::move(task));
+    dispatch_async_f(dispatch_get_main_queue(), copiedTask, &InvokeStdFunction);
 #endif
 }
 
@@ -75,15 +88,10 @@ void CloseAllWasmOverlayWindows() {
     return;
 #else
     RunWasmOverlayOnMainThreadSync([] {
-      const std::vector<void*> windows = ResetAndTakeAllWasmOverlayWindowsState();
-      for (void* handle : windows) {
-          NSWindow* window = reinterpret_cast<NSWindow*>(handle);
-          if (window == nil) {
-              continue;
-          }
-          [window orderOut:nil];
-          [window release];
-      }
+        const std::vector<void*> windows = ResetAndTakeAllWasmOverlayWindowsState();
+        for (void* handle : windows) {
+            macos_overlay_support::ReleaseOverlayWindow(handle);
+        }
     });
 #endif
 }
