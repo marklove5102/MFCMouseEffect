@@ -6,6 +6,7 @@
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Styles/ThemeStyle.h"
 #include "MouseFx/Utils/StringUtils.h"
+#include "Settings/EmojiUtils.h"
 
 #include <algorithm>
 #include <random>
@@ -103,6 +104,8 @@ ClickEffectRenderCommand MacosClickPulseEffect::BuildTextClickCommand(
     if (!labelUtf8.empty()) {
         command.textLabel = labelUtf8;
     }
+    command.textFontFamilyUtf8 = Utf16ToUtf8(textConfig_.fontFamily.c_str());
+    command.textEmoji = settings::HasEmojiStarter(resolvedLabel);
 
     const uint32_t resolvedTextArgb = ResolveConfiguredColor(textConfig_, isChromatic_, command.strokeArgb);
     command.fillArgb = 0x00000000u;

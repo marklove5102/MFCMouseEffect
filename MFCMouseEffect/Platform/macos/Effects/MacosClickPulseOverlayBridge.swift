@@ -160,6 +160,19 @@ private func mfxNormalizeTextLabel(_ textLabelUtf8: UnsafePointer<CChar>?) -> St
     return label
 }
 
+private func mfxResolveTextFont(_ fontFamily: String, _ size: CGFloat, _ emoji: Bool) -> NSFont {
+    if emoji {
+        if let emojiFont = NSFont(name: "Apple Color Emoji", size: size) {
+            return emojiFont
+        }
+        return NSFont.systemFont(ofSize: size, weight: .regular)
+    }
+    if !fontFamily.isEmpty, let custom = NSFont(name: fontFamily, size: size) {
+        return custom
+    }
+    return NSFont.boldSystemFont(ofSize: size)
+}
+
 @MainActor
 private func mfxCreateClickPulseOverlayOnMainThread(
     frameX: Double,
@@ -175,7 +188,9 @@ private func mfxCreateClickPulseOverlayOnMainThread(
     animationDurationSec: Double,
     textLabel: String,
     textFontSizePx: Double,
-    textFloatDistancePx: Double
+    textFloatDistancePx: Double,
+    textFontFamily: String,
+    textEmoji: Bool
 ) -> UnsafeMutableRawPointer? {
     let size = max(1.0, frameSize)
     let windowHandle = mfx_macos_overlay_create_window_v1(frameX, frameY, size, size)
@@ -258,7 +273,7 @@ private func mfxCreateClickPulseOverlayOnMainThread(
             max: max(10.0, sizeCGFloat * 0.92)
         )
         text.fontSize = fontSize
-        text.font = NSFont.boldSystemFont(ofSize: fontSize).fontName as CFTypeRef
+        text.font = mfxResolveTextFont(textFontFamily, fontSize, textEmoji).fontName as CFTypeRef
         text.string = textLabel
         text.opacity = Float(mfxResolveOpacity(baseOpacityCGFloat, 0.0, 0.0))
         contentLayer.addSublayer(text)
@@ -289,10 +304,14 @@ public func mfx_macos_click_pulse_overlay_create_v1(
     _ animationDurationSec: Double,
     _ textLabelUtf8: UnsafePointer<CChar>?,
     _ textFontSizePx: Double,
-    _ textFloatDistancePx: Double
+    _ textFloatDistancePx: Double,
+    _ textFontFamilyUtf8: UnsafePointer<CChar>?,
+    _ textEmoji: Int32
 ) -> UnsafeMutableRawPointer? {
     let normalizedType = mfxNormalizeClickType(normalizedTypeUtf8)
     let textLabel = mfxNormalizeTextLabel(textLabelUtf8)
+    let textFontFamily = textFontFamilyUtf8.map(String.init(cString:)) ?? ""
+    let textEmojiEnabled = (textEmoji != 0)
 
     if Thread.isMainThread {
         let bits = MainActor.assumeIsolated {
@@ -311,7 +330,9 @@ public func mfx_macos_click_pulse_overlay_create_v1(
                     animationDurationSec: animationDurationSec,
                     textLabel: textLabel,
                     textFontSizePx: textFontSizePx,
-                    textFloatDistancePx: textFloatDistancePx
+                    textFloatDistancePx: textFloatDistancePx,
+                    textFontFamily: textFontFamily,
+                    textEmoji: textEmojiEnabled
                 )
             )
         }
@@ -336,7 +357,9 @@ public func mfx_macos_click_pulse_overlay_create_v1(
                     animationDurationSec: animationDurationSec,
                     textLabel: textLabel,
                     textFontSizePx: textFontSizePx,
-                    textFloatDistancePx: textFloatDistancePx
+                    textFloatDistancePx: textFloatDistancePx,
+                    textFontFamily: textFontFamily,
+                    textEmoji: textEmojiEnabled
                 )
             )
         }

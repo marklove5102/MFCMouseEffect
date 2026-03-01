@@ -18,7 +18,9 @@ void* mfx_macos_click_pulse_overlay_create_v1(
     double animationDurationSec,
     const char* textLabelUtf8,
     double textFontSizePx,
-    double textFloatDistancePx);
+    double textFloatDistancePx,
+    const char* textFontFamilyUtf8,
+    int textEmoji);
 
 #ifdef __cplusplus
 }

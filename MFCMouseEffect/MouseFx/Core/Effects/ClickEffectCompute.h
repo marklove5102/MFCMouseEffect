@@ -32,6 +32,8 @@ struct ClickEffectRenderCommand {
     MouseButton button = MouseButton::Left;
     std::string normalizedType = "ripple";
     std::string textLabel{};
+    std::string textFontFamilyUtf8{};
+    bool textEmoji = false;
     int sizePx = 138;
     double textFontSizePx = 24.0;
     double textFloatDistancePx = 60.0;

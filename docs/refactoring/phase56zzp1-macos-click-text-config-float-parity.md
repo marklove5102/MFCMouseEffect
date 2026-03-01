@@ -19,7 +19,7 @@
 ## Changes
 1. Shared click command and profile model extended:
 - `ClickEffectProfile`: `textFontSizePx`, `textFloatDistancePx`
-- `ClickEffectRenderCommand`: `textFontSizePx`, `textFloatDistancePx`
+- `ClickEffectRenderCommand`: `textFontSizePx`, `textFloatDistancePx`, `textFontFamilyUtf8`, `textEmoji`
 
 2. macOS click profile mapping now carries text fields from config:
 - `ResolveClickRenderProfile(...)` now derives text font size and float distance from `config.textClick`.
@@ -33,12 +33,12 @@
   - duration/font/float distance from `TextConfig`
 
 4. Swift click overlay text mode moved to text-first rendering:
-- `mfx_macos_click_pulse_overlay_create_v1` now accepts `textFontSizePx` and `textFloatDistancePx`.
+- `mfx_macos_click_pulse_overlay_create_v1` now accepts `textFontSizePx`, `textFloatDistancePx`, `textFontFamilyUtf8`, and `textEmoji`.
 - Text mode no longer emits base ring layer.
 - Text mode now plays dedicated `translationY + fade` float animation.
 
 5. Diagnostics visibility improved:
-- `command_samples.click` now includes `text_font_size_px` and `text_float_distance_px`.
+- `command_samples.click` now includes `text_font_size_px`, `text_float_distance_px`, `text_font_family_utf8`, and `text_emoji`.
 
 ## Validation
 1. Build:

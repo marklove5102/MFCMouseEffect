@@ -47,6 +47,9 @@ void ShowClickPulseOverlayOnMain(
     const char* textLabelUtf8 = plan.command.textLabel.empty()
                                     ? ""
                                     : plan.command.textLabel.c_str();
+    const char* textFontFamilyUtf8 = plan.command.textFontFamilyUtf8.empty()
+                                         ? ""
+                                         : plan.command.textFontFamilyUtf8.c_str();
     void* windowHandle = mfx_macos_click_pulse_overlay_create_v1(
         static_cast<double>(plan.frame.origin.x),
         static_cast<double>(plan.frame.origin.y),
@@ -61,7 +64,9 @@ void ShowClickPulseOverlayOnMain(
         static_cast<double>(plan.animationDuration),
         textLabelUtf8,
         command.textFontSizePx,
-        command.textFloatDistancePx);
+        command.textFloatDistancePx,
+        textFontFamilyUtf8,
+        command.textEmoji ? 1 : 0);
     if (windowHandle == nullptr) {
         return;
     }
