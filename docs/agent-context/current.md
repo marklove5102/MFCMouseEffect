@@ -65,6 +65,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/README.md`
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/README.zh-CN.md`
 - Large non-indexed historical issue bundles were removed.
+- Remaining unreferenced issue docs were pruned; `docs/issues` now keeps only actively referenced entries.
 - Current docs focus is now:
   - `P0`: `AGENTS.md`
   - `P1`: this file + roadmap snapshot
