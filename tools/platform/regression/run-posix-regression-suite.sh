@@ -19,6 +19,7 @@ mfx_info "suite lock: mfx-posix-regression-suite"
 
 mfx_run_posix_regression_suite_workflow() {
     mfx_posix_suite_run_objcxx_gate_phase "$REPO_ROOT"
+    mfx_posix_suite_run_macos_objcxx_surface_gate_phase "$SCRIPT_DIR"
     mfx_posix_suite_log_entry_host_presence
     mfx_posix_suite_run_scaffold_phase "$SCRIPT_DIR"
     mfx_posix_suite_run_core_smoke_phase "$SCRIPT_DIR"

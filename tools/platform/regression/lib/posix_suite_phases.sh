@@ -24,6 +24,17 @@ mfx_posix_suite_run_objcxx_gate_phase() {
     fi
 }
 
+mfx_posix_suite_run_macos_objcxx_surface_gate_phase() {
+    local script_dir="$1"
+    if [[ "$MFX_SKIP_MACOS_OBJCXX_SURFACE_GATE" -eq 1 ]]; then
+        mfx_info "skip macos objcxx surface regression phase"
+        return
+    fi
+
+    mfx_info "run macos objcxx surface regression phase"
+    "$script_dir/run-macos-objcxx-surface-regression.sh"
+}
+
 mfx_posix_suite_log_entry_host_presence() {
     if ! command -v pgrep >/dev/null 2>&1; then
         return

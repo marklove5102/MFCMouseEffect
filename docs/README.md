@@ -145,6 +145,9 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 
 # macOS effects type parity selfcheck (5 categories + alias normalization)
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
+
+# macOS ObjC++ surface regression gate (.mm zero + explicit allowlist compile policy)
+./tools/platform/regression/run-macos-objcxx-surface-regression.sh
 ```
 
 ## Archive

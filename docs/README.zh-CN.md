@@ -145,6 +145,9 @@ rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issu
 
 # macOS 特效类型等价自检（5 类特效 + 别名归一化）
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
+
+# macOS ObjC++ 面积门禁（.mm 为零 + 显式白名单编译策略）
+./tools/platform/regression/run-macos-objcxx-surface-regression.sh
 ```
 
 ## 归档区
