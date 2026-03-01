@@ -152,7 +152,7 @@ void AppController::OnDispatchActivity(DispatchMessageKind kind, uint32_t timerI
     if (isStateTimerMsg || isInputCaptureHealthTimerMsg) {
         RefreshInputCaptureRuntimeState();
     }
-    if (isMouseInputMsg || isStateTimerMsg) {
+    if (isMouseInputMsg || isStateTimerMsg || isInputCaptureHealthTimerMsg) {
         UpdateVmSuppressionState();
     }
 

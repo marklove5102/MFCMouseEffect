@@ -51,6 +51,7 @@ _mfx_core_http_run_state_checks() {
     mfx_assert_eq "$code_state" "200" "core state status"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"automation\":" "core state automation section"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"input_capture\":" "core state input_capture section"
+    mfx_assert_file_contains "$tmp_dir/state.out" "\"effects_suspended_vm\":" "core state input_capture vm suppression field"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"wasm\":" "core state wasm section"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"effects_runtime\":" "core state effects_runtime section"
     mfx_assert_file_contains "$tmp_dir/state.out" "\"effects_profile\":" "core state effects_profile section"

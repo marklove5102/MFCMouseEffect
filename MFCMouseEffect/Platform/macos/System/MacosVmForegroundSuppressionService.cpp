@@ -18,9 +18,27 @@ bool IsFalseLike(const std::string& value) {
            value == "disabled";
 }
 
+bool IsTrueLike(const std::string& value) {
+    return value == "1" ||
+           value == "true" ||
+           value == "on" ||
+           value == "yes" ||
+           value == "enable" ||
+           value == "enabled";
+}
+
 } // namespace
 
 bool MacosVmForegroundSuppressionService::ShouldSuppress(uint64_t nowTickMs) {
+    if (!forcedSuppressionResolved_) {
+        forcedSuppressionEnabled_ = TryReadForcedSuppressionByEnv(&forcedSuppressionValue_);
+        forcedSuppressionResolved_ = true;
+    }
+    if (forcedSuppressionEnabled_) {
+        lastResult_ = forcedSuppressionValue_;
+        return lastResult_;
+    }
+
     if (!envEnabledResolved_) {
         envEnabledCached_ = IsSuppressionEnabledByEnv();
         envEnabledResolved_ = true;
@@ -36,6 +54,32 @@ bool MacosVmForegroundSuppressionService::ShouldSuppress(uint64_t nowTickMs) {
     lastCheckTickMs_ = nowTickMs;
     lastResult_ = IsVmForegroundProcess(foregroundProcessService_.CurrentProcessBaseName());
     return lastResult_;
+}
+
+bool MacosVmForegroundSuppressionService::TryReadForcedSuppressionByEnv(bool* outValue) {
+    if (!outValue) {
+        return false;
+    }
+
+    const char* raw = std::getenv("MFX_VM_FOREGROUND_SUPPRESSION_FORCE");
+    if (!raw) {
+        return false;
+    }
+
+    std::string value = ToLowerAscii(TrimAscii(raw));
+    if (value.empty()) {
+        return false;
+    }
+
+    if (IsTrueLike(value)) {
+        *outValue = true;
+        return true;
+    }
+    if (IsFalseLike(value)) {
+        *outValue = false;
+        return true;
+    }
+    return false;
 }
 
 bool MacosVmForegroundSuppressionService::IsSuppressionEnabledByEnv() {

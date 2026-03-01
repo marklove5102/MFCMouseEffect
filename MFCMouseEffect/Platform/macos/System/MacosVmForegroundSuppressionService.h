@@ -14,6 +14,7 @@ public:
     bool ShouldSuppress(uint64_t nowTickMs) override;
 
 private:
+    static bool TryReadForcedSuppressionByEnv(bool* outValue);
     static bool IsSuppressionEnabledByEnv();
     static bool IsVmForegroundProcess(const std::string& processBaseName);
     static bool ContainsVmToken(const std::string& input);
@@ -38,6 +39,9 @@ private:
     bool lastResult_ = false;
     bool envEnabledCached_ = false;
     bool envEnabledResolved_ = false;
+    bool forcedSuppressionResolved_ = false;
+    bool forcedSuppressionEnabled_ = false;
+    bool forcedSuppressionValue_ = false;
 };
 
 } // namespace mousefx
