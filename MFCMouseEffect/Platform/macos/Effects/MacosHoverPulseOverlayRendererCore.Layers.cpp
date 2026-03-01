@@ -47,6 +47,22 @@ void AddHoverExtraLayersAndAnimations(
     [ring2 addAnimation:spin forKey:@"mfx_hover_spin"];
 }
 
+void ConfigureHoverRingLayer(
+    CAShapeLayer* ring,
+    NSView* content,
+    const HoverPulseRenderPlan& plan) {
+    ring.frame = content.bounds;
+    const CGFloat ringInset = macos_overlay_support::ScaleOverlayMetric(plan.size, 20.0, 160.0, 10.0, 40.0);
+    CGPathRef ringPath = CGPathCreateWithEllipseInRect(CGRectInset(content.bounds, ringInset, ringInset), nullptr);
+    ring.path = ringPath;
+    CGPathRelease(ringPath);
+    ring.fillColor = [ArgbToNsColor(plan.command.glowFillArgb) CGColor];
+    ring.strokeColor = [ArgbToNsColor(plan.command.glowStrokeArgb) CGColor];
+    ring.lineWidth = macos_overlay_support::ScaleOverlayMetric(plan.size, 2.0, 160.0, 1.0, 4.2);
+    ring.opacity = static_cast<float>(
+        macos_overlay_support::ResolveOverlayOpacity(plan.command.baseOpacity, 0.0, 0.0));
+}
+
 #endif
 
 } // namespace mousefx::macos_hover_pulse
