@@ -8,8 +8,10 @@
 #include <thread>
 
 #include "MouseFx/Core/Protocol/InputTypes.h"
+#include "MouseFx/Effects/TextEffect.h"
 #include "MouseFx/Server/HttpServer.h"
 #include "MouseFx/Server/WebSettingsServer.TestRouteCommon.h"
+#include "MouseFx/Utils/StringUtils.h"
 #include "Platform/PlatformTarget.h"
 
 #if MFX_PLATFORM_MACOS
@@ -164,6 +166,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     const bool emitClick = ParseBooleanOrDefault(payload, "emit_click", false);
     const bool emitTrail = ParseBooleanOrDefault(payload, "emit_trail", false);
     const bool emitLineTrail = ParseBooleanOrDefault(payload, "emit_line_trail", false);
+    const bool emitTextClickEffect = ParseBooleanOrDefault(payload, "emit_text_click_effect", false);
     const bool emitScroll = ParseBooleanOrDefault(payload, "emit_scroll", false);
     const bool emitHold = ParseBooleanOrDefault(payload, "emit_hold", false);
     const bool emitHover = ParseBooleanOrDefault(payload, "emit_hover", false);
@@ -189,6 +192,9 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     const int32_t lineTrailIdleFadeStartMs = std::clamp(ParseInt32OrDefault(payload, "line_trail_idle_fade_start_ms", 180), 0, 3000);
     const int32_t lineTrailIdleFadeEndMs =
         std::max(lineTrailIdleFadeStartMs + 1, std::clamp(ParseInt32OrDefault(payload, "line_trail_idle_fade_end_ms", 420), 1, 4000));
+    const int32_t textClickFontSizePx = std::clamp(ParseInt32OrDefault(payload, "text_click_font_size_px", 96), 12, 320);
+    const std::string textClickTheme = payload.value("text_click_theme", std::string("default"));
+    const std::string textClickText = payload.value("text_click_text", std::string("MFX_TEXT_PROBE"));
 
     if (resetLineTrail) {
 #if MFX_PLATFORM_MACOS
@@ -212,6 +218,19 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     const ScreenPoint overlayPoint{x, y};
     if (emitClick) {
         macos_click_pulse::ShowClickPulseOverlay(overlayPoint, ParseMouseButton(button), clickType, "");
+    }
+    if (emitTextClickEffect) {
+        TextConfig textConfig{};
+        textConfig.fontSize = static_cast<float>(textClickFontSizePx);
+        textConfig.texts.push_back(Utf8ToWString(textClickText));
+        TextEffect textEffect(textConfig, textClickTheme);
+        if (textEffect.Initialize()) {
+            ClickEvent clickEvent{};
+            clickEvent.pt = overlayPoint;
+            clickEvent.button = ParseMouseButton(button);
+            textEffect.OnClick(clickEvent);
+            textEffect.Shutdown();
+        }
     }
     if (emitTrail) {
         macos_trail_pulse::ShowTrailPulseOverlay(overlayPoint, 20.0, 10.0, trailType, "");
@@ -283,6 +302,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"emit_click", emitClick},
         {"emit_trail", emitTrail},
         {"emit_line_trail", emitLineTrail},
+        {"emit_text_click_effect", emitTextClickEffect},
         {"emit_scroll", emitScroll},
         {"emit_hold", emitHold},
         {"emit_hover", emitHover},
@@ -301,6 +321,9 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"line_trail_line_width_px", lineTrailLineWidthPx},
         {"line_trail_idle_fade_start_ms", lineTrailIdleFadeStartMs},
         {"line_trail_idle_fade_end_ms", lineTrailIdleFadeEndMs},
+        {"text_click_font_size_px", textClickFontSizePx},
+        {"text_click_theme", textClickTheme},
+        {"text_click_text", textClickText},
         {"reset_line_trail", resetLineTrail},
         {"before", before.ToJson()},
         {"after", after.ToJson()},

@@ -128,6 +128,31 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
         fi
     fi
 
+    local code_effect_text_click_probe
+    code_effect_text_click_probe="$(mfx_http_code "$tmp_dir/effect-overlay-text-click-probe.out" "$base_url/api/effects/test-overlay-windows" \
+        -X POST \
+        -H "x-mfcmouseeffect-token: $token" \
+        -H "Content-Type: application/json" \
+        -d '{"emit_text_click_effect":true,"text_click_text":"MFX_TEXT_CLICK_PROBE","text_click_font_size_px":112,"close_persistent":true,"wait_ms":140,"wait_for_clear_ms":400}')"
+    mfx_assert_eq "$code_effect_text_click_probe" "200" "core effect overlay text-click probe status"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-text-click-probe.out" "\"ok\":true" "core effect overlay text-click probe ok"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-text-click-probe.out" "\"emit_text_click_effect\":true" "core effect overlay text-click probe emit flag"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-text-click-probe.out" "\"text_click_text\":\"MFX_TEXT_CLICK_PROBE\"" "core effect overlay text-click probe text echo"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-text-click-probe.out" "\"before_text_effect_fallback_show_count\":" "core effect overlay text-click probe before fallback count"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-text-click-probe.out" "\"after_text_effect_fallback_show_count\":" "core effect overlay text-click probe after fallback count"
+    if [[ "$platform" == "macos" ]]; then
+        local text_click_before_count
+        local text_click_after_count
+        text_click_before_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-text-click-probe.out" "before_text_effect_fallback_show_count")"
+        text_click_after_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-text-click-probe.out" "after_text_effect_fallback_show_count")"
+        if [[ -z "$text_click_before_count" || -z "$text_click_after_count" ]]; then
+            mfx_fail "core effect overlay text-click probe fallback count parse failed"
+        fi
+        if (( text_click_after_count <= text_click_before_count )); then
+            mfx_fail "core effect overlay text-click probe expected fallback show increase on macos: before=$text_click_before_count after=$text_click_after_count"
+        fi
+    fi
+
     local code_effect_overlay_line_trail_probe
     code_effect_overlay_line_trail_probe="$(mfx_http_code "$tmp_dir/effect-overlay-line-trail-probe.out" "$base_url/api/effects/test-overlay-windows" \
         -X POST \

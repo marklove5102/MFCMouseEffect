@@ -178,6 +178,25 @@ if (( after_text_fallback_count < before_text_fallback_count )); then
     mfx_fail "effects overlay text fallback count regressed: before=$before_text_fallback_count after=$after_text_fallback_count"
 fi
 
+overlay_text_click_probe_file="$tmp_dir/effects-overlay-text-click-probe.out"
+overlay_text_click_probe_code="$(mfx_http_code "$overlay_text_click_probe_file" "$MFX_MANUAL_BASE_URL/api/effects/test-overlay-windows" \
+    -X POST \
+    -H "$token_header" \
+    -H "Content-Type: application/json" \
+    -d '{"emit_text_click_effect":true,"text_click_text":"MFX_TEXT_CLICK_PROBE","text_click_font_size_px":112,"close_persistent":true,"wait_ms":140,"wait_for_clear_ms":400}')"
+mfx_assert_eq "$overlay_text_click_probe_code" "200" "effects overlay text click probe status"
+mfx_assert_file_contains "$overlay_text_click_probe_file" "\"ok\":true" "effects overlay text click probe ok"
+mfx_assert_file_contains "$overlay_text_click_probe_file" "\"emit_text_click_effect\":true" "effects overlay text click emit flag"
+mfx_assert_file_contains "$overlay_text_click_probe_file" "\"text_click_text\":\"MFX_TEXT_CLICK_PROBE\"" "effects overlay text click text echo"
+text_click_before_count="$(parse_uint_field "$overlay_text_click_probe_file" "before_text_effect_fallback_show_count")"
+text_click_after_count="$(parse_uint_field "$overlay_text_click_probe_file" "after_text_effect_fallback_show_count")"
+if [[ -z "$text_click_before_count" || -z "$text_click_after_count" ]]; then
+    mfx_fail "effects overlay text click fallback count parse failed"
+fi
+if (( text_click_after_count <= text_click_before_count )); then
+    mfx_fail "effects overlay text click expected fallback show increase: before=$text_click_before_count after=$text_click_after_count"
+fi
+
 overlay_line_trail_probe_file="$tmp_dir/effects-overlay-line-trail-probe.out"
 overlay_line_trail_probe_code="$(mfx_http_code "$overlay_line_trail_probe_file" "$MFX_MANUAL_BASE_URL/api/effects/test-overlay-windows" \
     -X POST \
