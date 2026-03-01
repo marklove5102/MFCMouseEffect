@@ -505,6 +505,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosApplicationCatalogScanner.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosCursorPositionService.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosForegroundProcessService.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosVmForegroundSuppressionService.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.EventTapDispatch.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/System/MacosGlobalInputHook.EventTapDispatch.Mouse.cpp"
