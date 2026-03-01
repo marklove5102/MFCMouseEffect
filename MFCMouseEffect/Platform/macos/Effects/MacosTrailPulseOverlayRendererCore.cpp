@@ -1,62 +1,8 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosTrailPulseOverlayRendererCore.h"
-#include "Platform/macos/Effects/MacosTrailPulseOverlayRendererCore.Internal.h"
-
-#include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
-#include "Platform/macos/Effects/MacosTrailPulseWindowRegistry.h"
-
-#if defined(__APPLE__)
-#import <AppKit/AppKit.h>
-#import <QuartzCore/QuartzCore.h>
-#import <dispatch/dispatch.h>
-#endif
 
 namespace mousefx::macos_trail_pulse {
-
-void ShowTrailPulseOverlayOnMain(
-    const TrailEffectRenderCommand& command,
-    const std::string& themeName) {
-#if !defined(__APPLE__)
-    (void)command;
-    (void)themeName;
-    return;
-#else
-    (void)themeName;
-    if (!command.emit) {
-        return;
-    }
-    const TrailPulseRenderPlan plan = BuildTrailPulseRenderPlan(command);
-    NSWindow* window = macos_overlay_support::CreateOverlayWindow(plan.frame);
-    if (window == nil) {
-        return;
-    }
-
-    NSView* content = [window contentView];
-    macos_overlay_support::ApplyOverlayContentScale(content, command.overlayPoint);
-
-    CAShapeLayer* core = [CAShapeLayer layer];
-    ConfigureTrailCoreLayer(core, content, plan, command.deltaX, command.deltaY);
-    [content.layer addSublayer:core];
-    AddTrailGlowLayer(content, plan);
-    StartTrailPulseAnimation(core, plan);
-
-    RegisterTrailPulseWindow(reinterpret_cast<void*>(window));
-    macos_overlay_support::ShowOverlayWindow(reinterpret_cast<void*>(window));
-
-    dispatch_after(
-        dispatch_time(
-            DISPATCH_TIME_NOW,
-            static_cast<int64_t>(plan.closeAfterMs) * NSEC_PER_MSEC),
-        dispatch_get_main_queue(),
-        ^{
-          if (!TakeTrailPulseWindow(reinterpret_cast<void*>(window))) {
-              return;
-          }
-          macos_overlay_support::ReleaseOverlayWindow(reinterpret_cast<void*>(window));
-        });
-#endif
-}
 
 void ShowTrailPulseOverlayOnMain(
     const ScreenPoint& overlayPt,
