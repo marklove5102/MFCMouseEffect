@@ -119,6 +119,19 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
         })}
     };
 
+    (*out)["input_capture"] = {
+        {"diagnostic_keys", json::array({
+            "active",
+            "error",
+            "reason",
+            "degraded",
+            "effects_suspended",
+            "effects_suspended_vm",
+            "required_permissions",
+            "notice"
+        })}
+    };
+
     (*out)["capabilities"] = {
         {"platform",
 #if MFX_PLATFORM_WINDOWS

@@ -121,6 +121,8 @@ _mfx_core_http_run_state_checks() {
     mfx_assert_eq "$code_schema" "200" "core schema status"
     mfx_assert_file_contains "$tmp_dir/schema.out" "\"capabilities\":" "core schema capabilities section"
     mfx_assert_file_contains "$tmp_dir/schema.out" "\"wasm\":" "core schema wasm capabilities section"
+    mfx_assert_file_contains "$tmp_dir/schema.out" "\"input_capture\":" "core schema input_capture section"
+    mfx_assert_file_contains "$tmp_dir/schema.out" "\"effects_suspended_vm\"" "core schema input_capture vm suppression key"
     mfx_assert_file_contains "$tmp_dir/schema.out" "\"lifetime_invoke_calls\"" "core schema wasm lifetime invoke key"
     mfx_assert_file_contains "$tmp_dir/schema.out" "\"lifetime_render_dispatches\"" "core schema wasm lifetime render key"
     mfx_assert_file_contains "$tmp_dir/schema.out" "\"lifetime_throttled_render_commands\"" "core schema wasm lifetime throttled key"
@@ -129,6 +131,7 @@ _mfx_core_http_run_state_checks() {
     local state_wasm_render_supported
     local schema_wasm_invoke
     local schema_wasm_render
+    _mfx_core_http_read_json_bool "$tmp_dir/state.out" "input_capture.effects_suspended_vm" >/dev/null
     state_wasm_invoke_supported="$(_mfx_core_http_read_json_bool "$tmp_dir/state.out" "wasm.invoke_supported")"
     state_wasm_render_supported="$(_mfx_core_http_read_json_bool "$tmp_dir/state.out" "wasm.render_supported")"
     schema_wasm_invoke="$(_mfx_core_http_read_json_bool "$tmp_dir/schema.out" "capabilities.wasm.invoke")"
