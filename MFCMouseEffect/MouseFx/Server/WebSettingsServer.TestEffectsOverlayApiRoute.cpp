@@ -154,6 +154,14 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     if (resetLineTrail) {
 #if MFX_PLATFORM_MACOS
         macos_line_trail::ResetLineTrail();
+        const auto resetDeadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
+        while (std::chrono::steady_clock::now() < resetDeadline) {
+            const LineTrailProbeState resetState = ReadLineTrailProbeState();
+            if (!resetState.active && resetState.pointCount == 0) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
 #endif
     }
 

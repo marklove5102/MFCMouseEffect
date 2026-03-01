@@ -159,6 +159,20 @@ mfx_assert_file_contains "$overlay_probe_file" "\"scroll_type\":\"helix\"" "effe
 mfx_assert_file_contains "$overlay_probe_file" "\"hold_type\":\"hologram\"" "effects overlay hold type"
 mfx_assert_file_contains "$overlay_probe_file" "\"hover_type\":\"tubes\"" "effects overlay hover type"
 
+overlay_trail_none_probe_file="$tmp_dir/effects-overlay-trail-none-probe.out"
+overlay_trail_none_probe_code="$(mfx_http_code "$overlay_trail_none_probe_file" "$MFX_MANUAL_BASE_URL/api/effects/test-overlay-windows" \
+    -X POST \
+    -H "$token_header" \
+    -H "Content-Type: application/json" \
+    -d '{"emit_trail":true,"trail_type":"none","close_persistent":true,"reset_line_trail":true,"wait_ms":40,"wait_for_clear_ms":400}')"
+mfx_assert_eq "$overlay_trail_none_probe_code" "200" "effects overlay trail none probe status"
+mfx_assert_file_contains "$overlay_trail_none_probe_file" "\"ok\":true" "effects overlay trail none probe ok"
+mfx_assert_file_contains "$overlay_trail_none_probe_file" "\"trail_type\":\"none\"" "effects overlay trail none probe trail type"
+mfx_assert_file_contains "$overlay_trail_none_probe_file" "\"before_line_trail_active\":false" "effects overlay trail none probe before inactive"
+mfx_assert_file_contains "$overlay_trail_none_probe_file" "\"after_line_trail_active\":false" "effects overlay trail none probe after inactive"
+mfx_assert_file_contains "$overlay_trail_none_probe_file" "\"before_line_trail_point_count\":0" "effects overlay trail none probe before point count"
+mfx_assert_file_contains "$overlay_trail_none_probe_file" "\"after_line_trail_point_count\":0" "effects overlay trail none probe after point count"
+
 mfx_ok "macos effects type parity selfcheck passed"
 
 if [[ "$keep_running" -eq 1 ]]; then

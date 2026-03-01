@@ -35,6 +35,9 @@
      - `after_line_trail_active=false`
      - `before_line_trail_point_count=0`
      - `after_line_trail_point_count=0`
+5. Manual one-command selfcheck coverage expansion:
+   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh`
+   - Added `trail_type=none` probe assertions on line-trail inactive/zero-point baseline.
 
 ## Validation
 Executed on macOS host:
