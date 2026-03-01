@@ -18,14 +18,17 @@ Commands:
       Run macOS core host without rebuilding.
       Default auto stop: 30 minutes.
 
-  effects [--skip-build]
+  effects [--skip-build] [--strict]
       Run macOS effects type parity selfcheck.
+      --strict: fail if constrained-runtime startup is skipped.
 
-  verify-effects
+  verify-effects [--strict]
       Run POSIX effects regression suite (recommended daily gate).
+      --strict: fail if scaffold/core/manual phases are skipped.
 
-  verify-full
+  verify-full [--strict]
       Run full POSIX regression suite.
+      --strict: fail if scaffold/core/manual phases are skipped.
 
 Compatibility aliases:
   start -> run
@@ -92,17 +95,80 @@ run_start() {
 
 run_effects() {
     shift
-    exec "$repo_root/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh" "$@"
+    local strict=0
+    local -a args=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --strict)
+            strict=1
+            shift
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+        esac
+    done
+
+    if [[ "$strict" -eq 1 ]]; then
+        exec env MFX_MANUAL_REQUIRE_EXECUTION=1 \
+            "$repo_root/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh" "${args[@]}"
+    fi
+    exec "$repo_root/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh" "${args[@]}"
 }
 
 run_verify_effects() {
     shift
-    exec "$repo_root/tools/platform/regression/run-posix-effects-regression-suite.sh" --platform auto "$@"
+    local strict=0
+    local -a args=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --strict)
+            strict=1
+            shift
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+        esac
+    done
+
+    if [[ "$strict" -eq 1 ]]; then
+        exec env \
+            MFX_HTTP_REQUIRE_EXECUTION=1 \
+            MFX_CORE_HTTP_REQUIRE_EXECUTION=1 \
+            MFX_MANUAL_REQUIRE_EXECUTION=1 \
+            "$repo_root/tools/platform/regression/run-posix-effects-regression-suite.sh" --platform auto "${args[@]}"
+    fi
+    exec "$repo_root/tools/platform/regression/run-posix-effects-regression-suite.sh" --platform auto "${args[@]}"
 }
 
 run_verify_full() {
     shift
-    exec "$repo_root/tools/platform/regression/run-posix-regression-suite.sh" --platform auto "$@"
+    local strict=0
+    local -a args=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --strict)
+            strict=1
+            shift
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+        esac
+    done
+
+    if [[ "$strict" -eq 1 ]]; then
+        exec env \
+            MFX_HTTP_REQUIRE_EXECUTION=1 \
+            MFX_CORE_HTTP_REQUIRE_EXECUTION=1 \
+            MFX_MANUAL_REQUIRE_EXECUTION=1 \
+            "$repo_root/tools/platform/regression/run-posix-regression-suite.sh" --platform auto "${args[@]}"
+    fi
+    exec "$repo_root/tools/platform/regression/run-posix-regression-suite.sh" --platform auto "${args[@]}"
 }
 
 if [[ $# -lt 1 ]]; then
