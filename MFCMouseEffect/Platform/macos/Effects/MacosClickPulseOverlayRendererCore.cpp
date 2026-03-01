@@ -21,6 +21,8 @@ void ShowClickPulseOverlayOnMain(
     const ClickEffectProfile computeProfile{
         profile.normalSizePx,
         profile.textSizePx,
+        profile.textFontSizePx,
+        profile.textFloatDistancePx,
         profile.normalDurationSec,
         profile.textDurationSec,
         profile.closePaddingMs,

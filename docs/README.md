@@ -23,6 +23,7 @@ Use it as a pointer index, not a full historical catalog.
 - POSIX Linux compile gate workflow: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
 ## Recent Issue Docs
+- macOS click text config-float parity: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp1-macos-click-text-config-float-parity.md`
 - macOS trail “none” selection not sticking: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/macos-trail-none-selection-apply.md`
 - macOS trail `streamer/line` regression fix: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/macos-trail-streamer-line-regression-fix.md`
 - macOS line-trail Swift bridge cutover: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zb-macos-line-trail-swift-bridge-cutover.md`

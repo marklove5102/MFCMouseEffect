@@ -16,9 +16,10 @@ void* mfx_macos_click_pulse_overlay_create_v1(
     unsigned int strokeArgb,
     double baseOpacity,
     double animationDurationSec,
-    const char* textLabelUtf8);
+    const char* textLabelUtf8,
+    double textFontSizePx,
+    double textFloatDistancePx);
 
 #ifdef __cplusplus
 }
 #endif
-

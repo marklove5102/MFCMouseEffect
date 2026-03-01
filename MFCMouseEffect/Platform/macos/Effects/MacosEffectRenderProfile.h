@@ -16,6 +16,8 @@ struct ClickButtonColorProfile {
 struct ClickRenderProfile {
     int normalSizePx = 138;
     int textSizePx = 152;
+    double textFontSizePx = 24.0;
+    double textFloatDistancePx = 60.0;
     double normalDurationSec = 0.32;
     double textDurationSec = 0.36;
     int closePaddingMs = 60;

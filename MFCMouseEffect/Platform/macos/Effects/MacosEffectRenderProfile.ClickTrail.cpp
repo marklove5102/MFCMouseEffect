@@ -59,9 +59,19 @@ ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
     ClickRenderProfile profile{};
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     const int textDurationMs = ClampInt(config.textClick.durationMs, 220, 1800);
+    const double textFontSizePx = detail::ClampDouble(
+        static_cast<double>(config.textClick.fontSize) * (96.0 / 72.0),
+        8.0,
+        180.0);
+    const double textFloatDistancePx = detail::ClampDouble(
+        static_cast<double>(config.textClick.floatDistance),
+        0.0,
+        320.0);
     const int baseWindowSize = ClampInt(config.ripple.windowSize, 80, 220);
     profile.normalSizePx = detail::ScaleInt(baseWindowSize + 22, tuning.sizeScale, 80, 320);
     profile.textSizePx = detail::ScaleInt(baseWindowSize + 38, tuning.sizeScale, 92, 360);
+    profile.textFontSizePx = detail::ScaleDouble(textFontSizePx, tuning.sizeScale, 8.0, 240.0);
+    profile.textFloatDistancePx = detail::ScaleDouble(textFloatDistancePx, tuning.sizeScale, 0.0, 360.0);
     profile.normalDurationSec = detail::ScaleDouble(
         detail::ClampDouble(static_cast<double>(rippleDurationMs) / 1000.0 * 1.06, 0.20, 1.30),
         tuning.durationScale,

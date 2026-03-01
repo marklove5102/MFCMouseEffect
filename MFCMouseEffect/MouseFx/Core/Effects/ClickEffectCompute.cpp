@@ -61,6 +61,8 @@ ClickEffectRenderCommand ComputeClickEffectRenderCommand(
     command.normalizedType = NormalizeClickEffectType(effectType);
     command.textLabel = ResolveTextLabel(button);
     command.sizePx = (command.normalizedType == "text") ? profile.textSizePx : profile.normalSizePx;
+    command.textFontSizePx = std::clamp(profile.textFontSizePx, 8.0, 220.0);
+    command.textFloatDistancePx = std::clamp(profile.textFloatDistancePx, 0.0, 420.0);
     command.animationDurationSec =
         (command.normalizedType == "text") ? profile.textDurationSec : profile.normalDurationSec;
     command.closePaddingMs = profile.closePaddingMs;

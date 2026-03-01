@@ -20,6 +20,8 @@ nlohmann::json BuildClickCommandJson(const ClickEffectRenderCommand& command) {
     return {
         {"normalized_type", command.normalizedType},
         {"size_px", command.sizePx},
+        {"text_font_size_px", command.textFontSizePx},
+        {"text_float_distance_px", command.textFloatDistancePx},
         {"duration_sec", command.animationDurationSec},
         {"close_padding_ms", command.closePaddingMs},
         {"base_opacity", command.baseOpacity},

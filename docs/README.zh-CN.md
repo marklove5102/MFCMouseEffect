@@ -23,6 +23,7 @@
 - POSIX Linux 编译门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
 ## 近期问题文档
+- macOS 点击文字配置语义 + 上浮动画对齐：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp1-macos-click-text-config-float-parity.md`
 - macOS 拖尾 “无” 不生效：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/macos-trail-none-selection-apply.md`
 - macOS 拖尾 `streamer/line` 回归修复：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/macos-trail-streamer-line-regression-fix.md`
 - macOS LineTrail Swift bridge 收口：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zb-macos-line-trail-swift-bridge-cutover.md`

@@ -8,6 +8,8 @@ ClickEffectProfile BuildClickProfile(const macos_effect_profile::ClickRenderProf
     ClickEffectProfile out{};
     out.normalSizePx = profile.normalSizePx;
     out.textSizePx = profile.textSizePx;
+    out.textFontSizePx = profile.textFontSizePx;
+    out.textFloatDistancePx = profile.textFloatDistancePx;
     out.normalDurationSec = profile.normalDurationSec;
     out.textDurationSec = profile.textDurationSec;
     out.closePaddingMs = profile.closePaddingMs;

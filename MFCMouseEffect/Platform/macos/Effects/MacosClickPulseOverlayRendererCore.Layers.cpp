@@ -59,7 +59,9 @@ void ShowClickPulseOverlayOnMain(
         command.strokeArgb,
         command.baseOpacity,
         static_cast<double>(plan.animationDuration),
-        textLabelUtf8);
+        textLabelUtf8,
+        command.textFontSizePx,
+        command.textFloatDistancePx);
     if (windowHandle == nullptr) {
         return;
     }
