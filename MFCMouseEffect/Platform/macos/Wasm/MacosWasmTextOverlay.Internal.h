@@ -6,7 +6,17 @@
 #include <cstdint>
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
+@class NSPanel;
+@class NSTextField;
+@class NSString;
+#else
+struct objc_object;
+using NSPanel = objc_object;
+using NSTextField = objc_object;
+using NSString = objc_object;
+#endif
 #endif
 
 namespace mousefx::platform::macos {
@@ -17,7 +27,7 @@ struct WasmTextOverlayLayout {
     CGFloat fontSize = 0;
     CGFloat width = 0;
     CGFloat height = 0;
-    NSRect frame = NSZeroRect;
+    CGRect frame = CGRectZero;
 };
 
 WasmTextOverlayLayout BuildWasmTextOverlayLayout(

@@ -46,6 +46,7 @@
 - macOS overlay coordinate conversion/service modules are now also detached from ObjC++ allowlist (`MacosOverlayCoordSpaceConversion.cpp`, `MacosOverlayCoordSpaceService.cpp`) since both paths are pure C++ wrappers over Swift bridge/C++ logic.
 - macOS ObjC++ allowlist is further pruned by compiler-level probe (`compile_commands` per entry with `-x c++ -fsyntax-only`), removing 26 additional pure-C++ wrappers across effects entry files, input-indicator overlays, and WASM command/state wrappers while preserving build/regression pass gates.
 - macOS effects plan/state headers now expose C++-compatible forward-declaration boundaries (AppKit imports kept in ObjC++ implementation files), enabling 4 additional files (`Click/Trail/Scroll Core.Plan` + `Hold Core.State`) to be removed from ObjC++ allowlist with full scaffold/core-automation/surface-gate regression pass.
+- macOS WASM planning/layout headers now use C++-compatible forward-declaration boundaries (with AppKit/Foundation imports moved to ObjC++ implementation files), enabling `MacosWasmImageOverlayRendererCore.Plan.cpp` and `MacosWasmTextOverlay.Layout.cpp` removal from ObjC++ allowlist while preserving scaffold/core-automation/surface-gate passes.
 - Validation passed:
   - `cmake -S MFCMouseEffect/Platform -B /tmp/mfx-platform-macos-legacy-mm-build -DMFX_PACKAGE_PLATFORM=macos -DMFX_ENABLE_POSIX_CORE_RUNTIME=ON -DMFX_ENABLE_ENTRY_RUNTIME_TARGETS=ON`
   - `cmake --build /tmp/mfx-platform-macos-legacy-mm-build --target mfx_shell_macos mfx_entry_posix_host -j8`

@@ -3,6 +3,10 @@
 #include "Platform/macos/Wasm/MacosWasmTextOverlay.Internal.h"
 #include "Platform/macos/Wasm/MacosWasmOverlayRenderMath.h"
 
+#if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#endif
+
 namespace mousefx::platform::macos {
 
 #if defined(__APPLE__)

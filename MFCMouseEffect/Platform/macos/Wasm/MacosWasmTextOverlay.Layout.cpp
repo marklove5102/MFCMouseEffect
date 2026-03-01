@@ -22,7 +22,7 @@ WasmTextOverlayLayout BuildWasmTextOverlayLayout(
         64.0,
         460.0);
     layout.height = wasm_overlay_render_math::ClampFloat(layout.fontSize * 2.0, 30.0, 88.0);
-    layout.frame = NSMakeRect(pt.x - layout.width * 0.5, pt.y - layout.height - 24.0, layout.width, layout.height);
+    layout.frame = CGRectMake(pt.x - layout.width * 0.5, pt.y - layout.height - 24.0, layout.width, layout.height);
     return layout;
 }
 

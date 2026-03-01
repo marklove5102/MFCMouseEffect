@@ -1,7 +1,13 @@
 #pragma once
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
+@class NSColor;
+#else
+struct objc_object;
+using NSColor = objc_object;
+#endif
 #endif
 
 #include <cstdint>

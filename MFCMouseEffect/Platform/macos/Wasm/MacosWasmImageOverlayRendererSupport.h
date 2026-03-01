@@ -3,7 +3,13 @@
 #include "Platform/macos/Wasm/MacosWasmImageOverlayRendererCore.h"
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
+#include <CoreGraphics/CoreGraphics.h>
+#ifdef __OBJC__
+@class NSString;
+#else
+struct objc_object;
+using NSString = objc_object;
+#endif
 #endif
 
 #include <cstdint>

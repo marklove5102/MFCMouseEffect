@@ -2,6 +2,10 @@
 
 #include "Platform/macos/Wasm/MacosWasmOverlayRenderMath.h"
 
+#if defined(__APPLE__)
+#import <AppKit/AppKit.h>
+#endif
+
 #include <algorithm>
 
 namespace mousefx::platform::macos::wasm_overlay_render_math {

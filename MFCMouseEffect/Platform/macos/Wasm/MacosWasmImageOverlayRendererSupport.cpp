@@ -5,6 +5,10 @@
 #include "Platform/macos/Wasm/MacosWasmOverlayRenderMath.h"
 #include "MouseFx/Utils/StringUtils.h"
 
+#if defined(__APPLE__)
+#import <Foundation/Foundation.h>
+#endif
+
 #include <cmath>
 
 namespace mousefx::platform::macos::wasm_image_overlay_support {
