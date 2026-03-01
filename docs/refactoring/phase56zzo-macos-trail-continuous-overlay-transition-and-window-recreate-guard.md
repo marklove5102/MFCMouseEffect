@@ -38,6 +38,9 @@
 5. Manual one-command selfcheck coverage expansion:
    - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh`
    - Added `trail_type=none` probe assertions on line-trail inactive/zero-point baseline.
+6. `click=text` anti-no-op gate expansion:
+   - `/api/effects/test-overlay-windows` now exposes text-effect before/after counters (`click_count`, `fallback_show_count`, `fallback_panel_created`, `fallback_error_count`).
+   - Effects contract regression and manual type-parity selfcheck now both assert `fallback_show_count` is non-regressing (`after >= before`) for `click_type=text` probe.
 
 ## Validation
 Executed on macOS host:

@@ -21,6 +21,7 @@
 #include "Platform/macos/Effects/MacosScrollPulseWindowRegistry.h"
 #include "Platform/macos/Effects/MacosTrailPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosTrailPulseWindowRegistry.h"
+#include "MouseFx/Core/Diagnostics/TextEffectRuntimeDiagnostics.h"
 #endif
 
 using json = nlohmann::json;
@@ -79,6 +80,22 @@ struct LineTrailProbeState final {
     }
 };
 
+struct TextEffectProbeState final {
+    uint64_t clickCount = 0;
+    uint64_t fallbackShowCount = 0;
+    bool fallbackPanelCreated = false;
+    uint64_t fallbackErrorCount = 0;
+
+    json ToJson() const {
+        return json{
+            {"click_count", clickCount},
+            {"fallback_show_count", fallbackShowCount},
+            {"fallback_panel_created", fallbackPanelCreated},
+            {"fallback_error_count", fallbackErrorCount},
+        };
+    }
+};
+
 OverlayWindowCounts ReadOverlayWindowCounts() {
     OverlayWindowCounts out{};
 #if MFX_PLATFORM_MACOS
@@ -97,6 +114,18 @@ LineTrailProbeState ReadLineTrailProbeState() {
     const auto snapshot = macos_line_trail::ReadLineTrailRuntimeSnapshot();
     out.active = snapshot.active;
     out.pointCount = snapshot.pointCount;
+#endif
+    return out;
+}
+
+TextEffectProbeState ReadTextEffectProbeState() {
+    TextEffectProbeState out{};
+#if MFX_PLATFORM_MACOS
+    const auto snapshot = diagnostics::GetTextEffectRuntimeSnapshot();
+    out.clickCount = snapshot.clickCount;
+    out.fallbackShowCount = snapshot.fallbackShowCount;
+    out.fallbackPanelCreated = snapshot.fallbackPanelCreated;
+    out.fallbackErrorCount = snapshot.fallbackErrorCount;
 #endif
     return out;
 }
@@ -167,6 +196,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
 
     const OverlayWindowCounts before = ReadOverlayWindowCounts();
     const LineTrailProbeState beforeLineTrail = ReadLineTrailProbeState();
+    const TextEffectProbeState beforeTextEffect = ReadTextEffectProbeState();
 
 #if MFX_PLATFORM_MACOS
     const ScreenPoint overlayPoint{x, y};
@@ -205,6 +235,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
 
     OverlayWindowCounts after = ReadOverlayWindowCounts();
     LineTrailProbeState afterLineTrail = ReadLineTrailProbeState();
+    TextEffectProbeState afterTextEffect = ReadTextEffectProbeState();
     if (waitForClearMs > 0) {
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(waitForClearMs);
         while (std::chrono::steady_clock::now() < deadline) {
@@ -214,6 +245,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
             after = ReadOverlayWindowCounts();
             afterLineTrail = ReadLineTrailProbeState();
+            afterTextEffect = ReadTextEffectProbeState();
         }
     }
 
@@ -238,6 +270,8 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"after", after.ToJson()},
         {"before_line_trail", beforeLineTrail.ToJson()},
         {"after_line_trail", afterLineTrail.ToJson()},
+        {"before_text_effect", beforeTextEffect.ToJson()},
+        {"after_text_effect", afterTextEffect.ToJson()},
         {"before_click_active_overlay_windows", before.click},
         {"before_trail_active_overlay_windows", before.trail},
         {"before_scroll_active_overlay_windows", before.scroll},
@@ -254,6 +288,14 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"before_line_trail_point_count", beforeLineTrail.pointCount},
         {"after_line_trail_active", afterLineTrail.active},
         {"after_line_trail_point_count", afterLineTrail.pointCount},
+        {"before_text_effect_click_count", beforeTextEffect.clickCount},
+        {"before_text_effect_fallback_show_count", beforeTextEffect.fallbackShowCount},
+        {"before_text_effect_fallback_panel_created", beforeTextEffect.fallbackPanelCreated},
+        {"before_text_effect_fallback_error_count", beforeTextEffect.fallbackErrorCount},
+        {"after_text_effect_click_count", afterTextEffect.clickCount},
+        {"after_text_effect_fallback_show_count", afterTextEffect.fallbackShowCount},
+        {"after_text_effect_fallback_panel_created", afterTextEffect.fallbackPanelCreated},
+        {"after_text_effect_fallback_error_count", afterTextEffect.fallbackErrorCount},
         {"before_total_matches_components", before.InvariantOk()},
         {"after_total_matches_components", after.InvariantOk()},
         {"restored_to_baseline", after.Total() <= before.Total()},

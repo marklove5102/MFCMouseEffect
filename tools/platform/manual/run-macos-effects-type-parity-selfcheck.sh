@@ -9,6 +9,14 @@ source "$repo_root/tools/platform/regression/lib/common.sh"
 source "$repo_root/tools/platform/regression/lib/build.sh"
 source "$repo_root/tools/platform/manual/lib/macos_core_host.sh"
 
+parse_uint_field() {
+    local file="$1"
+    local key="$2"
+    local value
+    value="$(grep -oE "\"$key\":[0-9]+" "$file" | head -n1 | cut -d: -f2 || true)"
+    printf '%s' "$value"
+}
+
 usage() {
     cat <<'EOF'
 Usage:
@@ -158,6 +166,17 @@ mfx_assert_file_contains "$overlay_probe_file" "\"trail_type\":\"meteor\"" "effe
 mfx_assert_file_contains "$overlay_probe_file" "\"scroll_type\":\"helix\"" "effects overlay scroll type"
 mfx_assert_file_contains "$overlay_probe_file" "\"hold_type\":\"hologram\"" "effects overlay hold type"
 mfx_assert_file_contains "$overlay_probe_file" "\"hover_type\":\"tubes\"" "effects overlay hover type"
+mfx_assert_file_contains "$overlay_probe_file" "\"before_text_effect_fallback_show_count\":" "effects overlay text fallback before count"
+mfx_assert_file_contains "$overlay_probe_file" "\"after_text_effect_fallback_show_count\":" "effects overlay text fallback after count"
+
+before_text_fallback_count="$(parse_uint_field "$overlay_probe_file" "before_text_effect_fallback_show_count")"
+after_text_fallback_count="$(parse_uint_field "$overlay_probe_file" "after_text_effect_fallback_show_count")"
+if [[ -z "$before_text_fallback_count" || -z "$after_text_fallback_count" ]]; then
+    mfx_fail "effects overlay text fallback count parse failed"
+fi
+if (( after_text_fallback_count < before_text_fallback_count )); then
+    mfx_fail "effects overlay text fallback count regressed: before=$before_text_fallback_count after=$after_text_fallback_count"
+fi
 
 overlay_trail_none_probe_file="$tmp_dir/effects-overlay-trail-none-probe.out"
 overlay_trail_none_probe_code="$(mfx_http_code "$overlay_trail_none_probe_file" "$MFX_MANUAL_BASE_URL/api/effects/test-overlay-windows" \

@@ -64,6 +64,10 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_line_trail_active\":" "core effect overlay probe after line trail active field"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_line_trail_point_count\":" "core effect overlay probe before line trail point count field"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_line_trail_point_count\":" "core effect overlay probe after line trail point count field"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_text_effect\":" "core effect overlay probe before text effect snapshot"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_text_effect\":" "core effect overlay probe after text effect snapshot"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_text_effect_fallback_show_count\":" "core effect overlay probe before text effect fallback count"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_text_effect_fallback_show_count\":" "core effect overlay probe after text effect fallback count"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_total_matches_components\":true" "core effect overlay probe before invariant"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_total_matches_components\":true" "core effect overlay probe after invariant"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"restored_to_baseline\":true" "core effect overlay probe restore baseline"
@@ -85,6 +89,8 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     local after_hold_count
     local after_hover_count
     local after_total_count
+    local before_text_effect_fallback_count
+    local after_text_effect_fallback_count
     before_click_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "before_click_active_overlay_windows")"
     before_trail_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "before_trail_active_overlay_windows")"
     before_scroll_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "before_scroll_active_overlay_windows")"
@@ -97,8 +103,10 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     after_hold_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "after_hold_active_overlay_windows")"
     after_hover_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "after_hover_active_overlay_windows")"
     after_total_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "after_active_overlay_windows_total")"
+    before_text_effect_fallback_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "before_text_effect_fallback_show_count")"
+    after_text_effect_fallback_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-probe.out" "after_text_effect_fallback_show_count")"
 
-    if [[ -z "$before_click_count" || -z "$before_trail_count" || -z "$before_scroll_count" || -z "$before_hold_count" || -z "$before_hover_count" || -z "$before_total_count" || -z "$after_click_count" || -z "$after_trail_count" || -z "$after_scroll_count" || -z "$after_hold_count" || -z "$after_hover_count" || -z "$after_total_count" ]]; then
+    if [[ -z "$before_click_count" || -z "$before_trail_count" || -z "$before_scroll_count" || -z "$before_hold_count" || -z "$before_hover_count" || -z "$before_total_count" || -z "$after_click_count" || -z "$after_trail_count" || -z "$after_scroll_count" || -z "$after_hold_count" || -z "$after_hover_count" || -z "$after_total_count" || -z "$before_text_effect_fallback_count" || -z "$after_text_effect_fallback_count" ]]; then
         mfx_fail "core effect overlay probe count parse failed"
     fi
 
@@ -109,6 +117,9 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     fi
     if (( after_sum != after_total_count )); then
         mfx_fail "core effect overlay probe after count mismatch: total=$after_total_count sum=$after_sum"
+    fi
+    if (( after_text_effect_fallback_count < before_text_effect_fallback_count )); then
+        mfx_fail "core effect overlay probe text fallback count regressed: before=$before_text_effect_fallback_count after=$after_text_effect_fallback_count"
     fi
 
     if [[ "$platform" == "macos" ]]; then
