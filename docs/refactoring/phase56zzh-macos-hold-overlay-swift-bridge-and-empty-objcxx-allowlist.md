@@ -42,6 +42,12 @@
 - `tools/platform/regression/run-macos-objcxx-surface-regression.sh`
   - empty allowlist is now accepted and reported as info, while retaining wildcard/shape/path checks.
 
+5. Residual cleanup after hold bridge cutover:
+- removed unused legacy hold accent path files from build:
+  - `MFCMouseEffect/Platform/macos/Effects/MacosHoldPulseOverlayStyle.Accent.cpp`
+  - `MFCMouseEffect/Platform/macos/Effects/MacosHoldPulseOverlayStyle.Internal.h`
+- `MFCMouseEffect/Platform/macos/CMakeLists.txt` no longer references removed files.
+
 ## Verification
 - `cmake --build /tmp/mfx-platform-macos-build --target mfx_entry_posix_host -j8`
 - `./tools/platform/regression/run-posix-scaffold-regression.sh --platform auto`
@@ -54,4 +60,3 @@ All commands passed on macOS.
 - Hold overlay rendering leaf is Swift-owned.
 - macOS ObjC++ allowlist reduced from `1` to `0`.
 - `.mm` remains `0`, and surface gate now supports the zero-allowlist end-state.
-
