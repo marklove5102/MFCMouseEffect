@@ -51,6 +51,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-macos-objcxx-surface-regression.sh`
   - Gate now checks both macOS CMake rules and any existing `/tmp/mfx-platform-macos*/compile_commands.json` for hidden Objective-C++ flags.
 - Core HTTP regression teardown now attempts `/api/stop` before TERM/KILL fallback to reduce forced-stop noise and flakiness.
+- Scaffold HTTP regression now logs startup failure with `stage/code`; `bind EPERM/EACCES (stage=2, code=1/13)` is treated as a controlled skip in sandbox-like runners (override with `MFX_HTTP_SKIP_BIND_EACCES=0`).
 
 ## High-Value Manual Entrypoints (macOS)
 - One-command launcher:

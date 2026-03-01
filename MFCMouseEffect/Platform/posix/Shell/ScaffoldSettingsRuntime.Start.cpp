@@ -5,6 +5,7 @@
 #include "Platform/posix/Shell/ScaffoldSettingsWebUiAssets.h"
 
 #include <memory>
+#include <string>
 
 namespace mousefx::platform::scaffold::runtime_internal {
 
@@ -33,7 +34,13 @@ bool StartEmbeddedServer(
             requestHandler.HandleRequest(req, resp);
         });
     if (!started && warningSink) {
-        warningSink("MFCMouseEffect", "Scaffold settings server failed to start.");
+        const std::string message =
+            "Scaffold settings server failed to start (stage=" +
+            std::to_string(server->LastStartErrorStage()) +
+            ",code=" +
+            std::to_string(server->LastStartErrorCode()) +
+            ").";
+        warningSink("MFCMouseEffect", message);
     }
     return started;
 }
