@@ -112,6 +112,20 @@ uint8_t ParseButtonOrDefault(const nlohmann::json& payload, const char* key, uin
     return static_cast<uint8_t>(raw);
 }
 
+uint32_t ParseUInt32OrDefault(const nlohmann::json& payload, const char* key, uint32_t defaultValue) {
+    if (!payload.contains(key) || !payload[key].is_number_integer()) {
+        return defaultValue;
+    }
+    const int64_t raw = payload[key].get<int64_t>();
+    if (raw < 0) {
+        return 0u;
+    }
+    if (raw > static_cast<int64_t>(std::numeric_limits<uint32_t>::max())) {
+        return std::numeric_limits<uint32_t>::max();
+    }
+    return static_cast<uint32_t>(raw);
+}
+
 float ParseFloatOrDefault(const nlohmann::json& payload, const char* key, float defaultValue) {
     if (!payload.contains(key) || !payload[key].is_number()) {
         return defaultValue;

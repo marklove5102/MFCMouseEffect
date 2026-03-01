@@ -46,6 +46,12 @@
   - scale matrix (affine enabled)
   - rotation matrix (affine enabled, 90deg)
 
+6. Hardened affine test-route payload typing:
+- `WebSettingsServer.TestWasmInputApiRoutes.cpp` now parses unsigned fields via `ParseUInt32OrDefault(...)` instead of signed helper + cast.
+- Added shared helper in `WebSettingsServer.TestRouteCommon.*`.
+- Covered fields: `tint_rgba`, `delay_ms`, `life_ms`, `image_id`, `affine_anchor_mode`.
+- This removes signed-cast ambiguity for high-bit values (for example RGBA values with alpha bit set) in `/api/wasm/test-resolve-image-affine` diagnostics.
+
 ## Validation
 1. Core wasm contract:
 ```bash

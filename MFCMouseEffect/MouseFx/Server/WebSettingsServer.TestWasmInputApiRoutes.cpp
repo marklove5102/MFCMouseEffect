@@ -23,6 +23,7 @@ using websettings_test_routes::ParseBooleanOrDefault;
 using websettings_test_routes::ParseButtonOrDefault;
 using websettings_test_routes::ParseFloatOrDefault;
 using websettings_test_routes::ParseInt32OrDefault;
+using websettings_test_routes::ParseUInt32OrDefault;
 using websettings_test_routes::ParseObjectOrEmpty;
 using websettings_test_routes::SetJsonResponse;
 using websettings_test_routes::SetPlainResponse;
@@ -192,10 +193,10 @@ bool HandleWebSettingsTestWasmInputApiRoute(
         cmd.base.scale = ParseFloatOrDefault(payload, "scale", 1.0f);
         cmd.base.rotation = ParseFloatOrDefault(payload, "rotation", 0.0f);
         cmd.base.alpha = ParseFloatOrDefault(payload, "alpha", 1.0f);
-        cmd.base.tintRgba = static_cast<uint32_t>(ParseInt32OrDefault(payload, "tint_rgba", 0xFFFFFFFFu));
-        cmd.base.delayMs = static_cast<uint32_t>(ParseInt32OrDefault(payload, "delay_ms", 0));
-        cmd.base.lifeMs = static_cast<uint32_t>(ParseInt32OrDefault(payload, "life_ms", 0));
-        cmd.base.imageId = static_cast<uint32_t>(ParseInt32OrDefault(payload, "image_id", 0));
+        cmd.base.tintRgba = ParseUInt32OrDefault(payload, "tint_rgba", 0xFFFFFFFFu);
+        cmd.base.delayMs = ParseUInt32OrDefault(payload, "delay_ms", 0u);
+        cmd.base.lifeMs = ParseUInt32OrDefault(payload, "life_ms", 0u);
+        cmd.base.imageId = ParseUInt32OrDefault(payload, "image_id", 0u);
 
         cmd.affineM11 = ParseFloatOrDefault(payload, "affine_m11", 1.0f);
         cmd.affineM12 = ParseFloatOrDefault(payload, "affine_m12", 0.0f);
@@ -203,7 +204,7 @@ bool HandleWebSettingsTestWasmInputApiRoute(
         cmd.affineM22 = ParseFloatOrDefault(payload, "affine_m22", 1.0f);
         cmd.affineDx = ParseFloatOrDefault(payload, "affine_dx", 0.0f);
         cmd.affineDy = ParseFloatOrDefault(payload, "affine_dy", 0.0f);
-        cmd.affineAnchorMode = static_cast<uint32_t>(ParseInt32OrDefault(payload, "affine_anchor_mode", 0));
+        cmd.affineAnchorMode = ParseUInt32OrDefault(payload, "affine_anchor_mode", 0u);
         cmd.affineEnabled = ParseBooleanOrDefault(payload, "affine_enabled", false) ? 1u : 0u;
 
         const wasm::SpawnImageCommandV1 resolved = wasm::ResolveSpawnImageCommand(cmd);
