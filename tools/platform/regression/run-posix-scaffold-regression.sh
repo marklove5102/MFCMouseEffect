@@ -46,6 +46,7 @@ Usage: run-posix-scaffold-regression.sh [options]
 
 Env tuning:
   MFX_HTTP_ENTRY_START_RETRIES     scaffold HTTP entry startup retries on early exit (default: 1)
+  MFX_HTTP_REQUIRE_EXECUTION       when 1, fail instead of skip on constrained-runtime HTTP startup skip (default: 0)
 USAGE
             exit 0
             ;;

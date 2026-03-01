@@ -22,6 +22,17 @@ _mfx_core_http_notification_capture_file=""
 _mfx_core_http_probe_diagnostics_file=""
 _mfx_core_http_startup_skip_reason=""
 
+_mfx_core_http_require_execution_enabled() {
+    local raw="${MFX_CORE_HTTP_REQUIRE_EXECUTION:-0}"
+    case "$raw" in
+        1|true|TRUE|True|yes|YES|on|ON)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
 
 mfx_run_core_http_contract_checks() {
     local platform="$1"
@@ -67,6 +78,9 @@ mfx_run_core_http_contract_checks() {
         "$probe_diagnostics_file" || start_status=$?
     if [[ "$start_status" -ne 0 ]]; then
         if [[ "$start_status" -eq 2 && -n "$_mfx_core_http_startup_skip_reason" ]]; then
+            if _mfx_core_http_require_execution_enabled; then
+                mfx_fail "core HTTP contract checks skipped while MFX_CORE_HTTP_REQUIRE_EXECUTION=1: $_mfx_core_http_startup_skip_reason"
+            fi
             trap - EXIT
             _mfx_core_http_stop_entry
             rm -rf "$tmp_dir"

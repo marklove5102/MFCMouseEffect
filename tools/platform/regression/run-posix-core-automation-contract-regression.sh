@@ -62,6 +62,7 @@ Env tuning:
   MFX_MACOS_WASM_IMAGE_MIN_INTERVAL_MS macOS wasm image overlay min interval test value (default: 9)
   MFX_MACOS_WASM_TEXT_MIN_INTERVAL_MS macOS wasm text overlay min interval test value (default: 11)
   MFX_CORE_HTTP_ALLOW_BIND_EACCES_SKIP when 1, treat bind EACCES startup failures as skipped in constrained runtimes (default: 1)
+  MFX_CORE_HTTP_REQUIRE_EXECUTION  when 1, fail instead of skip on constrained-runtime core HTTP startup skip (default: 0)
 USAGE
             exit 0
             ;;

@@ -8,6 +8,18 @@ source "$_mfx_http_lib_dir/http_entry_helpers.sh"
 _mfx_http_default_route_skipped=0
 _mfx_http_route_skip_reason=""
 
+_mfx_http_require_execution_enabled() {
+    local raw="${MFX_HTTP_REQUIRE_EXECUTION:-0}"
+    case "$raw" in
+        1|true|TRUE|True|yes|YES|on|ON)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 _mfx_http_skip_bind_eacces_enabled() {
     local raw="${MFX_HTTP_SKIP_BIND_EACCES:-1}"
     case "$raw" in
@@ -196,6 +208,9 @@ mfx_run_http_checks() {
     mfx_info "run scaffold HTTP checks: default route"
     _mfx_http_default_route_checks "$platform" "$entry_bin"
     if [[ "$_mfx_http_default_route_skipped" -eq 1 ]]; then
+        if _mfx_http_require_execution_enabled; then
+            mfx_fail "HTTP checks skipped while MFX_HTTP_REQUIRE_EXECUTION=1: ${_mfx_http_route_skip_reason:-loopback bind permission denial}"
+        fi
         mfx_ok "HTTP checks skipped: ${_mfx_http_route_skip_reason:-loopback bind permission denial}"
         return 0
     fi
@@ -204,6 +219,9 @@ mfx_run_http_checks() {
     local route_status=0
     _mfx_http_custom_route_checks "$entry_bin" || route_status=$?
     if [[ "$route_status" -eq 2 ]]; then
+        if _mfx_http_require_execution_enabled; then
+            mfx_fail "HTTP checks skipped while MFX_HTTP_REQUIRE_EXECUTION=1: ${_mfx_http_route_skip_reason:-constrained runtime startup skip}"
+        fi
         mfx_ok "HTTP checks skipped: ${_mfx_http_route_skip_reason:-constrained runtime startup skip}"
         return 0
     fi
@@ -213,6 +231,9 @@ mfx_run_http_checks() {
     route_status=0
     _mfx_http_missing_webui_checks "$entry_bin" || route_status=$?
     if [[ "$route_status" -eq 2 ]]; then
+        if _mfx_http_require_execution_enabled; then
+            mfx_fail "HTTP checks skipped while MFX_HTTP_REQUIRE_EXECUTION=1: ${_mfx_http_route_skip_reason:-constrained runtime startup skip}"
+        fi
         mfx_ok "HTTP checks skipped: ${_mfx_http_route_skip_reason:-constrained runtime startup skip}"
         return 0
     fi
