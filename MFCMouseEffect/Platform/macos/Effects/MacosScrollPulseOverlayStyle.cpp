@@ -1,36 +1,13 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosScrollPulseOverlayStyle.h"
-#include "MouseFx/Utils/StringUtils.h"
+#include "MouseFx/Core/Effects/ScrollEffectCompute.h"
 
 namespace mousefx::macos_scroll_pulse {
 
 #if defined(__APPLE__)
-namespace {
-
-bool ContainsScrollToken(const std::string& value, const char* token) {
-    return value.find(token) != std::string::npos;
-}
-
-} // namespace
-
 std::string NormalizeScrollType(const std::string& effectType) {
-    const std::string value = ToLowerAscii(effectType);
-    if (value.empty() || value == "none") {
-        return "arrow";
-    }
-    if (ContainsScrollToken(value, "helix")) {
-        return "helix";
-    }
-    if (ContainsScrollToken(value, "twinkle") || ContainsScrollToken(value, "stardust")) {
-        return "twinkle";
-    }
-    if (ContainsScrollToken(value, "arrow") ||
-        ContainsScrollToken(value, "direction") ||
-        ContainsScrollToken(value, "indicator")) {
-        return "arrow";
-    }
-    return "arrow";
+    return NormalizeScrollEffectType(effectType);
 }
 
 CGPathRef CreateScrollPulseDirectionArrowPath(CGRect bodyRect, bool horizontal, int delta) {

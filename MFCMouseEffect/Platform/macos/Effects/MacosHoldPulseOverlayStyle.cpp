@@ -1,18 +1,14 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosHoldPulseOverlayStyle.h"
+#include "MouseFx/Core/Effects/HoldEffectCompute.h"
 #include "MouseFx/Effects/HoldRouteCatalog.h"
-#include "MouseFx/Utils/StringUtils.h"
 
 namespace mousefx::macos_hold_pulse::detail {
 
 #if defined(__APPLE__)
 std::string NormalizeHoldType(const std::string& effectType) {
-    const std::string value = ToLowerAscii(effectType);
-    if (value.empty()) {
-        return "charge";
-    }
-    return value;
+    return NormalizeHoldEffectType(effectType);
 }
 
 bool ContainsHoldToken(const std::string& holdType, const char* token) {

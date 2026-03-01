@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "Platform/macos/Effects/MacosClickPulseOverlayStyle.h"
-#include "MouseFx/Utils/StringUtils.h"
+#include "MouseFx/Core/Effects/ClickEffectCompute.h"
 
 #if defined(__APPLE__)
 #include <algorithm>
@@ -16,11 +16,7 @@ namespace {
 } // namespace
 
 std::string NormalizeClickType(const std::string& effectType) {
-    const std::string value = ToLowerAscii(effectType);
-    if (value == "star" || value == "text") {
-        return value;
-    }
-    return "ripple";
+    return NormalizeClickEffectType(effectType);
 }
 
 CGPathRef CreateClickPulseStarPath(CGRect bounds, int points) {
