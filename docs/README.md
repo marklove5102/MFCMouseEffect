@@ -48,6 +48,7 @@ Use it as a pointer index, not a full historical catalog.
 - macOS overlay render-support ObjC++ prune: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzc-macos-overlay-render-support-objcxx-prune.md`
 - macOS hover overlay Swift bridge cutover: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzd-macos-hover-overlay-swift-bridge-cutover.md`
 - macOS click overlay Swift bridge cutover: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zze-macos-click-overlay-swift-bridge-cutover.md`
+- macOS scroll overlay Swift bridge cutover: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzf-macos-scroll-overlay-swift-bridge-cutover.md`
 
 ## Current macOS Mainline (Phases 50-55)
 - Dual-lane guardrails: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`
