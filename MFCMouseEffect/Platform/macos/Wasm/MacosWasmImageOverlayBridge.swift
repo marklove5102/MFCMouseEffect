@@ -75,7 +75,9 @@ private func mfxCreateWasmImageOverlayOnMainThread(
         let imageInset = mfxClamp(size * 0.16, min: 8.0, max: 60.0)
         let resolvedImage: NSImage
         if applyTint {
-            let tintColor = mfxColorFromArgb(tintArgb, alphaScaleClamped)
+            // Keep parity with Windows color-matrix semantics:
+            // tint alpha is applied once by tint color, then global alpha scales via imageView alphaValue.
+            let tintColor = mfxColorFromArgb(tintArgb, 1.0)
             resolvedImage = mfxCreateTintedImage(image, tintColor: tintColor) ?? image
         } else {
             resolvedImage = image
