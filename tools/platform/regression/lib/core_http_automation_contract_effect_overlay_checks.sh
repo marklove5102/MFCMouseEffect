@@ -132,6 +132,8 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"effective_timing\":" "core effect render profile probe effective timing section"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"click_duration_sec\":" "core effect render profile probe effective click duration"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"trail_duration_sec\":" "core effect render profile probe effective trail duration"
+    mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"trail_planner_teleport_skip_distance_px\":" "core effect render profile probe trail planner teleport distance"
+    mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"trail_planner_max_segments\":" "core effect render profile probe trail planner max segments"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"scroll_duration_sec\":" "core effect render profile probe effective scroll duration"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"scroll_emit_interval_ms\":" "core effect render profile probe effective scroll emit interval"
     mfx_assert_file_contains "$tmp_dir/effect-render-profile-probe.out" "\"scroll_max_duration_ms\":" "core effect render profile probe effective scroll max duration"
@@ -213,6 +215,9 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"opacity_scale\":" "core effect profile state opacity test tuning field"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"trail_throttle_scale\":" "core effect profile state trail throttle test tuning field"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"line_width_px\":" "core effect profile state trail line width field"
+    mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"trail_emission_planner\":" "core effect profile state trail emission planner section"
+    mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"teleport_skip_distance_px\":" "core effect profile state trail planner teleport distance"
+    mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"max_segments\":" "core effect profile state trail planner max segments"
 
     local probe_meteor_scale
     local state_meteor_scale

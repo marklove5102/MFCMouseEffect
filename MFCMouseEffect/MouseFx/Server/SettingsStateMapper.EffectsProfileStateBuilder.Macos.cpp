@@ -11,6 +11,7 @@
 #include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosEffectRenderProfile.h"
+#include "Platform/macos/Effects/MacosTrailPulseEmissionPlanner.h"
 
 namespace mousefx {
 namespace {
@@ -178,6 +179,7 @@ nlohmann::json BuildMacosEffectsProfileStateJson(const EffectConfig& cfg) {
     const auto holdProfile = macos_effect_profile::ResolveHoldRenderProfile(cfg);
     const auto hoverProfile = macos_effect_profile::ResolveHoverRenderProfile(cfg);
     const auto testTuning = macos_effect_profile::ResolveTestProfileTuning();
+    const auto trailPlannerConfig = macos_trail_pulse::ResolveTrailPulseEmissionPlannerConfig();
 
     nlohmann::json out = nlohmann::json::object();
     out["platform"] = "macos";
@@ -241,6 +243,10 @@ nlohmann::json BuildMacosEffectsProfileStateJson(const EffectConfig& cfg) {
     out["trail_throttle"] = {
         {"min_interval_ms", trailThrottle.minIntervalMs},
         {"min_distance_px", trailThrottle.minDistancePx},
+    };
+    out["trail_emission_planner"] = {
+        {"teleport_skip_distance_px", trailPlannerConfig.teleportSkipDistancePx},
+        {"max_segments", trailPlannerConfig.maxSegments},
     };
     out["scroll"] = {
         {"vertical_size_px", scrollProfile.verticalSizePx},
@@ -315,6 +321,7 @@ nlohmann::json BuildMacosEffectRenderCommandSamplesJson(const EffectConfig& cfg)
     const auto scrollProfile = macos_effect_profile::ResolveScrollRenderProfile(cfg);
     const auto holdProfile = macos_effect_profile::ResolveHoldRenderProfile(cfg);
     const auto hoverProfile = macos_effect_profile::ResolveHoverRenderProfile(cfg);
+    const auto trailPlannerConfig = macos_trail_pulse::ResolveTrailPulseEmissionPlannerConfig();
 
     const ClickEffectRenderCommand clickCommand = ComputeClickEffectRenderCommand(
         kSamplePoint,
@@ -400,6 +407,8 @@ nlohmann::json BuildMacosEffectRenderCommandSamplesJson(const EffectConfig& cfg)
         {"click_duration_sec", clickCommand.animationDurationSec},
         {"trail_duration_sec", trailCommand.durationSec},
         {"scroll_duration_sec", scrollCommand.durationSec},
+        {"trail_planner_teleport_skip_distance_px", trailPlannerConfig.teleportSkipDistancePx},
+        {"trail_planner_max_segments", trailPlannerConfig.maxSegments},
         {"scroll_emit_interval_ms", scrollShaper.emitIntervalMs},
         {"scroll_max_duration_ms", scrollShaper.maxDurationMs},
         {"hover_breathe_duration_sec", hoverCommand.breatheDurationSec},

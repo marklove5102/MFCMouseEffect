@@ -56,6 +56,7 @@ Use it as a pointer index, not a full historical catalog.
 - macOS trail line-width shared command wiring: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzk-macos-trail-line-width-shared-command-wiring.md`
 - macOS trail emission planner anti-matchstick: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzl-macos-trail-emission-planner-anti-matchstick.md`
 - macOS streamer continuous trail path: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzm-macos-streamer-continuous-trail-path.md`
+- macOS trail planner diagnostics surfacing: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzn-macos-trail-planner-diagnostics-surfacing.md`
 
 ## Current macOS Mainline (Phases 50-55)
 - Dual-lane guardrails: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`
