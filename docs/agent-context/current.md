@@ -18,6 +18,7 @@
   - macOS supports click/trail/scroll/hold/hover in core lane.
   - Shared compute-command model is active; renderer path is execution-focused.
   - Trail `none` hard-disable, line-trail diagnostics, and anti-origin-connector guards are in place.
+  - Core effects contract now asserts `trail=none` consistency across `POST /api/state` -> `GET /api/state` -> `/api/effects/test-render-profiles` active snapshot, preventing silent fallback to `line`.
   - Line-trail runtime diagnostics now include `line_trail_line_width_px` so contract gates can catch thin-line regressions.
   - Effects profile probe now exposes metadata-derived `catalog_values`; selfcheck asserts full five-category option coverage.
 - Automation:

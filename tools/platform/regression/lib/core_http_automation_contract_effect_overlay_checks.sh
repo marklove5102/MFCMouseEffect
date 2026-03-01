@@ -506,4 +506,42 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
             mfx_fail "core effect render profile probe support on macos: expected supported=true"
         fi
     fi
+
+    local code_effect_state_set_trail_none
+    code_effect_state_set_trail_none="$(mfx_http_code "$tmp_dir/effect-state-set-trail-none.out" "$base_url/api/state" \
+        -X POST \
+        -H "x-mfcmouseeffect-token: $token" \
+        -H "Content-Type: application/json" \
+        -d '{"active":{"click":"ripple","trail":"none","scroll":"helix","hold":"hologram","hover":"tubes"}}')"
+    mfx_assert_eq "$code_effect_state_set_trail_none" "200" "core effect set trail-none state post status"
+
+    local post_trail_none_active_trail
+    post_trail_none_active_trail="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-trail-none.out" "trail")"
+    if [[ "$post_trail_none_active_trail" != "none" ]]; then
+        mfx_fail "core effect set trail-none state post active trail mismatch: expected none, got ${post_trail_none_active_trail:-<empty>}"
+    fi
+
+    local code_effect_state_get_trail_none
+    code_effect_state_get_trail_none="$(mfx_http_code "$tmp_dir/effect-state-get-trail-none.out" "$base_url/api/state" \
+        -X GET \
+        -H "x-mfcmouseeffect-token: $token")"
+    mfx_assert_eq "$code_effect_state_get_trail_none" "200" "core effect set trail-none state get status"
+
+    local get_trail_none_active_trail
+    get_trail_none_active_trail="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-get-trail-none.out" "trail")"
+    if [[ "$get_trail_none_active_trail" != "none" ]]; then
+        mfx_fail "core effect set trail-none state get active trail mismatch: expected none, got ${get_trail_none_active_trail:-<empty>}"
+    fi
+
+    local code_effect_profile_probe_trail_none
+    code_effect_profile_probe_trail_none="$(mfx_http_code "$tmp_dir/effect-render-profile-probe-trail-none.out" "$base_url/api/effects/test-render-profiles" \
+        -X GET \
+        -H "x-mfcmouseeffect-token: $token")"
+    mfx_assert_eq "$code_effect_profile_probe_trail_none" "200" "core effect set trail-none render profile probe status"
+
+    local probe_trail_none_active_trail
+    probe_trail_none_active_trail="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-render-profile-probe-trail-none.out" "trail")"
+    if [[ "$probe_trail_none_active_trail" != "none" ]]; then
+        mfx_fail "core effect set trail-none render profile active trail mismatch: expected none, got ${probe_trail_none_active_trail:-<empty>}"
+    fi
 }
