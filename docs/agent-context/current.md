@@ -42,6 +42,7 @@
 - macOS line-trail overlay path is now Swift-owned (`MacosLineTrailOverlayBridge.swift` + `MacosLineTrailOverlaySwiftBridge.h`); `MacosLineTrailOverlay.cpp` is reduced to a pure C++ bridge wrapper (`ScreenToOverlayPoint` + C ABI forwarding), and the file was removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST`.
 - macOS effects bridge dedup is now tightened: `MacosLineTrailOverlayBridge.swift` reuses shared overlay bridge ABI for window/frame/scale operations (no local duplicate path), and `MacosTextEffectFallback.cpp` reuses `macos_overlay_support::RunOnMainThread*` instead of private duplicate helpers.
 - macOS click/trail/scroll window registries now detach from ObjC++ compile dependency by consuming `MacosOverlayRenderSupportSwiftBridge.h` C ABI directly, and all three `*WindowRegistry.cpp` files are removed from `MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST`.
+- macOS effects pure compute/registry modules are now detached from ObjC++ allowlist (`MacosEffectCreatorRegistry*`, `MacosEffectComputeProfileAdapter.cpp`, `MacosEffectRenderProfile*`), keeping allowlist focused on true AppKit/ObjC dependent runtime paths.
 - Validation passed:
   - `cmake -S MFCMouseEffect/Platform -B /tmp/mfx-platform-macos-legacy-mm-build -DMFX_PACKAGE_PLATFORM=macos -DMFX_ENABLE_POSIX_CORE_RUNTIME=ON -DMFX_ENABLE_ENTRY_RUNTIME_TARGETS=ON`
   - `cmake --build /tmp/mfx-platform-macos-legacy-mm-build --target mfx_shell_macos mfx_entry_posix_host -j8`
