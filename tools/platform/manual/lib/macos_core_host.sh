@@ -23,6 +23,32 @@ mfx_manual_trim_trailing_slash() {
     printf '%s' "$value"
 }
 
+mfx_manual_try_stop_via_http() {
+    local base_url="${1:-$MFX_MANUAL_BASE_URL}"
+    local token="${2:-$MFX_MANUAL_SETTINGS_TOKEN}"
+    if [[ -z "$base_url" || -z "$token" ]]; then
+        return 1
+    fi
+    if ! command -v curl >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local stop_url
+    stop_url="$(mfx_manual_trim_trailing_slash "$base_url")/api/stop"
+    local http_code=""
+    http_code="$(
+        curl -sS -m 2 -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "x-mfcmouseeffect-token: $token" \
+            "$stop_url" 2>/dev/null || true
+    )"
+    if [[ "$http_code" == "200" || "$http_code" == "204" ]]; then
+        mfx_info "manual host stop requested via /api/stop"
+        return 0
+    fi
+    return 1
+}
+
 mfx_manual_start_core_host() {
     local host_bin="$1"
     local probe_file="$2"
@@ -89,10 +115,29 @@ mfx_manual_stop_core_host() {
         stop_timeout_seconds=5
     fi
 
-    kill -TERM "$pid" 2>/dev/null || true
+    local http_stop_wait_seconds="${MFX_MANUAL_HTTP_STOP_WAIT_SECONDS:-2}"
+    if ! [[ "$http_stop_wait_seconds" =~ ^[0-9]+$ ]]; then
+        http_stop_wait_seconds=2
+    fi
+    local stop_requested_via_http=0
+    if [[ "$pid" == "$MFX_MANUAL_HOST_PID" ]]; then
+        if mfx_manual_try_stop_via_http "$MFX_MANUAL_BASE_URL" "$MFX_MANUAL_SETTINGS_TOKEN"; then
+            stop_requested_via_http=1
+        fi
+    fi
 
     local deadline=$((SECONDS + stop_timeout_seconds))
+    local term_sent=0
+    local term_deadline="$SECONDS"
+    if [[ "$stop_requested_via_http" -eq 1 ]]; then
+        term_deadline=$((SECONDS + http_stop_wait_seconds))
+    fi
+
     while kill -0 "$pid" 2>/dev/null; do
+        if [[ "$term_sent" -eq 0 ]] && (( SECONDS >= term_deadline )); then
+            kill -TERM "$pid" 2>/dev/null || true
+            term_sent=1
+        fi
         if (( SECONDS >= deadline )); then
             mfx_info "manual host graceful stop timeout; send KILL (pid=$pid)"
             kill -KILL "$pid" 2>/dev/null || true
@@ -107,11 +152,27 @@ mfx_manual_stop_core_host() {
 mfx_manual_schedule_auto_stop() {
     local pid="$1"
     local seconds="$2"
+    local base_url="${3:-$MFX_MANUAL_BASE_URL}"
+    local token="${4:-$MFX_MANUAL_SETTINGS_TOKEN}"
     if [[ -z "$pid" || "$seconds" -le 0 ]]; then
         return 0
     fi
     (
         sleep "$seconds"
+        if command -v curl >/dev/null 2>&1 && [[ -n "$base_url" && -n "$token" ]]; then
+            local stop_url
+            stop_url="$(mfx_manual_trim_trailing_slash "$base_url")/api/stop"
+            local http_code=""
+            http_code="$(
+                curl -sS -m 2 -o /dev/null -w "%{http_code}" \
+                    -X POST \
+                    -H "x-mfcmouseeffect-token: $token" \
+                    "$stop_url" 2>/dev/null || true
+            )"
+            if [[ "$http_code" == "200" || "$http_code" == "204" ]]; then
+                exit 0
+            fi
+        fi
         kill -TERM "$pid" 2>/dev/null || true
     ) >/dev/null 2>&1 &
 }
@@ -168,6 +229,11 @@ mfx_manual_print_stop_command() {
     local pid="${1:-$MFX_MANUAL_HOST_PID}"
     if [[ -z "$pid" ]]; then
         return 0
+    fi
+    if [[ -n "$MFX_MANUAL_BASE_URL" && -n "$MFX_MANUAL_SETTINGS_TOKEN" ]]; then
+        printf 'stop_cmd_http=curl -sS -X POST -H "x-mfcmouseeffect-token: %s" "%s/api/stop"\n' \
+            "$MFX_MANUAL_SETTINGS_TOKEN" \
+            "$(mfx_manual_trim_trailing_slash "$MFX_MANUAL_BASE_URL")"
     fi
     printf 'stop_cmd=kill -TERM %s\n' "$pid"
 }

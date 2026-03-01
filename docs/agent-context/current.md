@@ -56,6 +56,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build`
 - WASM runtime selfcheck:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build`
+- Manual host helper teardown now prefers `/api/stop` and falls back to TERM/KILL (same policy used by auto-stop scheduler).
 
 ## Key Contracts (Do Not Break)
 - `settings schema` vs `runtime diagnostics` capability parity.
