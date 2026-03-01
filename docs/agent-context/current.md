@@ -18,6 +18,7 @@
   - macOS supports click/trail/scroll/hold/hover in core lane.
   - Shared compute-command model is active; renderer path is execution-focused.
   - Trail `none` hard-disable, line-trail diagnostics, and anti-origin-connector guards are in place.
+  - Effects profile probe now exposes metadata-derived `catalog_values`; selfcheck asserts full five-category option coverage.
 - Automation:
   - App-scope alias normalization (`process:code` / `code.app` / `code.exe`) is gated.
   - Injection selfcheck and app-scope selfcheck are part of POSIX suite phases.

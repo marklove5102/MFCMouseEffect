@@ -133,6 +133,15 @@ mfx_assert_file_contains "$profile_probe_file" "\"hold_follow_mode_normalized\":
 mfx_assert_file_contains "$profile_probe_file" "\"input\":\"scifi\",\"normalized\":\"tubes\"" "effects profile trail scifi alias"
 mfx_assert_file_contains "$profile_probe_file" "\"input\":\"stardust\",\"normalized\":\"twinkle\"" "effects profile scroll stardust alias"
 mfx_assert_file_contains "$profile_probe_file" "\"input\":\"suspension\",\"normalized\":\"tubes\"" "effects profile hover suspension alias"
+mfx_assert_file_contains "$profile_probe_file" "\"catalog_values\":" "effects profile metadata catalog values"
+mfx_assert_file_contains "$profile_probe_file" "\"click\":[\"ripple\",\"star\",\"text\",\"none\"]" "effects profile click catalog values"
+mfx_assert_file_contains "$profile_probe_file" "\"trail\":[\"meteor\",\"streamer\",\"electric\",\"tubes\",\"particle\",\"line\",\"none\"]" "effects profile trail catalog values"
+mfx_assert_file_contains "$profile_probe_file" "\"scroll\":[\"arrow\",\"helix\",\"twinkle\",\"none\"]" "effects profile scroll catalog values"
+mfx_assert_file_contains "$profile_probe_file" "\"hover\":[\"glow\",\"tubes\",\"none\"]" "effects profile hover catalog values"
+mfx_assert_file_contains "$profile_probe_file" "\"hold\":[\"charge\",\"lightning\",\"hex\",\"tech_ring\",\"hologram\",\"hold_neon3d\"" "effects profile hold catalog values prefix"
+mfx_assert_file_contains "$profile_probe_file" "\"hold_quantum_halo_gpu_v2\"" "effects profile hold quantum halo gpu value"
+mfx_assert_file_contains "$profile_probe_file" "\"hold_fluxfield_cpu\"" "effects profile hold flux field cpu value"
+mfx_assert_file_contains "$profile_probe_file" "\"hold_fluxfield_gpu_v2\",\"none\"]" "effects profile hold catalog values suffix"
 
 state_apply_file="$tmp_dir/state-apply.out"
 state_apply_code="$(mfx_http_code "$state_apply_file" "$MFX_MANUAL_BASE_URL/api/state" \

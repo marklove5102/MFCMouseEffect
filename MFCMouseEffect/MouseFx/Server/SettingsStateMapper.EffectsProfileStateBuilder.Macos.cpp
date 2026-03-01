@@ -12,6 +12,9 @@
 #include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosEffectRenderProfile.h"
 #include "Platform/macos/Effects/MacosTrailPulseEmissionPlanner.h"
+#include "Settings/SettingsOptions.h"
+
+#include <unordered_set>
 
 namespace mousefx {
 namespace {
@@ -115,47 +118,99 @@ nlohmann::json BuildHoldUpdateCommandJson(const HoldEffectUpdateCommand& command
     };
 }
 
+template <typename NormalizeFn>
+nlohmann::json BuildCanonicalNormalizationMatrix(
+    const EffectOption* (*metadataFn)(size_t&),
+    NormalizeFn normalizeFn) {
+    nlohmann::json matrix = nlohmann::json::array();
+    size_t count = 0;
+    const EffectOption* options = metadataFn(count);
+    if (options == nullptr || count == 0) {
+        return matrix;
+    }
+
+    std::unordered_set<std::string> seenInputs;
+    for (size_t i = 0; i < count; ++i) {
+        const EffectOption& option = options[i];
+        if (option.value != nullptr && seenInputs.insert(option.value).second) {
+            matrix.push_back({
+                {"input", option.value},
+                {"normalized", normalizeFn(option.value)},
+            });
+        }
+        if (option.secondType != nullptr && seenInputs.insert(option.secondType).second) {
+            matrix.push_back({
+                {"input", option.secondType},
+                {"normalized", normalizeFn(option.secondType)},
+            });
+        }
+    }
+    return matrix;
+}
+
+nlohmann::json BuildMetadataCatalogValues(const EffectOption* (*metadataFn)(size_t&)) {
+    nlohmann::json values = nlohmann::json::array();
+    size_t count = 0;
+    const EffectOption* options = metadataFn(count);
+    if (options == nullptr || count == 0) {
+        return values;
+    }
+
+    for (size_t i = 0; i < count; ++i) {
+        const EffectOption& option = options[i];
+        if (option.value != nullptr) {
+            values.push_back(option.value);
+        }
+    }
+    return values;
+}
+
 nlohmann::json BuildAliasMatrixJson() {
-    const nlohmann::json click = nlohmann::json::array({
-        {{"input", "TEXT"}, {"normalized", NormalizeClickEffectType("TEXT")}},
-        {{"input", "icon"}, {"normalized", NormalizeClickEffectType("icon")}},
-        {{"input", "textclick"}, {"normalized", NormalizeClickEffectType("textclick")}},
-        {{"input", "none"}, {"normalized", NormalizeClickEffectType("none")}},
-        {{"input", "star"}, {"normalized", NormalizeClickEffectType("star")}},
-        {{"input", "ripple_custom"}, {"normalized", NormalizeClickEffectType("ripple_custom")}},
-    });
+    nlohmann::json click = BuildCanonicalNormalizationMatrix(
+        ClickMetadata,
+        [](const std::string& value) { return NormalizeClickEffectType(value); });
+    click.push_back({{"input", "TEXT"}, {"normalized", NormalizeClickEffectType("TEXT")}});
+    click.push_back({{"input", "icon"}, {"normalized", NormalizeClickEffectType("icon")}});
+    click.push_back({{"input", "textclick"}, {"normalized", NormalizeClickEffectType("textclick")}});
+    click.push_back({{"input", "none"}, {"normalized", NormalizeClickEffectType("none")}});
+    click.push_back({{"input", "star"}, {"normalized", NormalizeClickEffectType("star")}});
+    click.push_back({{"input", "ripple_custom"}, {"normalized", NormalizeClickEffectType("ripple_custom")}});
 
-    const nlohmann::json trail = nlohmann::json::array({
-        {{"input", "scifi"}, {"normalized", NormalizeTrailEffectType("scifi")}},
-        {{"input", "stream"}, {"normalized", NormalizeTrailEffectType("stream")}},
-        {{"input", "neon"}, {"normalized", NormalizeTrailEffectType("neon")}},
-        {{"input", "suspension"}, {"normalized", NormalizeTrailEffectType("suspension")}},
-        {{"input", "none"}, {"normalized", NormalizeTrailEffectType("none")}},
-        {{"input", "default"}, {"normalized", NormalizeTrailEffectType("default")}},
-        {{"input", "spark"}, {"normalized", NormalizeTrailEffectType("spark")}},
-    });
+    nlohmann::json trail = BuildCanonicalNormalizationMatrix(
+        TrailMetadata,
+        [](const std::string& value) { return NormalizeTrailEffectType(value); });
+    trail.push_back({{"input", "scifi"}, {"normalized", NormalizeTrailEffectType("scifi")}});
+    trail.push_back({{"input", "stream"}, {"normalized", NormalizeTrailEffectType("stream")}});
+    trail.push_back({{"input", "neon"}, {"normalized", NormalizeTrailEffectType("neon")}});
+    trail.push_back({{"input", "suspension"}, {"normalized", NormalizeTrailEffectType("suspension")}});
+    trail.push_back({{"input", "none"}, {"normalized", NormalizeTrailEffectType("none")}});
+    trail.push_back({{"input", "default"}, {"normalized", NormalizeTrailEffectType("default")}});
+    trail.push_back({{"input", "spark"}, {"normalized", NormalizeTrailEffectType("spark")}});
 
-    const nlohmann::json scroll = nlohmann::json::array({
-        {{"input", "stardust"}, {"normalized", NormalizeScrollEffectType("stardust")}},
-        {{"input", "helix"}, {"normalized", NormalizeScrollEffectType("helix")}},
-        {{"input", "none"}, {"normalized", NormalizeScrollEffectType("none")}},
-        {{"input", "arrow"}, {"normalized", NormalizeScrollEffectType("arrow")}},
-    });
+    nlohmann::json scroll = BuildCanonicalNormalizationMatrix(
+        ScrollMetadata,
+        [](const std::string& value) { return NormalizeScrollEffectType(value); });
+    scroll.push_back({{"input", "stardust"}, {"normalized", NormalizeScrollEffectType("stardust")}});
+    scroll.push_back({{"input", "helix"}, {"normalized", NormalizeScrollEffectType("helix")}});
+    scroll.push_back({{"input", "none"}, {"normalized", NormalizeScrollEffectType("none")}});
+    scroll.push_back({{"input", "arrow"}, {"normalized", NormalizeScrollEffectType("arrow")}});
 
-    const nlohmann::json hover = nlohmann::json::array({
-        {{"input", "suspension"}, {"normalized", NormalizeHoverEffectType("suspension")}},
-        {{"input", "helix"}, {"normalized", NormalizeHoverEffectType("helix")}},
-        {{"input", "none"}, {"normalized", NormalizeHoverEffectType("none")}},
-        {{"input", "glow"}, {"normalized", NormalizeHoverEffectType("glow")}},
-    });
+    nlohmann::json hover = BuildCanonicalNormalizationMatrix(
+        HoverMetadata,
+        [](const std::string& value) { return NormalizeHoverEffectType(value); });
+    hover.push_back({{"input", "suspension"}, {"normalized", NormalizeHoverEffectType("suspension")}});
+    hover.push_back({{"input", "helix"}, {"normalized", NormalizeHoverEffectType("helix")}});
+    hover.push_back({{"input", "none"}, {"normalized", NormalizeHoverEffectType("none")}});
+    hover.push_back({{"input", "glow"}, {"normalized", NormalizeHoverEffectType("glow")}});
 
-    const nlohmann::json hold = nlohmann::json::array({
-        {{"input", "hold_neon3d_gpu_v2"}, {"normalized", NormalizeHoldEffectType("hold_neon3d_gpu_v2")}},
-        {{"input", "hold_fluxfield_gpu_v2"}, {"normalized", NormalizeHoldEffectType("hold_fluxfield_gpu_v2")}},
-        {{"input", "scifi3d"}, {"normalized", NormalizeHoldEffectType("scifi3d")}},
-        {{"input", "neon3d"}, {"normalized", NormalizeHoldEffectType("neon3d")}},
-        {{"input", "charge"}, {"normalized", NormalizeHoldEffectType("charge")}},
-    });
+    nlohmann::json hold = BuildCanonicalNormalizationMatrix(
+        HoldMetadata,
+        [](const std::string& value) { return NormalizeHoldEffectType(value); });
+    hold.push_back({{"input", "hold_neon3d_gpu_v2"}, {"normalized", NormalizeHoldEffectType("hold_neon3d_gpu_v2")}});
+    hold.push_back({{"input", "hold_fluxfield_gpu_v2"}, {"normalized", NormalizeHoldEffectType("hold_fluxfield_gpu_v2")}});
+    hold.push_back({{"input", "scifi3d"}, {"normalized", NormalizeHoldEffectType("scifi3d")}});
+    hold.push_back({{"input", "neon3d"}, {"normalized", NormalizeHoldEffectType("neon3d")}});
+    hold.push_back({{"input", "charge"}, {"normalized", NormalizeHoldEffectType("charge")}});
     const nlohmann::json holdFollowMode = nlohmann::json::array({
         {{"input", "precise"}, {"normalized", config_internal::NormalizeHoldFollowMode("precise")}},
         {{"input", "cursor_priority"}, {"normalized", config_internal::NormalizeHoldFollowMode("cursor_priority")}},
@@ -170,6 +225,13 @@ nlohmann::json BuildAliasMatrixJson() {
         {"hover", hover},
         {"hold", hold},
         {"hold_follow_mode", holdFollowMode},
+        {"catalog_values", {
+            {"click", BuildMetadataCatalogValues(ClickMetadata)},
+            {"trail", BuildMetadataCatalogValues(TrailMetadata)},
+            {"scroll", BuildMetadataCatalogValues(ScrollMetadata)},
+            {"hold", BuildMetadataCatalogValues(HoldMetadata)},
+            {"hover", BuildMetadataCatalogValues(HoverMetadata)},
+        }},
     };
 }
 
