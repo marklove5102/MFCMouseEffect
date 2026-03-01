@@ -10,6 +10,10 @@ private var mfxTrayIconCacheInitialized = false
 
 private func mfxProjectLogoPathCandidates() -> [String] {
     var candidates: [String] = []
+    let envIconPath = ProcessInfo.processInfo.environment["MFX_MACOS_APP_ICON_PATH"] ?? ""
+    if !envIconPath.isEmpty {
+        candidates.append(envIconPath)
+    }
 
     if let bundleLogo = Bundle.main.url(forResource: "logo_elegant", withExtension: "png")?.path {
         candidates.append(bundleLogo)

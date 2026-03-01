@@ -32,6 +32,8 @@
 - Shell UX:
   - macOS tray now prefers icon rendering (project logo path fallback + SF Symbol fallback) instead of text-only `MFX`.
   - macOS warning notifications now initialize app icon before delivery to avoid generic default sender icon in unbundled runs.
+  - icon resolution supports explicit override via `MFX_MACOS_APP_ICON_PATH` (highest priority), then bundle/dev fallback paths.
+  - tray smoke gate now uses explicit CLI args (`--expect-settings-action`, `--settings-url`, `--launch-capture-file`); when sandbox runners do not emit launch-capture files, regression falls back to exit-code gating to avoid false negatives.
 
 ## Build and Regression Gates
 - macOS shell CMake Swift bridge registration has been normalized to one helper (`mfx_add_swift_bridge`) plus one source list (`MFX_MACOS_SWIFT_OBJECTS`), removing 20 duplicated compile blocks and reducing bridge drift risk.
