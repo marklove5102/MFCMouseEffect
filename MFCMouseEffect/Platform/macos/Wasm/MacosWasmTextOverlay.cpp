@@ -3,15 +3,39 @@
 #include "Platform/macos/Wasm/MacosWasmTransientOverlay.h"
 #include "Platform/macos/Wasm/MacosWasmOverlayRuntime.h"
 #include "Platform/macos/Wasm/MacosWasmTextOverlay.Internal.h"
+#include "Platform/macos/Wasm/MacosWasmTextOverlaySwiftBridge.h"
 
 #include "MouseFx/Utils/StringUtils.h"
 
 #if defined(__APPLE__)
-#import <AppKit/AppKit.h>
-#import <dispatch/dispatch.h>
+#include <dispatch/dispatch.h>
 #endif
 
+#include <memory>
+
 namespace mousefx::platform::macos {
+
+#if defined(__APPLE__)
+namespace {
+
+struct WasmTextOverlayCloseContext final {
+    void* panelHandle = nullptr;
+};
+
+void CloseWasmTextOverlayAfterDelay(void* context) {
+    std::unique_ptr<WasmTextOverlayCloseContext> closeContext(
+        static_cast<WasmTextOverlayCloseContext*>(context));
+    if (!closeContext || closeContext->panelHandle == nullptr) {
+        return;
+    }
+    if (!TakeWasmOverlayWindow(closeContext->panelHandle)) {
+        return;
+    }
+    mfx_macos_wasm_text_overlay_release_v1(closeContext->panelHandle);
+}
+
+} // namespace
+#endif
 
 WasmOverlayRenderResult ShowWasmTextOverlay(
     const ScreenPoint& screenPt,
@@ -45,41 +69,29 @@ WasmOverlayRenderResult ShowWasmTextOverlay(
     }
 
     RunWasmOverlayOnMainThreadAsync([=] {
-      NSString* value = [NSString stringWithUTF8String:utf8Text.c_str()];
-      if (value == nil) {
-          ReleaseWasmOverlaySlot();
-          return;
-      }
+        void* panelHandle = mfx_macos_wasm_text_overlay_create_v1(
+            static_cast<double>(layout.frame.origin.x),
+            static_cast<double>(layout.frame.origin.y),
+            static_cast<double>(layout.frame.size.width),
+            static_cast<double>(layout.frame.size.height),
+            static_cast<double>(layout.fontSize),
+            argb,
+            utf8Text.c_str());
+        if (panelHandle == nullptr) {
+            ReleaseWasmOverlaySlot();
+            return;
+        }
 
-      NSPanel* panel = [[NSPanel alloc] initWithContentRect:layout.frame
-                                                   styleMask:NSWindowStyleMaskBorderless
-                                                     backing:NSBackingStoreBuffered
-                                                       defer:NO];
-      if (panel == nil) {
-          ReleaseWasmOverlaySlot();
-          return;
-      }
+        RegisterWasmOverlayWindow(panelHandle);
+        mfx_macos_wasm_text_overlay_show_v1(panelHandle);
 
-      ConfigureWasmTextOverlayPanel(panel, layout.height);
-
-      NSView* content = [panel contentView];
-      NSTextField* label = CreateWasmTextOverlayLabel(layout.width, layout.height, layout.fontSize, argb, value);
-      [content addSubview:label];
-      [label release];
-
-      RegisterWasmOverlayWindow(reinterpret_cast<void*>(panel));
-      [panel orderFrontRegardless];
-
-      dispatch_after(
-          dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(layout.durationMs) * NSEC_PER_MSEC),
-          dispatch_get_main_queue(),
-          ^{
-            if (!TakeWasmOverlayWindow(reinterpret_cast<void*>(panel))) {
-                return;
-            }
-            [panel orderOut:nil];
-            [panel release];
-          });
+        auto* closeContext = new WasmTextOverlayCloseContext{};
+        closeContext->panelHandle = panelHandle;
+        dispatch_after_f(
+            dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(layout.durationMs) * NSEC_PER_MSEC),
+            dispatch_get_main_queue(),
+            closeContext,
+            &CloseWasmTextOverlayAfterDelay);
     });
     return WasmOverlayRenderResult::Rendered;
 #endif

@@ -23,6 +23,7 @@ set(MFX_MACOS_TEXT_FALLBACK_SWIFT_OBJECT "")
 set(MFX_MACOS_TRAY_LOCALIZATION_SWIFT_OBJECT "")
 set(MFX_MACOS_TRAY_MENU_SWIFT_OBJECT "")
 set(MFX_MACOS_EVENT_LOOP_SWIFT_OBJECT "")
+set(MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT "")
 set(MFX_SWIFT_LANGUAGE_MODE "auto" CACHE STRING "Swift language mode for macOS bridges: auto|5|6")
 set_property(CACHE MFX_SWIFT_LANGUAGE_MODE PROPERTY STRINGS auto 5 6)
 if(APPLE)
@@ -89,6 +90,8 @@ if(APPLE)
     set(MFX_MACOS_TRAY_MENU_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosTrayMenuBridge.swift.o")
     set(MFX_MACOS_EVENT_LOOP_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosEventLoopBridge.swift")
     set(MFX_MACOS_EVENT_LOOP_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosEventLoopBridge.swift.o")
+    set(MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlayBridge.swift")
+    set(MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosWasmTextOverlayBridge.swift.o")
     set(MFX_SWIFT_DEPLOYMENT_TARGET "${CMAKE_OSX_DEPLOYMENT_TARGET}")
     if(NOT MFX_SWIFT_DEPLOYMENT_TARGET)
         execute_process(
@@ -292,6 +295,19 @@ if(APPLE)
             GENERATED TRUE
             EXTERNAL_OBJECT TRUE
     )
+    add_custom_command(
+        OUTPUT "${MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT}"
+        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_COMMON_ARGS} "${MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_SOURCE}" -o "${MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT}"
+        DEPENDS "${MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_SOURCE}"
+        COMMENT "Compile Swift WASM text overlay bridge"
+        VERBATIM
+    )
+    set_source_files_properties(
+        "${MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT}"
+        PROPERTIES
+            GENERATED TRUE
+            EXTERNAL_OBJECT TRUE
+    )
 endif()
 
 add_library(mfx_shell_macos STATIC
@@ -377,7 +393,6 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmOverlayState.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmOverlayRuntime.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.Layout.cpp"
-    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.Style.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTransientOverlay.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell/MacosDpiAwarenessService.cpp"
@@ -430,8 +445,6 @@ if(APPLE)
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseOverlayRendererCore.Layers.cpp"
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Start.cpp"
         "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmImageOverlayRendererCore.Window.cpp"
-        "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.Style.cpp"
-        "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmTextOverlay.cpp"
     )
 
     get_target_property(MFX_MACOS_TARGET_SOURCES mfx_shell_macos SOURCES)
@@ -503,6 +516,9 @@ if(MFX_MACOS_TRAY_MENU_SWIFT_OBJECT)
 endif()
 if(MFX_MACOS_EVENT_LOOP_SWIFT_OBJECT)
     target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_EVENT_LOOP_SWIFT_OBJECT}")
+endif()
+if(MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT)
+    target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_WASM_TEXT_OVERLAY_SWIFT_OBJECT}")
 endif()
 
 target_link_libraries(mfx_shell_macos
