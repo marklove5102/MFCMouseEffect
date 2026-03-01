@@ -68,6 +68,7 @@
 - Remaining unreferenced issue docs were pruned; `docs/issues` now keeps only actively referenced entries.
 - Unreferenced refactoring history docs were also pruned by reachability; `docs/refactoring` keeps the linked active subset plus roadmap snapshot.
 - Unreferenced architecture docs (`dawn-native-effects-route`, `mousefx-folder-structure*`, `trail-effects-differentiation*`, `web-settings-ui*`) were pruned; architecture layer now keeps only linked workflow/contracts docs.
+- Unreferenced root-level docs (`input_indicator_refactor`, `installer_guide`, `macos-text-click-effect-rendering-fix`, `multi-monitor-positioning`, `singleton_implementation`) were removed as historical records with outdated paths/contracts.
 - Current docs focus is now:
   - `P0`: `AGENTS.md`
   - `P1`: this file + roadmap snapshot
