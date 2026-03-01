@@ -76,11 +76,13 @@ struct OverlayWindowCounts final {
 struct LineTrailProbeState final {
     bool active = false;
     int pointCount = 0;
+    double lineWidthPx = 0.0;
 
     json ToJson() const {
         return json{
             {"line_trail_active", active},
             {"line_trail_point_count", pointCount},
+            {"line_trail_line_width_px", lineWidthPx},
         };
     }
 };
@@ -119,6 +121,7 @@ LineTrailProbeState ReadLineTrailProbeState() {
     const auto snapshot = macos_line_trail::ReadLineTrailRuntimeSnapshot();
     out.active = snapshot.active;
     out.pointCount = snapshot.pointCount;
+    out.lineWidthPx = snapshot.lineWidthPx;
 #endif
     return out;
 }
@@ -413,8 +416,10 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"after_active_overlay_windows_total", after.Total()},
         {"before_line_trail_active", beforeLineTrail.active},
         {"before_line_trail_point_count", beforeLineTrail.pointCount},
+        {"before_line_trail_line_width_px", beforeLineTrail.lineWidthPx},
         {"after_line_trail_active", afterLineTrail.active},
         {"after_line_trail_point_count", afterLineTrail.pointCount},
+        {"after_line_trail_line_width_px", afterLineTrail.lineWidthPx},
         {"before_text_effect_click_count", beforeTextEffect.clickCount},
         {"before_text_effect_fallback_show_count", beforeTextEffect.fallbackShowCount},
         {"before_text_effect_fallback_panel_created", beforeTextEffect.fallbackPanelCreated},

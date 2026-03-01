@@ -58,6 +58,7 @@ public:
         }
         snapshot.active = (mfx_macos_line_trail_is_active_v1(handle_) != 0);
         snapshot.pointCount = std::max(0, mfx_macos_line_trail_point_count_v1(handle_));
+        snapshot.lineWidthPx = std::max(0.0, mfx_macos_line_trail_line_width_px_v1(handle_));
         return snapshot;
     }
 

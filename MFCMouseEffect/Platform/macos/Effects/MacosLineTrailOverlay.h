@@ -17,6 +17,7 @@ struct LineTrailConfig final {
 struct LineTrailRuntimeSnapshot final {
     bool active = false;
     int pointCount = 0;
+    double lineWidthPx = 0.0;
 };
 
 void UpdateLineTrail(const ScreenPoint& overlayPt, const LineTrailConfig& config);

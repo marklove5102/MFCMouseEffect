@@ -388,6 +388,10 @@ private final class MfxLineTrailState: NSObject {
     func pointCount() -> Int {
         return points.count
     }
+
+    func lineWidthPx() -> Double {
+        return Double(config.lineWidth)
+    }
 }
 
 @_cdecl("mfx_macos_line_trail_create_v1")
@@ -552,4 +556,30 @@ public func mfx_macos_line_trail_point_count_v1(_ handle: UnsafeMutableRawPointe
         }
     }
     return count
+}
+
+@_cdecl("mfx_macos_line_trail_line_width_px_v1")
+public func mfx_macos_line_trail_line_width_px_v1(_ handle: UnsafeMutableRawPointer?) -> Double {
+    let bits = UInt(bitPattern: handle)
+    if bits == 0 {
+        return 0.0
+    }
+    guard let ptr = UnsafeMutableRawPointer(bitPattern: bits) else {
+        return 0.0
+    }
+    let state = Unmanaged<MfxLineTrailState>.fromOpaque(ptr).takeUnretainedValue()
+
+    if Thread.isMainThread {
+        return MainActor.assumeIsolated {
+            state.lineWidthPx()
+        }
+    }
+
+    var width: Double = 0.0
+    DispatchQueue.main.sync {
+        width = MainActor.assumeIsolated {
+            state.lineWidthPx()
+        }
+    }
+    return width
 }

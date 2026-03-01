@@ -117,6 +117,7 @@ void AppendSettingsSchemaCapabilitiesSections(const EffectConfig& /*config*/, js
             "active_overlay_windows_total",
             "line_trail_active",
             "line_trail_point_count",
+            "line_trail_line_width_px",
             "trail_move_samples",
             "trail_origin_connector_drop_count",
             "trail_teleport_drop_count"

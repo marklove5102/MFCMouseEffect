@@ -18,6 +18,7 @@ void mfx_macos_line_trail_update_v1(
     int idleFadeEndMs);
 int mfx_macos_line_trail_is_active_v1(void* handle);
 int mfx_macos_line_trail_point_count_v1(void* handle);
+double mfx_macos_line_trail_line_width_px_v1(void* handle);
 
 #ifdef __cplusplus
 }

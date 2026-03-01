@@ -64,6 +64,8 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_line_trail_active\":" "core effect overlay probe after line trail active field"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_line_trail_point_count\":" "core effect overlay probe before line trail point count field"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_line_trail_point_count\":" "core effect overlay probe after line trail point count field"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_line_trail_line_width_px\":" "core effect overlay probe before line trail line-width field"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_line_trail_line_width_px\":" "core effect overlay probe after line trail line-width field"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_text_effect\":" "core effect overlay probe before text effect snapshot"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"after_text_effect\":" "core effect overlay probe after text effect snapshot"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-probe.out" "\"before_text_effect_fallback_show_count\":" "core effect overlay probe before text effect fallback count"
@@ -197,16 +199,23 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"emit_line_trail\":true" "core effect overlay line-trail probe emit flag"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_active\":" "core effect overlay line-trail probe active field"
     mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_point_count\":" "core effect overlay line-trail probe point count field"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_line_width_px\":" "core effect overlay line-trail probe line-width field"
     if [[ "$platform" == "macos" ]]; then
         mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_active\":true" "core effect overlay line-trail probe active on macos"
         local line_trail_after_count
+        local line_trail_after_width
         line_trail_after_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-line-trail-probe.out" "after_line_trail_point_count")"
+        line_trail_after_width="$(_mfx_core_http_automation_parse_scalar_field "$tmp_dir/effect-overlay-line-trail-probe.out" "after_line_trail_line_width_px")"
         if [[ -z "$line_trail_after_count" ]]; then
             mfx_fail "core effect overlay line-trail probe count parse failed"
+        fi
+        if [[ -z "$line_trail_after_width" ]]; then
+            mfx_fail "core effect overlay line-trail probe line-width parse failed"
         fi
         if (( line_trail_after_count <= 0 )); then
             mfx_fail "core effect overlay line-trail probe expected point count > 0 on macos, got $line_trail_after_count"
         fi
+        _mfx_core_http_automation_assert_float_within_tolerance "$line_trail_after_width" "4.0" "0.001" "core effect overlay line-trail probe expected line width"
     fi
 
     local code_effect_state_line_trail_active
@@ -216,19 +225,26 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_eq "$code_effect_state_line_trail_active" "200" "core effect line-trail active state status"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"line_trail_active\":" "core effect line-trail active state field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"line_trail_point_count\":" "core effect line-trail active state point field"
+    mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"line_trail_line_width_px\":" "core effect line-trail active state line-width field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"trail_move_samples\":" "core effect line-trail active state move sample field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"trail_origin_connector_drop_count\":" "core effect line-trail active state origin connector drop field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"trail_teleport_drop_count\":" "core effect line-trail active state teleport drop field"
     if [[ "$platform" == "macos" ]]; then
         mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-active.out" "\"line_trail_active\":true" "core effect line-trail active state on macos"
         local state_line_trail_active_count
+        local state_line_trail_active_width
         state_line_trail_active_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-state-line-trail-active.out" "line_trail_point_count")"
+        state_line_trail_active_width="$(_mfx_core_http_automation_parse_scalar_field "$tmp_dir/effect-state-line-trail-active.out" "line_trail_line_width_px")"
         if [[ -z "$state_line_trail_active_count" ]]; then
             mfx_fail "core effect line-trail active state count parse failed"
+        fi
+        if [[ -z "$state_line_trail_active_width" ]]; then
+            mfx_fail "core effect line-trail active state line-width parse failed"
         fi
         if (( state_line_trail_active_count <= 0 )); then
             mfx_fail "core effect line-trail active state expected point count > 0 on macos, got $state_line_trail_active_count"
         fi
+        _mfx_core_http_automation_assert_float_within_tolerance "$state_line_trail_active_width" "4.0" "0.001" "core effect line-trail active state expected line width"
     fi
 
     local code_effect_overlay_trail_none_probe
@@ -253,6 +269,7 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_eq "$code_effect_state_line_trail_cleared" "200" "core effect line-trail cleared state status"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-cleared.out" "\"line_trail_active\":" "core effect line-trail cleared state field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-cleared.out" "\"line_trail_point_count\":" "core effect line-trail cleared state point field"
+    mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-cleared.out" "\"line_trail_line_width_px\":" "core effect line-trail cleared state line-width field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-cleared.out" "\"trail_move_samples\":" "core effect line-trail cleared state move sample field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-cleared.out" "\"trail_origin_connector_drop_count\":" "core effect line-trail cleared state origin connector drop field"
     mfx_assert_file_contains "$tmp_dir/effect-state-line-trail-cleared.out" "\"trail_teleport_drop_count\":" "core effect line-trail cleared state teleport drop field"
@@ -376,6 +393,7 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"max_segments\":" "core effect profile state trail planner max segments"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"line_trail_active\":" "core effect runtime state line trail active field"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"line_trail_point_count\":" "core effect runtime state line trail point count field"
+    mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"line_trail_line_width_px\":" "core effect runtime state line trail line-width field"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"trail_move_samples\":" "core effect runtime state trail move sample field"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"trail_origin_connector_drop_count\":" "core effect runtime state trail origin connector drop field"
     mfx_assert_file_contains "$tmp_dir/effect-profile-state.out" "\"trail_teleport_drop_count\":" "core effect runtime state trail teleport drop field"

@@ -26,6 +26,7 @@ json BuildEffectsRuntimeState() {
     size_t hoverActiveOverlayWindows = 0;
     bool lineTrailActive = false;
     int lineTrailPointCount = 0;
+    double lineTrailLineWidthPx = 0.0;
     uint64_t trailMoveSamples = 0;
     uint64_t trailOriginConnectorDropCount = 0;
     uint64_t trailTeleportDropCount = 0;
@@ -38,6 +39,7 @@ json BuildEffectsRuntimeState() {
     const auto lineTrailSnapshot = macos_line_trail::ReadLineTrailRuntimeSnapshot();
     lineTrailActive = lineTrailSnapshot.active;
     lineTrailPointCount = lineTrailSnapshot.pointCount;
+    lineTrailLineWidthPx = lineTrailSnapshot.lineWidthPx;
     const auto trailDiag = ReadTrailPulseRuntimeDiagnostics();
     trailMoveSamples = trailDiag.moveSamples;
     trailOriginConnectorDropCount = trailDiag.originConnectorDropCount;
@@ -58,6 +60,7 @@ json BuildEffectsRuntimeState() {
         hoverActiveOverlayWindows;
     out["line_trail_active"] = lineTrailActive;
     out["line_trail_point_count"] = lineTrailPointCount;
+    out["line_trail_line_width_px"] = lineTrailLineWidthPx;
     out["trail_move_samples"] = trailMoveSamples;
     out["trail_origin_connector_drop_count"] = trailOriginConnectorDropCount;
     out["trail_teleport_drop_count"] = trailTeleportDropCount;
