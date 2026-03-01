@@ -41,6 +41,7 @@
 - macOS Scroll Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zv-macos-scroll-core-wrapper-objcxx-prune.md`
 - macOS Trail Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zw-macos-trail-core-wrapper-objcxx-prune.md`
 - macOS Click Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zx-macos-click-core-wrapper-objcxx-prune.md`
+- macOS Hover Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zy-macos-hover-core-wrapper-objcxx-prune.md`
 
 ## 当前 macOS 主线（Phase 50-55）
 - 双车道护栏：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`
