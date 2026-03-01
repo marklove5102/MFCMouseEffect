@@ -2,200 +2,57 @@
 
 语言： [English](README.md) | [中文](README.zh-CN.md)
 
-## 索引目标
-本文件保持精简，优先服务 AI-IDE 与人工快速定位。
-它是“导航入口”，不是“全量历史清单”。
+## 目标
+本索引保持精简，优先服务 AI-IDE 快速检索。禁止在这里继续堆长历史清单。
 
 ## 建议阅读顺序（Agent-First）
 1. `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/AGENTS.md`
 2. `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/current.md`
 3. `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
-4. 当前任务对应的一篇 issue/refactoring 文档
+4. 仅按当前任务打开 1 篇目标文档（`refactoring` 或 `issues`）
 
-## 高优先文档
-- 当前上下文：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/current.md`
-- 路线图快照：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
-- 文档治理：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/agent-doc-governance.md`
-- POSIX 回归总控：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-regression-suite-workflow.md`
-- POSIX scaffold 回归：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-scaffold-regression-workflow.md`
-- POSIX core smoke：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-lane-smoke-workflow.md`
-- POSIX core automation 合同：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md`
-- POSIX Linux 编译门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
+## 文档分层
+- `P0` 全局协作约束：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/AGENTS.md`
+- `P1` 当前上下文：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/current.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
+- `P2` 能力文档（按需打开）：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/`
+- `P3` 归档区：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/archive/README.md`
 
-## 近期问题文档
-- VM 抑制检测周期诊断字段与契约透出：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp13-vm-suppression-interval-diagnostics-contract-surfacing.md`
-- macOS VM 抑制检测周期测试态可配置化：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp12-macos-vm-suppression-check-interval-test-config.md`
-- POSIX 套件接入 macOS 特效类型等价自检门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp11-posix-suite-macos-effects-type-parity-selfcheck-gate.md`
-- input_capture VM 抑制字段 schema/state 契约对齐：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp10-input-capture-vm-suppression-schema-state-contract-alignment.md`
-- macOS 输入权限降级提示文案（去除“需重启”误导）：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp9-macos-input-permission-degraded-notice-hot-recovery-copy.md`
-- POSIX 套件接入 macOS VM 前台抑制自检门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp8-posix-suite-macos-vm-suppression-selfcheck-gate.md`
-- macOS VM 前台抑制测试强制开关 + 状态可观测性：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp7-macos-vm-suppression-force-and-state-observability.md`
-- POSIX 套件接入 macOS automation app-scope 自检门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp6-posix-suite-macos-automation-app-scope-selfcheck-gate.md`
-- macOS 拖尾 Swift 桥接 fail-closed 类型保护：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp5-macos-trail-swift-bridge-fail-closed-type-guard.md`
-- WASM schema/state 能力一致性门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp4-wasm-capability-schema-state-contract-parity.md`
-- WASM 能力判定单一来源：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp3-wasm-capability-resolver-single-source.md`
-- macOS 特效类型归一化单一来源：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp2-macos-effects-type-normalization-single-source.md`
-- macOS 点击文字配置语义 + 上浮动画对齐：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzp1-macos-click-text-config-float-parity.md`
-- macOS 拖尾 “无” 不生效：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/macos-trail-none-selection-apply.md`
-- macOS 拖尾 `streamer/line` 回归修复：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/macos-trail-streamer-line-regression-fix.md`
-- macOS LineTrail Swift bridge 收口：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zb-macos-line-trail-swift-bridge-cutover.md`
-- macOS 特效 Swift bridge 路径去重：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zc-macos-effects-swift-bridge-path-dedup.md`
-- macOS 窗口注册表去 ObjC++ 依赖：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zd-macos-window-registry-objcxx-detach.md`
-- macOS 特效计算/注册模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56ze-macos-effects-compute-registry-objcxx-prune.md`
-- macOS 坐标转换模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zf-macos-overlay-coord-objcxx-prune.md`
-- macOS ObjC++ 白名单编译器探测式收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zg-macos-objcxx-allowlist-compiler-probe-prune.md`
-- macOS 特效 Plan/State 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zh-macos-effects-plan-state-objcxx-prune.md`
-- macOS WASM Plan/Layout 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zi-macos-wasm-plan-layout-objcxx-prune.md`
-- macOS Hold Core 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zj-macos-hold-core-objcxx-prune.md`
-- macOS Hold Style 计算层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zr-macos-hold-style-compute-objcxx-prune.md`
-- macOS Hold Accent 路径计算 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zs-macos-hold-accent-path-objcxx-prune.md`
-- macOS Scroll Support 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zt-macos-scroll-support-objcxx-prune.md`
-- macOS Hold Update 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zu-macos-hold-update-objcxx-prune.md`
-- macOS Scroll Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zv-macos-scroll-core-wrapper-objcxx-prune.md`
-- macOS Trail Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zw-macos-trail-core-wrapper-objcxx-prune.md`
-- macOS Click Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zx-macos-click-core-wrapper-objcxx-prune.md`
-- macOS Hover Core 包装层 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zy-macos-hover-core-wrapper-objcxx-prune.md`
-- macOS WASM 文本叠层 Swift bridge 切换：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zz-macos-wasm-text-overlay-swift-bridge-cutover.md`
-- macOS WASM 图片窗口生命周期收口：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zza-macos-wasm-image-window-lifecycle-unify.md`
-- macOS WASM 图片叠层 Swift bridge 切换：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzb-macos-wasm-image-overlay-swift-bridge-cutover.md`
-- macOS Overlay Render Support 模块 ObjC++ 白名单收缩：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzc-macos-overlay-render-support-objcxx-prune.md`
-- macOS Hover 叠层 Swift bridge 切换：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzd-macos-hover-overlay-swift-bridge-cutover.md`
-- macOS Click 叠层 Swift bridge 切换：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zze-macos-click-overlay-swift-bridge-cutover.md`
-- macOS Scroll 叠层 Swift bridge 切换：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzf-macos-scroll-overlay-swift-bridge-cutover.md`
-- macOS Trail 叠层 Swift bridge 切换：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzg-macos-trail-overlay-swift-bridge-cutover.md`
-- macOS Hold 叠层 Swift bridge 切换 + ObjC++ 白名单清零：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzh-macos-hold-overlay-swift-bridge-and-empty-objcxx-allowlist.md`
-- macOS ObjC++ 编译模式机制移除：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzi-macos-objcxx-compile-mode-mechanism-removal.md`
-- macOS 拖尾 none 强禁用 + 合同门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzj-macos-trail-none-hard-disable-and-contract-gate.md`
-- macOS 拖尾线宽共享命令链路接入：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzk-macos-trail-line-width-shared-command-wiring.md`
-- macOS 拖尾发射规划器（抗火柴棍）: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzl-macos-trail-emission-planner-anti-matchstick.md`
-- macOS streamer 连续拖尾路径：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzm-macos-streamer-continuous-trail-path.md`
-- macOS 拖尾规划器诊断字段透出：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzn-macos-trail-planner-diagnostics-surfacing.md`
-- macOS 连续拖尾切换/重建收口防回潮：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzo-macos-trail-continuous-overlay-transition-and-window-recreate-guard.md`
-
-## 当前 macOS 主线（Phase 50-55）
-- 双车道护栏：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`
-- core 去 Win32 强耦合：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase51-core-win32-decoupling-and-posix-path-foundation.md`
-- 权限与输入收敛（52x）：
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52f-macos-runtime-permission-revocation-hardening.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52j-macos-startup-missing-permission-retry-and-notify-dedup.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52k-macos-permission-and-indicator-contract-automation.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase52l-macos-scroll-baseline-effect.md`
-- 自动化与 app_scope（53x）：
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53a-macos-automation-system-services-bootstrap.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53b-automation-appscope-cross-platform-normalization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53d-macos-shortcut-capture-keycode-normalization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53f-macos-automation-scope-ui-platform-semantics.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53i-macos-automation-injection-selfcheck-and-match-inject-contract.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53ai-automation-mapping-phase-closure.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase53aj-macos-automation-app-scope-selfcheck-script.md`
-- Linux 跟随门禁（54x）：
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54c-posix-regression-suite-orchestrator.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54f-core-automation-http-contract-regression.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54g-macos-automation-injection-selfcheck-suite-gate.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54h-linux-dual-lane-compile-gate.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase54i-linux-follow-phase-closure.md`
-- WASM 运行时与诊断（55x）：
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55o-macos-wasm-closure.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55p-macos-wasm-selfcheck-suite-gate.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55q-posix-wasm-load-failure-diagnostics-contract.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zd-wasm-transfer-error-code-regression-matrix-and-i18n.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55ze-webui-wasm-error-model-test-gate.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zf-wasm-focused-contract-gate-and-selfcheck-expansion.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zo-posix-platform-arg-helper-consolidation.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zp-doc-index-compaction-p0-p1.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zq-core-regression-workflow-helper-consolidation.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zr-wasm-dispatch-readiness-retry-hardening.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzs-wasm-manifest-path-trim-contract-gate.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzt-wasm-selfcheck-helper-modularization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzu-core-http-wasm-helper-modularization-and-lock-race-hardening.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzv-core-http-wasm-contract-check-modularization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzw-core-http-automation-contract-check-modularization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzx-core-http-orchestrator-helper-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzy-core-http-input-contract-helper-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzz-http-entry-helper-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzza-core-smoke-entry-helper-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzb-macos-effects-category-parity-baseline.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzc-macos-effects-runtime-diagnostics-and-probe-expansion.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzd-macos-effect-type-probe-and-hold-style-mapping.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzze-settings-state-effects-diagnostics-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzf-websettings-test-effects-route-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzg-macos-hold-overlay-style-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzh-macos-trail-overlay-style-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzi-macos-click-overlay-style-expansion.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzj-macos-scroll-overlay-style-normalization-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzk-macos-hover-overlay-style-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzl-effects-profile-state-builder-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzm-effects-profile-and-diagnostics-multi-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzn-click-scroll-renderer-core-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzo-hold-trail-renderer-core-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzp-macos-hover-renderer-core-and-effect-registry-table-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzq-command-handler-apply-settings-responsibility-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzr-macos-wasm-image-overlay-renderer-core-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzs-macos-wasm-overlay-state-internals-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzt-wasm-plugin-transfer-service-responsibility-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzu-wasm-plugin-manifest-load-validate-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzv-wasm3-runtime-responsibility-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzal-macos-wasm-text-overlay-layout-style-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzae-posix-shell-exit-command-and-scaffold-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzaf-scaffold-settings-api-and-routecodec-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzao-macos-hover-overlay-core-plan-layers-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzza-macos-wasm-overlay-render-math-consolidation.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzap-macos-trail-overlay-core-plan-layers-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzc-macos-keyboard-injector-keytables-responsibility-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzat-gesture-recognizer-direction-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzze-macos-global-input-hook-eventtap-dispatch-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzi-macos-hold-overlay-core-state-update-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzz-macos-input-indicator-show-plan-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzam-macos-click-overlay-core-plan-layers-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzan-macos-scroll-overlay-core-plan-layers-split.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzay-macos-effects-tempo-profile-parity.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzba-macos-effect-overlay-frame-clamp-multiscreen.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbb-macos-effect-overlay-contents-scale-consistency.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbc-macos-effect-animation-opacity-policy-consolidation.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbd-macos-effect-geometry-metric-scaling.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbe-macos-effect-duration-size-strength-mapping.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbf-macos-effect-alpha-policy-normalization.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbg-objcxx-edit-policy-gate.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbh-posix-regression-suite-options-phase-split.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbi-posix-regression-cli-value-contract-hardening.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbj-macos-user-notification-swift-bridge.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbk-macos-folder-picker-swift-bridge.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbl-macos-settings-launcher-swift-bridge.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbm-macos-user-notification-native-center.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbn-macos-click-color-config-parity.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbo-macos-scroll-hover-color-profile-parity.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbp-macos-trail-hold-color-profile-parity.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbq-effects-profile-color-contract-expansion.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbr-macos-effects-type-tempo-variant-parity.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbs-effects-tempo-contract-surfacing.md` + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase55zzzzbt-effects-profile-cross-api-parity-check.md`
-  - 完整 hardening 流水（`55h-55zzx`）见：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
+## 稳定工作流文档
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/agent-doc-governance.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-regression-suite-workflow.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-scaffold-regression-workflow.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-lane-smoke-workflow.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
 ## 定向检索命令
 ```bash
-# 查看最新重构文档
+# 最近重构文档
 rg --files docs/refactoring | sort | tail -n 30
 
-# 按能力关键词检索
-rg -n "permission|automation|app_scope|wasm|throttle" docs/refactoring docs/issues
+# 按能力关键词查文档
+rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/issues docs/architecture
 
-# 文档体积治理（建议每周执行）
+# 文档体积治理
 ./tools/docs/doc-hygiene-check.sh --strict
+```
 
-# macOS 一键快捷入口（仓库根目录）
+## macOS 本地命令
+```bash
 ./mfx start
 ./mfx fast
 ./mfx effects
-
-# macOS core 手测一键入口（自动解析 URL/token）
 ./tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60
-
-# macOS wasm 运行时自检（load/invoke/render/fallback）
-./tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build
-
-# macOS core wasm 聚焦 HTTP 合同门禁（比全量 automation 合同更快）
-./tools/platform/regression/run-posix-core-wasm-contract-regression.sh --platform auto
-
-# macOS 自动化 app_scope 别名自检（`code.exe/code/code.app`）
-./tools/platform/manual/run-macos-automation-app-scope-selfcheck.sh --skip-build
-
-# macOS 自动化注入自检（默认真实注入；加 --dry-run 为确定性测试模式）
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
-
-# macOS 特效类型等价自检（5 类特效 + 别名归一化）
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
-
-# macOS ObjC++ 面积门禁（.mm 为零 + 显式白名单编译策略）
 ./tools/platform/regression/run-macos-objcxx-surface-regression.sh
 ```
 
-## 归档区
-- 归档入口：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/archive/README.md`
-- 全量历史请用 `rg` 定向检索，不再扩展顶层索引体积。
+## 维护规则
+顶层索引只保留导航，不记录过程细节；细节放在对应能力文档。
