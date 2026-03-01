@@ -19,6 +19,10 @@ bool Win32VmForegroundSuppressionService::ShouldSuppress(uint64_t nowTickMs) {
     return lastResult_;
 }
 
+uint64_t Win32VmForegroundSuppressionService::CheckIntervalMsForDiagnostics() const {
+    return kCheckIntervalMs;
+}
+
 bool Win32VmForegroundSuppressionService::IsVmForegroundWindow() {
     const HWND hwnd = GetForegroundWindow();
     if (!hwnd || !IsWindow(hwnd)) {

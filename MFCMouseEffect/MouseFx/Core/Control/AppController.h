@@ -135,6 +135,7 @@ public:
     // --- Methods exposed for DispatchRouter delegation ---
     void OnDispatchActivity(DispatchMessageKind kind, uint32_t timerId);
     bool IsVmEffectsSuppressed() const { return vmEffectsSuppressed_; }
+    uint64_t VmForegroundSuppressionCheckIntervalMs() const;
     bool ConsumeIgnoreNextClick();
     void OnGlobalKey(const KeyEvent& ev);
     IInputIndicatorOverlay& IndicatorOverlay() { return *inputIndicatorOverlay_; }

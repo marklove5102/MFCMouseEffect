@@ -133,6 +133,10 @@ run_case() {
     host_env+=("MFX_VM_FOREGROUND_SUPPRESSION_CHECK_INTERVAL_MS=$check_interval_ms")
     mfx_manual_start_core_host "$host_bin" "$probe_file" "$log_file" "${host_env[@]}"
     wait_vm_suppression_state "$expected_state" "$state_file" "vm suppression selfcheck ($case_name)"
+    mfx_assert_file_contains \
+        "$state_file" \
+        "\"effects_suspended_vm_check_interval_ms\":$check_interval_ms" \
+        "vm suppression selfcheck ($case_name) interval field"
     mfx_manual_stop_core_host "$MFX_MANUAL_HOST_PID"
 }
 

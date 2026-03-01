@@ -4,6 +4,13 @@
 
 namespace mousefx {
 
+uint64_t AppController::VmForegroundSuppressionCheckIntervalMs() const {
+    if (!foregroundSuppressionService_) {
+        return 0;
+    }
+    return foregroundSuppressionService_->CheckIntervalMsForDiagnostics();
+}
+
 void AppController::UpdateVmSuppressionState() {
     if (!foregroundSuppressionService_) {
         return;

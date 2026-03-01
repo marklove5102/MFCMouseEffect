@@ -63,6 +63,13 @@ bool MacosVmForegroundSuppressionService::ShouldSuppress(uint64_t nowTickMs) {
     return lastResult_;
 }
 
+uint64_t MacosVmForegroundSuppressionService::CheckIntervalMsForDiagnostics() const {
+    if (checkIntervalResolved_) {
+        return checkIntervalMs_;
+    }
+    return ResolveCheckIntervalMsFromEnv();
+}
+
 bool MacosVmForegroundSuppressionService::TryReadForcedSuppressionByEnv(bool* outValue) {
     if (!outValue) {
         return false;

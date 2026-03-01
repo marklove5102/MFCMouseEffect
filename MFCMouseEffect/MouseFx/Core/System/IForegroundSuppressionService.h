@@ -10,6 +10,7 @@ public:
     virtual ~IForegroundSuppressionService() = default;
 
     virtual bool ShouldSuppress(uint64_t nowTickMs) = 0;
+    virtual uint64_t CheckIntervalMsForDiagnostics() const { return 0; }
 };
 
 } // namespace mousefx

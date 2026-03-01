@@ -11,6 +11,7 @@ namespace mousefx {
 class Win32VmForegroundSuppressionService final : public IForegroundSuppressionService {
 public:
     bool ShouldSuppress(uint64_t nowTickMs) override;
+    uint64_t CheckIntervalMsForDiagnostics() const override;
 
 private:
     static bool IsVmForegroundWindow();

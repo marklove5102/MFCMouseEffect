@@ -9,6 +9,9 @@ public:
     bool ShouldSuppress(uint64_t /*nowTickMs*/) override {
         return false;
     }
+    uint64_t CheckIntervalMsForDiagnostics() const override {
+        return 0;
+    }
 };
 
 } // namespace mousefx

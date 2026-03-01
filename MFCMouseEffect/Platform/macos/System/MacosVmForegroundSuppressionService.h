@@ -12,6 +12,7 @@ namespace mousefx {
 class MacosVmForegroundSuppressionService final : public IForegroundSuppressionService {
 public:
     bool ShouldSuppress(uint64_t nowTickMs) override;
+    uint64_t CheckIntervalMsForDiagnostics() const override;
 
 private:
     static bool TryReadForcedSuppressionByEnv(bool* outValue);
