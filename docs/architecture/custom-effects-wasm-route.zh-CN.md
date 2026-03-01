@@ -83,13 +83,5 @@ void mfx_plugin_reset(void); // 推荐实现
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-compatibility.zh-CN.md`
 - 排错手册：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-troubleshooting.zh-CN.md`
-- 增量实现记录：
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-policy-phase3b.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-budget-policy-phase3c.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-budget-schema-phase3d.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-diagnostics-phase3e.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-state-refresh-phase3f.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-runtime-bridge-self-build.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-plugin-template-sample-presets-phase4.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-plugin-template-full-sample-matrix-phase4b.zh-CN.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-plugin-template-assets-all-formats-phase4c.zh-CN.md`
+- 历史阶段拆分文档已从活跃文档层移除，以降低 token 成本。
+- 如需追溯细节，请直接查看本文件及相关 WASM 提交的 git 历史。

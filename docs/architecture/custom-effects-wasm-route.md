@@ -83,13 +83,5 @@ Observable runtime state:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-compatibility.md`
 - Troubleshooting:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-troubleshooting.md`
-- Incremental phase notes:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-policy-phase3b.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-budget-policy-phase3c.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-budget-schema-phase3d.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-diagnostics-phase3e.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-web-settings-state-refresh-phase3f.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-runtime-bridge-self-build.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-plugin-template-sample-presets-phase4.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-plugin-template-full-sample-matrix-phase4b.md`
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/issues/wasm-plugin-template-assets-all-formats-phase4c.md`
+- Historical phase-by-phase notes were intentionally removed from active docs to reduce token load.
+- For deep implementation chronology, use git history on this file and related WASM commits.
