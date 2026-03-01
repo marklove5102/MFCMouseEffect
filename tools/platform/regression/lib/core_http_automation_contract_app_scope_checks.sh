@@ -45,4 +45,8 @@ _mfx_core_http_automation_contract_app_scope_checks() {
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "code.app" "process:code" "true" "$tmp_dir/scope-app-vs-base.out" "core app-scope app<->base"
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "code.exe" "process:code.app" "true" "$tmp_dir/scope-exe-vs-app.out" "core app-scope exe<->app"
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "safari" "process:code" "false" "$tmp_dir/scope-negative.out" "core app-scope negative"
+    mfx_assert_file_contains "$tmp_dir/scope-code-vs-exe.out" "\"process_aliases\":[\"code\",\"code.exe\",\"code.app\"]" "core app-scope process alias matrix code"
+    mfx_assert_file_contains "$tmp_dir/scope-code-vs-exe.out" "\"app_scope_alias_matrix\":[{\"aliases\":[\"code.exe\",\"code\"]" "core app-scope scope alias matrix exe"
+    mfx_assert_file_contains "$tmp_dir/scope-app-vs-base.out" "\"process_aliases\":[\"code.app\",\"code\"]" "core app-scope process alias matrix code.app"
+    mfx_assert_file_contains "$tmp_dir/scope-exe-vs-app.out" "\"process_aliases\":[\"code.exe\",\"code\"]" "core app-scope process alias matrix code.exe"
 }

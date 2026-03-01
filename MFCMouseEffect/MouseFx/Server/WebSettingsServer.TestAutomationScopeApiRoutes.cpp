@@ -38,18 +38,41 @@ bool HandleWebSettingsTestAutomationScopeApiRoute(
         const std::vector<std::string> rawScopes = ParseAppScopes(payload);
         const std::string processBaseName = ParseProcessBaseName(payload);
         const std::string normalizedProcess = automation_scope::NormalizeProcessName(processBaseName);
+        const std::vector<std::string> processAliases = automation_scope::BuildProcessAliases(normalizedProcess);
 
         json normalizedScopes = json::array();
+        json scopeAliasMatrix = json::array();
         for (const std::string& scope : rawScopes) {
-            normalizedScopes.push_back(automation_scope::NormalizeScopeToken(scope));
+            const std::string normalized = automation_scope::NormalizeScopeToken(scope);
+            normalizedScopes.push_back(normalized);
+
+            json scopeEntry{
+                {"input", scope},
+                {"normalized", normalized},
+                {"aliases", json::array()},
+            };
+            if (automation_scope::IsProcessScopeToken(normalized)) {
+                const std::string process = automation_scope::ScopeProcessName(normalized);
+                for (const std::string& alias : automation_scope::BuildProcessAliases(process)) {
+                    scopeEntry["aliases"].push_back(alias);
+                }
+            }
+            scopeAliasMatrix.push_back(std::move(scopeEntry));
+        }
+
+        json processAliasJson = json::array();
+        for (const std::string& alias : processAliases) {
+            processAliasJson.push_back(alias);
         }
 
         SetJsonResponse(resp, json({
             {"ok", true},
             {"process", processBaseName},
             {"process_normalized", normalizedProcess},
+            {"process_aliases", processAliasJson},
             {"app_scopes", rawScopes},
             {"app_scopes_normalized", normalizedScopes},
+            {"app_scope_alias_matrix", scopeAliasMatrix},
             {"matched", automation_scope::AppScopeMatchesProcess(rawScopes, processBaseName)},
             {"specificity", automation_scope::AppScopeSpecificity(rawScopes)},
         }).dump());
