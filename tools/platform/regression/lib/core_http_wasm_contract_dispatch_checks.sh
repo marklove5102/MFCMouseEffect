@@ -13,6 +13,10 @@ _mfx_core_http_wasm_contract_dispatch_checks() {
     mfx_assert_eq "$code_wasm_enable" "200" "core wasm enable status"
     mfx_assert_file_contains "$tmp_dir/wasm-enable.out" "\"ok\":true" "core wasm enable ok"
 
+    local code_state_before_dispatch
+    code_state_before_dispatch="$(mfx_http_code "$tmp_dir/state-before-wasm-dispatch.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
+    mfx_assert_eq "$code_state_before_dispatch" "200" "core wasm state before dispatch status"
+
     local require_rendered_any="false"
     if [[ "$platform" == "macos" ]]; then
         require_rendered_any="true"
@@ -30,5 +34,7 @@ _mfx_core_http_wasm_contract_dispatch_checks() {
     _mfx_core_http_assert_wasm_dispatch_diagnostics_consistent \
         "$tmp_dir/wasm-test-dispatch.out" \
         "$tmp_dir/state-after-wasm-dispatch.out" \
-        "core wasm dispatch diagnostics consistency"
+        "core wasm dispatch diagnostics consistency" \
+        "$tmp_dir/state-before-wasm-dispatch.out" \
+        "$platform"
 }

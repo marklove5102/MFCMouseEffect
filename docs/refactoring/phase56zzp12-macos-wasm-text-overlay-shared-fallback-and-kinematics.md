@@ -29,6 +29,10 @@
 - Added `MouseFx/Core/Wasm/WasmTextCommandConfig.h` (`BuildSpawnTextConfig(...)`).
 - Windows `WasmClickCommandExecutor` and macOS `MacosWasmCommandRenderDispatch.Text.cpp` now call the same helper for `lifeMs/scale/vy/ay -> TextConfig` mapping.
 
+5. Added anti-regression gate for fallback route:
+- Regression helper now captures `/api/state` before and after WASM `test-dispatch-click` and asserts `fallback_show_count` increases on macOS when text commands are executed.
+- Manual selfcheck (`run-macos-wasm-runtime-selfcheck.sh`) now includes the same before/after fallback counter assertion.
+
 ## Validation
 1. Build:
 ```bash
@@ -44,6 +48,11 @@ cmake --build /tmp/mfx-platform-macos-core-automation-build --target mfx_entry_p
 3. Suite gate:
 ```bash
 ./tools/platform/regression/run-posix-wasm-regression-suite.sh --platform auto --skip-automation-test
+```
+
+4. Manual selfcheck:
+```bash
+./tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build --build-dir /tmp/mfx-platform-macos-core-automation-build
 ```
 
 ## Result

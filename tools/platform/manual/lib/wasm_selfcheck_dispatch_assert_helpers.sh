@@ -6,6 +6,8 @@ mfx_wasm_selfcheck_assert_dispatch_diagnostics_consistent() {
     local label="$1"
     local dispatch_output_file="$2"
     local state_output_file="$3"
+    local state_before_output_file="${4:-}"
+    local platform="${5:-}"
 
     local dispatch_throttled
     local dispatch_throttled_by_capacity
@@ -112,6 +114,19 @@ mfx_wasm_selfcheck_assert_dispatch_diagnostics_consistent() {
     mfx_assert_eq "$state_throttled_by_interval" "$dispatch_throttled_by_interval" "selfcheck $label throttled by interval"
     mfx_assert_eq "$state_dropped" "$dispatch_dropped" "selfcheck $label dropped commands"
     mfx_assert_eq "$state_render_error" "$dispatch_render_error" "selfcheck $label render error"
+
+    if [[ "$platform" == "macos" && -n "$state_before_output_file" && -f "$state_before_output_file" ]]; then
+        local before_fallback_show_count
+        local after_fallback_show_count
+        before_fallback_show_count="$(mfx_wasm_selfcheck_parse_uint_field "$state_before_output_file" "fallback_show_count")"
+        after_fallback_show_count="$(mfx_wasm_selfcheck_parse_uint_field "$state_output_file" "fallback_show_count")"
+        if [[ -z "$before_fallback_show_count" || -z "$after_fallback_show_count" ]]; then
+            mfx_fail "selfcheck $label macos text fallback diagnostics parse failed"
+        fi
+        if (( dispatch_executed_text > 0 && after_fallback_show_count <= before_fallback_show_count )); then
+            mfx_fail "selfcheck $label macos text fallback counter did not increase: before=$before_fallback_show_count after=$after_fallback_show_count dispatched_text=$dispatch_executed_text"
+        fi
+    fi
 }
 
 mfx_wasm_selfcheck_assert_test_dispatch_ok() {
