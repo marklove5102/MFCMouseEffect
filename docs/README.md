@@ -54,6 +54,7 @@ Use it as a pointer index, not a full historical catalog.
 - macOS ObjC++ compile-mode mechanism removal: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzi-macos-objcxx-compile-mode-mechanism-removal.md`
 - macOS trail none hard-disable + contract gate: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzj-macos-trail-none-hard-disable-and-contract-gate.md`
 - macOS trail line-width shared command wiring: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzk-macos-trail-line-width-shared-command-wiring.md`
+- macOS trail emission planner anti-matchstick: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzl-macos-trail-emission-planner-anti-matchstick.md`
 
 ## Current macOS Mainline (Phases 50-55)
 - Dual-lane guardrails: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`

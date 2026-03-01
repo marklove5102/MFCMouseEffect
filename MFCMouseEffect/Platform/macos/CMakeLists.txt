@@ -431,6 +431,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosEffectRenderProfile.ScrollHoldHover.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosOverlayRenderSupport.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosLineTrailOverlay.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseEmissionPlanner.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseEffect.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayStyle.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayRenderer.cpp"

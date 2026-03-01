@@ -3,6 +3,7 @@
 #include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "Platform/macos/Effects/MacosTrailPulseEffect.h"
 #include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
+#include "Platform/macos/Effects/MacosTrailPulseEmissionPlanner.h"
 
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "Platform/macos/Effects/MacosLineTrailOverlay.h"
@@ -39,6 +40,7 @@ bool MacosTrailPulseEffect::Initialize() {
     initialized_ = true;
     hasLastPoint_ = false;
     lastEmitTickMs_ = 0;
+    emissionPlannerConfig_ = macos_trail_pulse::ResolveTrailPulseEmissionPlannerConfig();
     return true;
 }
 
@@ -64,9 +66,17 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
     const uint64_t now = CurrentTickMs();
     const std::string normalizedType = NormalizeTrailEffectType(effectType_);
     if (normalizedType == "none") {
+        lastPoint_ = pt;
         return;
     }
     const bool lineTrail = (normalizedType == "line");
+    const double moveDx = static_cast<double>(pt.x - lastPoint_.x);
+    const double moveDy = static_cast<double>(pt.y - lastPoint_.y);
+    const double moveDistance = std::sqrt(moveDx * moveDx + moveDy * moveDy);
+    if (moveDistance > std::max(200.0, emissionPlannerConfig_.teleportSkipDistancePx)) {
+        lastPoint_ = pt;
+        return;
+    }
 
     if (lineTrail) {
         macos_line_trail::LineTrailConfig config{};
@@ -82,9 +92,7 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         // Use gentler idle fade for continuous line trail
         config.idleFade.startMs = std::max(idleFade_.startMs, 300);
         config.idleFade.endMs = std::max(idleFade_.endMs, 600);
-        const double dx = static_cast<double>(pt.x - lastPoint_.x);
-        const double dy = static_cast<double>(pt.y - lastPoint_.y);
-        const double distance = std::sqrt(dx * dx + dy * dy);
+        const double distance = moveDistance;
         const int segmentCount = static_cast<int>(std::clamp(std::ceil(distance / 4.0), 1.0, 48.0));
         for (int i = 1; i <= segmentCount; ++i) {
             const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
@@ -119,20 +127,20 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
     lastEmitTickMs_ = now;
     const TrailEffectProfile profile =
         macos_effect_compute_profile::BuildTrailProfile(renderProfile_);
-    const double distance = std::max(0.0, emission.distancePx);
-    const double minStep = (normalizedType == "streamer")
-        ? 3.5
-        : ((normalizedType == "meteor") ? 6.0 : ((normalizedType == "electric") ? 5.0 : 8.0));
-    const double segmentStep = std::max(minStep, throttleProfile.minDistancePx * 0.9);
-    const int segmentCount = static_cast<int>(std::clamp(std::ceil(distance / segmentStep), 1.0, 48.0));
+    const macos_trail_pulse::TrailPulseEmissionPlan segmentPlan =
+        macos_trail_pulse::BuildTrailPulseEmissionPlan(
+            lastPoint_,
+            pt,
+            normalizedType,
+            throttleProfile.minDistancePx,
+            emissionPlannerConfig_);
+    if (segmentPlan.dropAsTeleport || segmentPlan.segmentPoints.empty()) {
+        lastPoint_ = pt;
+        return;
+    }
+
     ScreenPoint prev = lastPoint_;
-    for (int i = 1; i <= segmentCount; ++i) {
-        const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
-        ScreenPoint segPt{};
-        segPt.x = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.x) +
-                                                   (static_cast<double>(pt.x - lastPoint_.x) * t)));
-        segPt.y = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.y) +
-                                                   (static_cast<double>(pt.y - lastPoint_.y) * t)));
+    for (const ScreenPoint& segPt : segmentPlan.segmentPoints) {
         const double dx = static_cast<double>(segPt.x - prev.x);
         const double dy = static_cast<double>(segPt.y - prev.y);
         const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(

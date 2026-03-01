@@ -3,6 +3,7 @@
 #include "MouseFx/Interfaces/IMouseEffect.h"
 #include "MouseFx/Core/Config/EffectConfig.h"
 #include "Platform/macos/Effects/MacosEffectRenderProfile.h"
+#include "Platform/macos/Effects/MacosTrailPulseEmissionPlanner.h"
 
 #include <cstdint>
 #include <string>
@@ -41,6 +42,7 @@ private:
     bool hasLastPoint_ = false;
     ScreenPoint lastPoint_{};
     uint64_t lastEmitTickMs_ = 0;
+    macos_trail_pulse::TrailPulseEmissionPlannerConfig emissionPlannerConfig_{};
 };
 
 } // namespace mousefx
