@@ -4,6 +4,7 @@
 
 #include "Platform/macos/Wasm/MacosWasmImageOverlayRenderer.h"
 #include "Platform/macos/Wasm/MacosWasmOverlayRuntime.h"
+#include "Platform/macos/Wasm/MacosWasmTextOverlayFallback.h"
 
 namespace mousefx::platform::macos {
 
@@ -30,6 +31,7 @@ void CloseAllWasmOverlays() {
 #if !defined(__APPLE__)
     return;
 #else
+    wasm_text_overlay::SharedFallback().Shutdown();
     CloseAllWasmOverlayWindows();
 #endif
 }

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 
+#include "MouseFx/Core/Config/EffectConfig.h"
 #include "MouseFx/Core/Protocol/InputTypes.h"
 
 namespace mousefx::platform::macos {
@@ -43,8 +44,7 @@ WasmOverlayRenderResult ShowWasmTextOverlay(
     const ScreenPoint& screenPt,
     const std::wstring& text,
     uint32_t argb,
-    float scale,
-    uint32_t lifeMs);
+    const TextConfig& textConfig);
 
 void CloseAllWasmOverlays();
 

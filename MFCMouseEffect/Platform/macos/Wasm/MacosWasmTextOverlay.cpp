@@ -2,36 +2,35 @@
 
 #include "Platform/macos/Wasm/MacosWasmTransientOverlay.h"
 #include "Platform/macos/Wasm/MacosWasmOverlayRuntime.h"
-#include "Platform/macos/Wasm/MacosWasmTextOverlay.Internal.h"
-#include "Platform/macos/Wasm/MacosWasmTextOverlaySwiftBridge.h"
-
-#include "MouseFx/Utils/StringUtils.h"
+#include "Platform/macos/Wasm/MacosWasmTextOverlayFallback.h"
 
 #if defined(__APPLE__)
 #include <dispatch/dispatch.h>
 #endif
 
-#include <memory>
+#include <algorithm>
 
 namespace mousefx::platform::macos {
 
 #if defined(__APPLE__)
 namespace {
 
-struct WasmTextOverlayCloseContext final {
-    void* panelHandle = nullptr;
-};
+uint32_t ResolveWasmTextDurationMs(const TextConfig& config) {
+    return static_cast<uint32_t>(std::clamp(config.durationMs, 80, 8000));
+}
 
-void CloseWasmTextOverlayAfterDelay(void* context) {
-    std::unique_ptr<WasmTextOverlayCloseContext> closeContext(
-        static_cast<WasmTextOverlayCloseContext*>(context));
-    if (!closeContext || closeContext->panelHandle == nullptr) {
-        return;
+void ReleaseWasmTextOverlaySlotAfterDelay(void*) {
+    ReleaseWasmOverlaySlot();
+}
+
+TextConfig ResolveWasmTextConfig(const TextConfig& config) {
+    TextConfig resolved = config;
+    resolved.durationMs = static_cast<int>(ResolveWasmTextDurationMs(config));
+    resolved.floatDistance = std::clamp(resolved.floatDistance, 0, 640);
+    if (resolved.fontSize <= 0.0f) {
+        resolved.fontSize = 8.0f;
     }
-    if (!TakeWasmOverlayWindow(closeContext->panelHandle)) {
-        return;
-    }
-    mfx_macos_wasm_text_overlay_release_v1(closeContext->panelHandle);
+    return resolved;
 }
 
 } // namespace
@@ -41,26 +40,20 @@ WasmOverlayRenderResult ShowWasmTextOverlay(
     const ScreenPoint& screenPt,
     const std::wstring& text,
     uint32_t argb,
-    float scale,
-    uint32_t lifeMs) {
+    const TextConfig& textConfig) {
 #if !defined(__APPLE__)
     (void)screenPt;
     (void)text;
     (void)argb;
-    (void)scale;
-    (void)lifeMs;
+    (void)textConfig;
     return WasmOverlayRenderResult::Failed;
 #else
     if (text.empty()) {
         return WasmOverlayRenderResult::Failed;
     }
 
-    const std::string utf8Text = Utf16ToUtf8(text.c_str());
-    if (utf8Text.empty()) {
-        return WasmOverlayRenderResult::Failed;
-    }
-
-    const WasmTextOverlayLayout layout = BuildWasmTextOverlayLayout(screenPt, utf8Text.size(), scale, lifeMs);
+    const TextConfig resolvedConfig = ResolveWasmTextConfig(textConfig);
+    const uint32_t durationMs = ResolveWasmTextDurationMs(resolvedConfig);
     const WasmOverlayAdmissionResult admission = TryAcquireWasmOverlaySlot(WasmOverlayKind::Text);
     if (admission != WasmOverlayAdmissionResult::Accepted) {
         return (admission == WasmOverlayAdmissionResult::RejectedByCapacity)
@@ -69,29 +62,15 @@ WasmOverlayRenderResult ShowWasmTextOverlay(
     }
 
     RunWasmOverlayOnMainThreadAsync([=] {
-        void* panelHandle = mfx_macos_wasm_text_overlay_create_v1(
-            static_cast<double>(layout.frame.origin.x),
-            static_cast<double>(layout.frame.origin.y),
-            static_cast<double>(layout.frame.size.width),
-            static_cast<double>(layout.frame.size.height),
-            static_cast<double>(layout.fontSize),
-            argb,
-            utf8Text.c_str());
-        if (panelHandle == nullptr) {
-            ReleaseWasmOverlaySlot();
-            return;
-        }
+        auto& fallback = wasm_text_overlay::SharedFallback();
+        fallback.EnsureInitialized(8);
+        fallback.ShowText(screenPt, text, Argb{argb}, resolvedConfig);
 
-        RegisterWasmOverlayWindow(panelHandle);
-        mfx_macos_wasm_text_overlay_show_v1(panelHandle);
-
-        auto* closeContext = new WasmTextOverlayCloseContext{};
-        closeContext->panelHandle = panelHandle;
         dispatch_after_f(
-            dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(layout.durationMs) * NSEC_PER_MSEC),
+            dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(durationMs) * NSEC_PER_MSEC),
             dispatch_get_main_queue(),
-            closeContext,
-            &CloseWasmTextOverlayAfterDelay);
+            nullptr,
+            &ReleaseWasmTextOverlaySlotAfterDelay);
     });
     return WasmOverlayRenderResult::Rendered;
 #endif
