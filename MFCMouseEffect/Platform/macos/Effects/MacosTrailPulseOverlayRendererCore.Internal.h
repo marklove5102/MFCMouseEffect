@@ -9,14 +9,6 @@
 #if defined(__APPLE__)
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
-#ifdef __OBJC__
-@class CAShapeLayer;
-@class NSView;
-#else
-struct objc_object;
-using CAShapeLayer = objc_object;
-using NSView = objc_object;
-#endif
 #endif
 
 namespace mousefx::macos_trail_pulse {
@@ -31,16 +23,6 @@ struct TrailPulseRenderPlan {
 };
 
 TrailPulseRenderPlan BuildTrailPulseRenderPlan(const TrailEffectRenderCommand& command);
-
-void ConfigureTrailCoreLayer(
-    CAShapeLayer* core,
-    NSView* content,
-    const TrailPulseRenderPlan& plan,
-    double deltaX,
-    double deltaY);
-
-void AddTrailGlowLayer(NSView* content, const TrailPulseRenderPlan& plan);
-void StartTrailPulseAnimation(CAShapeLayer* core, const TrailPulseRenderPlan& plan);
 #endif
 
 } // namespace mousefx::macos_trail_pulse

@@ -20,6 +20,7 @@ set(MFX_MACOS_OVERLAY_COORD_SWIFT_OBJECT "")
 set(MFX_MACOS_OVERLAY_RENDER_SUPPORT_SWIFT_OBJECT "")
 set(MFX_MACOS_CLICK_PULSE_SWIFT_OBJECT "")
 set(MFX_MACOS_SCROLL_PULSE_SWIFT_OBJECT "")
+set(MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT "")
 set(MFX_MACOS_LINE_TRAIL_SWIFT_OBJECT "")
 set(MFX_MACOS_TEXT_FALLBACK_SWIFT_OBJECT "")
 set(MFX_MACOS_HOVER_PULSE_SWIFT_OBJECT "")
@@ -88,6 +89,8 @@ if(APPLE)
     set(MFX_MACOS_CLICK_PULSE_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosClickPulseOverlayBridge.swift.o")
     set(MFX_MACOS_SCROLL_PULSE_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseOverlayBridge.swift")
     set(MFX_MACOS_SCROLL_PULSE_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosScrollPulseOverlayBridge.swift.o")
+    set(MFX_MACOS_TRAIL_PULSE_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayBridge.swift")
+    set(MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosTrailPulseOverlayBridge.swift.o")
     set(MFX_MACOS_LINE_TRAIL_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosLineTrailOverlayBridge.swift")
     set(MFX_MACOS_LINE_TRAIL_SWIFT_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/MacosLineTrailOverlayBridge.swift.o")
     set(MFX_MACOS_TEXT_FALLBACK_SWIFT_SOURCE "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTextEffectFallbackBridge.swift")
@@ -264,6 +267,19 @@ if(APPLE)
     )
     set_source_files_properties(
         "${MFX_MACOS_SCROLL_PULSE_SWIFT_OBJECT}"
+        PROPERTIES
+            GENERATED TRUE
+            EXTERNAL_OBJECT TRUE
+    )
+    add_custom_command(
+        OUTPUT "${MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT}"
+        COMMAND "${MFX_SWIFTC_EXECUTABLE}" ${MFX_SWIFTC_COMMON_ARGS} "${MFX_MACOS_TRAIL_PULSE_SWIFT_SOURCE}" -o "${MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT}"
+        DEPENDS "${MFX_MACOS_TRAIL_PULSE_SWIFT_SOURCE}"
+        COMMENT "Compile Swift trail-pulse overlay bridge"
+        VERBATIM
+    )
+    set_source_files_properties(
+        "${MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT}"
         PROPERTIES
             GENERATED TRUE
             EXTERNAL_OBJECT TRUE
@@ -502,7 +518,6 @@ if(APPLE)
     # Explicit ObjC++ allowlist. Keep this list tight and prune entries when
     # modules are fully migrated to Swift bridges.
     set(MFX_MACOS_OBJCXX_SOURCE_ALLOWLIST
-        "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosTrailPulseOverlayRendererCore.Layers.cpp"
         "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoldPulseOverlayRendererCore.Start.cpp"
     )
 
@@ -566,6 +581,9 @@ if(MFX_MACOS_CLICK_PULSE_SWIFT_OBJECT)
 endif()
 if(MFX_MACOS_SCROLL_PULSE_SWIFT_OBJECT)
     target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_SCROLL_PULSE_SWIFT_OBJECT}")
+endif()
+if(MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT)
+    target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_TRAIL_PULSE_SWIFT_OBJECT}")
 endif()
 if(MFX_MACOS_LINE_TRAIL_SWIFT_OBJECT)
     target_sources(mfx_shell_macos PRIVATE "${MFX_MACOS_LINE_TRAIL_SWIFT_OBJECT}")
