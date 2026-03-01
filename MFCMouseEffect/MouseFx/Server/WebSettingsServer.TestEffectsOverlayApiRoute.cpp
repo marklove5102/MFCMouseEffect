@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <string>
 #include <thread>
 
@@ -162,6 +163,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     const json payload = ParseObjectOrEmpty(req.body);
     const bool emitClick = ParseBooleanOrDefault(payload, "emit_click", false);
     const bool emitTrail = ParseBooleanOrDefault(payload, "emit_trail", false);
+    const bool emitLineTrail = ParseBooleanOrDefault(payload, "emit_line_trail", false);
     const bool emitScroll = ParseBooleanOrDefault(payload, "emit_scroll", false);
     const bool emitHold = ParseBooleanOrDefault(payload, "emit_hold", false);
     const bool emitHover = ParseBooleanOrDefault(payload, "emit_hover", false);
@@ -179,6 +181,14 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     const std::string hoverType = payload.value("hover_type", std::string("glow"));
     const int32_t waitMs = std::clamp(ParseInt32OrDefault(payload, "wait_ms", 0), 0, 3000);
     const int32_t waitForClearMs = std::clamp(ParseInt32OrDefault(payload, "wait_for_clear_ms", 0), 0, 3000);
+    const int32_t lineTrailSteps = std::clamp(ParseInt32OrDefault(payload, "line_trail_steps", 6), 1, 64);
+    const int32_t lineTrailDeltaX = ParseInt32OrDefault(payload, "line_trail_delta_x", 84);
+    const int32_t lineTrailDeltaY = ParseInt32OrDefault(payload, "line_trail_delta_y", 42);
+    const int32_t lineTrailDurationMs = std::clamp(ParseInt32OrDefault(payload, "line_trail_duration_ms", 900), 80, 3000);
+    const int32_t lineTrailLineWidthPx = std::clamp(ParseInt32OrDefault(payload, "line_trail_line_width_px", 4), 1, 18);
+    const int32_t lineTrailIdleFadeStartMs = std::clamp(ParseInt32OrDefault(payload, "line_trail_idle_fade_start_ms", 180), 0, 3000);
+    const int32_t lineTrailIdleFadeEndMs =
+        std::max(lineTrailIdleFadeStartMs + 1, std::clamp(ParseInt32OrDefault(payload, "line_trail_idle_fade_end_ms", 420), 1, 4000));
 
     if (resetLineTrail) {
 #if MFX_PLATFORM_MACOS
@@ -206,6 +216,21 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
     if (emitTrail) {
         macos_trail_pulse::ShowTrailPulseOverlay(overlayPoint, 20.0, 10.0, trailType, "");
     }
+    if (emitLineTrail) {
+        macos_line_trail::LineTrailConfig lineTrailConfig{};
+        lineTrailConfig.durationMs = lineTrailDurationMs;
+        lineTrailConfig.lineWidth = static_cast<float>(lineTrailLineWidthPx);
+        lineTrailConfig.strokeArgb = 0xF552F2EBu;
+        lineTrailConfig.idleFade.startMs = lineTrailIdleFadeStartMs;
+        lineTrailConfig.idleFade.endMs = lineTrailIdleFadeEndMs;
+        for (int32_t i = 0; i <= lineTrailSteps; ++i) {
+            const double t = static_cast<double>(i) / static_cast<double>(std::max<int32_t>(1, lineTrailSteps));
+            ScreenPoint samplePt{};
+            samplePt.x = static_cast<int32_t>(std::lround(static_cast<double>(x) + static_cast<double>(lineTrailDeltaX) * t));
+            samplePt.y = static_cast<int32_t>(std::lround(static_cast<double>(y) + static_cast<double>(lineTrailDeltaY) * t));
+            macos_line_trail::UpdateLineTrail(samplePt, lineTrailConfig);
+        }
+    }
     if (emitScroll) {
         macos_scroll_pulse::ShowScrollPulseOverlay(overlayPoint, scrollHorizontal, scrollDelta, scrollType, "");
     }
@@ -229,6 +254,9 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         }
         if (emitHover) {
             macos_hover_pulse::CloseHoverPulseOverlay();
+        }
+        if (emitLineTrail) {
+            macos_line_trail::ResetLineTrail();
         }
     }
 #endif
@@ -254,6 +282,7 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"supported", MFX_PLATFORM_MACOS ? true : false},
         {"emit_click", emitClick},
         {"emit_trail", emitTrail},
+        {"emit_line_trail", emitLineTrail},
         {"emit_scroll", emitScroll},
         {"emit_hold", emitHold},
         {"emit_hover", emitHover},
@@ -265,6 +294,13 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         {"close_persistent", closePersistent},
         {"wait_ms", waitMs},
         {"wait_for_clear_ms", waitForClearMs},
+        {"line_trail_steps", lineTrailSteps},
+        {"line_trail_delta_x", lineTrailDeltaX},
+        {"line_trail_delta_y", lineTrailDeltaY},
+        {"line_trail_duration_ms", lineTrailDurationMs},
+        {"line_trail_line_width_px", lineTrailLineWidthPx},
+        {"line_trail_idle_fade_start_ms", lineTrailIdleFadeStartMs},
+        {"line_trail_idle_fade_end_ms", lineTrailIdleFadeEndMs},
         {"reset_line_trail", resetLineTrail},
         {"before", before.ToJson()},
         {"after", after.ToJson()},

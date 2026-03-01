@@ -128,6 +128,29 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
         fi
     fi
 
+    local code_effect_overlay_line_trail_probe
+    code_effect_overlay_line_trail_probe="$(mfx_http_code "$tmp_dir/effect-overlay-line-trail-probe.out" "$base_url/api/effects/test-overlay-windows" \
+        -X POST \
+        -H "x-mfcmouseeffect-token: $token" \
+        -H "Content-Type: application/json" \
+        -d '{"emit_line_trail":true,"reset_line_trail":true,"close_persistent":false,"wait_ms":160,"wait_for_clear_ms":0,"line_trail_steps":10,"line_trail_duration_ms":1200,"line_trail_line_width_px":4}')"
+    mfx_assert_eq "$code_effect_overlay_line_trail_probe" "200" "core effect overlay line-trail probe status"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"ok\":true" "core effect overlay line-trail probe ok"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"emit_line_trail\":true" "core effect overlay line-trail probe emit flag"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_active\":" "core effect overlay line-trail probe active field"
+    mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_point_count\":" "core effect overlay line-trail probe point count field"
+    if [[ "$platform" == "macos" ]]; then
+        mfx_assert_file_contains "$tmp_dir/effect-overlay-line-trail-probe.out" "\"after_line_trail_active\":true" "core effect overlay line-trail probe active on macos"
+        local line_trail_after_count
+        line_trail_after_count="$(_mfx_core_http_automation_parse_uint_field "$tmp_dir/effect-overlay-line-trail-probe.out" "after_line_trail_point_count")"
+        if [[ -z "$line_trail_after_count" ]]; then
+            mfx_fail "core effect overlay line-trail probe count parse failed"
+        fi
+        if (( line_trail_after_count <= 0 )); then
+            mfx_fail "core effect overlay line-trail probe expected point count > 0 on macos, got $line_trail_after_count"
+        fi
+    fi
+
     local code_effect_overlay_trail_none_probe
     code_effect_overlay_trail_none_probe="$(mfx_http_code "$tmp_dir/effect-overlay-trail-none-probe.out" "$base_url/api/effects/test-overlay-windows" \
         -X POST \

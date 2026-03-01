@@ -41,6 +41,11 @@
 6. `click=text` anti-no-op gate expansion:
    - `/api/effects/test-overlay-windows` now exposes text-effect before/after counters (`click_count`, `fallback_show_count`, `fallback_panel_created`, `fallback_error_count`).
    - Effects contract regression and manual type-parity selfcheck now both assert `fallback_show_count` is non-regressing (`after >= before`) for `click_type=text` probe.
+7. Continuous line-trail active-path probe expansion:
+   - `/api/effects/test-overlay-windows` now supports direct continuous line-trail injection (`emit_line_trail`, `line_trail_steps`, `line_trail_delta_*`, `line_trail_duration_ms`, `line_trail_line_width_px`, `line_trail_idle_fade_*`).
+   - Effects contract regression and manual type-parity selfcheck now both assert:
+     - active-path probe: `after_line_trail_active=true` and `after_line_trail_point_count>0`
+     - cleanup probe (`trail_type=none` + `reset_line_trail`): `after_line_trail_active=false` and `after_line_trail_point_count=0`
 
 ## Validation
 Executed on macOS host:

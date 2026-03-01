@@ -178,6 +178,24 @@ if (( after_text_fallback_count < before_text_fallback_count )); then
     mfx_fail "effects overlay text fallback count regressed: before=$before_text_fallback_count after=$after_text_fallback_count"
 fi
 
+overlay_line_trail_probe_file="$tmp_dir/effects-overlay-line-trail-probe.out"
+overlay_line_trail_probe_code="$(mfx_http_code "$overlay_line_trail_probe_file" "$MFX_MANUAL_BASE_URL/api/effects/test-overlay-windows" \
+    -X POST \
+    -H "$token_header" \
+    -H "Content-Type: application/json" \
+    -d '{"emit_line_trail":true,"reset_line_trail":true,"close_persistent":false,"wait_ms":160,"wait_for_clear_ms":0,"line_trail_steps":10,"line_trail_duration_ms":1200,"line_trail_line_width_px":4}')"
+mfx_assert_eq "$overlay_line_trail_probe_code" "200" "effects overlay line trail probe status"
+mfx_assert_file_contains "$overlay_line_trail_probe_file" "\"ok\":true" "effects overlay line trail probe ok"
+mfx_assert_file_contains "$overlay_line_trail_probe_file" "\"emit_line_trail\":true" "effects overlay line trail emit flag"
+mfx_assert_file_contains "$overlay_line_trail_probe_file" "\"after_line_trail_active\":true" "effects overlay line trail active"
+line_trail_after_count="$(parse_uint_field "$overlay_line_trail_probe_file" "after_line_trail_point_count")"
+if [[ -z "$line_trail_after_count" ]]; then
+    mfx_fail "effects overlay line trail point count parse failed"
+fi
+if (( line_trail_after_count <= 0 )); then
+    mfx_fail "effects overlay line trail expected point count > 0, got $line_trail_after_count"
+fi
+
 overlay_trail_none_probe_file="$tmp_dir/effects-overlay-trail-none-probe.out"
 overlay_trail_none_probe_code="$(mfx_http_code "$overlay_trail_none_probe_file" "$MFX_MANUAL_BASE_URL/api/effects/test-overlay-windows" \
     -X POST \
