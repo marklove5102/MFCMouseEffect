@@ -55,6 +55,7 @@
 - macOS 拖尾 none 强禁用 + 合同门禁：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzj-macos-trail-none-hard-disable-and-contract-gate.md`
 - macOS 拖尾线宽共享命令链路接入：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzk-macos-trail-line-width-shared-command-wiring.md`
 - macOS 拖尾发射规划器（抗火柴棍）: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzl-macos-trail-emission-planner-anti-matchstick.md`
+- macOS streamer 连续拖尾路径：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase56zzm-macos-streamer-continuous-trail-path.md`
 
 ## 当前 macOS 主线（Phase 50-55）
 - 双车道护栏：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase50-posix-core-runtime-dual-lane-guardrails.md`

@@ -70,6 +70,8 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         return;
     }
     const bool lineTrail = (normalizedType == "line");
+    const bool streamerTrail = (normalizedType == "streamer");
+    const bool continuousTrail = (lineTrail || streamerTrail);
     const double moveDx = static_cast<double>(pt.x - lastPoint_.x);
     const double moveDy = static_cast<double>(pt.y - lastPoint_.y);
     const double moveDistance = std::sqrt(moveDx * moveDx + moveDy * moveDy);
@@ -78,22 +80,27 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         return;
     }
 
-    if (lineTrail) {
+    if (continuousTrail) {
         macos_line_trail::LineTrailConfig config{};
-        // Use a longer duration for continuous line trail than the pulse trail.
-        // The pulse durationSec is scaled down by 0.73 which is too short for
-        // a persistent trail. Use at least 500ms for good visibility.
+        // Keep line/streamer on continuous overlay path to avoid pulse-segment
+        // "matchstick" artifacts during fast pointer movement.
+        const double durationScale = streamerTrail ? 1.9 : 2.5;
+        const int minDurationMs = streamerTrail ? 320 : 500;
+        const int maxDurationMs = streamerTrail ? 1800 : 2200;
         config.durationMs = std::clamp(
-            static_cast<int>(std::lround(renderProfile_.durationSec * 1000.0 * 2.5)),
-            500,
-            2000);
-        config.lineWidth = std::clamp(lineWidth_, 2.0f, 18.0f);
-        config.strokeArgb = renderProfile_.line.strokeArgb;
-        // Use gentler idle fade for continuous line trail
-        config.idleFade.startMs = std::max(idleFade_.startMs, 300);
-        config.idleFade.endMs = std::max(idleFade_.endMs, 600);
+            static_cast<int>(std::lround(renderProfile_.durationSec * 1000.0 * durationScale)),
+            minDurationMs,
+            maxDurationMs);
+        config.lineWidth = std::clamp(
+            lineWidth_ * (streamerTrail ? 0.9f : 1.0f),
+            streamerTrail ? 1.5f : 2.0f,
+            18.0f);
+        config.strokeArgb = streamerTrail ? renderProfile_.streamer.strokeArgb : renderProfile_.line.strokeArgb;
+        config.idleFade.startMs = std::max(idleFade_.startMs, streamerTrail ? 180 : 300);
+        config.idleFade.endMs = std::max(idleFade_.endMs, streamerTrail ? 420 : 600);
         const double distance = moveDistance;
-        const int segmentCount = static_cast<int>(std::clamp(std::ceil(distance / 4.0), 1.0, 48.0));
+        const double segmentStepPx = streamerTrail ? 3.0 : 4.0;
+        const int segmentCount = static_cast<int>(std::clamp(std::ceil(distance / segmentStepPx), 1.0, 64.0));
         for (int i = 1; i <= segmentCount; ++i) {
             const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
             ScreenPoint segPt{};
