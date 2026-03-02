@@ -62,6 +62,7 @@ This file intentionally excludes low-value historical step logs.
   - Non-Windows scope persistence now canonicalizes suffix variants to `process:<base>` and enforces legacy `app_scope == app_scopes[0]` parity in automation contract checks.
   - Binding-priority contract now verifies platform-aware normalized selected scope and alias-tie deterministic winner behavior.
   - macOS manual app-scope selfcheck now includes alias-dedupe persistence assertions.
+  - App-scope JSON parse helpers are shared across regression/manual scripts for single-source contract parsing behavior.
   - Injection and matcher contracts script-gated.
 - WASM:
   - load/invoke/render/fallback path active.
