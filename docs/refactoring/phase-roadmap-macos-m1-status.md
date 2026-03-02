@@ -63,6 +63,7 @@ This file intentionally excludes low-value historical step logs.
 - WASM:
   - load/invoke/render/fallback path active.
   - schema vs state capability parity is contract-gated.
+  - wasm platform checks now also lock runtime backend expectation (`wasm3_static`) and schema/state invoke-render capability parity in wasm-only contract scope.
 - Permissions:
   - runtime revoke -> degrade + notify.
   - runtime regrant -> hot recovery without restart.
