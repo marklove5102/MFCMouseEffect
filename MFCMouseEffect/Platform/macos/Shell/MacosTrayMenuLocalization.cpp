@@ -16,7 +16,7 @@ MacosTrayMenuText BuildMacosTrayMenuText(bool preferZhLabels) {
         text.holdTitle = u8"\u957f\u6309\u7279\u6548";
         text.hoverTitle = u8"\u60ac\u505c\u7279\u6548";
         text.starProjectTitle = u8"\u2605 Star \u9879\u76ee";
-        text.settingsTitle = u8"\u8bbe\u7f6e";
+        text.settingsTitle = u8"\u8bbe\u7f6e...";
         text.reloadConfigTitle = u8"\u91cd\u8f7d\u914d\u7f6e";
         text.exitTitle = u8"\u9000\u51fa";
         text.preferZhLabels = true;

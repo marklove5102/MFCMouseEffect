@@ -12,7 +12,7 @@ struct MacosTrayMenuText {
     std::string holdTitle = "Hold Effects";
     std::string hoverTitle = "Hover Effects";
     std::string starProjectTitle = u8"\u2605 Star Project";
-    std::string settingsTitle = "Settings";
+    std::string settingsTitle = "Settings...";
     std::string reloadConfigTitle = "Reload config";
     std::string exitTitle = "Exit";
     std::string tooltip = "MFCMouseEffect";

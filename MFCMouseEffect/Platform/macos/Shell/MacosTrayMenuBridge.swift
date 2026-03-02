@@ -381,6 +381,13 @@ private func mfxCreateTrayMenuOnMainThread(
     )
     let menu = NSMenu(title: "MFCMouseEffect")
 
+    var hasEffectSection = false
+    for section in effectSections {
+        if mfxAddEffectSection(menu, actionBridge, section) {
+            hasEffectSection = true
+        }
+    }
+
     if !themeValues.isEmpty {
         let themeMenu = NSMenu(title: themeTitle)
         let selectedTheme = selectedThemeValue
@@ -407,17 +414,10 @@ private func mfxCreateTrayMenuOnMainThread(
             let rootItem = NSMenuItem(title: themeTitle, action: nil, keyEquivalent: "")
             rootItem.submenu = themeMenu
             menu.addItem(rootItem)
-            mfxAddMenuSeparatorIfNeeded(menu)
         }
     }
 
-    var hasEffectSection = false
-    for section in effectSections {
-        if mfxAddEffectSection(menu, actionBridge, section) {
-            hasEffectSection = true
-        }
-    }
-    if hasEffectSection {
+    if hasEffectSection || !themeValues.isEmpty {
         mfxAddMenuSeparatorIfNeeded(menu)
     }
 
