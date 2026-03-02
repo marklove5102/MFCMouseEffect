@@ -285,6 +285,12 @@
     <ClInclude Include="MouseFx\Core\Wasm\NullWasmRuntime.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
+    <ClInclude Include="MouseFx\Core\Wasm\Wasm3Runtime.h">
+      <Filter>头文件\MouseFx</Filter>
+    </ClInclude>
+    <ClInclude Include="MouseFx\Core\Wasm\Wasm3Runtime.Internal.h">
+      <Filter>头文件\MouseFx</Filter>
+    </ClInclude>
     <ClInclude Include="MouseFx\Core\Wasm\WasmRuntimeFactory.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
@@ -815,6 +821,15 @@
     <ClCompile Include="MouseFx\Core\Wasm\NullWasmRuntime.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
+    <ClCompile Include="MouseFx\Core\Wasm\Wasm3Runtime.Calls.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Core\Wasm\Wasm3Runtime.Linking.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Core\Wasm\Wasm3Runtime.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
     <ClCompile Include="MouseFx\Core\Wasm\WasmRuntimeFactory.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
@@ -834,6 +849,36 @@
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Core\Wasm\WasmImageFileRenderer.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_bind.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_code.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_compile.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_core.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_env.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_exec.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_function.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_info.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_module.c">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_parse.c">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
   </ItemGroup>

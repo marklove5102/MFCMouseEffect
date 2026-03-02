@@ -76,6 +76,9 @@
   - Injection selfcheck now asserts both `Cmd+C` and `Cmd+V` on `/api/automation/test-match-and-inject` (`ok/matched/injected/selected_keys`), and app-scope selfcheck remains part of POSIX suite phases.
 - WASM:
   - macOS runtime path + diagnostics + fallback contracts are active.
+  - Default runtime backend selection is now unified across platforms in one order:
+    - try `wasm3_static` first, then fallback to `dynamic_bridge`, then `null`.
+  - Windows runtime factory now enables `wasm3_static` creation path (with `dynamic_bridge` fallback kept), and VS project wiring now includes `Wasm3Runtime*` plus wasm3 C sources in main app build.
   - Capability schema/state parity is gated.
   - Core state gate now asserts wasm runtime backend consistency (`dynamic_bridge|wasm3_static|null|external`) and enforces `runtime_backend=null => runtime_fallback_reason` non-empty.
   - Core state gate now hard-checks schema wasm platform matrix (`macOS: invoke/render=true`, `Linux: invoke/render=false`) before parity checks.

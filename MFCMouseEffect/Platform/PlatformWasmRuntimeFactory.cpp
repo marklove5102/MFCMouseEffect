@@ -4,10 +4,10 @@
 
 #include "Platform/PlatformTarget.h"
 
+#include "MouseFx/Core/Wasm/Wasm3Runtime.h"
+
 #if MFX_PLATFORM_WINDOWS
 #include "Platform/windows/Wasm/Win32DllWasmRuntime.h"
-#else
-#include "MouseFx/Core/Wasm/Wasm3Runtime.h"
 #endif
 
 namespace mousefx::platform {
@@ -28,17 +28,10 @@ std::unique_ptr<mousefx::wasm::IWasmRuntime> CreateDynamicBridgeWasmRuntime(std:
 }
 
 std::unique_ptr<mousefx::wasm::IWasmRuntime> CreateWasm3StaticRuntime(std::string* outError) {
-#if MFX_PLATFORM_WINDOWS
-    if (outError) {
-        *outError = "wasm3 static runtime is disabled on windows";
-    }
-    return nullptr;
-#else
     if (outError) {
         outError->clear();
     }
     return std::make_unique<mousefx::wasm::Wasm3Runtime>();
-#endif
 }
 
 } // namespace mousefx::platform

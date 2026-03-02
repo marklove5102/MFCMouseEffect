@@ -67,6 +67,9 @@ This file intentionally excludes low-value historical step logs.
   - Injection and matcher contracts script-gated.
 - WASM:
   - load/invoke/render/fallback path active.
+  - default runtime backend selection is now policy-unified:
+    - try `wasm3_static` first, fallback to `dynamic_bridge`, then `null`.
+  - Windows build wiring now includes `Wasm3Runtime*` and wasm3 C runtime sources in `MFCMouseEffect.vcxproj`, so unified backend policy can execute in both macOS and Windows lanes.
   - schema vs state capability parity is contract-gated.
   - wasm platform checks now also lock runtime backend expectation (`wasm3_static`) and schema/state invoke-render capability parity in wasm-only contract scope.
 - Permissions:

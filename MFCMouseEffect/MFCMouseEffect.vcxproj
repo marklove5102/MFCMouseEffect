@@ -374,6 +374,8 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClInclude Include="MouseFx\Core\Wasm\WasmPluginImageAssetCatalog.h" />
     <ClInclude Include="Platform\windows\Wasm\Win32DllWasmRuntime.h" />
     <ClInclude Include="MouseFx\Core\Wasm\NullWasmRuntime.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\Wasm3Runtime.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\Wasm3Runtime.Internal.h" />
     <ClInclude Include="MouseFx\Core\Wasm\WasmRuntimeFactory.h" />
     <ClInclude Include="MouseFx\Core\Wasm\WasmEffectHost.h" />
     <ClInclude Include="MouseFx\Core\Wasm\WasmEventInvokeExecutor.h" />
@@ -558,6 +560,9 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClCompile Include="MouseFx\Core\Wasm\WasmPluginImageAssetCatalog.cpp" />
     <ClCompile Include="Platform\windows\Wasm\Win32DllWasmRuntime.cpp" />
     <ClCompile Include="MouseFx\Core\Wasm\NullWasmRuntime.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\Wasm3Runtime.Calls.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\Wasm3Runtime.Linking.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\Wasm3Runtime.cpp" />
     <ClCompile Include="MouseFx\Core\Wasm\WasmRuntimeFactory.cpp" />
     <ClCompile Include="MouseFx\Core\Wasm\WasmEffectHost.cpp" />
     <ClCompile Include="MouseFx\Core\Wasm\WasmEventInvokeExecutor.cpp" />
@@ -565,6 +570,46 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClCompile Include="MouseFx\Core\Wasm\WasmClickCommandExecutor.cpp" />
     <ClCompile Include="MouseFx\Core\Wasm\WasmRenderResourceResolver.cpp" />
     <ClCompile Include="MouseFx\Core\Wasm\WasmImageFileRenderer.cpp" />
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_bind.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_code.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_compile.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_core.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_env.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_exec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_function.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_info.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_module.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WasmRuntimeBridge\third_party\wasm3\source\m3_parse.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="MouseFx\Utils\StringUtils.cpp" />
     <ClCompile Include="MouseFx\Server\HttpServer.cpp" />
     <ClCompile Include="MouseFx\Server\HttpServer.Protocol.cpp" />
