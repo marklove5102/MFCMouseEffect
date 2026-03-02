@@ -154,6 +154,123 @@ emit_value(resolved, output_mode)
 PY
 }
 
+_mfx_core_http_automation_parse_path_value() {
+    local input_file="$1"
+    local output_mode="$2"
+    shift 2
+    python3 - "$input_file" "$output_mode" "$@" <<'PY'
+import json
+import sys
+
+input_file = sys.argv[1]
+output_mode = sys.argv[2]
+path_segments = sys.argv[3:]
+missing = object()
+
+try:
+    with open(input_file, "r", encoding="utf-8") as f:
+        root = json.load(f)
+except Exception:
+    print("")
+    sys.exit(0)
+
+def emit_value(value, mode):
+    if mode == "string":
+        if isinstance(value, str):
+            print(value)
+            return
+        print("")
+        return
+    if mode == "uint":
+        if isinstance(value, bool):
+            print("")
+            return
+        if isinstance(value, int) and value >= 0:
+            print(str(value))
+            return
+        print("")
+        return
+
+    if isinstance(value, bool):
+        print("true" if value else "false")
+    elif isinstance(value, (int, float)) and not isinstance(value, bool):
+        print(str(value))
+    elif value is None:
+        print("null")
+    elif isinstance(value, str):
+        print(json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+    else:
+        print(json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+
+if not path_segments:
+    print("")
+    sys.exit(0)
+
+value = root
+for segment in path_segments:
+    if isinstance(value, dict):
+        if segment not in value:
+            value = missing
+            break
+        value = value[segment]
+        continue
+    if isinstance(value, list):
+        if not segment.isdigit():
+            value = missing
+            break
+        index = int(segment)
+        if index < 0 or index >= len(value):
+            value = missing
+            break
+        value = value[index]
+        continue
+    value = missing
+    break
+
+if value is missing:
+    print("")
+    sys.exit(0)
+
+emit_value(value, output_mode)
+PY
+}
+
+_mfx_core_http_automation_parse_path_scalar_field() {
+    local input_file="$1"
+    shift
+    _mfx_core_http_automation_parse_path_value "$input_file" "scalar" "$@"
+}
+
+_mfx_core_http_automation_parse_path_string_field() {
+    local input_file="$1"
+    shift
+    _mfx_core_http_automation_parse_path_value "$input_file" "string" "$@"
+}
+
+_mfx_core_http_automation_parse_command_section_scalar_field() {
+    local input_file="$1"
+    local section_name="$2"
+    local field_name="$3"
+    _mfx_core_http_automation_parse_path_scalar_field \
+        "$input_file" \
+        "command_samples" \
+        "$section_name" \
+        "$field_name"
+}
+
+_mfx_core_http_automation_parse_command_nested_section_scalar_field() {
+    local input_file="$1"
+    local section_name="$2"
+    local nested_section_name="$3"
+    local field_name="$4"
+    _mfx_core_http_automation_parse_path_scalar_field \
+        "$input_file" \
+        "command_samples" \
+        "$section_name" \
+        "$nested_section_name" \
+        "$field_name"
+}
+
 _mfx_core_http_automation_first_catalog_process() {
     local file_path="$1"
     local resolved_exe

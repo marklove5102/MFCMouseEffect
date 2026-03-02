@@ -56,8 +56,8 @@ JSON
     parsed_active_click="$(_mfx_core_http_automation_parse_active_field "$fixture_file" "click")"
     parsed_click_type="$(_mfx_core_http_automation_parse_section_scalar_field "$fixture_file" "click" "normalized_type")"
     parsed_click_opacity="$(_mfx_core_http_automation_parse_section_scalar_field "$fixture_file" "click" "base_opacity")"
-    parsed_trail_emit="$(_mfx_core_http_automation_parse_section_scalar_field "$fixture_file" "trail" "emit")"
-    parsed_hold_start_type="$(_mfx_core_http_automation_parse_nested_section_scalar_field "$fixture_file" "hold" "start" "normalized_type")"
+    parsed_trail_emit="$(_mfx_core_http_automation_parse_command_section_scalar_field "$fixture_file" "trail" "emit")"
+    parsed_hold_start_type="$(_mfx_core_http_automation_parse_command_nested_section_scalar_field "$fixture_file" "hold" "start" "normalized_type")"
 
     mfx_assert_eq "$parsed_catalog_process" "code.app" "core automation parse helper first catalog process"
     mfx_assert_eq "$parsed_uint" "7" "core automation parse helper uint field"
