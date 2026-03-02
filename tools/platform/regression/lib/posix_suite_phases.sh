@@ -35,6 +35,17 @@ mfx_posix_suite_run_macos_objcxx_surface_gate_phase() {
     "$script_dir/run-macos-objcxx-surface-regression.sh"
 }
 
+mfx_posix_suite_run_theme_catalog_surface_gate_phase() {
+    local script_dir="$1"
+    if [[ "$MFX_SKIP_THEME_CATALOG_SURFACE_GATE" -eq 1 ]]; then
+        mfx_info "skip theme catalog surface regression phase"
+        return
+    fi
+
+    mfx_info "run theme catalog surface regression phase"
+    "$script_dir/run-theme-catalog-surface-regression.sh"
+}
+
 mfx_posix_suite_log_entry_host_presence() {
     if ! command -v pgrep >/dev/null 2>&1; then
         return

@@ -26,6 +26,7 @@ mfx_posix_suite_init_defaults() {
     MFX_SKIP_CORE_SMOKE=0
     MFX_SKIP_CORE_AUTOMATION=0
     MFX_SKIP_MACOS_OBJCXX_SURFACE_GATE=0
+    MFX_SKIP_THEME_CATALOG_SURFACE_GATE=0
     MFX_SKIP_MACOS_AUTOMATION_INJECTION_SELFCHECK=0
     MFX_SKIP_MACOS_AUTOMATION_APP_SCOPE_SELFCHECK=0
     MFX_SKIP_MACOS_VM_SUPPRESSION_SELFCHECK=0
@@ -54,6 +55,7 @@ Usage: run-posix-regression-suite.sh [options]
   --skip-core-smoke               skip core-lane smoke phase
   --skip-core-automation          skip core automation HTTP contract phase
   --skip-macos-objcxx-surface-gate skip macOS ObjC++ surface regression phase
+  --skip-theme-catalog-surface-gate skip theme catalog source consistency phase
   --skip-macos-automation-injection-selfcheck skip macOS automation injection selfcheck phase
   --skip-macos-automation-app-scope-selfcheck skip macOS automation app-scope selfcheck phase
   --skip-macos-vm-suppression-selfcheck skip macOS VM foreground suppression selfcheck phase
@@ -126,6 +128,10 @@ mfx_posix_suite_parse_args() {
                 ;;
             --skip-macos-objcxx-surface-gate)
                 MFX_SKIP_MACOS_OBJCXX_SURFACE_GATE=1
+                shift
+                ;;
+            --skip-theme-catalog-surface-gate)
+                MFX_SKIP_THEME_CATALOG_SURFACE_GATE=1
                 shift
                 ;;
             --skip-macos-automation-injection-selfcheck)
