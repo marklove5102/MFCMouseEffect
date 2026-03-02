@@ -194,6 +194,8 @@ void Win32TrayHostWindow::HandleTrayMenu() {
         shellHost_->RequestExitFromShell();
     } else if (cmd == kCmdTraySettings) {
         shellHost_->OpenSettingsFromShell();
+    } else if (cmd == kCmdTrayReloadConfig) {
+        shellHost_->ReloadConfigFromShell();
     } else if (cmd == kCmdStarRepo) {
         shellHost_->OpenProjectRepositoryFromShell();
     } else if (mouseFx) {
