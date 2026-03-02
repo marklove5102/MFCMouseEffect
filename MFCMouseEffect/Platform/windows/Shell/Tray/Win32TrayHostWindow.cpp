@@ -176,7 +176,7 @@ void Win32TrayHostWindow::HandleTrayMenu() {
     if (!menu) {
         return;
     }
-    Win32TrayMenuBuilder::BuildTrayMenu(menu, mouseFx);
+    Win32TrayMenuBuilder::BuildTrayMenu(menu, mouseFx, shellHost_);
 
     POINT pt{};
     GetCursorPos(&pt);
@@ -203,8 +203,8 @@ void Win32TrayHostWindow::HandleTrayMenu() {
         }
 
         std::string theme;
-        if (Win32TrayMenuBuilder::TryBuildTheme(cmd, &theme)) {
-            mouseFx->SetTheme(theme);
+        if (Win32TrayMenuBuilder::TryBuildTheme(cmd, &theme) && shellHost_) {
+            shellHost_->SetThemeFromShell(theme);
         }
     }
 

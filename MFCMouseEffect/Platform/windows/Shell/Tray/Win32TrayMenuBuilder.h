@@ -6,10 +6,11 @@
 
 namespace mousefx {
 class AppController;
+class IAppShellHost;
 
 class Win32TrayMenuBuilder final {
 public:
-    static void BuildTrayMenu(HMENU menu, AppController* mouseFx);
+    static void BuildTrayMenu(HMENU menu, AppController* mouseFx, IAppShellHost* shellHost);
 
     // Returns true if cmd maps to an IPC JSON command for AppController::HandleCommand.
     static bool TryBuildIpcJson(UINT cmd, std::string* outJson);

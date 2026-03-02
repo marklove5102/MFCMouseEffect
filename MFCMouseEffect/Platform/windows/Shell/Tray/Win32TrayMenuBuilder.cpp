@@ -4,6 +4,7 @@
 #include "Platform/windows/Shell/Tray/Win32TrayMenuCommands.h"
 
 #include "MouseFx/Core/Control/AppController.h"
+#include "MouseFx/Core/Shell/IAppShellHost.h"
 #include "MouseFx/Styles/ThemeStyle.h"
 #include "Settings/SettingsOptions.h"
 
@@ -21,11 +22,19 @@ static std::string ToLowerAscii(std::string s) {
     return s;
 }
 
-static bool IsZhUi(mousefx::AppController* mouseFx) {
+static bool ResolveZhUiFromConfig(mousefx::AppController* mouseFx) {
     if (!mouseFx) return true;
     std::string lang = ToLowerAscii(mouseFx->Config().uiLanguage);
     if (lang.empty()) return true;
     return lang.rfind("zh", 0) == 0;
+}
+
+static bool IsZhUi(mousefx::AppController* mouseFx, mousefx::IAppShellHost* shellHost) {
+    const bool fallbackPreferZh = ResolveZhUiFromConfig(mouseFx);
+    if (!shellHost) {
+        return fallbackPreferZh;
+    }
+    return shellHost->PreferZhLabelsFromShell(fallbackPreferZh);
 }
 
 static std::wstring PickLabel(const wchar_t* zh, const wchar_t* en, bool isZh) {
@@ -238,7 +247,7 @@ static void AppendEffectSubMenu(HMENU parent,
     }
 }
 
-static void AppendThemeSubMenu(HMENU parent, mousefx::AppController* mouseFx) {
+static void AppendThemeSubMenu(HMENU parent, mousefx::AppController* mouseFx, mousefx::IAppShellHost* shellHost, bool zh) {
     if (!::IsMenu(parent)) return;
 
     HMENU themeMenu = CreatePopupMenu();
@@ -246,13 +255,23 @@ static void AppendThemeSubMenu(HMENU parent, mousefx::AppController* mouseFx) {
 
     ResetDynamicThemeMenuMap();
 
-    const bool zh = IsZhUi(mouseFx);
     UINT nextDynamicCmd = kDynamicThemeCmdBase;
     std::string currentThemeNormalized = "neon";
+    std::vector<mousefx::ShellThemeMenuItem> shellThemeItems;
+    std::string shellSelectedTheme;
+    if (shellHost) {
+        shellHost->GetThemeMenuSnapshotFromShell(zh, &shellThemeItems, &shellSelectedTheme);
+    }
+    if (!shellSelectedTheme.empty()) {
+        const std::string resolvedSelected = mousefx::ResolveRuntimeThemeName(shellSelectedTheme);
+        currentThemeNormalized = mousefx::NormalizeThemeName(resolvedSelected.empty() ? shellSelectedTheme : resolvedSelected);
+    }
     if (mouseFx) {
-        const std::string configuredTheme = mouseFx->Config().theme;
-        const std::string resolvedTheme = mousefx::ResolveRuntimeThemeName(configuredTheme);
-        currentThemeNormalized = mousefx::NormalizeThemeName(resolvedTheme.empty() ? configuredTheme : resolvedTheme);
+        if (currentThemeNormalized.empty()) {
+            const std::string configuredTheme = mouseFx->Config().theme;
+            const std::string resolvedTheme = mousefx::ResolveRuntimeThemeName(configuredTheme);
+            currentThemeNormalized = mousefx::NormalizeThemeName(resolvedTheme.empty() ? configuredTheme : resolvedTheme);
+        }
         if (currentThemeNormalized.empty()) {
             currentThemeNormalized = "neon";
         }
@@ -260,24 +279,34 @@ static void AppendThemeSubMenu(HMENU parent, mousefx::AppController* mouseFx) {
     UINT checkedCmd = kCmdThemeNeon;
     bool hasCheckedCmd = false;
 
-    for (const auto& option : mousefx::GetThemeOptions()) {
+    auto appendThemeOption = [&](const std::string& value, const std::wstring& label) {
         UINT cmd = 0;
-        if (!TryBuildThemeMenuCommand(option.value, &cmd)) {
+        if (!TryBuildThemeMenuCommand(value, &cmd)) {
             if (nextDynamicCmd > kDynamicThemeCmdMax) {
-                continue;
+                return;
             }
             cmd = nextDynamicCmd++;
-            RegisterDynamicThemeMenuItem(cmd, option.value);
+            RegisterDynamicThemeMenuItem(cmd, value);
         }
-        std::wstring label = zh ? option.labelZh : option.labelEn;
-        if (label.empty()) {
-            label = std::wstring(option.value.begin(), option.value.end());
+        std::wstring finalLabel = label;
+        if (finalLabel.empty()) {
+            finalLabel = mousefx::Utf8ToWString(value);
         }
-        if (AppendMenuW(themeMenu, MF_STRING, cmd, label.c_str())) {
-            if (mousefx::NormalizeThemeName(option.value) == currentThemeNormalized) {
+        if (AppendMenuW(themeMenu, MF_STRING, cmd, finalLabel.c_str())) {
+            if (mousefx::NormalizeThemeName(value) == currentThemeNormalized) {
                 checkedCmd = cmd;
                 hasCheckedCmd = true;
             }
+        }
+    };
+
+    if (!shellThemeItems.empty()) {
+        for (const auto& item : shellThemeItems) {
+            appendThemeOption(item.value, mousefx::Utf8ToWString(item.label));
+        }
+    } else {
+        for (const auto& option : mousefx::GetThemeOptions()) {
+            appendThemeOption(option.value, zh ? option.labelZh : option.labelEn);
         }
     }
 
@@ -342,11 +371,11 @@ static bool TryBuildEffectJsonByCommand(UINT cmd, std::string* outJson) {
 
 } // namespace
 
-void Win32TrayMenuBuilder::BuildTrayMenu(HMENU menu, mousefx::AppController* mouseFx) {
+void Win32TrayMenuBuilder::BuildTrayMenu(HMENU menu, mousefx::AppController* mouseFx, mousefx::IAppShellHost* shellHost) {
     if (!::IsMenu(menu)) return;
 
     size_t n = 0;
-    const bool zh = IsZhUi(mouseFx);
+    const bool zh = IsZhUi(mouseFx, shellHost);
 
     const mousefx::EffectOption* clickOpts = mousefx::ClickMetadata(n);
     AppendEffectSubMenu(menu, PickLabel(L"\u70b9\u51fb\u7279\u6548", L"Click Effects", zh), mouseFx, mousefx::EffectCategory::Click,
@@ -368,7 +397,7 @@ void Win32TrayMenuBuilder::BuildTrayMenu(HMENU menu, mousefx::AppController* mou
     AppendEffectSubMenu(menu, PickLabel(L"\u60ac\u505c\u7279\u6548", L"Hover Effects", zh), mouseFx, mousefx::EffectCategory::Hover,
                         hoverOpts, n);
 
-    AppendThemeSubMenu(menu, mouseFx);
+    AppendThemeSubMenu(menu, mouseFx, shellHost, zh);
 
     AppendMenuW(menu, MF_STRING, kCmdStarRepo, PickLabel(L"\u2605 Star \u9879\u76EE", L"\u2605 Star Project", zh).c_str());
     AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
