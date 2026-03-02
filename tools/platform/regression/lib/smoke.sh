@@ -40,6 +40,7 @@ mfx_run_smoke_checks() {
         local tray_effect_capture_file="$tray_smoke_tmp_dir/tray-effect-capture.env"
         local tray_reload_capture_file="$tray_smoke_tmp_dir/tray-reload-capture.env"
         local tray_star_capture_file="$tray_smoke_tmp_dir/tray-star-capture.env"
+        local tray_menu_layout_capture_file="$tray_smoke_tmp_dir/tray-menu-layout-capture.env"
         local tray_theme_value="neon"
         local tray_effect_category="click"
         local tray_effect_value="ripple"
@@ -58,7 +59,8 @@ mfx_run_smoke_checks() {
             --theme-capture-file "$tray_theme_capture_file" \
             --effect-capture-file "$tray_effect_capture_file" \
             --reload-capture-file "$tray_reload_capture_file" \
-            --star-capture-file "$tray_star_capture_file" >/dev/null 2>&1
+            --star-capture-file "$tray_star_capture_file" \
+            --menu-layout-capture-file "$tray_menu_layout_capture_file" >/dev/null 2>&1
         if [[ -f "$tray_launch_capture_file" ]]; then
             mfx_assert_file_contains "$tray_launch_capture_file" "captured=1" "macOS tray smoke launch capture flag"
             mfx_assert_file_contains "$tray_launch_capture_file" "command=open" "macOS tray smoke launch command"
@@ -96,6 +98,13 @@ mfx_run_smoke_checks() {
             mfx_assert_file_contains "$tray_star_capture_file" "url=$tray_star_url" "macOS tray smoke star url"
         else
             mfx_info "macOS tray smoke star capture file not emitted; keep exit-code gate only under current runner"
+        fi
+        if [[ -f "$tray_menu_layout_capture_file" ]]; then
+            mfx_assert_file_contains "$tray_menu_layout_capture_file" "captured=1" "macOS tray smoke menu layout capture flag"
+            mfx_assert_file_contains "$tray_menu_layout_capture_file" "top_level_layout_keys=effect:click|theme|star|settings|reload|exit" "macOS tray smoke menu layout order"
+            mfx_assert_file_contains "$tray_menu_layout_capture_file" "settings_title_has_ellipsis=1" "macOS tray smoke settings label ellipsis"
+        else
+            mfx_info "macOS tray smoke menu layout capture file not emitted; keep exit-code gate only under current runner"
         fi
         rm -rf "$tray_smoke_tmp_dir"
     else

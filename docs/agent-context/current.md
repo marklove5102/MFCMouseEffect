@@ -102,6 +102,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-effects-regression-suite.sh --platform auto`
 - POSIX scaffold regression:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-scaffold-regression.sh --platform auto`
+  - macOS tray smoke now captures top-level logical layout keys and settings title punctuation (`MFX_TEST_TRAY_MENU_LAYOUT_CAPTURE_FILE`) and asserts Win-aligned order (`effect -> theme -> star -> settings -> reload -> exit`) plus `Settings.../设置...` ellipsis semantics.
 - POSIX core effects contract:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-core-effects-contract-regression.sh --platform auto`
   - overlay probe now contains explicit trail mode guards:

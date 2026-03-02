@@ -296,6 +296,9 @@ int main(int argc, char* argv[]) {
     std::string starCaptureFilePath = ReadStringEnvOrDefault(
         "MFX_TEST_TRAY_SMOKE_STAR_CAPTURE_FILE",
         "");
+    std::string menuLayoutCaptureFilePath = ReadStringEnvOrDefault(
+        "MFX_TEST_TRAY_SMOKE_MENU_LAYOUT_CAPTURE_FILE",
+        "");
 
     bool forceExpectSettingsAction = false;
     bool forceExpectThemeAction = false;
@@ -404,6 +407,14 @@ int main(int argc, char* argv[]) {
             starCaptureFilePath = argv[++i];
             continue;
         }
+        if (arg == "--menu-layout-capture-file") {
+            if (i + 1 >= argc) {
+                std::fprintf(stderr, "mfx_shell_macos_tray_smoke: missing value for --menu-layout-capture-file\n");
+                return 64;
+            }
+            menuLayoutCaptureFilePath = argv[++i];
+            continue;
+        }
         std::fprintf(stderr, "mfx_shell_macos_tray_smoke: unknown argument: %.*s\n", static_cast<int>(arg.size()), arg.data());
         return 64;
     }
@@ -442,6 +453,11 @@ int main(int argc, char* argv[]) {
         setenv("MFX_TEST_TRAY_AUTO_TRIGGER_STAR_ACTION", "1", 1);
     } else {
         unsetenv("MFX_TEST_TRAY_AUTO_TRIGGER_STAR_ACTION");
+    }
+    if (!menuLayoutCaptureFilePath.empty()) {
+        setenv("MFX_TEST_TRAY_MENU_LAYOUT_CAPTURE_FILE", menuLayoutCaptureFilePath.c_str(), 1);
+    } else {
+        unsetenv("MFX_TEST_TRAY_MENU_LAYOUT_CAPTURE_FILE");
     }
 
     mousefx::MacosEventLoopService loop;

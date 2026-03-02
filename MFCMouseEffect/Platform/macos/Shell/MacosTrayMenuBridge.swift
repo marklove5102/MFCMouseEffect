@@ -259,6 +259,33 @@ private func mfxIsTrayStarAutoTriggerEnabled() -> Bool {
     return normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "on"
 }
 
+private func mfxReadTrayMenuLayoutCaptureFilePath() -> String {
+    let raw = ProcessInfo.processInfo.environment["MFX_TEST_TRAY_MENU_LAYOUT_CAPTURE_FILE"] ?? ""
+    if raw.isEmpty {
+        return ""
+    }
+    return raw.trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+private func mfxWriteTrayMenuLayoutCaptureIfNeeded(
+    layoutKeys: [String],
+    settingsTitle: String
+) {
+    let capturePath = mfxReadTrayMenuLayoutCaptureFilePath()
+    if capturePath.isEmpty {
+        return
+    }
+    let hasEllipsis = settingsTitle.hasSuffix("...")
+    let lines = [
+        "captured=1",
+        "top_level_layout_keys=\(layoutKeys.joined(separator: "|"))",
+        "settings_title=\(settingsTitle)",
+        "settings_title_has_ellipsis=\(hasEllipsis ? "1" : "0")",
+    ]
+    let content = lines.joined(separator: "\n") + "\n"
+    try? content.write(toFile: capturePath, atomically: true, encoding: .utf8)
+}
+
 private func mfxFindThemeMenuItem(_ menu: NSMenu?, value: String) -> NSMenuItem? {
     guard let menu else {
         return nil
@@ -380,11 +407,13 @@ private func mfxCreateTrayMenuOnMainThread(
         onEffectSelectCallback: onEffectSelect
     )
     let menu = NSMenu(title: "MFCMouseEffect")
+    var topLevelLayoutKeys: [String] = []
 
     var hasEffectSection = false
     for section in effectSections {
         if mfxAddEffectSection(menu, actionBridge, section) {
             hasEffectSection = true
+            topLevelLayoutKeys.append("effect:\(section.category)")
         }
     }
 
@@ -414,6 +443,7 @@ private func mfxCreateTrayMenuOnMainThread(
             let rootItem = NSMenuItem(title: themeTitle, action: nil, keyEquivalent: "")
             rootItem.submenu = themeMenu
             menu.addItem(rootItem)
+            topLevelLayoutKeys.append("theme")
         }
     }
 
@@ -429,6 +459,7 @@ private func mfxCreateTrayMenuOnMainThread(
         )
         starItem.target = actionBridge
         menu.addItem(starItem)
+        topLevelLayoutKeys.append("star")
     }
 
     if !reloadConfigTitle.isEmpty || !settingsTitle.isEmpty {
@@ -443,6 +474,7 @@ private func mfxCreateTrayMenuOnMainThread(
     settingsItem.keyEquivalentModifierMask = [.command]
     settingsItem.target = actionBridge
     menu.addItem(settingsItem)
+    topLevelLayoutKeys.append("settings")
 
     if !reloadConfigTitle.isEmpty {
         let reloadItem = NSMenuItem(
@@ -453,6 +485,7 @@ private func mfxCreateTrayMenuOnMainThread(
         reloadItem.keyEquivalentModifierMask = [.command]
         reloadItem.target = actionBridge
         menu.addItem(reloadItem)
+        topLevelLayoutKeys.append("reload")
     }
 
     menu.addItem(NSMenuItem.separator())
@@ -465,6 +498,9 @@ private func mfxCreateTrayMenuOnMainThread(
     exitItem.keyEquivalentModifierMask = [.command]
     exitItem.target = actionBridge
     menu.addItem(exitItem)
+    topLevelLayoutKeys.append("exit")
+
+    mfxWriteTrayMenuLayoutCaptureIfNeeded(layoutKeys: topLevelLayoutKeys, settingsTitle: settingsTitle)
 
     statusItem.menu = menu
     if let button = statusItem.button {
