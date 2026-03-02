@@ -87,7 +87,7 @@
   - macOS tray now prefers icon rendering (project logo path fallback + SF Symbol fallback) instead of text-only `MFX`.
   - macOS warning notifications now initialize app icon before delivery to avoid generic default sender icon in unbundled runs.
   - icon resolution supports explicit override via `MFX_MACOS_APP_ICON_PATH` (highest priority), then bundle/dev fallback paths.
-  - Windows tray theme submenu now reads theme entries and selected value from `IAppShellHost::GetThemeMenuSnapshotFromShell(...)` (same source as macOS tray), and theme apply action now routes through `SetThemeFromShell(...)` to keep shell behavior path consistent.
+  - Windows tray theme/effect submenus now read from shell snapshots (`GetThemeMenuSnapshotFromShell` / `GetEffectMenuSnapshotFromShell`) with dynamic command fallback for unknown future types; theme apply action routes through `SetThemeFromShell(...)` to keep shell behavior path consistent.
   - macOS tray now exposes effect submenus (`click/trail/scroll/hold/hover`) with metadata-driven labels and active-item checks; selection is routed through the same `set_effect` / `clear_effect` command path used on Windows (`AppController::HandleCommand`), closing tray capability parity gap.
   - macOS tray now also exposes `★ Star Project` and `Reload config` actions with Windows-aligned behavior (`OpenProjectRepositoryFromShell` and `reload_config` command dispatch), removing the remaining tray action-surface mismatch.
   - macOS tray label language now follows runtime `uiLanguage` first (with system-language fallback), so tray text/tooltip stays aligned with app language semantics used on Windows.

@@ -74,6 +74,8 @@ static bool TryBuildThemeMenuCommand(const std::string& themeValue, UINT* outCmd
 
 constexpr UINT kDynamicThemeCmdBase = 8100;
 constexpr UINT kDynamicThemeCmdMax = 8299;
+constexpr UINT kDynamicEffectCmdBase = 8300;
+constexpr UINT kDynamicEffectCmdMax = 8599;
 
 std::mutex& DynamicThemeMenuMapMutex() {
     static std::mutex mutex;
@@ -81,6 +83,16 @@ std::mutex& DynamicThemeMenuMapMutex() {
 }
 
 std::unordered_map<UINT, std::string>& DynamicThemeMenuMap() {
+    static std::unordered_map<UINT, std::string> map;
+    return map;
+}
+
+std::mutex& DynamicEffectMenuMapMutex() {
+    static std::mutex mutex;
+    return mutex;
+}
+
+std::unordered_map<UINT, std::string>& DynamicEffectMenuMap() {
     static std::unordered_map<UINT, std::string> map;
     return map;
 }
@@ -103,6 +115,34 @@ bool TryReadDynamicThemeMenuItem(UINT cmd, std::string* outTheme) {
         return false;
     }
     *outTheme = it->second;
+    return true;
+}
+
+void ResetDynamicEffectMenuMap() {
+    std::lock_guard<std::mutex> guard(DynamicEffectMenuMapMutex());
+    DynamicEffectMenuMap().clear();
+}
+
+std::string BuildDynamicEffectCommandJson(const std::string& category, const std::string& effectType) {
+    if (ToLowerAscii(effectType) == "none") {
+        return std::string("{\"cmd\":\"clear_effect\",\"category\":\"") + category + "\"}";
+    }
+    return std::string("{\"cmd\":\"set_effect\",\"category\":\"") + category + "\",\"type\":\"" + effectType + "\"}";
+}
+
+void RegisterDynamicEffectMenuItem(UINT cmd, const std::string& category, const std::string& effectType) {
+    std::lock_guard<std::mutex> guard(DynamicEffectMenuMapMutex());
+    DynamicEffectMenuMap()[cmd] = BuildDynamicEffectCommandJson(category, effectType);
+}
+
+bool TryReadDynamicEffectMenuItem(UINT cmd, std::string* outJson) {
+    if (!outJson) return false;
+    std::lock_guard<std::mutex> guard(DynamicEffectMenuMapMutex());
+    const auto it = DynamicEffectMenuMap().find(cmd);
+    if (it == DynamicEffectMenuMap().end()) {
+        return false;
+    }
+    *outJson = it->second;
     return true;
 }
 
@@ -193,6 +233,66 @@ static bool IsCurrentTypeMatchByCommand(const std::string& currentType, UINT cmd
     }
 }
 
+static bool TryBuildEffectMenuCommand(const std::string& category, const std::string& effectType, UINT* outCmd) {
+    if (!outCmd) return false;
+    const std::string normalizedCategory = ToLowerAscii(category);
+    const std::string normalizedType = ToLowerAscii(effectType);
+
+    if (normalizedCategory == "click") {
+        if (normalizedType == "ripple") { *outCmd = kCmdClickRipple; return true; }
+        if (normalizedType == "star") { *outCmd = kCmdClickStar; return true; }
+        if (normalizedType == "text") { *outCmd = kCmdClickText; return true; }
+        if (normalizedType == "none") { *outCmd = kCmdClickNone; return true; }
+        return false;
+    }
+
+    if (normalizedCategory == "trail") {
+        if (normalizedType == "meteor") { *outCmd = kCmdTrailMeteor; return true; }
+        if (normalizedType == "streamer") { *outCmd = kCmdTrailStreamer; return true; }
+        if (normalizedType == "electric") { *outCmd = kCmdTrailElectric; return true; }
+        if (normalizedType == "tubes") { *outCmd = kCmdTrailTubes; return true; }
+        if (normalizedType == "particle") { *outCmd = kCmdTrailParticle; return true; }
+        if (normalizedType == "line") { *outCmd = kCmdTrailLine; return true; }
+        if (normalizedType == "none") { *outCmd = kCmdTrailNone; return true; }
+        return false;
+    }
+
+    if (normalizedCategory == "scroll") {
+        if (normalizedType == "arrow") { *outCmd = kCmdScrollArrow; return true; }
+        if (normalizedType == "helix") { *outCmd = kCmdScrollHelix; return true; }
+        if (normalizedType == "twinkle") { *outCmd = kCmdScrollTwinkle; return true; }
+        if (normalizedType == "none") { *outCmd = kCmdScrollNone; return true; }
+        return false;
+    }
+
+    if (normalizedCategory == "hold") {
+        if (normalizedType == "charge") { *outCmd = kCmdHoldCharge; return true; }
+        if (normalizedType == "lightning") { *outCmd = kCmdHoldLightning; return true; }
+        if (normalizedType == "hex") { *outCmd = kCmdHoldHex; return true; }
+        if (normalizedType == "tech_ring") { *outCmd = kCmdHoldTechRing; return true; }
+        if (normalizedType == "hologram" || normalizedType == "scifi3d") { *outCmd = kCmdHoldHologram; return true; }
+        if (normalizedType == "hold_neon3d" || normalizedType == "neon3d") { *outCmd = kCmdHoldNeon3D; return true; }
+        if (normalizedType == mousefx::hold_route::kTypeQuantumHaloGpuV2 ||
+            normalizedType == "hold_neon3d_gpu_v2") {
+            *outCmd = kCmdHoldQuantumHaloGpuV2;
+            return true;
+        }
+        if (normalizedType == mousefx::hold_route::kTypeFluxFieldCpu) { *outCmd = kCmdHoldFluxFieldCpu; return true; }
+        if (normalizedType == mousefx::hold_route::kTypeFluxFieldGpuV2) { *outCmd = kCmdHoldFluxFieldGpuV2; return true; }
+        if (normalizedType == "none") { *outCmd = kCmdHoldNone; return true; }
+        return false;
+    }
+
+    if (normalizedCategory == "hover") {
+        if (normalizedType == "glow") { *outCmd = kCmdHoverGlow; return true; }
+        if (normalizedType == "tubes" || normalizedType == "suspension") { *outCmd = kCmdHoverTubes; return true; }
+        if (normalizedType == "none") { *outCmd = kCmdHoverNone; return true; }
+        return false;
+    }
+
+    return false;
+}
+
 static std::string GetCurrentEffectType(mousefx::AppController* mouseFx, mousefx::EffectCategory category) {
     if (!mouseFx) return "";
     const auto cfg = mouseFx->GetConfigSnapshot();
@@ -242,6 +342,45 @@ static void AppendEffectSubMenu(HMENU parent,
         }
     }
 
+    if (!AppendMenuW(parent, MF_POPUP | MF_BYPOSITION, reinterpret_cast<UINT_PTR>(sub), title.c_str())) {
+        DestroyMenu(sub);
+    }
+}
+
+static void AppendEffectSubMenuFromShell(HMENU parent,
+                                         const mousefx::ShellEffectMenuSection& section,
+                                         UINT* nextDynamicCmd) {
+    if (!::IsMenu(parent) || !nextDynamicCmd) return;
+
+    HMENU sub = CreatePopupMenu();
+    if (!sub) return;
+
+    for (const auto& item : section.items) {
+        UINT cmd = 0;
+        if (!TryBuildEffectMenuCommand(section.category, item.value, &cmd)) {
+            if (*nextDynamicCmd > kDynamicEffectCmdMax) {
+                continue;
+            }
+            cmd = (*nextDynamicCmd)++;
+            RegisterDynamicEffectMenuItem(cmd, section.category, item.value);
+        }
+
+        std::wstring label = mousefx::Utf8ToWString(item.label);
+        if (label.empty()) {
+            label = mousefx::Utf8ToWString(item.value);
+        }
+        if (!AppendMenuW(sub, MF_STRING | MF_BYPOSITION, cmd, label.c_str())) {
+            continue;
+        }
+        if (item.selected) {
+            CheckMenuItem(sub, cmd, MF_BYCOMMAND | MF_CHECKED);
+        }
+    }
+
+    std::wstring title = mousefx::Utf8ToWString(section.title);
+    if (title.empty()) {
+        title = mousefx::Utf8ToWString(section.category);
+    }
     if (!AppendMenuW(parent, MF_POPUP | MF_BYPOSITION, reinterpret_cast<UINT_PTR>(sub), title.c_str())) {
         DestroyMenu(sub);
     }
@@ -376,26 +515,39 @@ void Win32TrayMenuBuilder::BuildTrayMenu(HMENU menu, mousefx::AppController* mou
 
     size_t n = 0;
     const bool zh = IsZhUi(mouseFx, shellHost);
+    ResetDynamicEffectMenuMap();
 
-    const mousefx::EffectOption* clickOpts = mousefx::ClickMetadata(n);
-    AppendEffectSubMenu(menu, PickLabel(L"\u70b9\u51fb\u7279\u6548", L"Click Effects", zh), mouseFx, mousefx::EffectCategory::Click,
-                        clickOpts, n);
+    std::vector<mousefx::ShellEffectMenuSection> shellEffectSections;
+    if (shellHost) {
+        shellHost->GetEffectMenuSnapshotFromShell(zh, &shellEffectSections);
+    }
 
-    const mousefx::EffectOption* trailOpts = mousefx::TrailMetadata(n);
-    AppendEffectSubMenu(menu, PickLabel(L"\u62d6\u5c3e\u7279\u6548", L"Trail Effects", zh), mouseFx, mousefx::EffectCategory::Trail,
-                        trailOpts, n);
+    if (!shellEffectSections.empty()) {
+        UINT nextDynamicEffectCmd = kDynamicEffectCmdBase;
+        for (const auto& section : shellEffectSections) {
+            AppendEffectSubMenuFromShell(menu, section, &nextDynamicEffectCmd);
+        }
+    } else {
+        const mousefx::EffectOption* clickOpts = mousefx::ClickMetadata(n);
+        AppendEffectSubMenu(menu, PickLabel(L"\u70b9\u51fb\u7279\u6548", L"Click Effects", zh), mouseFx,
+                            mousefx::EffectCategory::Click, clickOpts, n);
 
-    const mousefx::EffectOption* scrollOpts = mousefx::ScrollMetadata(n);
-    AppendEffectSubMenu(menu, PickLabel(L"\u6eda\u8f6e\u7279\u6548", L"Scroll Effects", zh), mouseFx, mousefx::EffectCategory::Scroll,
-                        scrollOpts, n);
+        const mousefx::EffectOption* trailOpts = mousefx::TrailMetadata(n);
+        AppendEffectSubMenu(menu, PickLabel(L"\u62d6\u5c3e\u7279\u6548", L"Trail Effects", zh), mouseFx,
+                            mousefx::EffectCategory::Trail, trailOpts, n);
 
-    const mousefx::EffectOption* holdOpts = mousefx::HoldMetadata(n);
-    AppendEffectSubMenu(menu, PickLabel(L"\u957f\u6309\u7279\u6548", L"Hold Effects", zh), mouseFx, mousefx::EffectCategory::Hold,
-                        holdOpts, n);
+        const mousefx::EffectOption* scrollOpts = mousefx::ScrollMetadata(n);
+        AppendEffectSubMenu(menu, PickLabel(L"\u6eda\u8f6e\u7279\u6548", L"Scroll Effects", zh), mouseFx,
+                            mousefx::EffectCategory::Scroll, scrollOpts, n);
 
-    const mousefx::EffectOption* hoverOpts = mousefx::HoverMetadata(n);
-    AppendEffectSubMenu(menu, PickLabel(L"\u60ac\u505c\u7279\u6548", L"Hover Effects", zh), mouseFx, mousefx::EffectCategory::Hover,
-                        hoverOpts, n);
+        const mousefx::EffectOption* holdOpts = mousefx::HoldMetadata(n);
+        AppendEffectSubMenu(menu, PickLabel(L"\u957f\u6309\u7279\u6548", L"Hold Effects", zh), mouseFx,
+                            mousefx::EffectCategory::Hold, holdOpts, n);
+
+        const mousefx::EffectOption* hoverOpts = mousefx::HoverMetadata(n);
+        AppendEffectSubMenu(menu, PickLabel(L"\u60ac\u505c\u7279\u6548", L"Hover Effects", zh), mouseFx,
+                            mousefx::EffectCategory::Hover, hoverOpts, n);
+    }
 
     AppendThemeSubMenu(menu, mouseFx, shellHost, zh);
 
@@ -407,6 +559,9 @@ void Win32TrayMenuBuilder::BuildTrayMenu(HMENU menu, mousefx::AppController* mou
 }
 
 bool Win32TrayMenuBuilder::TryBuildIpcJson(UINT cmd, std::string* outJson) {
+    if (TryReadDynamicEffectMenuItem(cmd, outJson)) {
+        return true;
+    }
     if (cmd == kCmdTrayReloadConfig) {
         if (outJson) *outJson = "{\"cmd\":\"reload_config\"}";
         return true;
