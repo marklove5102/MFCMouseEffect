@@ -4,6 +4,7 @@ set -euo pipefail
 
 _mfx_http_entry_pid=""
 _mfx_http_fifo_path=""
+_mfx_http_fifo_dir=""
 _mfx_http_fifo_writer_pid=""
 _mfx_http_startup_skip_reason=""
 
@@ -33,9 +34,19 @@ _mfx_http_cleanup_entry_runtime() {
     if [[ -n "$_mfx_http_fifo_path" ]]; then
         rm -f "$_mfx_http_fifo_path"
     fi
+    if [[ -n "$_mfx_http_fifo_dir" ]]; then
+        rm -rf "$_mfx_http_fifo_dir"
+    fi
     _mfx_http_entry_pid=""
     _mfx_http_fifo_path=""
+    _mfx_http_fifo_dir=""
     _mfx_http_fifo_writer_pid=""
+}
+
+_mfx_http_prepare_fifo_runtime() {
+    _mfx_http_fifo_dir="$(mktemp -d "/tmp/mfx-posix-http-fifo.XXXXXX")"
+    _mfx_http_fifo_path="$_mfx_http_fifo_dir/entry.fifo"
+    mkfifo "$_mfx_http_fifo_path"
 }
 
 _mfx_http_start_entry() {
@@ -52,8 +63,7 @@ _mfx_http_start_entry() {
     server_wait_seconds="$(mfx_parse_positive_integer_or_default "${MFX_HTTP_SERVER_WAIT_SECONDS:-1}" "1")"
 
     while (( attempt <= max_attempts )); do
-        _mfx_http_fifo_path="$(mktemp -u "/tmp/mfx-posix-http-fifo.XXXXXX")"
-        mkfifo "$_mfx_http_fifo_path"
+        _mfx_http_prepare_fifo_runtime
 
         tail -f /dev/null >"$_mfx_http_fifo_path" &
         _mfx_http_fifo_writer_pid="$!"

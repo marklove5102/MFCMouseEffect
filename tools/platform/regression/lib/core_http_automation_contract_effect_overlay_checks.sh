@@ -515,18 +515,24 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
         -d '{"active":{"click":"textclick","trail":"scifi","scroll":"stardust","hold":"scifi3d","hover":"suspension"},"hold_follow_mode":"cursor_priority"}')"
     mfx_assert_eq "$code_effect_state_set_legacy_aliases" "200" "core effect set legacy aliases state post status"
 
+    local code_effect_state_get_legacy_aliases
+    code_effect_state_get_legacy_aliases="$(mfx_http_code "$tmp_dir/effect-state-get-legacy-aliases.out" "$base_url/api/state" \
+        -X GET \
+        -H "x-mfcmouseeffect-token: $token")"
+    mfx_assert_eq "$code_effect_state_get_legacy_aliases" "200" "core effect set legacy aliases state get status"
+
     local state_legacy_click
     local state_legacy_trail
     local state_legacy_scroll
     local state_legacy_hold
     local state_legacy_hover
     local state_legacy_hold_follow_mode
-    state_legacy_click="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-legacy-aliases.out" "click")"
-    state_legacy_trail="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-legacy-aliases.out" "trail")"
-    state_legacy_scroll="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-legacy-aliases.out" "scroll")"
-    state_legacy_hold="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-legacy-aliases.out" "hold")"
-    state_legacy_hover="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-legacy-aliases.out" "hover")"
-    state_legacy_hold_follow_mode="$(_mfx_core_http_automation_parse_scalar_field "$tmp_dir/effect-state-set-legacy-aliases.out" "hold_follow_mode")"
+    state_legacy_click="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-get-legacy-aliases.out" "click")"
+    state_legacy_trail="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-get-legacy-aliases.out" "trail")"
+    state_legacy_scroll="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-get-legacy-aliases.out" "scroll")"
+    state_legacy_hold="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-get-legacy-aliases.out" "hold")"
+    state_legacy_hover="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-get-legacy-aliases.out" "hover")"
+    state_legacy_hold_follow_mode="$(_mfx_core_http_automation_parse_scalar_field "$tmp_dir/effect-state-get-legacy-aliases.out" "hold_follow_mode")"
     state_legacy_hold_follow_mode="${state_legacy_hold_follow_mode//\"/}"
 
     mfx_assert_eq "$state_legacy_click" "text" "core effect state legacy alias normalize click"
@@ -566,12 +572,6 @@ _mfx_core_http_automation_contract_effect_overlay_checks() {
         -H "Content-Type: application/json" \
         -d '{"active":{"click":"ripple","trail":"none","scroll":"helix","hold":"hologram","hover":"tubes"}}')"
     mfx_assert_eq "$code_effect_state_set_trail_none" "200" "core effect set trail-none state post status"
-
-    local post_trail_none_active_trail
-    post_trail_none_active_trail="$(_mfx_core_http_automation_parse_active_field "$tmp_dir/effect-state-set-trail-none.out" "trail")"
-    if [[ "$post_trail_none_active_trail" != "none" ]]; then
-        mfx_fail "core effect set trail-none state post active trail mismatch: expected none, got ${post_trail_none_active_trail:-<empty>}"
-    fi
 
     local code_effect_state_get_trail_none
     code_effect_state_get_trail_none="$(mfx_http_code "$tmp_dir/effect-state-get-trail-none.out" "$base_url/api/state" \

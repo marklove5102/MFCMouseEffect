@@ -41,9 +41,19 @@ _mfx_core_http_cleanup_startup_runtime() {
     if [[ -n "${_mfx_core_http_fifo_path:-}" ]]; then
         rm -f "$_mfx_core_http_fifo_path"
     fi
+    if [[ -n "${_mfx_core_http_fifo_dir:-}" ]]; then
+        rm -rf "$_mfx_core_http_fifo_dir"
+    fi
     _mfx_core_http_entry_pid=""
     _mfx_core_http_fifo_path=""
+    _mfx_core_http_fifo_dir=""
     _mfx_core_http_fifo_writer_pid=""
+}
+
+_mfx_core_http_prepare_fifo_runtime() {
+    _mfx_core_http_fifo_dir="$(mktemp -d "/tmp/mfx-posix-core-http-fifo.XXXXXX")"
+    _mfx_core_http_fifo_path="$_mfx_core_http_fifo_dir/entry.fifo"
+    mkfifo "$_mfx_core_http_fifo_path"
 }
 
 _mfx_core_http_try_stop_entry_via_http() {
@@ -122,8 +132,7 @@ _mfx_core_http_start_entry() {
     local start_wait_seconds
     start_wait_seconds="$(mfx_parse_positive_integer_or_default "${MFX_CORE_HTTP_START_WAIT_SECONDS:-1}" "1")"
     while (( attempt <= max_attempts )); do
-        _mfx_core_http_fifo_path="$(mktemp -u "/tmp/mfx-posix-core-http-fifo.XXXXXX")"
-        mkfifo "$_mfx_core_http_fifo_path"
+        _mfx_core_http_prepare_fifo_runtime
 
         tail -f /dev/null >"$_mfx_core_http_fifo_path" &
         _mfx_core_http_fifo_writer_pid="$!"
@@ -273,6 +282,9 @@ _mfx_core_http_stop_entry() {
     if [[ -n "$_mfx_core_http_fifo_path" ]]; then
         rm -f "$_mfx_core_http_fifo_path"
     fi
+    if [[ -n "${_mfx_core_http_fifo_dir:-}" ]]; then
+        rm -rf "$_mfx_core_http_fifo_dir"
+    fi
     if [[ -n "$_mfx_core_http_probe_file" ]]; then
         rm -f "$_mfx_core_http_probe_file" "${_mfx_core_http_probe_file}.tmp" || true
     fi
@@ -294,6 +306,7 @@ _mfx_core_http_stop_entry() {
 
     _mfx_core_http_entry_pid=""
     _mfx_core_http_fifo_path=""
+    _mfx_core_http_fifo_dir=""
     _mfx_core_http_fifo_writer_pid=""
     _mfx_core_http_probe_file=""
     _mfx_core_http_launch_probe_file=""

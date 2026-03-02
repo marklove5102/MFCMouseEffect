@@ -4,14 +4,20 @@ set -euo pipefail
 
 _mfx_core_smoke_entry_pid=""
 _mfx_core_smoke_fifo_path=""
+_mfx_core_smoke_fifo_dir=""
 _mfx_core_smoke_fifo_writer_pid=""
+
+_mfx_core_smoke_prepare_fifo_runtime() {
+    _mfx_core_smoke_fifo_dir="$(mktemp -d "/tmp/mfx-posix-core-smoke-fifo.XXXXXX")"
+    _mfx_core_smoke_fifo_path="$_mfx_core_smoke_fifo_dir/entry.fifo"
+    mkfifo "$_mfx_core_smoke_fifo_path"
+}
 
 _mfx_core_smoke_start_entry() {
     local entry_bin="$1"
     local log_file="$2"
 
-    _mfx_core_smoke_fifo_path="$(mktemp -u "/tmp/mfx-posix-core-smoke-fifo.XXXXXX")"
-    mkfifo "$_mfx_core_smoke_fifo_path"
+    _mfx_core_smoke_prepare_fifo_runtime
 
     tail -f /dev/null >"$_mfx_core_smoke_fifo_path" &
     _mfx_core_smoke_fifo_writer_pid="$!"
@@ -62,8 +68,12 @@ _mfx_core_smoke_stop_entry() {
     if [[ -n "$_mfx_core_smoke_fifo_path" ]]; then
         rm -f "$_mfx_core_smoke_fifo_path"
     fi
+    if [[ -n "$_mfx_core_smoke_fifo_dir" ]]; then
+        rm -rf "$_mfx_core_smoke_fifo_dir"
+    fi
 
     _mfx_core_smoke_entry_pid=""
     _mfx_core_smoke_fifo_path=""
+    _mfx_core_smoke_fifo_dir=""
     _mfx_core_smoke_fifo_writer_pid=""
 }
