@@ -1,0 +1,264 @@
+#pragma once
+
+#include <cstddef>
+#include <iterator>
+#include <string>
+#include <vector>
+#include "MouseFx/Effects/HoldRouteCatalog.h"
+#include "MouseFx/Interfaces/EffectCommands.h"
+#include "MouseFx/Interfaces/EffectMetadata.h"
+
+struct SettingOption {
+    const wchar_t* display;
+    const char* value;
+};
+
+struct SettingsText {
+    const wchar_t* title;
+    const wchar_t* subtitle;
+
+    const wchar_t* sectionGeneral;
+    const wchar_t* sectionEffects;
+
+    const wchar_t* labelLanguage;
+    const wchar_t* labelTheme;
+
+    const wchar_t* labelClick;
+    const wchar_t* labelTrail;
+    const wchar_t* labelScroll;
+    const wchar_t* labelHold;
+    const wchar_t* labelHover;
+    const wchar_t* labelTextsEntry;
+
+    const wchar_t* btnClose;
+    const wchar_t* btnApply;
+    const wchar_t* btnReset;
+    const wchar_t* btnStar;
+    const wchar_t* btnTrailTuning;
+};
+
+inline const SettingsText& TextZh() {
+    static const SettingsText t{
+        L"MFCMouseEffect \u8BBE\u7F6E",
+        L"\u8F7B\u91CF\u914D\u7F6E\u7A97\u53E3\uFF0C\u4EC5\u975E background \u6A21\u5F0F\u53EF\u7528",
+        L"\u4E00\u822C",
+        L"\u7279\u6548",
+        L"\u8BED\u8A00",
+        L"\u4E3B\u9898",
+        L"\u70B9\u51FB",
+        L"\u62D6\u5C3E",
+        L"\u6EDA\u8F6E",
+        L"\u957F\u6309",
+        L"\u60AC\u505C",
+        L"\u6587\u5B57\u5185\u5BB9",
+        L"\u5173\u95ED",
+        L"\u5E94\u7528",
+        L"\u6062\u590D\u9ED8\u8BA4",
+        L"\u2605 Star \u9879\u76EE",
+        L"\u9AD8\u7EA7\u8C03\u53C2...",
+    };
+    return t;
+}
+
+inline const SettingsText& TextEn() {
+    static const SettingsText t{
+        L"MFCMouseEffect Settings",
+        L"Lightweight UI (non-background mode only)",
+        L"General",
+        L"Effects",
+        L"Language",
+        L"Theme",
+        L"Click",
+        L"Trail",
+        L"Scroll",
+        L"Hold",
+        L"Hover",
+        L"Text Content",
+        L"Close",
+        L"Apply",
+        L"Reset",
+        L"\u2605 Star Repo",
+        L"Tuning...",
+    };
+    return t;
+}
+
+inline const SettingOption* LangOptions(size_t& n) {
+    static const SettingOption opts[] = {
+        {L"\u4E2D\u6587", "zh-CN"},
+        {L"English", "en-US"},
+    };
+    n = std::size(opts);
+    return opts;
+}
+
+// Master metadata lists to ensure unified sorting
+namespace mousefx {
+
+inline const EffectOption* ClickMetadata(size_t& n) {
+    static const EffectOption opts[] = {
+        {"ripple", kCmdClickRipple, L"\u6C34\u6CE2\u7EB9", L"Ripple"},
+        {"star",   kCmdClickStar,   L"\u661F\u661F",      L"Star"},
+        {"text",   kCmdClickText,   L"\u98D8\u6D6E\u6587\u5B57", L"Text"},
+        {"none",   kCmdClickNone,   L"\u65E0",            L"None"},
+    };
+    n = std::size(opts);
+    return opts;
+}
+
+inline const EffectOption* TrailMetadata(size_t& n) {
+    static const EffectOption opts[] = {
+        {"meteor",   kCmdTrailMeteor,   L"\u7D62\u4E3D\u6D41\u661F", L"Meteor Shower"},
+        {"streamer", kCmdTrailStreamer, L"\u9713\u8679\u6D41\u5149", L"Neon Streamer"},
+        {"electric", kCmdTrailElectric, L"\u8D5B\u535A\u7535\u5F27", L"Cyber Electric"},
+        {"tubes",    kCmdTrailTubes,    L"\u79D1\u5E7B\u7BA1\u9053", L"Sci-Fi Tubes"},
+        {"particle", kCmdTrailParticle, L"\u5F69\u8679\u7C92\u5B50", L"Particle"},
+        {"line",     kCmdTrailLine,     L"\u666E\u901A\u7EBF\u6761", L"Line"},
+        {"none",     kCmdTrailNone,     L"\u65E0",            L"None"},
+    };
+    n = std::size(opts);
+    return opts;
+}
+
+inline const EffectOption* ScrollMetadata(size_t& n) {
+    static const EffectOption opts[] = {
+        {"arrow", kCmdScrollArrow, L"\u65B9\u5411\u6307\u793A", L"Arrow"},
+        {"helix", kCmdScrollHelix, L"\u0033\u0044\u53CC\u87BA\u65CB", L"3D Helix"},
+        {"twinkle", kCmdScrollTwinkle, L"\u661F\u5C18\u55B7\u6D41", L"Stardust Stream"},
+        {"none",  kCmdScrollNone,  L"\u65E0",            L"None"},
+    };
+    n = std::size(opts);
+    return opts;
+}
+
+inline const EffectOption* HoldMetadata(size_t& n) {
+    static const EffectOption opts[] = {
+        {"charge",    kCmdHoldCharge,   L"\u84C4\u529B (\u80FD\u91CF\u73AF)", L"Energy Charge"},
+        {"lightning", kCmdHoldLightning,L"\u95EA\u7535 (\u5947\u70B9)",        L"Lightning"},
+        {"hex",       kCmdHoldHex,      L"\u516D\u8FB9\u5F62 (\u62A4\u76FE)", L"Hex Shield"},
+        {"tech_ring", kCmdHoldTechRing, L"\u79D1\u6280\u5708 (3D)",        L"Tech Ring (3D)"},
+        {"hologram",  kCmdHoldHologram, L"\u516E\u606F\u6295\u5F71 (3D)", L"Hologram (3D)", "scifi3d"},
+        {"hold_neon3d", kCmdHoldNeon3D, L"\u9713\u8679 HUD (3D)",        L"Neon HUD (3D)", "neon3d"},
+        {mousefx::hold_route::kTypeQuantumHaloGpuV2, kCmdHoldQuantumHaloGpuV2, L"\u91CF\u5B50\u5149\u73AF GPU", L"Quantum Halo GPU"},
+        {mousefx::hold_route::kTypeFluxFieldGpuV2, kCmdHoldFluxFieldGpuV2, L"\u78C1\u901A\u573A HUD GPU", L"FluxField HUD GPU"},
+        {"none",      kCmdHoldNone,     L"\u65E0",                    L"None"},
+    };
+    n = std::size(opts);
+    return opts;
+}
+
+inline const EffectOption* HoverMetadata(size_t& n) {
+    static const EffectOption opts[] = {
+        {"glow",  kCmdHoverGlow,  L"\u547C\u5438\u706F", L"Glow"},
+        {"tubes", kCmdHoverTubes, L"\u87ba\u65cb\u60ac\u6d6e", L"Helix Suspension", "suspension"},
+        {"none",  kCmdHoverNone,  L"\u65E0",            L"None"},
+    };
+    n = std::size(opts);
+    return opts;
+}
+
+} // namespace mousefx
+
+// Converter helpers for SettingsWindow compatibility
+inline const SettingOption* ThemeOptions(bool zh, size_t& n) {
+    static const SettingOption zhOpts[] = {
+        {L"\u70ab\u5f69", "chromatic"},
+        {L"\u9713\u8679", "neon"},
+        {L"\u79D1\u5E7B", "scifi"},
+        {L"\u6781\u7B80", "minimal"},
+        {L"\u6E38\u620F\u611F", "game"},
+    };
+    static const SettingOption enOpts[] = {
+        {L"Chromatic", "chromatic"},
+        {L"Neon", "neon"},
+        {L"Sci-Fi", "scifi"},
+        {L"Minimal", "minimal"},
+        {L"Game", "game"},
+    };
+    if (zh) { n = std::size(zhOpts); return zhOpts; }
+    n = std::size(enOpts); return enOpts;
+}
+
+inline const SettingOption* ClickOptions(bool zh, size_t& n) {
+    static std::vector<SettingOption> zhCache, enCache;
+    if (zhCache.empty()) {
+        size_t count = 0;
+        const auto* meta = mousefx::ClickMetadata(count);
+        for (size_t i = 0; i < count; ++i) {
+            zhCache.push_back({meta[i].displayZh, meta[i].value});
+            enCache.push_back({meta[i].displayEn, meta[i].value});
+        }
+    }
+    n = zhCache.size();
+    return zh ? zhCache.data() : enCache.data();
+}
+
+inline const SettingOption* TrailOptions(bool zh, size_t& n) {
+    static std::vector<SettingOption> zhCache, enCache;
+    if (zhCache.empty()) {
+        size_t count = 0;
+        const auto* meta = mousefx::TrailMetadata(count);
+        for (size_t i = 0; i < count; ++i) {
+            zhCache.push_back({meta[i].displayZh, meta[i].value});
+            enCache.push_back({meta[i].displayEn, meta[i].value});
+        }
+    }
+    n = zhCache.size();
+    return zh ? zhCache.data() : enCache.data();
+}
+
+inline const SettingOption* ScrollOptions(bool zh, size_t& n) {
+    static std::vector<SettingOption> zhCache, enCache;
+    if (zhCache.empty()) {
+        size_t count = 0;
+        const auto* meta = mousefx::ScrollMetadata(count);
+        for (size_t i = 0; i < count; ++i) {
+            zhCache.push_back({meta[i].displayZh, meta[i].value});
+            enCache.push_back({meta[i].displayEn, meta[i].value});
+        }
+    }
+    n = zhCache.size();
+    return zh ? zhCache.data() : enCache.data();
+}
+
+inline const SettingOption* HoldOptions(bool zh, size_t& n) {
+    static std::vector<SettingOption> zhCache, enCache;
+    if (zhCache.empty()) {
+        size_t count = 0;
+        const auto* meta = mousefx::HoldMetadata(count);
+        for (size_t i = 0; i < count; ++i) {
+            zhCache.push_back({meta[i].displayZh, meta[i].value});
+            enCache.push_back({meta[i].displayEn, meta[i].value});
+        }
+    }
+    n = zhCache.size();
+    return zh ? zhCache.data() : enCache.data();
+}
+
+inline const SettingOption* HoverOptions(bool zh, size_t& n) {
+    static std::vector<SettingOption> zhCache, enCache;
+    if (zhCache.empty()) {
+        size_t count = 0;
+        const auto* meta = mousefx::HoverMetadata(count);
+        for (size_t i = 0; i < count; ++i) {
+            zhCache.push_back({meta[i].displayZh, meta[i].value});
+            enCache.push_back({meta[i].displayEn, meta[i].value});
+        }
+    }
+    n = zhCache.size();
+    return zh ? zhCache.data() : enCache.data();
+}
+
+inline const wchar_t* DisplayForValue(const SettingOption* opts, size_t n, const std::string& value) {
+    for (size_t i = 0; i < n; ++i) {
+        if (value == opts[i].value) return opts[i].display;
+    }
+    return (n > 0) ? opts[0].display : L"";
+}
+
+inline std::string ValueForDisplay(const SettingOption* opts, size_t n, const wchar_t* display) {
+    for (size_t i = 0; i < n; ++i) {
+        if (wcscmp(display, opts[i].display) == 0) return opts[i].value;
+    }
+    return (n > 0) ? std::string(opts[0].value) : std::string();
+}

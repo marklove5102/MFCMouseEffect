@@ -1,0 +1,83 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base-vs2026",
+      "displayName": "Base VS2026",
+      "hidden": true,
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/../cmake_build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "17",
+        "MFX_PACKAGE_PLATFORM": "auto"
+      }
+    },
+    {
+      "name": "host-auto-vs2026",
+      "displayName": "Host Auto (VS2026)",
+      "inherits": "base-vs2026",
+      "cacheVariables": {
+        "MFX_PACKAGE_PLATFORM": "auto"
+      }
+    },
+    {
+      "name": "windows-shell-vs2026",
+      "displayName": "Windows Shell Package (VS2026)",
+      "inherits": "base-vs2026",
+      "cacheVariables": {
+        "MFX_PACKAGE_PLATFORM": "windows"
+      }
+    },
+    {
+      "name": "macos-shell-vs2026",
+      "displayName": "macOS Shell Package (cross enabled)",
+      "inherits": "base-vs2026",
+      "cacheVariables": {
+        "MFX_PACKAGE_PLATFORM": "macos",
+        "MFX_ENABLE_CROSS_HOST_PACKAGES": "ON"
+      }
+    },
+    {
+      "name": "linux-shell-vs2026",
+      "displayName": "Linux Shell Package (cross enabled)",
+      "inherits": "base-vs2026",
+      "cacheVariables": {
+        "MFX_PACKAGE_PLATFORM": "linux",
+        "MFX_ENABLE_CROSS_HOST_PACKAGES": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-host-auto-release",
+      "displayName": "Build Host Auto Release",
+      "configurePreset": "host-auto-vs2026",
+      "configuration": "Release"
+    },
+    {
+      "name": "build-windows-shell-release",
+      "displayName": "Build Windows Shell Release",
+      "configurePreset": "windows-shell-vs2026",
+      "configuration": "Release",
+      "targets": [
+        "mfx_shell_windows"
+      ]
+    },
+    {
+      "name": "build-windows-entry-release",
+      "displayName": "Build Windows Entry Runtime Release",
+      "configurePreset": "windows-shell-vs2026",
+      "configuration": "Release",
+      "targets": [
+        "mfx_entry_windows",
+        "mfx_entry_runtime_common"
+      ]
+    }
+  ]
+}

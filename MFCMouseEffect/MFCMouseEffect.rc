@@ -1,0 +1,7 @@
+// Minimal Win32 resources for tray shell.
+#include "resource.h"
+#include <winres.h>
+
+LANGUAGE 0x04, 0x02
+
+IDR_MAINFRAME ICON "res\\MFCMouseEffect.ico"

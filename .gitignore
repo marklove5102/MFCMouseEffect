@@ -1,0 +1,61 @@
+# Build outputs
+/x64/
+/Win32/
+/Debug/
+/Release/
+*/x64/
+*/Win32/
+*/Debug/
+*/Release/
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+ipch/
+
+# Intermediate/obj
+*.obj
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.log
+*.tlog
+*.lastcodeanalysissucceeded
+*.cachefile
+*.opendb
+*.VC.db
+
+# Other
+*.aps
+*.ncb
+*.log?
+*.tmp
+*.bak
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Installer outputs (Inno Setup)
+Install/Output/
+
+# Common frontend artifacts
+node_modules/
+dist/
+out/
+cmake_stage*/
+cmake-stage*/
+cmake_build/
+
+# WebUI Svelte workspace
+MFCMouseEffect/WebUIWorkspace/node_modules/
+MFCMouseEffect/WebUIWorkspace/dist/
+MFCMouseEffect/WebUIWorkspace/_bootstrap_cache/
+
+# WebUI generated bundles (copied from WebUIWorkspace/dist)
+MFCMouseEffect/WebUI/*.svelte.js

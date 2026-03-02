@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <ProjectGuid>{58E124AB-0DA0-9EF7-0B0B-7F826CE29FFD}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>MFCMouseEffect</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)..\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)..\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist "$(OutDir)webui" rmdir /S /Q "$(OutDir)webui"
+if exist "$(ProjectDir)WebUI" xcopy /E /Y /I "$(ProjectDir)WebUI" "$(OutDir)webui\\"
+if exist "$(ProjectDir)Runtime\Dawn\webgpu_dawn.dll" copy /Y "$(ProjectDir)Runtime\Dawn\webgpu_dawn.dll" "$(OutDir)webgpu_dawn.dll"
+if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" "$(OutDir)d3dcompiler_47.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist "$(OutDir)webui" rmdir /S /Q "$(OutDir)webui"
+if exist "$(ProjectDir)WebUI" xcopy /E /Y /I "$(ProjectDir)WebUI" "$(OutDir)webui\\"
+if exist "$(ProjectDir)Runtime\Dawn\webgpu_dawn.dll" copy /Y "$(ProjectDir)Runtime\Dawn\webgpu_dawn.dll" "$(OutDir)webgpu_dawn.dll"
+if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" "$(OutDir)d3dcompiler_47.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="MFCMouseEffect.h" />
+    <ClInclude Include="Platform\windows\Common\Win32Base.h" />
+    <ClInclude Include="MouseFx\Core\Control\IDispatchMessageHandler.h" />
+    <ClInclude Include="MouseFx\Core\Control\DispatchMessage.h" />
+    <ClInclude Include="MouseFx\Core\Control\IDispatchMessageCodec.h" />
+    <ClInclude Include="MouseFx\Core\Control\IDispatchMessageHost.h" />
+    <ClInclude Include="MouseFx\Core\Control\NullDispatchMessageCodec.h" />
+    <ClInclude Include="MouseFx\Core\Control\NullDispatchMessageHost.h" />
+    <ClInclude Include="MouseFx\Core\Control\AppController.h" />
+    <ClInclude Include="MouseFx\Core\Control\AutomationDispatchFeature.h" />
+    <ClInclude Include="MouseFx\Core\Control\InputIndicatorDispatchFeature.h" />
+    <ClInclude Include="MouseFx\Core\Control\WasmDispatchFeature.h" />
+    <ClInclude Include="MouseFx\Core\Automation\InputAutomationEngine.h" />
+    <ClInclude Include="MouseFx\Core\Automation\KeyChord.h" />
+    <ClInclude Include="MouseFx\Core\Automation\ShortcutCaptureSession.h" />
+    <ClInclude Include="MouseFx\Compute\EffectComputeExecutor.h" />
+    <ClInclude Include="MouseFx\Core\Config\ConfigPathResolver.h" />
+    <ClInclude Include="MouseFx\Core\Control\EffectFactory.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\OverlayCoordSpace.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\IOverlayCoordSpaceService.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\NullOverlayCoordSpaceService.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\IOverlayHostBackend.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\OverlayHostService.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\IInputIndicatorOverlay.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\NullInputIndicatorOverlay.h" />
+    <ClInclude Include="MouseFx\Core\Shell\IAppShellHost.h" />
+    <ClInclude Include="MouseFx\Core\Shell\AppShellCore.h" />
+    <ClInclude Include="MouseFx\Core\Shell\ITrayService.h" />
+    <ClInclude Include="MouseFx\Core\Shell\IEventLoopService.h" />
+    <ClInclude Include="MouseFx\Core\Shell\ISettingsLauncher.h" />
+    <ClInclude Include="MouseFx\Core\Shell\IUserNotificationService.h" />
+    <ClInclude Include="MouseFx\Core\Shell\ISingleInstanceGuard.h" />
+    <ClInclude Include="MouseFx\Core\Shell\IDpiAwarenessService.h" />
+    <ClInclude Include="MouseFx\Core\Shell\ShellPlatformServices.h" />
+    <ClInclude Include="MouseFx\Core\Shell\AppShellStartOptions.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32AppShell.h" />
+    <ClInclude Include="Platform\PlatformOverlayCoordSpaceFactory.h" />
+    <ClInclude Include="Platform\PlatformControlMessageCodecFactory.h" />
+    <ClInclude Include="Platform\PlatformControlServicesFactory.h" />
+    <ClInclude Include="Platform\PlatformInputServicesFactory.h" />
+    <ClInclude Include="Platform\PlatformOverlayServicesFactory.h" />
+    <ClInclude Include="Platform\PlatformRuntimeEnvironment.h" />
+    <ClInclude Include="Platform\PlatformEffectFallbackFactory.h" />
+    <ClInclude Include="Platform\PlatformHoldRuntimeFactory.h" />
+    <ClInclude Include="Platform\PlatformSystemServicesFactory.h" />
+    <ClInclude Include="Platform\PlatformShellServicesFactory.h" />
+    <ClInclude Include="Platform\IPlatformAppShell.h" />
+    <ClInclude Include="Platform\PlatformAppShellFactory.h" />
+    <ClInclude Include="Platform\PlatformEntryArgs.h" />
+    <ClInclude Include="Platform\PlatformEntryRunner.h" />
+    <ClInclude Include="Platform\PlatformTarget.h" />
+    <ClInclude Include="Platform\PlatformStartupOptionsFactory.h" />
+    <ClInclude Include="Platform\PlatformWasmRuntimeFactory.h" />
+    <ClInclude Include="Platform\PlatformTextEncoding.h" />
+    <ClInclude Include="Platform\PlatformBinaryResourceLoader.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32DpiAwarenessService.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32EventLoopService.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32SettingsLauncher.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32SingleInstanceGuard.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32TrayService.h" />
+    <ClInclude Include="Platform\windows\Shell\Win32UserNotificationService.h" />
+    <ClInclude Include="Platform\windows\Control\Win32DispatchMessageCodec.h" />
+    <ClInclude Include="Platform\windows\Control\Win32DispatchMessageHost.h" />
+    <ClInclude Include="Platform\windows\Effects\Win32TextEffectFallback.h" />
+    <ClInclude Include="Platform\windows\Effects\Win32TrailEffectFallback.h" />
+    <ClInclude Include="Platform\windows\Effects\Win32ParticleTrailEffectFallback.h" />
+    <ClInclude Include="Platform\windows\Effects\Win32HoldQuantumHaloGpuV2DirectRuntime.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\QuantumHaloGpuV2Presenter.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\QuantumHaloGpuV2ShaderPipeline.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\QuantumHaloGpuV2ComputeEngine.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\FluxFieldGpuV2ComputeEngine.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\FluxFieldHudGpuV2D2DBackend.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\HoldQuantumHaloGpuV2D2DBackend.h" />
+    <ClInclude Include="MouseFx\Renderers\Indicator\IndicatorRenderer.h" />
+    <ClInclude Include="MouseFx\Core\System\GdiPlusSession.h" />
+    <ClInclude Include="MouseFx\Core\System\CursorPositionProvider.h" />
+    <ClInclude Include="MouseFx\Core\System\ICursorPositionService.h" />
+    <ClInclude Include="MouseFx\Core\System\IMonotonicClockService.h" />
+    <ClInclude Include="MouseFx\Core\System\IForegroundProcessService.h" />
+    <ClInclude Include="MouseFx\Core\System\IForegroundSuppressionService.h" />
+    <ClInclude Include="MouseFx\Core\System\IGlobalMouseHook.h" />
+    <ClInclude Include="MouseFx\Core\System\IKeyboardInjector.h" />
+    <ClInclude Include="MouseFx\Core\System\NullCursorPositionService.h" />
+    <ClInclude Include="MouseFx\Core\System\NullForegroundProcessService.h" />
+    <ClInclude Include="MouseFx\Core\System\NullForegroundSuppressionService.h" />
+    <ClInclude Include="MouseFx\Core\System\NullGlobalMouseHook.h" />
+    <ClInclude Include="MouseFx\Core\System\NullKeyboardInjector.h" />
+    <ClInclude Include="MouseFx\Core\System\StdMonotonicClockService.h" />
+    <ClInclude Include="Platform\PlatformApplicationCatalog.h" />
+    <ClInclude Include="Platform\PlatformNativeFolderPicker.h" />
+    <ClInclude Include="Platform\PlatformDisplayTopology.h" />
+    <ClInclude Include="MouseFx\Effects\IconEffect.h" />
+    <ClInclude Include="MouseFx\Interfaces\IMouseEffect.h" />
+    <ClInclude Include="MouseFx\Interfaces\IOverlayLayer.h" />
+    <ClInclude Include="MouseFx\Interfaces\ITextEffectFallback.h" />
+    <ClInclude Include="MouseFx\Interfaces\ITrailEffectFallback.h" />
+    <ClInclude Include="MouseFx\Interfaces\IParticleTrailEffectFallback.h" />
+    <ClInclude Include="MouseFx\Interfaces\NullTextEffectFallback.h" />
+    <ClInclude Include="MouseFx\Interfaces\NullTrailEffectFallback.h" />
+    <ClInclude Include="MouseFx\Interfaces\NullParticleTrailEffectFallback.h" />
+    <ClInclude Include="MouseFx\Layers\ParticleTrailOverlayLayer.h" />
+    <ClInclude Include="MouseFx\Layers\RippleOverlayLayer.h" />
+    <ClInclude Include="MouseFx\Layers\TextOverlayLayer.h" />
+    <ClInclude Include="MouseFx\Layers\TrailOverlayLayer.h" />
+    <ClInclude Include="MouseFx\Core\Control\IpcController.h" />
+    <ClInclude Include="MouseFx\Core\Protocol\JsonLite.h" />
+    <ClInclude Include="MouseFx\Core\Protocol\VirtualKeyCodes.h" />
+    <ClInclude Include="MouseFx\Core\Json\JsonFacade.h" />
+    <ClInclude Include="MouseFx\Core\Protocol\MouseFxMessages.h" />
+    <ClInclude Include="MouseFx\Server\HttpServer.h" />
+    <ClInclude Include="MouseFx\Server\WebUiAssets.h" />
+    <ClInclude Include="MouseFx\Server\WebSettingsServer.h" />
+    <ClInclude Include="MouseFx\Effects\RippleEffect.h" />
+    <ClInclude Include="MouseFx\Styles\RippleStyle.h" />
+    <ClInclude Include="MouseFx\Styles\ThemeStyle.h" />
+    <ClInclude Include="MouseFx\Effects\TextEffect.h" />
+    <ClInclude Include="Platform\windows\Effects\TextWindow.h" />
+    <ClInclude Include="Platform\windows\Effects\TextWindowPool.h" />
+    <ClInclude Include="MouseFx\Effects\TrailEffect.h" />
+    <ClInclude Include="Platform\windows\Effects\TrailWindow.h" />
+    <ClInclude Include="MouseFx\Effects\ParticleTrailEffect.h" />
+    <ClInclude Include="Platform\windows\Effects\ParticleTrailWindow.h" />
+    <ClInclude Include="Platform\windows\Overlay\Win32OverlayHostWindow.h" />
+    <ClInclude Include="MouseFx\Effects\ScrollEffect.h" />
+    <ClInclude Include="MouseFx\Effects\HoldEffect.h" />
+    <ClInclude Include="MouseFx\Effects\HoverEffect.h" />
+    <ClInclude Include="MouseFx\Effects\HoldRouteCatalog.h" />
+    <ClInclude Include="MouseFx\Renderers\Hold\Presentation\IQuantumHaloPresenterBackend.h" />
+    <ClInclude Include="MouseFx\Renderers\Hold\Presentation\QuantumHaloPresenterBackendRegistry.h" />
+    <ClInclude Include="MouseFx\Renderers\Hold\Presentation\QuantumHaloPresenterHost.h" />
+    <ClInclude Include="MouseFx\Renderers\Hold\Presentation\QuantumHaloPresenterSelection.h" />
+    <ClInclude Include="Platform\windows\Renderers\Hold\Presentation\QuantumHaloDCompPresenterBackend.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfig.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigInternal.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Root.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Active.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Input.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Automation.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Wasm.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Trail.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonKeys.Effects.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonCodecEffectsColorHelpers.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonCodecParseInternal.h" />
+    <ClInclude Include="MouseFx\\Core\\Config\\EffectConfigJsonCodecSerializeInternal.h" />
+    <ClInclude Include="Platform\windows\Graphics\Win32D2DFactory.h" />
+    <ClInclude Include="MouseFx\Core\Input\GestureRecognizer.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmPluginAbi.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmBinaryCodec.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmCommandBufferParser.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmExecutionBudgetGuard.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmRuntime.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmPluginManifest.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmPluginPaths.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmPluginCatalog.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmPluginTransferService.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmPluginImageAssetCatalog.h" />
+    <ClInclude Include="Platform\windows\Wasm\Win32DllWasmRuntime.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\NullWasmRuntime.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmRuntimeFactory.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmEffectHost.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmEventInvokeExecutor.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmCommandExecutionResult.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmCommandRenderer.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmClickCommandExecutor.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmRenderResourceResolver.h" />
+    <ClInclude Include="MouseFx\Core\Wasm\WasmImageFileRenderer.h" />
+    <ClInclude Include="Settings\SettingsOptions.h" />
+    <ClInclude Include="Settings\EmojiUtils.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Platform\windows\Shell\Tray\Win32TrayMenuBuilder.h" />
+    <ClInclude Include="Platform\windows\Shell\Tray\Win32TrayMenuCommands.h" />
+    <ClInclude Include="Platform\windows\Shell\Tray\Win32TrayHostWindow.h" />
+    <ClInclude Include="Platform\windows\Overlay\Win32OverlayCoordSpaceService.h" />
+    <ClInclude Include="Platform\windows\Overlay\Win32OverlayHostBackend.h" />
+    <ClInclude Include="Platform\windows\Overlay\Win32InputIndicatorOverlay.h" />
+    <ClInclude Include="Platform\windows\System\Win32GlobalMouseHook.h" />
+    <ClInclude Include="Platform\windows\System\Win32KeyboardInjector.h" />
+    <ClInclude Include="Platform\windows\System\Win32CursorPositionService.h" />
+    <ClInclude Include="Platform\windows\System\Win32MonotonicClockService.h" />
+    <ClInclude Include="Platform\windows\System\Win32ForegroundProcessService.h" />
+    <ClInclude Include="Platform\windows\System\Win32VmForegroundSuppressionService.h" />
+    <ClInclude Include="Platform\windows\System\Win32ApplicationCatalogScanner.h" />
+    <ClInclude Include="Platform\windows\System\Win32NativeFolderPicker.h" />
+    <ClInclude Include="Platform\windows\System\Win32DisplayTopology.h" />
+    <ClInclude Include="Platform\windows\System\Win32TextEncoding.h" />
+    <ClInclude Include="Platform\windows\System\Win32BinaryResourceLoader.h" />
+    <ClInclude Include="Platform\windows\System\Win32RuntimeEnvironment.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MFCMouseEffect.cpp" />
+    <ClCompile Include="Platform\windows\Control\Win32DispatchMessageCodec.cpp" />
+    <ClCompile Include="Platform\windows\Control\Win32DispatchMessageHost.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\AppController.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\AppController.Wasm.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\AppController.ConfigUpdates.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\AutomationDispatchFeature.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\InputIndicatorDispatchFeature.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\WasmDispatchFeature.cpp" />
+    <ClCompile Include="MouseFx\Core\Automation\InputAutomationEngine.cpp" />
+    <ClCompile Include="MouseFx\Core\Automation\KeyChord.cpp" />
+    <ClCompile Include="MouseFx\Core\Automation\ShortcutCaptureSession.cpp" />
+    <ClCompile Include="MouseFx\Core\Config\ConfigPathResolver.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\EffectFactory.cpp" />
+    <ClCompile Include="MouseFx\Core\Overlay\OverlayCoordSpace.cpp" />
+    <ClCompile Include="MouseFx\Core\Overlay\OverlayHostService.cpp" />
+    <ClCompile Include="MouseFx\Core\System\GdiPlusSession.cpp" />
+    <ClCompile Include="MouseFx\Core\System\CursorPositionProvider.cpp" />
+    <ClCompile Include="Platform\PlatformApplicationCatalog.cpp" />
+    <ClCompile Include="Platform\PlatformNativeFolderPicker.cpp" />
+    <ClCompile Include="Platform\PlatformDisplayTopology.cpp" />
+    <ClCompile Include="MouseFx\Effects\IconEffect.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\IpcController.cpp" />
+    <ClCompile Include="MouseFx\Core\Shell\AppShellCore.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32AppShell.cpp" />
+    <ClCompile Include="Platform\PlatformOverlayCoordSpaceFactory.cpp" />
+    <ClCompile Include="Platform\PlatformControlMessageCodecFactory.cpp" />
+    <ClCompile Include="Platform\PlatformControlServicesFactory.cpp" />
+    <ClCompile Include="Platform\PlatformInputServicesFactory.cpp" />
+    <ClCompile Include="Platform\PlatformOverlayServicesFactory.cpp" />
+    <ClCompile Include="Platform\PlatformRuntimeEnvironment.cpp" />
+    <ClCompile Include="Platform\PlatformEffectFallbackFactory.cpp" />
+    <ClCompile Include="Platform\PlatformHoldRuntimeFactory.cpp" />
+    <ClCompile Include="Platform\PlatformSystemServicesFactory.cpp" />
+    <ClCompile Include="Platform\PlatformShellServicesFactory.cpp" />
+    <ClCompile Include="Platform\PlatformAppShellFactory.cpp" />
+    <ClCompile Include="Platform\PlatformEntryRunner.cpp" />
+    <ClCompile Include="Platform\PlatformStartupOptionsFactory.cpp" />
+    <ClCompile Include="Platform\PlatformWasmRuntimeFactory.cpp" />
+    <ClCompile Include="Platform\PlatformTextEncoding.cpp" />
+    <ClCompile Include="Platform\PlatformBinaryResourceLoader.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32DpiAwarenessService.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32EventLoopService.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32SettingsLauncher.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32SingleInstanceGuard.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32TrayService.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Win32UserNotificationService.cpp" />
+    <ClCompile Include="Platform\windows\Overlay\Win32OverlayCoordSpaceService.cpp" />
+    <ClCompile Include="Platform\windows\Overlay\Win32OverlayHostWindow.cpp" />
+    <ClCompile Include="Platform\windows\Overlay\Win32OverlayHostBackend.cpp" />
+    <ClCompile Include="Platform\windows\Overlay\Win32InputIndicatorOverlay.cpp" />
+    <ClCompile Include="Platform\windows\Effects\Win32TextEffectFallback.cpp" />
+    <ClCompile Include="Platform\windows\Effects\Win32TrailEffectFallback.cpp" />
+    <ClCompile Include="Platform\windows\Effects\Win32ParticleTrailEffectFallback.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32GlobalMouseHook.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32KeyboardInjector.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32CursorPositionService.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32MonotonicClockService.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32ForegroundProcessService.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32VmForegroundSuppressionService.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32ApplicationCatalogScanner.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32NativeFolderPicker.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32DisplayTopology.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32TextEncoding.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32BinaryResourceLoader.cpp" />
+    <ClCompile Include="MouseFx\Core\Protocol\JsonLite.cpp" />
+    <ClCompile Include="MouseFx\Effects\RippleEffect.cpp" />
+    <ClCompile Include="MouseFx\Renderers\RendererLinkage.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Hold\HoldRendererLinkage.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\Win32HoldRendererLinkage.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\QuantumHaloGpuV2ShaderPipeline.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\QuantumHaloGpuV2Presenter.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Hold\Presentation\QuantumHaloPresenterBackendRegistry.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Hold\Presentation\QuantumHaloPresenterHost.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Hold\Presentation\QuantumHaloPresenterSelection.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\Presentation\QuantumHaloDCompPresenterBackend.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\QuantumHaloGpuV2ComputeEngine.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\HoldQuantumHaloGpuV2D2DBackend.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\FluxFieldHudGpuV2D2DBackend.cpp" />
+    <ClCompile Include="Platform\windows\Renderers\Hold\FluxFieldGpuV2ComputeEngine.cpp" />
+    <ClCompile Include="MouseFx\Effects\HoldRouteCatalog.cpp" />
+    <ClCompile Include="Platform\windows\Effects\Win32HoldQuantumHaloGpuV2DirectRuntime.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Hold\Neon3D\Neon3DFx.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\CommandHandler.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\CommandHandler.ApplySettings.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32RuntimeEnvironment.cpp" />
+    <ClCompile Include="MouseFx\Core\Control\DispatchRouter.cpp" />
+    <ClCompile Include="MouseFx\Effects\RippleBasedHoldRuntime.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Indicator\IndicatorRenderer.cpp" />
+    <ClCompile Include="MouseFx\Styles\ThemeStyle.cpp" />
+    <ClCompile Include="MouseFx\Effects\TextEffect.cpp" />
+    <ClCompile Include="Platform\windows\Effects\TextWindow.cpp" />
+    <ClCompile Include="Platform\windows\Effects\TextWindowPool.cpp" />
+    <ClCompile Include="MouseFx\Effects\TrailEffect.cpp" />
+    <ClCompile Include="Platform\windows\Effects\TrailWindow.cpp" />
+    <ClCompile Include="MouseFx\Effects\ParticleTrailEffect.cpp" />
+    <ClCompile Include="MouseFx\Layers\ParticleTrailOverlayLayer.cpp" />
+    <ClCompile Include="MouseFx\Layers\RippleOverlayLayer.cpp" />
+    <ClCompile Include="MouseFx\Layers\TextOverlayLayer.cpp" />
+    <ClCompile Include="MouseFx\Layers\TrailOverlayLayer.cpp" />
+    <ClCompile Include="Platform\windows\Effects\ParticleTrailWindow.cpp" />
+    <ClCompile Include="MouseFx\Effects\ScrollEffect.cpp" />
+    <ClCompile Include="MouseFx\Effects\HoldEffect.cpp" />
+    <ClCompile Include="MouseFx\Effects\HoverEffect.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfig.Internal.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodecEffectsColorHelpers.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.Common.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.Input.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.Automation.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.Wasm.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.Trail.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.Effects.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Parse.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Serialize.Input.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Serialize.Automation.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Serialize.Wasm.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Serialize.Trail.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Serialize.Effects.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfigJsonCodec.Serialize.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfig.Load.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfig.Save.cpp" />
+    <ClCompile Include="MouseFx\\Core\\Config\\EffectConfig.cpp" />
+    <ClCompile Include="Platform\windows\Graphics\Win32D2DFactory.cpp" />
+    <ClCompile Include="MouseFx\Core\Input\GestureRecognizer.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmBinaryCodec.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmCommandBufferParser.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmExecutionBudgetGuard.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmPluginManifest.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmPluginPaths.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmPluginCatalog.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmPluginTransferService.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmPluginImageAssetCatalog.cpp" />
+    <ClCompile Include="Platform\windows\Wasm\Win32DllWasmRuntime.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\NullWasmRuntime.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmRuntimeFactory.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmEffectHost.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmEventInvokeExecutor.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmCommandRenderer.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmClickCommandExecutor.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmRenderResourceResolver.cpp" />
+    <ClCompile Include="MouseFx\Core\Wasm\WasmImageFileRenderer.cpp" />
+    <ClCompile Include="MouseFx\Utils\StringUtils.cpp" />
+    <ClCompile Include="MouseFx\Server\HttpServer.cpp" />
+    <ClCompile Include="MouseFx\Server\HttpServer.Protocol.cpp" />
+    <ClCompile Include="MouseFx\Server\WebUiAssets.cpp" />
+    <ClCompile Include="MouseFx\Server\WebSettingsServer.cpp" />
+    <ClCompile Include="MouseFx\Server\WebSettingsServer.Routing.cpp" />
+    <ClCompile Include="MouseFx\Server\WebSettingsServer.TokenMonitor.cpp" />
+    <ClCompile Include="MouseFx\Server\SettingsSchemaBuilder.cpp" />
+    <ClCompile Include="MouseFx\Server\SettingsStateMapper.cpp" />
+    <ClCompile Include="Settings\EmojiUtils.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Shell\Tray\Win32TrayMenuBuilder.cpp" />
+    <ClCompile Include="Platform\windows\Shell\Tray\Win32TrayHostWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MFCMouseEffect.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\classview.bmp" />
+    <Image Include="res\classview_hc.bmp" />
+    <Image Include="res\class_view.ico" />
+    <Image Include="res\class_view_hc.ico" />
+    <Image Include="res\explorer.bmp" />
+    <Image Include="res\explorer_hc.bmp" />
+    <Image Include="res\fileview.bmp" />
+    <Image Include="res\fileview_hc.bmp" />
+    <Image Include="res\file_view.ico" />
+    <Image Include="res\file_view_hc.ico" />
+    <Image Include="res\menuimages.bmp" />
+    <Image Include="res\menuimages_hc.bmp" />
+    <Image Include="res\MFCMouseEffect.ico" />
+    <Image Include="res\MFCMouseEffectDoc.ico" />
+    <Image Include="res\output_wnd.ico" />
+    <Image Include="res\output_wnd_hc.ico" />
+    <Image Include="res\properties.bmp" />
+    <Image Include="res\properties_hc.bmp" />
+    <Image Include="res\properties_wnd.ico" />
+    <Image Include="res\properties_wnd_hc.ico" />
+    <Image Include="res\sort.bmp" />
+    <Image Include="res\sort_hc.bmp" />
+    <Image Include="res\Toolbar.bmp" />
+    <Image Include="res\Toolbar256.bmp" />
+    <Image Include="res\userimages.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\MFCMouseEffect.rc2" />
+    <None Include="WebUI\index.html" />
+    <None Include="WebUI\app.js" />
+    <None Include="WebUI\styles.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="WasmRuntimeBridge\mfx_wasm_runtime.vcxproj">
+      <Project>{3056E52C-9A32-4E9D-9F49-537D2145D1C2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

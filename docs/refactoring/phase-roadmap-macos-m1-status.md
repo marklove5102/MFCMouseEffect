@@ -1,0 +1,164 @@
+# macOS M1/M2 Roadmap Status (Snapshot: 2026-02-24)
+
+## Why this file
+- Keep "plan vs actual" aligned in one short place.
+- Update this snapshot at each phase commit so review cost stays low.
+
+## Status Matrix
+- Phase 50 (dual runtime lane guardrails): completed.
+  - Evidence: scaffold lane still default, core lane gated by `MFX_ENABLE_POSIX_CORE_RUNTIME`, scaffold regression green.
+- Phase 51 (core Win32/GDI+ decoupling for compile/start): completed (baseline scope).
+  - Evidence: core Win32 constants/path assembly decoupled, mac core lane can compile/start.
+- Phase 52 (mac input + indicator + click-first effect): completed.
+  - 52a completed: dispatch/input/indicator foundations and factory wiring.
+  - 52b completed: AppController bootstrapped in mac core lane, non-Windows degradation path landed.
+  - 52c completed: permission-aware degraded notice path + schema capability consumption in WebUI landed.
+  - 52d completed: manual records landed; permission path validated with degraded warning evidence.
+  - 52e completed: mac coordinate-space unification landed and permission-on alignment manually verified.
+  - 52f completed (code): runtime permission-revocation degradation hardening landed.
+  - 52f completed (acceptance): core automation contract regression now simulates runtime permission revoke and asserts degraded transition without process restart.
+  - 52g completed (code): mac input-indicator empty-label lifetime fix landed.
+  - 52g completed (acceptance): core automation contract regression now probes mouse indicator labels and asserts `L/R/M` render labels through mac overlay path.
+  - 52h completed (code): startup permission-missing path now converges through degraded handler (same as runtime revoke).
+  - 52h completed (acceptance): core automation contract regression now starts with simulated missing permission and asserts startup degraded convergence (`permission_denied`).
+  - 52i completed (code): runtime permission loss notify + hot-recovery path landed.
+  - 52i completed (acceptance): core automation contract regression now simulates runtime regrant and asserts hot-recovery (`active=true`) without process restart.
+  - 52j completed (code): startup-missing-permission retry recovery + startup degraded notify dedup landed.
+  - 52j completed (acceptance): core automation contract regression now captures shell warnings and asserts startup degraded notify dedup + startup grant-after-start auto-recovery.
+- Phase 53 (automation mapping with unified shortcut semantics): in progress.
+  - 53a completed (code): mac keyboard injector + foreground-process service landed and factory/build wiring completed.
+  - 53a completed (acceptance-script): core automation contract regression now enforces non-empty `active-process`, `schema.capabilities.input.keyboard_injector=true`, and test-inject shortcut acceptance (`Cmd+C`) under explicit dry-run injector mode.
+  - 53a pending (acceptance-manual): real OS key event dispatch (`left_click -> Cmd+C`) still requires permissioned manual verification.
+  - 53b completed (code): shared app-scope normalization/matching helper landed; `.exe/.app/none` suffix compatibility is now unified.
+  - 53b completed (acceptance): core automation contract regression now asserts cross-suffix app-scope hits (`process:code.exe` / `process:code` / `process:code.app`) via test-gated API.
+  - 53c completed (code): POSIX core settings entry rewired to WebSettingsServer, tray width fixed, and Svelte WebUI directory discovery improved.
+  - 53c completed (acceptance): core automation contract regression now asserts tokenized core settings WebUI root + `settings-shell.svelte.js` asset load + shell settings-launcher URL call-path via probe/capture files, and macOS tray smoke now asserts `Settings` action callback + launcher URL call path.
+  - 53d completed (code): macOS shortcut capture now normalizes hardware keycodes to shared virtual-key semantics, removing `Cmd+V -> Cmd+Tab` collision.
+  - 53d completed (acceptance): core automation contract regression now asserts mac keycode->shortcut mapping (`Cmd+V`, `Cmd+Tab`) via test-gated endpoint.
+  - 53e completed (code): macOS automation app catalog scan landed (`/Applications` + `/System/Applications` + `~/Applications`) and platform facade now returns non-empty scan entries on macOS.
+  - 53e completed (acceptance): core automation contract regression now asserts `Refresh app list` (`force=true/false`) and selected-app scope persistence from scanned app entries.
+  - 53f completed (code): macOS automation scope UI now uses `.app` semantics end-to-end (catalog normalization, selected chips, picker suffix, placeholder and validation copy).
+  - 53f completed (acceptance): user manual test passed on macOS (`Selected Apps` semantics and picker copy no longer show `exe`).
+  - 53g completed (code): added test-gated core API for app-scope matching verification and unified matcher reuse across runtime and test paths.
+  - 53g completed (acceptance): macOS core automation contract regression and wasm selfcheck remain green after app-scope contract expansion.
+- Phase 54 (Linux compile-level + contract-level follow): in progress, compile gate currently passing in CI-style local commands.
+  - 54a completed (code): Linux compile-level gate is now scriptized as one-command workflow (`run-posix-linux-compile-gate.sh`) with modular regression packaging.
+  - 54a completed (acceptance): gate command executed and passed on current host.
+  - 54b completed (code): WebUI automation platform semantics now have lightweight scripted regression coverage (`test:automation-platform`).
+  - 54b completed (acceptance): platform semantic tests executed and passed (`.app/.exe` normalization, parse/serialize, payload/read mappings).
+  - 54c completed (code): POSIX regression suite orchestrator landed (`run-posix-regression-suite.sh`) to chain scaffold/linux-gate/automation checks under one entry.
+  - 54c completed (acceptance): suite command executed and passed on current host.
+  - 54d completed (code): scaffold HTTP regression now asserts automation API unsupported contracts (`active-process`, `app-catalog` must return `404 not found` in scaffold lane).
+  - 54d completed (acceptance): scaffold regression and unified suite executed and passed after the new checks.
+  - 54e completed (code): core-lane startup/alive/exit smoke is now scriptized (`run-posix-core-smoke.sh`) and integrated into the POSIX suite.
+  - 54e completed (acceptance): core smoke command and updated suite command executed and passed on current host.
+  - 54f completed (code): core-lane automation HTTP contracts are now scriptized (`run-posix-core-automation-contract-regression.sh`) with test-only WebSettings probe output.
+  - 54f completed (acceptance): core automation contract command and updated suite command executed and passed on current host.
+- Phase 55 (mac WASM runtime): in progress (M2).
+  - 55a completed (code): macOS core lane now wires a native `wasm3_static` backend while keeping Windows default on `dynamic_bridge`.
+  - 55a completed (acceptance): core build/smoke/contracts passed, and `/api/state` contract now asserts `runtime_backend=wasm3_static` on macOS.
+  - 55b completed (code): POSIX dispatch path now invokes WASM host on click/move/scroll/hold/hover-start instead of Windows-only stubs.
+  - 55b completed (acceptance): core/scaffold/linux/webui regression gates passed after dispatch change.
+  - 55b pending (manual): end-to-end plugin invoke/render/fallback acceptance on macOS core lane.
+  - 55c completed (code): schema/state now expose WASM `invoke_supported` vs `render_supported` contracts for platform-aware degrade signaling.
+  - 55c completed (acceptance): core HTTP contract regression now enforces wasm capability fields (`invoke_supported`/`render_supported`) and `capabilities.wasm` presence.
+  - 55d completed (code): shared `WasmEventInvokeExecutor` + `IWasmCommandRenderer` strategy landed to remove duplicate invoke/render branches from control paths.
+  - 55d completed (acceptance): core smoke + core automation contract + scaffold regression + Linux compile gate all passed after consolidation.
+  - 55e completed (code): platform renderer adapter is now promoted to explicit strategy contract (`IWasmCommandRenderer`) with platform factory and injectable executor overload.
+  - 55e completed (acceptance): core/scaffold/linux regression gates remain green after replacing adapter files with strategy implementation.
+  - 55f completed (code): macOS `IWasmCommandRenderer` now executes `spawn_text`/`spawn_image` command output via native transient overlays; capability flag is strategy-driven.
+  - 55f completed (acceptance): core HTTP contract now asserts `render_supported=true` on macOS and all regression gates remain green.
+  - 55g completed (code): macOS renderer now consumes plugin `image_assets` when available and maps `delay/vx/vy/ax/ay/rotation` into overlay motion semantics.
+  - 55g completed (acceptance): core/scaffold/linux regression gates remain green after fidelity and overlay-runtime refactor.
+  - 55h completed (code): macOS transient overlays now have policy-driven admission guardrails (in-flight cap + per-kind interval throttling) with test-friendly env overrides.
+  - 55h completed (acceptance): core/scaffold/linux regression gates remain green after overlay throttling hardening.
+  - 55i completed (code): macOS renderer now reports throttled-vs-failed drops explicitly (`last_throttled_render_commands`) while keeping `last_render_error` failure-only semantics, and Linux WASM renderer roadmap is explicitly locked to degrade-only for current M2 scope.
+  - 55i completed (acceptance): core/scaffold/linux regression gates remain green after diagnostics contract extension.
+  - 55j completed (code): macOS throttle diagnostics now split capacity-vs-interval causes (`last_throttled_by_capacity_render_commands` / `last_throttled_by_interval_render_commands`) and WebUI diagnostics panel now exposes both counters.
+  - 55j completed (acceptance): core/scaffold/linux regression gates + WebUI workspace build remain green after diagnostics expansion.
+  - 55k completed (code): fixed macOS async overlay task lifetime crash by switching main-thread overlay task passing from reference semantics to value semantics.
+  - 55k completed (acceptance): synthetic click burst self-run no longer crashes process; core/scaffold/linux regression gates remain green.
+  - 55l completed (code): POSIX core lane now enables WASM plugin catalog/import/export APIs (shared with Windows semantics), including cross-platform build wiring for catalog/transfer modules.
+  - 55l completed (acceptance): POSIX suite remains green after adding WASM catalog HTTP contracts and removing platform-unsupported marker on macOS.
+  - 55m completed (code): macOS native folder picker (`NSOpenPanel`) is now wired through platform facade for `/api/wasm/import-from-folder-dialog`, and the route is no longer Windows-guarded.
+  - 55m completed (acceptance): core smoke + core automation contracts + full POSIX suite remain green after picker integration.
+  - 55m1 completed (code): folder picker modal activation is now foreground-safe for tray/background shell context (temporary activation-policy promotion + app activation), preventing immediate auto-cancel on click.
+  - 55m1 completed (acceptance): core automation contract regression remains green after activation-guard patch.
+  - 55m2 completed (code): macOS chooser now prefers `osascript choose folder` as primary path (isolated foreground chooser process) with `NSOpenPanel` fallback only on script failure, reducing tray-context modal-dismiss instability.
+  - 55m2 completed (acceptance): core automation contract regression remains green after chooser-path switch.
+  - 55m3 completed (code): fixed AppleScript chooser `default location` coercion to alias form so primary chooser path no longer falls back unnecessarily (avoids transient Dock `exec` icon in normal import flow).
+  - 55m3 completed (acceptance): core automation contract regression remains green after chooser-script fix.
+  - 55m4 completed (code): macOS folder chooser no longer shells out via `popen`; it now executes AppleScript in-process (`NSAppleScript`) and fallback activation no longer promotes app policy to Regular, reducing transient Dock `exec` icon risk.
+  - 55m4 completed (acceptance): core automation contract regression remains green after in-process chooser switch.
+  - 55n completed (code): added test-gated WASM dispatch endpoint (`/api/wasm/test-dispatch-click`) and automated import/load/enable/dispatch contract checks in core HTTP regression.
+  - 55n completed (acceptance): core automation contracts and full POSIX suite pass with invoke/render assertions on macOS.
+  - 55o-a completed (code): added one-command macOS manual WebSettings runner (`build -> tray host -> probe URL -> optional open + auto-stop`) to stabilize manual acceptance workflow.
+  - 55o-a completed (acceptance): runner executed successfully on local macOS host and emits valid tokenized URL.
+  - 55o-b completed (code): added macOS WASM runtime selfcheck script (`load-manifest -> enable -> test-dispatch -> invalid-manifest fallback non-crash`) and extracted shared manual host startup helper.
+  - 55o-b completed (acceptance): selfcheck script executed successfully on local macOS host and passed all assertions.
+  - 55o-c completed (code): split macOS folder-picker implementation into coordinator + AppleScript module + OpenPanel fallback module, reducing single-file coupling without behavior change.
+  - 55o-c completed (acceptance): core automation contract regression and wasm selfcheck remain green after split.
+  - 55o-d completed (closure): minimal closure evidence is now recorded (selfcheck pass + manual runner availability + user-confirmed folder-import UX fixes).
+
+## Current truth (important)
+- `mfx_entry_posix_host` on mac core lane now boots and exits cleanly.
+- Scaffold lane behavior is preserved and remains regression-protected.
+- macOS core lane now has a real WASM backend (`wasm3_static`) instead of non-Windows forced no-op.
+- macOS permission degradation is now visible in both shell notification and Web settings status banner.
+- WebUI now consumes `schema.capabilities.effects` and disables unavailable effect categories on current platform.
+- macOS click/indicator permission-on coordinate offset has been closed (manual verification passed).
+- Runtime revoke path is now code+script closed (degraded transition asserted through permission simulation and API state checks).
+- macOS indicator empty-label path is now code+script closed (`L/R/M` label probe assertions in core automation contracts).
+- Startup permission-missing path is now code+script closed (startup degraded convergence asserted under simulated missing permission).
+- Runtime permission revoke/regrant path is now code+script closed (revoke/regrant transitions asserted without process restart).
+- Startup-without-permission now retries hook start under degraded state (throttled) so grant-after-start can recover without process restart.
+- macOS automation system services are no longer null-only: keyboard injection and foreground process resolution are now wired.
+- Automation app-scope matching now uses shared normalization + suffix-compatible matching (`.exe/.app/none`) across config/runtime paths.
+- POSIX core settings no longer hardcode scaffold URL; WebSettingsServer URL/token is now produced by runtime and opened through shell launcher.
+- macOS shortcut recording no longer feeds raw keycodes into core; it now passes normalized virtual keys to avoid capture alias collisions.
+- macOS app-catalog endpoint now scans local app bundles through a dedicated scanner instead of non-Windows empty fallback.
+- macOS automation scope UI semantics are now platform-aware (`.app` on macOS, `.exe` on Windows) in both normalization and visible copy.
+- phase53f manual acceptance is now closed by user-side macOS verification.
+- phase53b acceptance is now script-closed by core contract assertions (`code/.exe/.app` alias matching).
+- phase53d acceptance is now script-closed by core contract assertions (`mac_key_code 9 -> Win+V`, `mac_key_code 48 -> Win+Tab`).
+- phase53a service wiring is now script-closed (`process` non-empty + `keyboard_injector=true` + test-inject `accepted=true` in dry-run mode), while real key-event dispatch E2E remains manual.
+- phase53c WebUI, shell-launch, and tray `Settings` action contract is now script-closed (tokenized root + Svelte shell asset + settings-launcher URL probe + tray smoke action/launch assertions).
+- phase53e refresh/catalog/persistence path is now script-closed (`force=true/false` + selected scope roundtrip via `/api/state`).
+- Linux compile gate now has a dedicated orchestration script, reducing manual command drift risk for cross-host follow.
+- Automation platform semantics now have script-level regression guard, reducing manual-only verification for `.app/.exe` behavior.
+- POSIX regression now has a single suite entrypoint with phase-level skip switches for faster diagnosis.
+- Suite preflight now auto-cleans stale `mfx_entry_posix_host` processes, reducing single-instance conflict noise during HTTP checks.
+- Scaffold HTTP regression now guards scaffold-lane automation boundary contracts (`404 not found`), reducing dual-lane behavior drift risk.
+- Core lane now has an automated startup/alive/exit gate, reducing "compile-only green" risk while core runtime remains non-default.
+- Core lane automation APIs are now contract-tested in CI-style scripts (`200 + token gate + macOS .app catalog semantics`) instead of manual-only checks.
+- Core lane HTTP contracts now additionally guard WASM runtime identity (`runtime_backend=wasm3_static` on macOS).
+- POSIX core lane now dispatches runtime WASM events through a shared strategy path; macOS strategy has visible render output while Linux remains degrade-only.
+- WASM capability boundary is now explicit in schema/state (`invoke_supported` vs `render_supported`) for UI and automation decisions.
+- WASM invoke/render bookkeeping now has a single shared execution pipeline used by both dispatch routing and hover-end handling, reducing branch drift risk.
+- WASM render path now has a platform strategy boundary (`IWasmCommandRenderer`), reducing future backend switch cost on POSIX.
+- macOS core HTTP state now reports `render_supported=true` based on renderer strategy capability rather than compile-time hardcoding.
+- macOS WASM renderer now prefers plugin image assets and supports delayed/motionized image overlays while retaining fallback pulse behavior.
+- macOS overlay runtime internals are split (`overlay runtime` vs `transient overlay renderer`) to reduce file-level coupling.
+- macOS WASM overlays now use runtime admission policy (in-flight + interval) to degrade burst output safely instead of allowing unbounded transient-window buildup.
+- macOS WASM diagnostics now separate throttled drops from generic render failures (`last_throttled_render_commands`), improving failure-path triage from `/api/state` and `/api/wasm/state` without overloading `last_render_error`.
+- macOS WASM diagnostics now also expose throttle cause breakdown (`capacity` vs `interval`) for faster burst-path root-cause triage.
+- macOS core lane synthetic click burst previously crashed due async callable lifetime misuse; this is fixed, and process survival is now verified in automated self-run scenarios.
+- macOS core lane now exposes `POST /api/wasm/catalog`, `POST /api/wasm/import-selected`, and `POST /api/wasm/export-all`; shared WebUI plugin-path workflow is no longer Windows-only.
+- macOS core lane now also supports native folder-dialog import route for WASM plugins (`/api/wasm/import-from-folder-dialog`) instead of returning immediate unsupported.
+- macOS folder picker modal open path is now foreground-safe under tray/accessory policy, reducing immediate-dismiss risk in background-launch state.
+- macOS folder chooser now defaults to AppleScript chooser path and keeps `NSOpenPanel` as fallback, reducing tray-context focus fragility.
+- AppleScript chooser default-location clause now uses alias coercion, reducing unnecessary fallback that can surface transient Dock icon.
+- AppleScript chooser is now executed in-process (no external `exec` helper process), reducing Dock icon side effects during import.
+- macOS manual acceptance now has a single stable launcher script (`tools/platform/manual/run-macos-core-websettings-manual.sh`) that removes ad-hoc token/port command drift.
+- macOS WASM runtime closure now has one-command selfcheck (`tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh`) for invoke/render/fallback process-survival assertions.
+- macOS folder-picker internals are now responsibility-split (coordinator vs AppleScript vs OpenPanel fallback), reducing review and change risk for future behavior updates.
+- phase55o closure is complete with minimal evidence; no additional phase55o-specific manual command choreography is required.
+- Core automation HTTP contracts now include non-interactive import-dialog capability probing (`probe_only=true`) and assert macOS support automatically.
+- Core automation HTTP contracts now include non-interactive WASM dispatch invocation checks (`load-manifest -> enable -> test-dispatch-click`) under test-only endpoint gate.
+- Linux WASM renderer path is now explicitly defined as `degrade-only` for current M2, preserving `invoke_supported=true` and `render_supported=false` contract semantics until a separate Linux-native renderer phase is approved.
+
+## Next slice
+- Complete Phase 52/53 acceptance closure:
+  - execute 53a manual re-check (`left_click -> Cmd+C` injection path),
+  - keep Phase 54 suite green via `run-posix-regression-suite.sh --platform auto`,
+  - if pass, continue Phase 53 scope-priority polish while keeping Linux compile gate green.
