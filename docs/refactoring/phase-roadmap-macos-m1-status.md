@@ -59,6 +59,7 @@ This file intentionally excludes low-value historical step logs.
   - Effects contract assertion script has been deduplicated to shared helper-based checks (active+type, mode flags, nested command fields) with no behavior contract change.
 - Automation:
   - `process:code` / `code.app` / `code.exe` scope semantics normalized.
+  - Non-Windows scope persistence now canonicalizes suffix variants to `process:<base>` and enforces legacy `app_scope == app_scopes[0]` parity in automation contract checks.
   - Injection and matcher contracts script-gated.
 - WASM:
   - load/invoke/render/fallback path active.

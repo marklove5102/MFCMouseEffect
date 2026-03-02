@@ -58,6 +58,11 @@ inline std::string ScopeProcessName(const std::string& rawScope) {
     return NormalizeProcessName(scope.substr(kProcessScopePrefixLength));
 }
 
+inline bool EndsWith(std::string_view value, std::string_view suffix) {
+    return value.size() >= suffix.size() &&
+           value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 inline std::string NormalizeScopeToken(std::string value) {
     value = ToLowerAscii(TrimAscii(std::move(value)));
     if (IsGlobalScopeToken(value)) {
@@ -76,17 +81,22 @@ inline std::string NormalizeScopeToken(std::string value) {
         return "all";
     }
 
+#if !MFX_PLATFORM_WINDOWS
+    if (processName.size() > 4 &&
+        (EndsWith(processName, ".exe") || EndsWith(processName, ".app"))) {
+        const std::string baseName = processName.substr(0, processName.size() - 4);
+        if (!baseName.empty()) {
+            processName = baseName;
+        }
+    }
+#endif
+
 #if MFX_PLATFORM_WINDOWS
     if (processName.find('.') == std::string::npos) {
         processName += ".exe";
     }
 #endif
     return std::string(kProcessScopePrefix) + processName;
-}
-
-inline bool EndsWith(std::string_view value, std::string_view suffix) {
-    return value.size() >= suffix.size() &&
-           value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 inline void PushUniqueAlias(std::vector<std::string>* aliases, std::string value) {

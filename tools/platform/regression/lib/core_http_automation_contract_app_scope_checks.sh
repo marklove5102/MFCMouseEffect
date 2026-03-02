@@ -55,10 +55,33 @@ print(value if isinstance(value, str) else "")
 PY
 }
 
+_mfx_core_http_automation_parse_first_mapping_legacy_scope_value() {
+    local input_file="$1"
+    python3 - "$input_file" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    root = json.load(f)
+
+mappings = (
+    root.get("automation", {})
+        .get("mouse_mappings", [])
+)
+if not mappings:
+    print("")
+    sys.exit(0)
+
+value = mappings[0].get("app_scope", "")
+print(value if isinstance(value, str) else "")
+PY
+}
+
 _mfx_core_http_automation_contract_app_scope_checks() {
-    local tmp_dir="$1"
-    local base_url="$2"
-    local token="$3"
+    local platform="$1"
+    local tmp_dir="$2"
+    local base_url="$3"
+    local token="$4"
 
     local code_app_catalog
     code_app_catalog="$(mfx_http_code "$tmp_dir/app-catalog.out" "$base_url/api/automation/app-catalog" -X POST -H "x-mfcmouseeffect-token: $token" -H "Content-Type: application/json" -d '{"force":true}')"
@@ -91,7 +114,27 @@ _mfx_core_http_automation_contract_app_scope_checks() {
         local code_state_after_scope
         code_state_after_scope="$(mfx_http_code "$tmp_dir/state-after-scope.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
         mfx_assert_eq "$code_state_after_scope" "200" "core state after selected-scope status"
-        mfx_assert_file_contains "$tmp_dir/state-after-scope.out" "\"app_scopes\":[\"$selected_scope\"]" "core selected-scope persistence"
+
+        local selected_scope_count
+        local selected_scope_value
+        local selected_legacy_scope_value
+        selected_scope_count="$(_mfx_core_http_automation_parse_first_mapping_scope_count "$tmp_dir/state-after-scope.out")"
+        selected_scope_value="$(_mfx_core_http_automation_parse_first_mapping_scope_value "$tmp_dir/state-after-scope.out")"
+        selected_legacy_scope_value="$(_mfx_core_http_automation_parse_first_mapping_legacy_scope_value "$tmp_dir/state-after-scope.out")"
+        mfx_assert_eq "$selected_scope_count" "1" "core selected-scope persisted count"
+        mfx_assert_eq "$selected_legacy_scope_value" "$selected_scope_value" "core selected-scope legacy field parity"
+        _mfx_core_http_automation_assert_scope_match \
+            "$base_url" \
+            "$token" \
+            "$selected_process" \
+            "$selected_scope_value" \
+            "true" \
+            "$tmp_dir/scope-selected-process-persisted.out" \
+            "core selected-scope persisted semantic match"
+
+        if [[ "$platform" != "windows" && "$selected_scope_value" =~ ^process:.*\.(exe|app)$ ]]; then
+            mfx_fail "core selected-scope canonicalization on non-windows should not persist suffix token: ${selected_scope_value:-<empty>}"
+        fi
     fi
 
     local code_state_apply_scope_alias_dedupe
@@ -108,19 +151,29 @@ _mfx_core_http_automation_contract_app_scope_checks() {
 
     local dedupe_scope_count
     local dedupe_scope_value
+    local dedupe_legacy_scope_value
     dedupe_scope_count="$(_mfx_core_http_automation_parse_first_mapping_scope_count "$tmp_dir/state-after-scope-alias-dedupe.out")"
     dedupe_scope_value="$(_mfx_core_http_automation_parse_first_mapping_scope_value "$tmp_dir/state-after-scope-alias-dedupe.out")"
+    dedupe_legacy_scope_value="$(_mfx_core_http_automation_parse_first_mapping_legacy_scope_value "$tmp_dir/state-after-scope-alias-dedupe.out")"
     mfx_assert_eq "$dedupe_scope_count" "1" "core app-scope alias dedupe persisted count"
-    if [[ -z "$dedupe_scope_value" || ! "$dedupe_scope_value" =~ ^process:code(\.app|\.exe)?$ ]]; then
-        mfx_fail "core app-scope alias dedupe persisted value unexpected: ${dedupe_scope_value:-<empty>}"
+    mfx_assert_eq "$dedupe_legacy_scope_value" "$dedupe_scope_value" "core app-scope alias dedupe legacy field parity"
+    local expected_dedupe_scope="process:code.exe"
+    if [[ "$platform" != "windows" ]]; then
+        expected_dedupe_scope="process:code"
     fi
+    mfx_assert_eq "$dedupe_scope_value" "$expected_dedupe_scope" "core app-scope alias dedupe canonical persisted value"
 
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "code" "process:code.exe" "true" "$tmp_dir/scope-code-vs-exe.out" "core app-scope code<->exe"
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "code.app" "process:code" "true" "$tmp_dir/scope-app-vs-base.out" "core app-scope app<->base"
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "code.exe" "process:code.app" "true" "$tmp_dir/scope-exe-vs-app.out" "core app-scope exe<->app"
     _mfx_core_http_automation_assert_scope_match "$base_url" "$token" "safari" "process:code" "false" "$tmp_dir/scope-negative.out" "core app-scope negative"
     mfx_assert_file_contains "$tmp_dir/scope-code-vs-exe.out" "\"process_aliases\":[\"code\",\"code.exe\",\"code.app\"]" "core app-scope process alias matrix code"
-    mfx_assert_file_contains "$tmp_dir/scope-code-vs-exe.out" "\"app_scope_alias_matrix\":[{\"aliases\":[\"code.exe\",\"code\"]" "core app-scope scope alias matrix exe"
+    local expected_scope_code_vs_exe="process:code.exe"
+    if [[ "$platform" != "windows" ]]; then
+        expected_scope_code_vs_exe="process:code"
+    fi
+    mfx_assert_file_contains "$tmp_dir/scope-code-vs-exe.out" "\"normalized\":\"$expected_scope_code_vs_exe\"" "core app-scope scope alias normalized token"
+    mfx_assert_file_contains "$tmp_dir/scope-code-vs-exe.out" "\"aliases\":[\"code\"" "core app-scope scope alias canonical base"
     mfx_assert_file_contains "$tmp_dir/scope-app-vs-base.out" "\"process_aliases\":[\"code.app\",\"code\"]" "core app-scope process alias matrix code.app"
     mfx_assert_file_contains "$tmp_dir/scope-exe-vs-app.out" "\"process_aliases\":[\"code.exe\",\"code\"]" "core app-scope process alias matrix code.exe"
 }

@@ -59,6 +59,7 @@
 - Automation:
   - App-scope alias normalization (`process:code` / `code.app` / `code.exe`) is gated.
   - App-scope persistence dedupe is contract-gated: writing equivalent aliases (`process:code.exe/code.app/code`) must collapse to one persisted scope token.
+  - Non-Windows app-scope canonical persistence is now base-token first: `.exe/.app` suffix variants are stripped during normalize/dedupe, and `app_scope` is required to stay equal to `app_scopes[0]`.
   - Injection selfcheck and app-scope selfcheck are part of POSIX suite phases.
 - WASM:
   - macOS runtime path + diagnostics + fallback contracts are active.
