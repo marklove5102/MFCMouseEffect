@@ -59,6 +59,21 @@ std::string ReadStringEnvOrDefault(const char* key, const char* defaultValue) {
     return std::string(raw);
 }
 
+struct SmokeEffectMenuSeed final {
+    const char* category = "";
+    const char* titleEn = "";
+    const char* titleZh = "";
+    const char* defaultValue = "";
+};
+
+constexpr SmokeEffectMenuSeed kSmokeEffectMenuSeeds[] = {
+    {"click", "Click Effects", u8"点击特效", "ripple"},
+    {"trail", "Trail Effects", u8"拖尾特效", "line"},
+    {"scroll", "Scroll Effects", u8"滚轮特效", "arrow"},
+    {"hold", "Hold Effects", u8"长按特效", "hologram"},
+    {"hover", "Hover Effects", u8"悬停特效", "glow"},
+};
+
 class TraySmokeHost final : public mousefx::IAppShellHost {
 public:
     TraySmokeHost(
@@ -120,13 +135,23 @@ public:
         if (outSections != nullptr) {
             outSections->clear();
             if (expectEffectAction_) {
-                mousefx::ShellEffectMenuSection section;
-                section.category = expectedEffectCategory_;
-                section.title = preferZhLabels ? u8"点击特效" : "Click Effects";
-                section.items.push_back(
-                    {expectedEffectValue_, expectedEffectValue_, true});
-                section.items.push_back({"none", "none", false});
-                outSections->push_back(std::move(section));
+                outSections->reserve(5);
+                for (const SmokeEffectMenuSeed& seed : kSmokeEffectMenuSeeds) {
+                    mousefx::ShellEffectMenuSection section;
+                    section.category = seed.category;
+                    section.title = preferZhLabels ? seed.titleZh : seed.titleEn;
+
+                    std::string selectedValue = seed.defaultValue;
+                    if (expectedEffectCategory_ == seed.category && !expectedEffectValue_.empty()) {
+                        selectedValue = expectedEffectValue_;
+                    }
+
+                    section.items.push_back({selectedValue, selectedValue, true});
+                    if (selectedValue != "none") {
+                        section.items.push_back({"none", "none", false});
+                    }
+                    outSections->push_back(std::move(section));
+                }
             }
         }
     }

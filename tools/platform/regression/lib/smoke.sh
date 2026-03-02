@@ -101,7 +101,7 @@ mfx_run_smoke_checks() {
         fi
         if [[ -f "$tray_menu_layout_capture_file" ]]; then
             mfx_assert_file_contains "$tray_menu_layout_capture_file" "captured=1" "macOS tray smoke menu layout capture flag"
-            mfx_assert_file_contains "$tray_menu_layout_capture_file" "top_level_layout_keys=effect:click|theme|star|settings|reload|exit" "macOS tray smoke menu layout order"
+            mfx_assert_file_contains "$tray_menu_layout_capture_file" "top_level_layout_keys=effect:click|effect:trail|effect:scroll|effect:hold|effect:hover|theme|star|settings|reload|exit" "macOS tray smoke menu layout order"
             mfx_assert_file_contains "$tray_menu_layout_capture_file" "settings_title_has_ellipsis=1" "macOS tray smoke settings label ellipsis"
         else
             mfx_info "macOS tray smoke menu layout capture file not emitted; keep exit-code gate only under current runner"
