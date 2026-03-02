@@ -65,6 +65,7 @@
   - App-scope mapping parse helpers are now shared between regression contracts and manual selfcheck scripts to avoid dual parser drift.
   - Nested contract field parser now resolves JSON paths with strict section matching plus one-level compatible fallback (for existing `command_samples.*` call style), removing ambiguous regex parsing while keeping current contracts stable.
   - Remaining scalar parsers in automation helpers (`first_catalog_process`, `parse_uint_field`, `parse_scalar_field`, `parse_active_field`, `parse_section_scalar_field`) now use JSON traversal instead of `sed` regex extraction; output compatibility is preserved for existing contract assertions.
+  - Core automation contracts now run a parser fixture gate (`core_http_automation_parse_helper_contract_checks.sh`) to lock scalar/section/nested fallback output semantics (`string/number/bool/null`) before HTTP assertions execute.
   - Injection selfcheck and app-scope selfcheck are part of POSIX suite phases.
 - WASM:
   - macOS runtime path + diagnostics + fallback contracts are active.

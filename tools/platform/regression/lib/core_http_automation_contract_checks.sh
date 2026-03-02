@@ -4,6 +4,7 @@ set -euo pipefail
 
 _mfx_core_http_automation_contract_checks_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_mfx_core_http_automation_contract_checks_dir/core_http_automation_parse_helpers.sh"
+source "$_mfx_core_http_automation_contract_checks_dir/core_http_automation_parse_helper_contract_checks.sh"
 source "$_mfx_core_http_automation_contract_checks_dir/core_http_automation_assert_helpers.sh"
 source "$_mfx_core_http_automation_contract_checks_dir/core_http_automation_contract_basic_checks.sh"
 source "$_mfx_core_http_automation_contract_checks_dir/core_http_automation_contract_app_scope_checks.sh"
@@ -19,6 +20,9 @@ _mfx_core_http_run_automation_contract_checks() {
     local tmp_dir="$2"
     local base_url="$3"
     local token="$4"
+
+    _mfx_core_http_automation_parse_helper_contract_checks \
+        "$tmp_dir"
 
     _mfx_core_http_automation_contract_basic_checks \
         "$tmp_dir" \
