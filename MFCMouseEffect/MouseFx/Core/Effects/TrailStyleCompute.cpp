@@ -133,4 +133,27 @@ ParticleSegmentMetrics ComputeParticleSegmentMetrics(
     return metrics;
 }
 
+TubesNodeRenderMetrics ComputeTubesNodeRenderMetrics(
+    uint32_t chainIndex,
+    uint32_t nodeIndex,
+    uint32_t nodesCount,
+    double fadeScale) {
+    TubesNodeRenderMetrics metrics{};
+    const uint32_t safeCount = std::max<uint32_t>(1, nodesCount);
+    const double invCount = 1.0 / static_cast<double>(safeCount);
+    const double ratio = Clamp01(1.0 - static_cast<double>(nodeIndex) * invCount);
+    const double safeFade = Clamp01(fadeScale);
+
+    metrics.radiusPx = 2.0 + 7.0 * ratio;
+    metrics.amplitudePx = 8.0;
+    if (safeFade < 1.0) {
+        metrics.radiusPx *= safeFade;
+        metrics.amplitudePx *= safeFade;
+    }
+    metrics.alpha = Clamp01(ratio * safeFade);
+    metrics.nodePhase = static_cast<double>(nodeIndex) * 0.3;
+    metrics.chainPhase = static_cast<double>(chainIndex) * ((2.0 * 3.14159265358979323846) / 3.0);
+    return metrics;
+}
+
 } // namespace mousefx::trail_style_compute

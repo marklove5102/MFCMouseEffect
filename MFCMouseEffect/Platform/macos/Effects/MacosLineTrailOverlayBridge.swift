@@ -94,6 +94,19 @@ private func mfxComputeParticleTrailSegmentMetrics(
     _ outHaloOpacity: UnsafeMutablePointer<Double>?
 )
 
+@_silgen_name("mfx_compute_tubes_node_render_metrics_v1")
+private func mfxComputeTubesNodeRenderMetrics(
+    _ chainIndex: UInt32,
+    _ nodeIndex: UInt32,
+    _ nodesCount: UInt32,
+    _ fadeScale: Double,
+    _ outRadiusPx: UnsafeMutablePointer<Double>?,
+    _ outAmplitudePx: UnsafeMutablePointer<Double>?,
+    _ outAlpha: UnsafeMutablePointer<Double>?,
+    _ outNodePhase: UnsafeMutablePointer<Double>?,
+    _ outChainPhase: UnsafeMutablePointer<Double>?
+)
+
 @MainActor
 private final class MfxLineTrailState: NSObject {
     private struct Point {
@@ -594,8 +607,6 @@ private final class MfxLineTrailState: NSObject {
             for chainIndex in 0..<tubeChains.count {
                 let chain = tubeChains[chainIndex]
                 let nodesCount = max(1, chain.nodes.count)
-                let invCount = 1.0 / CGFloat(nodesCount)
-                let chainPhase = CGFloat(chainIndex) * (CGFloat.pi * 2.0 / 3.0)
                 var chainColor = chain.color
                 if config.chromatic {
                     chainColor = Self.hslToRgbColor(
@@ -607,24 +618,29 @@ private final class MfxLineTrailState: NSObject {
                 }
                 for nodeIndex in stride(from: nodesCount - 1, through: 0, by: -1) {
                     let node = chain.nodes[nodeIndex]
-                    let ratio = 1.0 - CGFloat(nodeIndex) * invCount
-                    var radius = 2.0 + 7.0 * ratio
-                    if tubeFadeAlpha < 255.0 {
-                        radius *= fadeScale
-                    }
-                    var amplitude: CGFloat = 8.0
-                    if tubeFadeAlpha < 255.0 {
-                        amplitude *= fadeScale
-                    }
-                    let nodePhase = CGFloat(nodeIndex) * 0.3
-                    let renderX = node.x + cos(frameTime + nodePhase + chainPhase) * amplitude
-                    let renderY = node.y + sin(frameTime + nodePhase + chainPhase) * amplitude
-                    let alpha = max(0.0, min(1.0, CGFloat(ratio) * fadeScale))
+                    var radius = 0.0
+                    var amplitude = 0.0
+                    var alpha = 0.0
+                    var nodePhase = 0.0
+                    var chainPhase = 0.0
+                    mfxComputeTubesNodeRenderMetrics(
+                        UInt32(chainIndex),
+                        UInt32(nodeIndex),
+                        UInt32(nodesCount),
+                        Double(fadeScale),
+                        &radius,
+                        &amplitude,
+                        &alpha,
+                        &nodePhase,
+                        &chainPhase
+                    )
+                    let renderX = node.x + cos(frameTime + CGFloat(nodePhase) + CGFloat(chainPhase)) * CGFloat(amplitude)
+                    let renderY = node.y + sin(frameTime + CGFloat(nodePhase) + CGFloat(chainPhase)) * CGFloat(amplitude)
                     let halo = CAShapeLayer()
                     halo.frame = containerLayer.bounds
                     halo.contentsScale = layerScale
-                    halo.path = CGPath(ellipseIn: CGRect(x: renderX - radius * 1.3, y: renderY - radius * 1.3, width: radius * 2.6, height: radius * 2.6), transform: nil)
-                    halo.fillColor = chainColor.withAlphaComponent(alpha * 0.22).cgColor
+                    halo.path = CGPath(ellipseIn: CGRect(x: renderX - CGFloat(radius * 1.3), y: renderY - CGFloat(radius * 1.3), width: CGFloat(radius * 2.6), height: CGFloat(radius * 2.6)), transform: nil)
+                    halo.fillColor = chainColor.withAlphaComponent(CGFloat(alpha * 0.22)).cgColor
                     halo.strokeColor = NSColor.clear.cgColor
                     halo.opacity = 1.0
                     containerLayer.addSublayer(halo)
@@ -632,8 +648,8 @@ private final class MfxLineTrailState: NSObject {
                     let core = CAShapeLayer()
                     core.frame = containerLayer.bounds
                     core.contentsScale = layerScale
-                    core.path = CGPath(ellipseIn: CGRect(x: renderX - radius, y: renderY - radius, width: radius * 2.0, height: radius * 2.0), transform: nil)
-                    core.fillColor = chainColor.withAlphaComponent(alpha).cgColor
+                    core.path = CGPath(ellipseIn: CGRect(x: renderX - CGFloat(radius), y: renderY - CGFloat(radius), width: CGFloat(radius * 2.0), height: CGFloat(radius * 2.0)), transform: nil)
+                    core.fillColor = chainColor.withAlphaComponent(CGFloat(alpha)).cgColor
                     core.strokeColor = NSColor.clear.cgColor
                     core.opacity = 1.0
                     containerLayer.addSublayer(core)

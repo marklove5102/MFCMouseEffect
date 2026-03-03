@@ -53,6 +53,17 @@ void mfx_compute_particle_trail_segment_metrics_v1(
     double* outHaloRadiusPx,
     double* outHaloOpacity);
 
+void mfx_compute_tubes_node_render_metrics_v1(
+    uint32_t chainIndex,
+    uint32_t nodeIndex,
+    uint32_t nodesCount,
+    double fadeScale,
+    double* outRadiusPx,
+    double* outAmplitudePx,
+    double* outAlpha,
+    double* outNodePhase,
+    double* outChainPhase);
+
 #ifdef __cplusplus
 }
 #endif

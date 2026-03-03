@@ -41,6 +41,14 @@ struct ParticleSegmentMetrics final {
     double haloOpacity = 0.0;
 };
 
+struct TubesNodeRenderMetrics final {
+    double radiusPx = 0.0;
+    double amplitudePx = 0.0;
+    double alpha = 0.0;
+    double nodePhase = 0.0;
+    double chainPhase = 0.0;
+};
+
 StreamerSegmentMetrics ComputeStreamerSegmentMetrics(
     double segmentRatio,
     double life,
@@ -62,5 +70,11 @@ ParticleSegmentMetrics ComputeParticleSegmentMetrics(
     double segmentRatio,
     double life,
     double intensity);
+
+TubesNodeRenderMetrics ComputeTubesNodeRenderMetrics(
+    uint32_t chainIndex,
+    uint32_t nodeIndex,
+    uint32_t nodesCount,
+    double fadeScale);
 
 } // namespace mousefx::trail_style_compute

@@ -113,3 +113,26 @@ void mfx_compute_particle_trail_segment_metrics_v1(
     WriteValue(outHaloRadiusPx, metrics.haloRadiusPx);
     WriteValue(outHaloOpacity, metrics.haloOpacity);
 }
+
+void mfx_compute_tubes_node_render_metrics_v1(
+    uint32_t chainIndex,
+    uint32_t nodeIndex,
+    uint32_t nodesCount,
+    double fadeScale,
+    double* outRadiusPx,
+    double* outAmplitudePx,
+    double* outAlpha,
+    double* outNodePhase,
+    double* outChainPhase) {
+    const mousefx::trail_style_compute::TubesNodeRenderMetrics metrics =
+        mousefx::trail_style_compute::ComputeTubesNodeRenderMetrics(
+            chainIndex,
+            nodeIndex,
+            nodesCount,
+            fadeScale);
+    WriteValue(outRadiusPx, metrics.radiusPx);
+    WriteValue(outAmplitudePx, metrics.amplitudePx);
+    WriteValue(outAlpha, metrics.alpha);
+    WriteValue(outNodePhase, metrics.nodePhase);
+    WriteValue(outChainPhase, metrics.chainPhase);
+}
