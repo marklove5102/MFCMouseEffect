@@ -33,6 +33,55 @@ private func mfxOverlayApplyContentScale(
     _ y: Int32
 )
 
+@_silgen_name("mfx_macos_overlay_timer_interval_ms_v1")
+private func mfxOverlayTimerIntervalMs(
+    _ x: Int32,
+    _ y: Int32
+) -> Int32
+
+@_silgen_name("mfx_compute_streamer_trail_segment_metrics_v1")
+private func mfxComputeStreamerTrailSegmentMetrics(
+    _ segmentRatio: Double,
+    _ life: Double,
+    _ headPower: Double,
+    _ outWidthPx: UnsafeMutablePointer<Double>?,
+    _ outCoreOpacity: UnsafeMutablePointer<Double>?,
+    _ outGlowOpacity: UnsafeMutablePointer<Double>?
+)
+
+@_silgen_name("mfx_compute_electric_trail_segment_metrics_v1")
+private func mfxComputeElectricTrailSegmentMetrics(
+    _ frameBucket: UInt64,
+    _ segmentIndex: UInt32,
+    _ life: Double,
+    _ lengthPx: Double,
+    _ amplitudeScale: Double,
+    _ forkChance: Double,
+    _ outJitterA: UnsafeMutablePointer<Double>?,
+    _ outJitterB: UnsafeMutablePointer<Double>?,
+    _ outGlowWidthPx: UnsafeMutablePointer<Double>?,
+    _ outCoreWidthPx: UnsafeMutablePointer<Double>?,
+    _ outGlowOpacity: UnsafeMutablePointer<Double>?,
+    _ outCoreOpacity: UnsafeMutablePointer<Double>?,
+    _ outEmitFork: UnsafeMutablePointer<Int32>?,
+    _ outForkT: UnsafeMutablePointer<Double>?,
+    _ outForkLengthPx: UnsafeMutablePointer<Double>?,
+    _ outForkWidthPx: UnsafeMutablePointer<Double>?,
+    _ outForkOpacity: UnsafeMutablePointer<Double>?,
+    _ outForkSide: UnsafeMutablePointer<Int32>?
+)
+
+@_silgen_name("mfx_compute_meteor_trail_segment_metrics_v1")
+private func mfxComputeMeteorTrailSegmentMetrics(
+    _ segmentRatio: Double,
+    _ life: Double,
+    _ outWidthPx: UnsafeMutablePointer<Double>?,
+    _ outTrailOpacity: UnsafeMutablePointer<Double>?,
+    _ outEmitCore: UnsafeMutablePointer<Int32>?,
+    _ outCoreWidthPx: UnsafeMutablePointer<Double>?,
+    _ outCoreOpacity: UnsafeMutablePointer<Double>?
+)
+
 @MainActor
 private final class MfxLineTrailState: NSObject {
     private struct Point {
@@ -41,12 +90,51 @@ private final class MfxLineTrailState: NSObject {
         var tickMs: UInt64
     }
 
+    private enum StyleKind: Int32 {
+        case line = 0
+        case streamer = 1
+        case electric = 2
+        case meteor = 3
+        case tubes = 4
+
+        static func resolve(_ rawValue: Int32) -> StyleKind {
+            return StyleKind(rawValue: rawValue) ?? .line
+        }
+    }
+
     private struct Config {
         var durationMs: Int = 300
         var lineWidth: CGFloat = 4.0
         var strokeArgb: UInt32 = 0xFFFFFFFF
+        var fillArgb: UInt32 = 0x66FFFFFF
+        var style: StyleKind = .line
+        var intensity: Double = 0.0
+        var chromatic: Bool = false
+        var streamerGlowWidthScale: CGFloat = 1.8
+        var streamerCoreWidthScale: CGFloat = 0.55
+        var streamerHeadPower: CGFloat = 1.6
+        var electricAmplitudeScale: CGFloat = 1.0
+        var electricForkChance: CGFloat = 0.10
+        var meteorSparkRateScale: CGFloat = 1.0
+        var meteorSparkSpeedScale: CGFloat = 1.0
         var idleFadeStartMs: Int = 60
         var idleFadeEndMs: Int = 220
+    }
+
+    private struct MeteorSpark {
+        var x: CGFloat
+        var y: CGFloat
+        var vx: CGFloat
+        var vy: CGFloat
+        var life: CGFloat
+        var size: CGFloat
+        var hue: CGFloat
+    }
+
+    private struct TubeChain {
+        var nodes: [CGPoint]
+        var color: NSColor
+        var lag: CGFloat
     }
 
     private var windowHandle: UnsafeMutableRawPointer?
@@ -59,7 +147,15 @@ private final class MfxLineTrailState: NSObject {
     private var points: [Point] = []
     private var config = Config()
     private var timer: DispatchSourceTimer?
+    private var timerIntervalMs: Int = 16
     private var lastInputMs: UInt64 = 0
+    private var rngState: UInt32 = 0x7F4A7C15
+    private var meteorSparks: [MeteorSpark] = []
+    private var meteorLastUpdateMs: UInt64 = 0
+    private var tubeChains: [TubeChain] = []
+    private var tubeFadeAlpha: CGFloat = 255.0
+    private var tubeLastTarget: CGPoint = .zero
+    private var tubeHasLastTarget = false
 
     private static func nowMs() -> UInt64 {
         let ms = ProcessInfo.processInfo.systemUptime * 1000.0
@@ -73,6 +169,151 @@ private final class MfxLineTrailState: NSObject {
         let green = CGFloat(Double((argb >> 8) & 0xFF) / 255.0)
         let blue = CGFloat(Double(argb & 0xFF) / 255.0)
         return NSColor(calibratedRed: red, green: green, blue: blue, alpha: alpha)
+    }
+
+    private static func argbWithForcedAlpha(_ argb: UInt32, _ alpha: UInt8) -> UInt32 {
+        return (UInt32(alpha) << 24) | (argb & 0x00FFFFFF)
+    }
+
+    private static func clamp01(_ value: Double) -> Double {
+        if value <= 0.0 {
+            return 0.0
+        }
+        if value >= 1.0 {
+            return 1.0
+        }
+        return value
+    }
+
+    private static func nearScreenOrigin(x: Int32, y: Int32) -> Bool {
+        let tolerance: Int32 = 6
+        return abs(x) <= tolerance && abs(y) <= tolerance
+    }
+
+    private static func isOriginConnector(from: Point, toX: Int32, toY: Int32) -> Bool {
+        let fromOrigin = nearScreenOrigin(x: from.x, y: from.y)
+        let toOrigin = nearScreenOrigin(x: toX, y: toY)
+        if fromOrigin == toOrigin {
+            return false
+        }
+        let dx = Double(toX - from.x)
+        let dy = Double(toY - from.y)
+        return (dx * dx + dy * dy) >= (24.0 * 24.0)
+    }
+
+    private func localPoint(_ point: Point) -> CGPoint {
+        return CGPoint(
+            x: CGFloat(point.x - windowOriginX),
+            y: CGFloat(point.y - windowOriginY)
+        )
+    }
+
+    private func segmentLife(nowMs: UInt64, point: Point, durationMs: Int, idleFactor: Double) -> Double {
+        let safeDuration = max(1, durationMs)
+        let age = Double(nowMs > point.tickMs ? nowMs - point.tickMs : 0)
+        let life = 1.0 - (age / Double(safeDuration))
+        return Self.clamp01(life) * idleFactor
+    }
+
+    private func addPathLayer(
+        containerLayer: CALayer,
+        layerScale: CGFloat,
+        path: CGPath,
+        color: NSColor,
+        lineWidth: CGFloat,
+        opacity: Double
+    ) {
+        if opacity <= 0.0 {
+            return
+        }
+        let layer = CAShapeLayer()
+        layer.frame = containerLayer.bounds
+        layer.contentsScale = layerScale
+        layer.path = path
+        layer.strokeColor = color.cgColor
+        layer.fillColor = NSColor.clear.cgColor
+        layer.lineWidth = max(0.2, lineWidth)
+        layer.lineCap = .round
+        layer.lineJoin = .round
+        layer.allowsEdgeAntialiasing = true
+        layer.opacity = Float(Self.clamp01(opacity))
+        containerLayer.addSublayer(layer)
+    }
+
+    private func nextRandom01() -> CGFloat {
+        // xorshift32
+        var x = rngState
+        x ^= x << 13
+        x ^= x >> 17
+        x ^= x << 5
+        rngState = x
+        let normalized = Double(x) / Double(UInt32.max)
+        return CGFloat(normalized)
+    }
+
+    private func random(in range: ClosedRange<CGFloat>) -> CGFloat {
+        let t = nextRandom01()
+        return range.lowerBound + (range.upperBound - range.lowerBound) * t
+    }
+
+    private static func hslToRgbColor(hueDegrees: CGFloat, saturation: CGFloat, lightness: CGFloat, alpha: CGFloat) -> NSColor {
+        let h = hueDegrees.truncatingRemainder(dividingBy: 360.0)
+        let hh = h < 0.0 ? h + 360.0 : h
+        let s = max(0.0, min(1.0, saturation))
+        let l = max(0.0, min(1.0, lightness))
+        let c = (1.0 - abs(2.0 * l - 1.0)) * s
+        let x = c * (1.0 - abs(((hh / 60.0).truncatingRemainder(dividingBy: 2.0)) - 1.0))
+        let m = l - c * 0.5
+        let (r1, g1, b1): (CGFloat, CGFloat, CGFloat)
+        switch hh {
+        case 0.0..<60.0:
+            (r1, g1, b1) = (c, x, 0.0)
+        case 60.0..<120.0:
+            (r1, g1, b1) = (x, c, 0.0)
+        case 120.0..<180.0:
+            (r1, g1, b1) = (0.0, c, x)
+        case 180.0..<240.0:
+            (r1, g1, b1) = (0.0, x, c)
+        case 240.0..<300.0:
+            (r1, g1, b1) = (x, 0.0, c)
+        default:
+            (r1, g1, b1) = (c, 0.0, x)
+        }
+        return NSColor(
+            calibratedRed: r1 + m,
+            green: g1 + m,
+            blue: b1 + m,
+            alpha: max(0.0, min(1.0, alpha))
+        )
+    }
+
+    private func resetStyleRuntimeStateOnMain() {
+        meteorSparks.removeAll(keepingCapacity: false)
+        meteorLastUpdateMs = 0
+        tubeChains.removeAll(keepingCapacity: false)
+        tubeFadeAlpha = 255.0
+        tubeHasLastTarget = false
+        tubeLastTarget = .zero
+    }
+
+    private func ensureTubeChains() {
+        if !tubeChains.isEmpty {
+            return
+        }
+        let nodeCount = 30
+        let tubeColors: [NSColor] = [
+            NSColor(calibratedRed: 249.0 / 255.0, green: 103.0 / 255.0, blue: 251.0 / 255.0, alpha: 1.0),
+            NSColor(calibratedRed: 83.0 / 255.0, green: 188.0 / 255.0, blue: 40.0 / 255.0, alpha: 1.0),
+            NSColor(calibratedRed: 105.0 / 255.0, green: 88.0 / 255.0, blue: 213.0 / 255.0, alpha: 1.0),
+        ]
+        let lags: [CGFloat] = [0.30, 0.40, 0.50]
+        tubeChains = (0..<3).map { idx in
+            TubeChain(
+                nodes: Array(repeating: .zero, count: nodeCount),
+                color: tubeColors[idx],
+                lag: lags[idx]
+            )
+        }
     }
 
     private static func resolveScreenFrame(forX x: Int32, y: Int32) -> NSRect? {
@@ -108,12 +349,22 @@ private final class MfxLineTrailState: NSObject {
         return max(0.0, 1.0 - t)
     }
 
+    private static func clampTimerIntervalMs(_ value: Int32) -> Int {
+        return max(4, min(1000, Int(value)))
+    }
+
+    private func resolveTimerIntervalMs(forX x: Int32, y: Int32) -> Int {
+        let interval = mfxOverlayTimerIntervalMs(x, y)
+        return Self.clampTimerIntervalMs(interval)
+    }
+
     private func stopTimer() {
         guard let timer else {
             return
         }
         timer.cancel()
         self.timer = nil
+        timerIntervalMs = 16
     }
 
     private func closeWindow() {
@@ -142,6 +393,7 @@ private final class MfxLineTrailState: NSObject {
         closeWindow()
         points.removeAll(keepingCapacity: false)
         lastInputMs = 0
+        resetStyleRuntimeStateOnMain()
     }
 
     private func ensureWindow(forX x: Int32, y: Int32) -> Bool {
@@ -219,32 +471,31 @@ private final class MfxLineTrailState: NSObject {
             endMs: config.idleFadeEndMs
         )
         let durationMs = max(1, config.durationMs)
-        let lineWidth = max(0.2, config.lineWidth)
+        let lineWidth = max(1.0, config.lineWidth)
         let layerScale = max(containerLayer.contentsScale, CGFloat(1.0))
 
         CATransaction.begin()
         CATransaction.setDisableActions(true)
 
-        let fullAlphaStroke = config.strokeArgb | 0xFF000000
+        let fullAlphaStroke = Self.argbWithForcedAlpha(config.strokeArgb, 0xFF)
+        let fullAlphaFill = Self.argbWithForcedAlpha(config.fillArgb, 0xFF)
+        let strokeColor = Self.colorFromArgb(fullAlphaStroke, 1.0)
+        let fillColor = Self.colorFromArgb(fullAlphaFill, 1.0)
 
         if points.count == 1 {
             let point = points[0]
-            let x = CGFloat(point.x - windowOriginX)
-            let y = CGFloat(point.y - windowOriginY)
+            let local = localPoint(point)
             let radius = max(lineWidth * 0.6, 2.0)
-
-            let age = Float(nowMs - point.tickMs)
-            let life = max(0.0, 1.0 - age / Float(durationMs))
-            let opacity = max(0.0, min(1.0, Double(life) * idleFactor))
+            let opacity = segmentLife(nowMs: nowMs, point: point, durationMs: durationMs, idleFactor: idleFactor)
 
             let dot = CAShapeLayer()
             dot.frame = containerLayer.bounds
             dot.contentsScale = layerScale
             dot.path = CGPath(
-                ellipseIn: CGRect(x: x - radius, y: y - radius, width: radius * 2.0, height: radius * 2.0),
+                ellipseIn: CGRect(x: local.x - radius, y: local.y - radius, width: radius * 2.0, height: radius * 2.0),
                 transform: nil
             )
-            dot.fillColor = Self.colorFromArgb(fullAlphaStroke, 1.0).cgColor
+            dot.fillColor = strokeColor.cgColor
             dot.strokeColor = NSColor.clear.cgColor
             dot.opacity = Float(opacity)
             containerLayer.addSublayer(dot)
@@ -253,37 +504,455 @@ private final class MfxLineTrailState: NSObject {
             return
         }
 
-        let pathLayer = CAShapeLayer()
-        pathLayer.frame = containerLayer.bounds
-        pathLayer.contentsScale = layerScale
-
-        let path = CGMutablePath()
-        var started = false
-        for point in points {
-            let x = CGFloat(point.x - windowOriginX)
-            let y = CGFloat(point.y - windowOriginY)
-            if !started {
-                path.move(to: CGPoint(x: x, y: y))
-                started = true
+        if config.style == .tubes {
+            ensureTubeChains()
+            let hasInput = !points.isEmpty
+            let target: CGPoint
+            if let head = points.last {
+                target = localPoint(head)
+                tubeLastTarget = target
+                tubeHasLastTarget = true
+            } else if tubeHasLastTarget {
+                target = tubeLastTarget
             } else {
-                path.addLine(to: CGPoint(x: x, y: y))
+                CATransaction.commit()
+                return
+            }
+
+            let isIdle = !hasInput || (nowMs > points[points.count - 1].tickMs + 50)
+            if !isIdle {
+                tubeFadeAlpha = 255.0
+            } else {
+                var converged = true
+                for chain in tubeChains {
+                    guard let head = chain.nodes.first, let tail = chain.nodes.last else {
+                        continue
+                    }
+                    let dx = head.x - tail.x
+                    let dy = head.y - tail.y
+                    if (dx * dx + dy * dy) > 100.0 {
+                        converged = false
+                        break
+                    }
+                }
+                tubeFadeAlpha -= converged ? 35.0 : 10.0
+                if tubeFadeAlpha < 0.0 {
+                    tubeFadeAlpha = 0.0
+                }
+            }
+            if tubeFadeAlpha <= 0.0 {
+                CATransaction.commit()
+                return
+            }
+
+            for chainIndex in 0..<tubeChains.count {
+                var chain = tubeChains[chainIndex]
+                if !chain.nodes.isEmpty {
+                    let headDx = target.x - chain.nodes[0].x
+                    let headDy = target.y - chain.nodes[0].y
+                    chain.nodes[0].x += headDx * chain.lag
+                    chain.nodes[0].y += headDy * chain.lag
+
+                    if chain.nodes.count > 1 {
+                        for nodeIndex in 1..<chain.nodes.count {
+                            let prev = chain.nodes[nodeIndex - 1]
+                            var curr = chain.nodes[nodeIndex]
+                            let ddx = prev.x - curr.x
+                            let ddy = prev.y - curr.y
+                            curr.x += ddx * chain.lag
+                            curr.y += ddy * chain.lag
+                            let dist = sqrt(ddx * ddx + ddy * ddy)
+                            if dist < 3.5, dist > 0.01 {
+                                let nx = ddx / dist
+                                let ny = ddy / dist
+                                curr.x = prev.x - nx * 3.5
+                                curr.y = prev.y - ny * 3.5
+                            }
+                            chain.nodes[nodeIndex] = curr
+                        }
+                    }
+                }
+                tubeChains[chainIndex] = chain
+            }
+
+            let fadeScale = tubeFadeAlpha / 255.0
+            let frameTime = CGFloat(Double(nowMs) * 0.005)
+            let chromaBaseHue = CGFloat(fmod(Double(nowMs) * 0.2, 360.0))
+            for chainIndex in 0..<tubeChains.count {
+                let chain = tubeChains[chainIndex]
+                let nodesCount = max(1, chain.nodes.count)
+                let invCount = 1.0 / CGFloat(nodesCount)
+                let chainPhase = CGFloat(chainIndex) * (CGFloat.pi * 2.0 / 3.0)
+                var chainColor = chain.color
+                if config.chromatic {
+                    chainColor = Self.hslToRgbColor(
+                        hueDegrees: fmod(chromaBaseHue + CGFloat(chainIndex) * 30.0, 360.0),
+                        saturation: 0.9,
+                        lightness: 0.6,
+                        alpha: 1.0
+                    )
+                }
+                for nodeIndex in stride(from: nodesCount - 1, through: 0, by: -1) {
+                    let node = chain.nodes[nodeIndex]
+                    let ratio = 1.0 - CGFloat(nodeIndex) * invCount
+                    var radius = 2.0 + 7.0 * ratio
+                    if tubeFadeAlpha < 255.0 {
+                        radius *= fadeScale
+                    }
+                    var amplitude: CGFloat = 8.0
+                    if tubeFadeAlpha < 255.0 {
+                        amplitude *= fadeScale
+                    }
+                    let nodePhase = CGFloat(nodeIndex) * 0.3
+                    let renderX = node.x + cos(frameTime + nodePhase + chainPhase) * amplitude
+                    let renderY = node.y + sin(frameTime + nodePhase + chainPhase) * amplitude
+                    let alpha = max(0.0, min(1.0, CGFloat(ratio) * fadeScale))
+                    let halo = CAShapeLayer()
+                    halo.frame = containerLayer.bounds
+                    halo.contentsScale = layerScale
+                    halo.path = CGPath(ellipseIn: CGRect(x: renderX - radius * 1.3, y: renderY - radius * 1.3, width: radius * 2.6, height: radius * 2.6), transform: nil)
+                    halo.fillColor = chainColor.withAlphaComponent(alpha * 0.22).cgColor
+                    halo.strokeColor = NSColor.clear.cgColor
+                    halo.opacity = 1.0
+                    containerLayer.addSublayer(halo)
+
+                    let core = CAShapeLayer()
+                    core.frame = containerLayer.bounds
+                    core.contentsScale = layerScale
+                    core.path = CGPath(ellipseIn: CGRect(x: renderX - radius, y: renderY - radius, width: radius * 2.0, height: radius * 2.0), transform: nil)
+                    core.fillColor = chainColor.withAlphaComponent(alpha).cgColor
+                    core.strokeColor = NSColor.clear.cgColor
+                    core.opacity = 1.0
+                    containerLayer.addSublayer(core)
+                }
+            }
+
+            CATransaction.commit()
+            return
+        }
+
+        if config.style == .meteor {
+            let dt: CGFloat
+            if meteorLastUpdateMs == 0 || nowMs <= meteorLastUpdateMs {
+                dt = 0.016
+            } else {
+                dt = min(0.1, CGFloat(Double(nowMs - meteorLastUpdateMs) / 1000.0))
+            }
+            meteorLastUpdateMs = nowMs
+            if points.count >= 2 {
+                let head = localPoint(points[points.count - 1])
+                let prev = localPoint(points[points.count - 2])
+                let dx = head.x - prev.x
+                let dy = head.y - prev.y
+                let dist = sqrt(dx * dx + dy * dy)
+                if dist > 1.0 {
+                    let baseEmit = min(4, Int(dist / 7.0) + 1)
+                    let emitCount = max(1, min(8, Int(CGFloat(baseEmit) * config.meteorSparkRateScale)))
+                    for sparkIndex in 0..<emitCount {
+                        let baseAngle = atan2(-dy, -dx)
+                        let angle = baseAngle + random(in: -0.55...0.55)
+                        let speed = random(in: 0.6...3.2) * config.meteorSparkSpeedScale
+                        meteorSparks.append(
+                            MeteorSpark(
+                                x: head.x,
+                                y: head.y,
+                                vx: cos(angle) * speed,
+                                vy: sin(angle) * speed,
+                                life: 1.0,
+                                size: random(in: 1.0...3.5),
+                                hue: CGFloat(fmod(Double(nowMs) * 0.1 + Double(sparkIndex) * 20.0, 360.0))
+                            )
+                        )
+                    }
+                }
+            }
+
+            let sparkFadeBoost = 1.0 + CGFloat(1.0 - idleFactor) * 2.0
+            var updatedSparks: [MeteorSpark] = []
+            updatedSparks.reserveCapacity(meteorSparks.count)
+            for var spark in meteorSparks {
+                spark.x += spark.vx
+                spark.y += spark.vy
+                spark.vy += 0.05
+                spark.life -= dt * 1.9 * sparkFadeBoost
+                if spark.life > 0.0 {
+                    updatedSparks.append(spark)
+                }
+            }
+            if updatedSparks.count > 220 {
+                updatedSparks.removeFirst(updatedSparks.count - 220)
+            }
+            meteorSparks = updatedSparks
+        }
+
+        let segmentCount = points.count - 1
+        let safeSegmentCount = max(1, segmentCount)
+        let electricFrameBucket = UInt64(nowMs / 30)
+
+        for i in 0..<segmentCount {
+            let startPoint = points[i]
+            let endPoint = points[i + 1]
+            let life = segmentLife(nowMs: nowMs, point: startPoint, durationMs: durationMs, idleFactor: idleFactor)
+            if life <= 0.0 {
+                continue
+            }
+            let start = localPoint(startPoint)
+            let end = localPoint(endPoint)
+
+            switch config.style {
+            case .line:
+                var c = strokeColor
+                if config.chromatic {
+                    let hue = CGFloat(fmod(Double(nowMs) * 0.10 + Double(i) * 12.0, 360.0))
+                    c = Self.hslToRgbColor(hueDegrees: hue, saturation: 0.85, lightness: 0.60, alpha: 1.0)
+                }
+                let p = CGMutablePath()
+                p.move(to: start)
+                p.addLine(to: end)
+                addPathLayer(containerLayer: containerLayer, layerScale: layerScale, path: p, color: c, lineWidth: lineWidth, opacity: life)
+            case .streamer:
+                let t: Double = (segmentCount <= 1)
+                    ? 1.0
+                    : (Double(i) / Double(max(1, segmentCount - 1)))
+                var width = 0.0
+                var alphaCore = 0.0
+                var alphaGlow = 0.0
+                mfxComputeStreamerTrailSegmentMetrics(
+                    t,
+                    life,
+                    Double(config.streamerHeadPower),
+                    &width,
+                    &alphaCore,
+                    &alphaGlow
+                )
+                var coreColor = strokeColor
+                var glowColor = fillColor
+                if config.chromatic {
+                    let hue = CGFloat(fmod(Double(nowMs) * 0.18 + Double(i) * 6.0, 360.0))
+                    coreColor = Self.hslToRgbColor(hueDegrees: hue, saturation: 0.95, lightness: 0.62, alpha: 1.0)
+                    glowColor = Self.hslToRgbColor(hueDegrees: hue, saturation: 0.95, lightness: 0.58, alpha: 1.0)
+                }
+                let p = CGMutablePath()
+                p.move(to: start)
+                p.addLine(to: end)
+                addPathLayer(
+                    containerLayer: containerLayer,
+                    layerScale: layerScale,
+                    path: p,
+                    color: glowColor,
+                    lineWidth: max(0.8, CGFloat(width) * config.streamerGlowWidthScale),
+                    opacity: alphaGlow
+                )
+                addPathLayer(
+                    containerLayer: containerLayer,
+                    layerScale: layerScale,
+                    path: p,
+                    color: coreColor,
+                    lineWidth: max(1.5, CGFloat(width) * config.streamerCoreWidthScale),
+                    opacity: alphaCore
+                )
+            case .electric:
+                let dx = end.x - start.x
+                let dy = end.y - start.y
+                let len = sqrt(dx * dx + dy * dy)
+                if len < 0.5 {
+                    continue
+                }
+                let invLen = 1.0 / len
+                let nx = -dy * invLen
+                let ny = dx * invLen
+                var jitterA = 0.0
+                var jitterB = 0.0
+                var glowWidth = 0.0
+                var coreWidth = 0.0
+                var glowOpacity = 0.0
+                var coreOpacity = 0.0
+                var emitFork: Int32 = 0
+                var forkT = 0.0
+                var forkLength = 0.0
+                var forkWidth = 0.0
+                var forkOpacity = 0.0
+                var forkSide: Int32 = 1
+                mfxComputeElectricTrailSegmentMetrics(
+                    electricFrameBucket,
+                    UInt32(i),
+                    life,
+                    Double(len),
+                    Double(config.electricAmplitudeScale),
+                    Double(config.electricForkChance),
+                    &jitterA,
+                    &jitterB,
+                    &glowWidth,
+                    &coreWidth,
+                    &glowOpacity,
+                    &coreOpacity,
+                    &emitFork,
+                    &forkT,
+                    &forkLength,
+                    &forkWidth,
+                    &forkOpacity,
+                    &forkSide
+                )
+                let o1 = CGFloat(jitterA)
+                let o2 = CGFloat(jitterB)
+                let a = start
+                let b = CGPoint(x: start.x + dx * 0.35 + nx * o1, y: start.y + dy * 0.35 + ny * o1)
+                let c = CGPoint(x: start.x + dx * 0.70 + nx * o2, y: start.y + dy * 0.70 + ny * o2)
+                let d = end
+                let coreW = CGFloat(max(1.0, coreWidth))
+                let glowW = CGFloat(max(coreW, CGFloat(glowWidth)))
+                var cGlow = Self.hslToRgbColor(hueDegrees: 190.0, saturation: 0.9, lightness: 0.62, alpha: 1.0)
+                var cCore = NSColor.white
+                if config.chromatic {
+                    let hue = CGFloat(fmod(Double(nowMs) * 0.55 + Double(i) * 18.0, 360.0))
+                    cGlow = Self.hslToRgbColor(hueDegrees: hue, saturation: 1.0, lightness: 0.60, alpha: 1.0)
+                    cCore = Self.hslToRgbColor(hueDegrees: fmod(hue + 30.0, 360.0), saturation: 1.0, lightness: 0.75, alpha: 1.0)
+                }
+                let path = CGMutablePath()
+                path.move(to: a)
+                path.addLine(to: b)
+                path.addLine(to: c)
+                path.addLine(to: d)
+                addPathLayer(
+                    containerLayer: containerLayer,
+                    layerScale: layerScale,
+                    path: path,
+                    color: cGlow,
+                    lineWidth: glowW,
+                    opacity: glowOpacity
+                )
+                addPathLayer(
+                    containerLayer: containerLayer,
+                    layerScale: layerScale,
+                    path: path,
+                    color: cCore,
+                    lineWidth: coreW,
+                    opacity: coreOpacity
+                )
+                if emitFork != 0 {
+                    let t = CGFloat(forkT)
+                    let base = CGPoint(x: start.x + dx * t, y: start.y + dy * t)
+                    let side: CGFloat = (forkSide < 0) ? -1.0 : 1.0
+                    let forkLen = CGFloat(forkLength)
+                    let tip = CGPoint(
+                        x: base.x + nx * side * forkLen + dx * 0.05,
+                        y: base.y + ny * side * forkLen + dy * 0.05
+                    )
+                    let forkPath = CGMutablePath()
+                    forkPath.move(to: base)
+                    forkPath.addLine(to: tip)
+                    addPathLayer(
+                        containerLayer: containerLayer,
+                        layerScale: layerScale,
+                        path: forkPath,
+                        color: cGlow,
+                        lineWidth: CGFloat(max(1.0, forkWidth)),
+                        opacity: forkOpacity
+                    )
+                }
+            case .meteor:
+                let ratio = Double(i) / Double(safeSegmentCount)
+                var width = 0.0
+                var alpha = 0.0
+                var emitCore: Int32 = 0
+                var coreWidth = 0.0
+                var coreOpacity = 0.0
+                mfxComputeMeteorTrailSegmentMetrics(
+                    ratio,
+                    life,
+                    &width,
+                    &alpha,
+                    &emitCore,
+                    &coreWidth,
+                    &coreOpacity
+                )
+                var meteorColor = fillColor
+                if config.chromatic {
+                    let hue = CGFloat(fmod(Double(nowMs) * 0.15 + Double(i) * 8.0, 360.0))
+                    meteorColor = Self.hslToRgbColor(hueDegrees: hue, saturation: 0.9, lightness: 0.6, alpha: 1.0)
+                } else {
+                    meteorColor = NSColor(calibratedRed: 1.0, green: 220.0 / 255.0, blue: 160.0 / 255.0, alpha: 1.0)
+                }
+                let path = CGMutablePath()
+                path.move(to: start)
+                path.addLine(to: end)
+                addPathLayer(
+                    containerLayer: containerLayer,
+                    layerScale: layerScale,
+                    path: path,
+                    color: meteorColor,
+                    lineWidth: CGFloat(width),
+                    opacity: alpha
+                )
+                if emitCore != 0 {
+                    addPathLayer(
+                        containerLayer: containerLayer,
+                        layerScale: layerScale,
+                        path: path,
+                        color: NSColor.white,
+                        lineWidth: CGFloat(max(1.0, coreWidth)),
+                        opacity: coreOpacity
+                    )
+                }
+            case .tubes:
+                break
             }
         }
-        pathLayer.path = path
-        pathLayer.strokeColor = Self.colorFromArgb(fullAlphaStroke, 1.0).cgColor
-        pathLayer.fillColor = NSColor.clear.cgColor
-        pathLayer.lineWidth = lineWidth
-        pathLayer.lineCap = .round
-        pathLayer.lineJoin = .round
-        pathLayer.allowsEdgeAntialiasing = true
 
-        let newestAge = Float(nowMs - points[points.count - 1].tickMs)
-        let newestLife = max(0.0, 1.0 - newestAge / Float(durationMs))
-        pathLayer.opacity = Float(max(0.0, min(1.0, Double(newestLife) * idleFactor)))
-        pathLayer.strokeStart = 0.0
-        pathLayer.strokeEnd = 1.0
+        if config.style == .meteor {
+            for spark in meteorSparks {
+                let alpha = max(0.0, min(1.0, Double(spark.life) * idleFactor))
+                let sparkColor: NSColor
+                if config.chromatic {
+                    sparkColor = Self.hslToRgbColor(hueDegrees: spark.hue, saturation: 0.8, lightness: 0.7, alpha: 1.0)
+                } else {
+                    sparkColor = NSColor(calibratedRed: 1.0, green: 235.0 / 255.0, blue: 170.0 / 255.0, alpha: 1.0)
+                }
+                let core = CAShapeLayer()
+                core.frame = containerLayer.bounds
+                core.contentsScale = layerScale
+                core.path = CGPath(ellipseIn: CGRect(x: spark.x - spark.size * 0.5, y: spark.y - spark.size * 0.5, width: spark.size, height: spark.size), transform: nil)
+                core.fillColor = sparkColor.withAlphaComponent(alpha).cgColor
+                core.strokeColor = NSColor.clear.cgColor
+                core.opacity = 1.0
+                containerLayer.addSublayer(core)
+                if spark.life > 0.5 {
+                    let halo = CAShapeLayer()
+                    halo.frame = containerLayer.bounds
+                    halo.contentsScale = layerScale
+                    let haloSize = spark.size * 2.5
+                    halo.path = CGPath(ellipseIn: CGRect(x: spark.x - haloSize * 0.5, y: spark.y - haloSize * 0.5, width: haloSize, height: haloSize), transform: nil)
+                    halo.fillColor = sparkColor.withAlphaComponent(alpha * 0.25).cgColor
+                    halo.strokeColor = NSColor.clear.cgColor
+                    halo.opacity = 1.0
+                    containerLayer.addSublayer(halo)
+                }
+            }
 
-        containerLayer.addSublayer(pathLayer)
+            if let head = points.last {
+                let headPoint = localPoint(head)
+                let layers: [(radius: CGFloat, alpha: CGFloat, color: NSColor)] = [
+                    (18.0, CGFloat(0.16 * idleFactor), config.chromatic
+                        ? Self.hslToRgbColor(hueDegrees: CGFloat(fmod(Double(nowMs) * 0.2, 360.0)), saturation: 0.8, lightness: 0.5, alpha: 1.0)
+                        : NSColor(calibratedRed: 1.0, green: 200.0 / 255.0, blue: 120.0 / 255.0, alpha: 1.0)),
+                    (10.0, CGFloat(0.42 * idleFactor), config.chromatic
+                        ? Self.hslToRgbColor(hueDegrees: CGFloat(fmod(Double(nowMs) * 0.2, 360.0)), saturation: 0.9, lightness: 0.7, alpha: 1.0)
+                        : NSColor(calibratedRed: 1.0, green: 240.0 / 255.0, blue: 180.0 / 255.0, alpha: 1.0)),
+                    (4.0, 1.0, NSColor.white),
+                ]
+                for layer in layers {
+                    let ring = CAShapeLayer()
+                    ring.frame = containerLayer.bounds
+                    ring.contentsScale = layerScale
+                    ring.path = CGPath(ellipseIn: CGRect(x: headPoint.x - layer.radius, y: headPoint.y - layer.radius, width: layer.radius * 2.0, height: layer.radius * 2.0), transform: nil)
+                    ring.fillColor = layer.color.withAlphaComponent(layer.alpha).cgColor
+                    ring.strokeColor = NSColor.clear.cgColor
+                    ring.opacity = 1.0
+                    containerLayer.addSublayer(ring)
+                }
+            }
+        }
+
         CATransaction.commit()
     }
 
@@ -311,21 +980,31 @@ private final class MfxLineTrailState: NSObject {
         }
     }
 
-    private func ensureTimerOnMain() {
-        if timer != nil {
+    private func ensureTimerOnMain(x: Int32, y: Int32) {
+        let desiredIntervalMs = resolveTimerIntervalMs(forX: x, y: y)
+        if let timer {
+            if timerIntervalMs != desiredIntervalMs {
+                timer.schedule(
+                    deadline: .now(),
+                    repeating: .milliseconds(desiredIntervalMs),
+                    leeway: .milliseconds(max(1, desiredIntervalMs / 8))
+                )
+                timerIntervalMs = desiredIntervalMs
+            }
             return
         }
         let source = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
         source.schedule(
             deadline: .now(),
-            repeating: .milliseconds(33),
-            leeway: .milliseconds(2)
+            repeating: .milliseconds(desiredIntervalMs),
+            leeway: .milliseconds(max(1, desiredIntervalMs / 8))
         )
         source.setEventHandler { [weak self] in
             self?.tickOnMain()
         }
         source.resume()
         timer = source
+        timerIntervalMs = desiredIntervalMs
     }
 
     func updateOnMain(
@@ -334,12 +1013,38 @@ private final class MfxLineTrailState: NSObject {
         durationMs: Int,
         lineWidth: Float,
         strokeArgb: UInt32,
+        fillArgb: UInt32,
+        styleKind: Int32,
+        intensity: Double,
+        chromatic: Int32,
+        streamerGlowWidthScale: Float,
+        streamerCoreWidthScale: Float,
+        streamerHeadPower: Float,
+        electricAmplitudeScale: Float,
+        electricForkChance: Float,
+        meteorSparkRateScale: Float,
+        meteorSparkSpeedScale: Float,
         idleFadeStartMs: Int,
         idleFadeEndMs: Int
     ) {
+        let nextStyle = StyleKind.resolve(styleKind)
+        if config.style != nextStyle {
+            resetStyleRuntimeStateOnMain()
+        }
         config.durationMs = max(1, durationMs)
-        config.lineWidth = CGFloat(max(0.2, lineWidth))
+        config.lineWidth = CGFloat(max(1.0, lineWidth))
         config.strokeArgb = strokeArgb
+        config.fillArgb = fillArgb
+        config.style = nextStyle
+        config.intensity = Self.clamp01(intensity)
+        config.chromatic = (chromatic != 0)
+        config.streamerGlowWidthScale = max(0.5, min(4.0, CGFloat(streamerGlowWidthScale)))
+        config.streamerCoreWidthScale = max(0.2, min(2.0, CGFloat(streamerCoreWidthScale)))
+        config.streamerHeadPower = max(0.8, min(3.0, CGFloat(streamerHeadPower)))
+        config.electricAmplitudeScale = max(0.2, min(3.0, CGFloat(electricAmplitudeScale)))
+        config.electricForkChance = max(0.0, min(0.5, CGFloat(electricForkChance)))
+        config.meteorSparkRateScale = max(0.2, min(4.0, CGFloat(meteorSparkRateScale)))
+        config.meteorSparkSpeedScale = max(0.2, min(4.0, CGFloat(meteorSparkSpeedScale)))
         config.idleFadeStartMs = idleFadeStartMs
         config.idleFadeEndMs = idleFadeEndMs
 
@@ -351,8 +1056,14 @@ private final class MfxLineTrailState: NSObject {
         lastInputMs = nowMs
 
         if let last = points.last {
+            if Self.isOriginConnector(from: last, toX: x, toY: y) {
+                points.removeAll(keepingCapacity: true)
+            }
             let dx = Double(x - last.x)
             let dy = Double(y - last.y)
+            if (dx * dx + dy * dy) > (1600.0 * 1600.0) {
+                points.removeAll(keepingCapacity: true)
+            }
             if (dx * dx + dy * dy) < 1.0 {
                 return
             }
@@ -370,7 +1081,7 @@ private final class MfxLineTrailState: NSObject {
         }
 
         rebuildPath(nowMs: nowMs)
-        ensureTimerOnMain()
+        ensureTimerOnMain(x: x, y: y)
     }
 
     func reset() {
@@ -465,6 +1176,17 @@ public func mfx_macos_line_trail_update_v1(
     _ durationMs: Int32,
     _ lineWidth: Float,
     _ strokeArgb: UInt32,
+    _ fillArgb: UInt32,
+    _ styleKind: Int32,
+    _ intensity: Double,
+    _ chromatic: Int32,
+    _ streamerGlowWidthScale: Float,
+    _ streamerCoreWidthScale: Float,
+    _ streamerHeadPower: Float,
+    _ electricAmplitudeScale: Float,
+    _ electricForkChance: Float,
+    _ meteorSparkRateScale: Float,
+    _ meteorSparkSpeedScale: Float,
     _ idleFadeStartMs: Int32,
     _ idleFadeEndMs: Int32
 ) {
@@ -485,6 +1207,17 @@ public func mfx_macos_line_trail_update_v1(
                 durationMs: Int(durationMs),
                 lineWidth: lineWidth,
                 strokeArgb: strokeArgb,
+                fillArgb: fillArgb,
+                styleKind: styleKind,
+                intensity: intensity,
+                chromatic: chromatic,
+                streamerGlowWidthScale: streamerGlowWidthScale,
+                streamerCoreWidthScale: streamerCoreWidthScale,
+                streamerHeadPower: streamerHeadPower,
+                electricAmplitudeScale: electricAmplitudeScale,
+                electricForkChance: electricForkChance,
+                meteorSparkRateScale: meteorSparkRateScale,
+                meteorSparkSpeedScale: meteorSparkSpeedScale,
                 idleFadeStartMs: Int(idleFadeStartMs),
                 idleFadeEndMs: Int(idleFadeEndMs)
             )
@@ -499,6 +1232,17 @@ public func mfx_macos_line_trail_update_v1(
                 durationMs: Int(durationMs),
                 lineWidth: lineWidth,
                 strokeArgb: strokeArgb,
+                fillArgb: fillArgb,
+                styleKind: styleKind,
+                intensity: intensity,
+                chromatic: chromatic,
+                streamerGlowWidthScale: streamerGlowWidthScale,
+                streamerCoreWidthScale: streamerCoreWidthScale,
+                streamerHeadPower: streamerHeadPower,
+                electricAmplitudeScale: electricAmplitudeScale,
+                electricForkChance: electricForkChance,
+                meteorSparkRateScale: meteorSparkRateScale,
+                meteorSparkSpeedScale: meteorSparkSpeedScale,
                 idleFadeStartMs: Int(idleFadeStartMs),
                 idleFadeEndMs: Int(idleFadeEndMs)
             )

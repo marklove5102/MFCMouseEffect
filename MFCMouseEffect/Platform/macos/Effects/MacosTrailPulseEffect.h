@@ -25,7 +25,7 @@ public:
         std::string themeName,
         macos_effect_profile::TrailRenderProfile renderProfile,
         macos_effect_profile::TrailThrottleProfile throttleProfile,
-        IdleFadeParams idleFade,
+        TrailRendererParamsConfig trailParams,
         float lineWidth);
     ~MacosTrailPulseEffect() override;
 
@@ -43,7 +43,7 @@ private:
     std::string themeName_{};
     macos_effect_profile::TrailRenderProfile renderProfile_{};
     macos_effect_profile::TrailThrottleProfile throttleProfile_{};
-    IdleFadeParams idleFade_{};
+    TrailRendererParamsConfig trailParams_{};
     float lineWidth_ = 4.0f;
     bool initialized_ = false;
 

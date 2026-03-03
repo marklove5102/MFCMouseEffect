@@ -6,6 +6,7 @@
 #include "Platform/macos/Effects/MacosTrailPulseEmissionPlanner.h"
 
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
+#include "MouseFx/Utils/StringUtils.h"
 #include "Platform/macos/Effects/MacosLineTrailOverlay.h"
 #include "Platform/macos/Effects/MacosTrailPulseOverlayRenderer.h"
 
@@ -40,6 +41,117 @@ bool IsOriginConnectorSample(const ScreenPoint& from, const ScreenPoint& to) {
     return distance >= 24.0;
 }
 
+bool IsContinuousTrailType(const std::string& normalizedType) {
+    return normalizedType != "none" && normalizedType != "particle";
+}
+
+macos_line_trail::LineTrailStyleKind ResolveLineTrailStyleKind(const std::string& normalizedType) {
+    if (normalizedType == "streamer") {
+        return macos_line_trail::LineTrailStyleKind::Streamer;
+    }
+    if (normalizedType == "electric") {
+        return macos_line_trail::LineTrailStyleKind::Electric;
+    }
+    if (normalizedType == "meteor") {
+        return macos_line_trail::LineTrailStyleKind::Meteor;
+    }
+    if (normalizedType == "tubes") {
+        return macos_line_trail::LineTrailStyleKind::Tubes;
+    }
+    return macos_line_trail::LineTrailStyleKind::Line;
+}
+
+int ResolveTrailDurationFloorMs(const std::string& normalizedType) {
+    if (normalizedType == "streamer") {
+        return 420;
+    }
+    if (normalizedType == "electric") {
+        return 280;
+    }
+    if (normalizedType == "meteor") {
+        return 520;
+    }
+    if (normalizedType == "tubes") {
+        return 350;
+    }
+    return 300;
+}
+
+float ResolveTrailLineWidthFloorPx(const std::string& normalizedType) {
+    if (normalizedType == "streamer") {
+        return 2.8f;
+    }
+    if (normalizedType == "electric") {
+        return 2.2f;
+    }
+    if (normalizedType == "meteor") {
+        return 2.6f;
+    }
+    if (normalizedType == "tubes") {
+        return 3.0f;
+    }
+    return 2.4f;
+}
+
+macos_line_trail::LineTrailConfig BuildLineTrailConfig(
+    const TrailEffectRenderCommand& command,
+    const std::string& themeName,
+    const TrailRendererParamsConfig& trailParams,
+    float fallbackLineWidth) {
+    macos_line_trail::LineTrailConfig config{};
+    const int computedDurationMs = static_cast<int>(std::lround(command.durationSec * 1000.0));
+    const int durationFloorMs = ResolveTrailDurationFloorMs(command.normalizedType);
+    config.durationMs = std::clamp(std::max(computedDurationMs, durationFloorMs), 80, 2200);
+
+    const float fallbackWidth = std::clamp(fallbackLineWidth, 1.0f, 24.0f);
+    float lineWidth = (command.lineWidthPx > 0.0)
+        ? static_cast<float>(command.lineWidthPx)
+        : fallbackWidth;
+    if (command.normalizedType == "streamer") {
+        lineWidth *= 1.18f;
+    } else if (command.normalizedType == "tubes") {
+        lineWidth *= 1.24f;
+    }
+    config.lineWidth = std::clamp(
+        std::max(lineWidth, ResolveTrailLineWidthFloorPx(command.normalizedType)),
+        1.0f,
+        24.0f);
+    config.strokeArgb = command.strokeArgb;
+    config.fillArgb = command.fillArgb;
+    if ((config.fillArgb & 0xFF000000u) == 0u) {
+        config.fillArgb = (0x66u << 24) | (config.strokeArgb & 0x00FFFFFFu);
+    }
+    config.intensity = std::clamp(command.intensity, 0.0, 1.0);
+    config.style = ResolveLineTrailStyleKind(command.normalizedType);
+    config.chromatic = (ToLowerAscii(themeName) == "chromatic");
+    config.streamerGlowWidthScale = trailParams.streamer.glowWidthScale;
+    config.streamerCoreWidthScale = trailParams.streamer.coreWidthScale;
+    config.streamerHeadPower = trailParams.streamer.headPower;
+    config.electricAmplitudeScale = trailParams.electric.amplitudeScale;
+    config.electricForkChance = trailParams.electric.forkChance;
+    config.meteorSparkRateScale = trailParams.meteor.sparkRateScale;
+    config.meteorSparkSpeedScale = trailParams.meteor.sparkSpeedScale;
+    config.idleFade.startMs = std::max(0, trailParams.idleFade.startMs);
+    config.idleFade.endMs = std::max(config.idleFade.startMs + 1, trailParams.idleFade.endMs);
+    return config;
+}
+
+double ResolveContinuousTrailStepPx(const std::string& normalizedType) {
+    if (normalizedType == "streamer") {
+        return 3.0;
+    }
+    if (normalizedType == "electric") {
+        return 2.5;
+    }
+    if (normalizedType == "meteor") {
+        return 3.0;
+    }
+    if (normalizedType == "tubes") {
+        return 3.5;
+    }
+    return 4.0;
+}
+
 } // namespace
 
 TrailPulseRuntimeDiagnostics ReadTrailPulseRuntimeDiagnostics() {
@@ -55,13 +167,13 @@ MacosTrailPulseEffect::MacosTrailPulseEffect(
     std::string themeName,
     macos_effect_profile::TrailRenderProfile renderProfile,
     macos_effect_profile::TrailThrottleProfile throttleProfile,
-    IdleFadeParams idleFade,
+    TrailRendererParamsConfig trailParams,
     float lineWidth)
     : effectType_(std::move(effectType)),
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile),
       throttleProfile_(throttleProfile),
-      idleFade_(idleFade),
+      trailParams_(trailParams),
       lineWidth_(lineWidth) {
     effectType_ = NormalizeTrailEffectType(effectType_);
 }
@@ -110,9 +222,7 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         lastPoint_ = pt;
         return;
     }
-    const bool lineTrail = (normalizedType == "line");
-    const bool streamerTrail = (normalizedType == "streamer");
-    const bool continuousTrail = (lineTrail || streamerTrail);
+    const bool continuousTrail = IsContinuousTrailType(normalizedType);
     if (!continuousTrail && continuousTrailActive_) {
         macos_line_trail::ResetLineTrail();
         continuousTrailActive_ = false;
@@ -140,26 +250,11 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
     }
 
     if (continuousTrail) {
-        macos_line_trail::LineTrailConfig config{};
-        // Keep line/streamer on continuous overlay path to avoid pulse-segment
-        // "matchstick" artifacts during fast pointer movement.
-        const double durationScale = streamerTrail ? 1.9 : 2.5;
-        const int minDurationMs = streamerTrail ? 320 : 500;
-        const int maxDurationMs = streamerTrail ? 1800 : 2200;
-        config.durationMs = std::clamp(
-            static_cast<int>(std::lround(renderProfile_.durationSec * 1000.0 * durationScale)),
-            minDurationMs,
-            maxDurationMs);
-        config.lineWidth = std::clamp(
-            lineWidth_ * (streamerTrail ? 0.9f : 1.0f),
-            streamerTrail ? 1.5f : 2.0f,
-            18.0f);
-        config.strokeArgb = streamerTrail ? renderProfile_.streamer.strokeArgb : renderProfile_.line.strokeArgb;
-        config.idleFade.startMs = std::max(idleFade_.startMs, streamerTrail ? 180 : 300);
-        config.idleFade.endMs = std::max(idleFade_.endMs, streamerTrail ? 420 : 600);
-        const double distance = moveDistance;
-        const double segmentStepPx = streamerTrail ? 3.0 : 4.0;
-        const int segmentCount = static_cast<int>(std::clamp(std::ceil(distance / segmentStepPx), 1.0, 64.0));
+        const TrailEffectProfile profile =
+            macos_effect_compute_profile::BuildTrailProfile(renderProfile_);
+        const double segmentStepPx = ResolveContinuousTrailStepPx(normalizedType);
+        const int segmentCount = static_cast<int>(std::clamp(std::ceil(moveDistance / segmentStepPx), 1.0, 72.0));
+        ScreenPoint prev = lastPoint_;
         for (int i = 1; i <= segmentCount; ++i) {
             const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
             ScreenPoint segPt{};
@@ -167,7 +262,18 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
                                                        (static_cast<double>(pt.x - lastPoint_.x) * t)));
             segPt.y = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.y) +
                                                        (static_cast<double>(pt.y - lastPoint_.y) * t)));
-            macos_line_trail::UpdateLineTrail(segPt, config);
+            const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
+                ScreenToOverlayPoint(segPt),
+                static_cast<double>(segPt.x - prev.x),
+                static_cast<double>(segPt.y - prev.y),
+                normalizedType,
+                profile);
+            if (command.emit) {
+                const macos_line_trail::LineTrailConfig config =
+                    BuildLineTrailConfig(command, themeName_, trailParams_, lineWidth_);
+                macos_line_trail::UpdateLineTrail(segPt, config);
+            }
+            prev = segPt;
         }
         continuousTrailActive_ = true;
         lastPoint_ = pt;
@@ -182,9 +288,7 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         lastEmitTickMs_,
         throttleProfile);
     if (!emission.shouldEmit) {
-        const double forceDistance = (normalizedType == "streamer")
-            ? std::max(6.0, throttleProfile.minDistancePx * 1.4)
-            : std::max(12.0, throttleProfile.minDistancePx * 2.0);
+        const double forceDistance = std::max(12.0, throttleProfile.minDistancePx * 2.0);
         if (emission.distancePx < forceDistance) {
             return;
         }

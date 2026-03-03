@@ -35,6 +35,25 @@ double Clamp01(double value) {
     return std::clamp(value, 0.0, 1.0);
 }
 
+double ResolveLineWidthScale(const std::string& trailType) {
+    if (trailType == "streamer") {
+        return 1.22;
+    }
+    if (trailType == "meteor") {
+        return 1.18;
+    }
+    if (trailType == "tubes") {
+        return 1.35;
+    }
+    if (trailType == "electric") {
+        return 0.95;
+    }
+    if (trailType == "particle") {
+        return 0.82;
+    }
+    return 1.0;
+}
+
 } // namespace
 
 std::string NormalizeTrailEffectType(const std::string& effectType) {
@@ -110,9 +129,10 @@ TrailEffectRenderCommand ComputeTrailEffectRenderCommand(
     command.durationSec = std::clamp(profile.durationSec * tempo.durationScale * speedDurationScale, 0.08, 3.0);
     command.closeAfterMs = static_cast<int>(command.durationSec * 1000.0) + profile.closePaddingMs;
     command.baseOpacity = std::clamp(profile.baseOpacity, 0.05, 1.0);
-    if (command.normalizedType == "line") {
-        command.lineWidthPx = std::clamp(profile.lineWidthPx, 1.0, 18.0);
-    }
+    const double baseLineWidth = std::clamp(profile.lineWidthPx, 1.0, 18.0);
+    const double typeLineScale = ResolveLineWidthScale(command.normalizedType);
+    const double speedLineScale = 0.88 + command.intensity * 0.52;
+    command.lineWidthPx = std::clamp(baseLineWidth * typeLineScale * speedLineScale, 1.0, 24.0);
     command.fillArgb = color.fillArgb;
     command.strokeArgb = color.strokeArgb;
     return command;

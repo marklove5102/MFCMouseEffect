@@ -38,6 +38,17 @@ public:
             durationMs,
             lineWidth,
             config.strokeArgb,
+            config.fillArgb,
+            static_cast<int>(config.style),
+            std::clamp(config.intensity, 0.0, 1.0),
+            config.chromatic ? 1 : 0,
+            std::clamp(config.streamerGlowWidthScale, 0.5f, 4.0f),
+            std::clamp(config.streamerCoreWidthScale, 0.2f, 2.0f),
+            std::clamp(config.streamerHeadPower, 0.8f, 3.0f),
+            std::clamp(config.electricAmplitudeScale, 0.2f, 3.0f),
+            std::clamp(config.electricForkChance, 0.0f, 0.5f),
+            std::clamp(config.meteorSparkRateScale, 0.2f, 4.0f),
+            std::clamp(config.meteorSparkSpeedScale, 0.2f, 4.0f),
             idleFadeStartMs,
             idleFadeEndMs);
     }
