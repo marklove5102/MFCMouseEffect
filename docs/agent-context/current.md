@@ -35,6 +35,7 @@
   - 2026-03-03 trail tubes compute extraction: tubes node render math (radius/amplitude/alpha/node-phase/chain-phase) is now computed in `TrailStyleCompute` and bridged to Swift, removing another chunk of style formula branching from macOS renderer code.
   - 2026-03-03 trail tubes follow extraction: tubes chain follow-step math (head follow + per-node follow/min-distance clamp) is now computed in `TrailStyleCompute` and called by Swift bridge, so macOS keeps only state update orchestration and drawing.
   - 2026-03-03 trail chromatic extraction: per-style chromatic hue-time formulas (`line/streamer/electric/meteor/tubes/particle`) are now provided by shared `TrailStyleCompute` and consumed via Swift bridge, reducing scattered platform-local color timing math.
+  - 2026-03-03 trail lane convergence: `MacosTrailPulseEffect` removed the legacy non-continuous pulse emission branch; all non-`none` trail types now stay on one continuous line-trail command lane (compute in Core, render in Swift).
   - 2026-03-03 trail particle closure: `particle` is now routed to the same continuous line-trail lane on macOS (no legacy pulse-segment fallback path); `TrailStyleCompute`/Swift bridge adds shared particle segment metrics (`radius/opacity/halo`) so all trail types (`line/streamer/electric/meteor/tubes/particle`) stay under one compute-driven trail pipeline.
   - Core effects contract now also enforces trail visibility semantics on macOS:
     - `trail=line` must increase active trail overlay window count in overlay probe.

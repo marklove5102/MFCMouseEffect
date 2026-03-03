@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <chrono>
 #include <cmath>
 #include <utility>
 
@@ -178,13 +177,11 @@ MacosTrailPulseEffect::MacosTrailPulseEffect(
     std::string effectType,
     std::string themeName,
     macos_effect_profile::TrailRenderProfile renderProfile,
-    macos_effect_profile::TrailThrottleProfile throttleProfile,
     TrailRendererParamsConfig trailParams,
     float lineWidth)
     : effectType_(std::move(effectType)),
       themeName_(std::move(themeName)),
       renderProfile_(renderProfile),
-      throttleProfile_(throttleProfile),
       trailParams_(trailParams),
       lineWidth_(lineWidth) {
     effectType_ = NormalizeTrailEffectType(effectType_);
@@ -197,7 +194,6 @@ MacosTrailPulseEffect::~MacosTrailPulseEffect() {
 bool MacosTrailPulseEffect::Initialize() {
     initialized_ = true;
     hasLastPoint_ = false;
-    lastEmitTickMs_ = 0;
     continuousTrailActive_ = false;
     emissionPlannerConfig_ = macos_trail_pulse::ResolveTrailPulseEmissionPlannerConfig();
     return true;
@@ -206,7 +202,6 @@ bool MacosTrailPulseEffect::Initialize() {
 void MacosTrailPulseEffect::Shutdown() {
     initialized_ = false;
     hasLastPoint_ = false;
-    lastEmitTickMs_ = 0;
     continuousTrailActive_ = false;
     macos_line_trail::ResetLineTrail();
     macos_trail_pulse::CloseAllTrailPulseWindows();
@@ -224,7 +219,6 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
     }
     gTrailMoveSamples.fetch_add(1, std::memory_order_relaxed);
 
-    const uint64_t now = CurrentTickMs();
     const std::string normalizedType = NormalizeTrailEffectType(effectType_);
     if (normalizedType == "none") {
         if (continuousTrailActive_) {
@@ -235,16 +229,12 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         return;
     }
     const bool continuousTrail = IsContinuousTrailType(normalizedType);
-    if (!continuousTrail && continuousTrailActive_) {
-        macos_line_trail::ResetLineTrail();
-        continuousTrailActive_ = false;
-    }
     const double moveDx = static_cast<double>(pt.x - lastPoint_.x);
     const double moveDy = static_cast<double>(pt.y - lastPoint_.y);
     const double moveDistance = std::sqrt(moveDx * moveDx + moveDy * moveDy);
     if (IsOriginConnectorSample(lastPoint_, pt)) {
         gTrailOriginConnectorDropCount.fetch_add(1, std::memory_order_relaxed);
-        if (continuousTrail && continuousTrailActive_) {
+        if (continuousTrailActive_) {
             macos_line_trail::ResetLineTrail();
             continuousTrailActive_ = false;
         }
@@ -253,7 +243,7 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
     }
     if (moveDistance > std::max(200.0, emissionPlannerConfig_.teleportSkipDistancePx)) {
         gTrailTeleportDropCount.fetch_add(1, std::memory_order_relaxed);
-        if (continuousTrail && continuousTrailActive_) {
+        if (continuousTrailActive_) {
             macos_line_trail::ResetLineTrail();
             continuousTrailActive_ = false;
         }
@@ -261,89 +251,37 @@ void MacosTrailPulseEffect::OnMouseMove(const ScreenPoint& pt) {
         return;
     }
 
-    if (continuousTrail) {
-        const TrailEffectProfile profile =
-            macos_effect_compute_profile::BuildTrailProfile(renderProfile_);
-        const double segmentStepPx = ResolveContinuousTrailStepPx(normalizedType);
-        const int segmentCount = static_cast<int>(std::clamp(std::ceil(moveDistance / segmentStepPx), 1.0, 72.0));
-        ScreenPoint prev = lastPoint_;
-        for (int i = 1; i <= segmentCount; ++i) {
-            const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
-            ScreenPoint segPt{};
-            segPt.x = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.x) +
-                                                       (static_cast<double>(pt.x - lastPoint_.x) * t)));
-            segPt.y = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.y) +
-                                                       (static_cast<double>(pt.y - lastPoint_.y) * t)));
-            const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
-                ScreenToOverlayPoint(segPt),
-                static_cast<double>(segPt.x - prev.x),
-                static_cast<double>(segPt.y - prev.y),
-                normalizedType,
-                profile);
-            if (command.emit) {
-                const macos_line_trail::LineTrailConfig config =
-                    BuildLineTrailConfig(command, themeName_, trailParams_, lineWidth_);
-                macos_line_trail::UpdateLineTrail(segPt, config);
-            }
-            prev = segPt;
-        }
-        continuousTrailActive_ = true;
+    if (!continuousTrail) {
         lastPoint_ = pt;
         return;
     }
-    const auto throttleProfile =
-        macos_effect_compute_profile::BuildTrailThrottleProfile(throttleProfile_);
-    TrailEffectEmissionResult emission = ComputeTrailEffectEmission(
-        pt,
-        lastPoint_,
-        now,
-        lastEmitTickMs_,
-        throttleProfile);
-    if (!emission.shouldEmit) {
-        const double forceDistance = std::max(12.0, throttleProfile.minDistancePx * 2.0);
-        if (emission.distancePx < forceDistance) {
-            return;
-        }
-        emission.shouldEmit = true;
-    }
-
-    lastEmitTickMs_ = now;
     const TrailEffectProfile profile =
         macos_effect_compute_profile::BuildTrailProfile(renderProfile_);
-    const macos_trail_pulse::TrailPulseEmissionPlan segmentPlan =
-        macos_trail_pulse::BuildTrailPulseEmissionPlan(
-            lastPoint_,
-            pt,
-            normalizedType,
-            throttleProfile.minDistancePx,
-            emissionPlannerConfig_);
-    if (segmentPlan.dropAsTeleport || segmentPlan.segmentPoints.empty()) {
-        if (segmentPlan.dropAsTeleport) {
-            gTrailTeleportDropCount.fetch_add(1, std::memory_order_relaxed);
-        }
-        lastPoint_ = pt;
-        return;
-    }
-
+    const double segmentStepPx = ResolveContinuousTrailStepPx(normalizedType);
+    const int segmentCount = static_cast<int>(std::clamp(std::ceil(moveDistance / segmentStepPx), 1.0, 72.0));
     ScreenPoint prev = lastPoint_;
-    for (const ScreenPoint& segPt : segmentPlan.segmentPoints) {
-        const double dx = static_cast<double>(segPt.x - prev.x);
-        const double dy = static_cast<double>(segPt.y - prev.y);
+    for (int i = 1; i <= segmentCount; ++i) {
+        const double t = static_cast<double>(i) / static_cast<double>(segmentCount);
+        ScreenPoint segPt{};
+        segPt.x = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.x) +
+                                                   (static_cast<double>(pt.x - lastPoint_.x) * t)));
+        segPt.y = static_cast<int32_t>(std::lround(static_cast<double>(lastPoint_.y) +
+                                                   (static_cast<double>(pt.y - lastPoint_.y) * t)));
         const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
             ScreenToOverlayPoint(segPt),
-            dx,
-            dy,
+            static_cast<double>(segPt.x - prev.x),
+            static_cast<double>(segPt.y - prev.y),
             normalizedType,
             profile);
-        macos_trail_pulse::ShowTrailPulseOverlay(command, themeName_);
+        if (command.emit) {
+            const macos_line_trail::LineTrailConfig config =
+                BuildLineTrailConfig(command, themeName_, trailParams_, lineWidth_);
+            macos_line_trail::UpdateLineTrail(segPt, config);
+        }
         prev = segPt;
     }
+    continuousTrailActive_ = true;
     lastPoint_ = pt;
-}
-
-uint64_t MacosTrailPulseEffect::CurrentTickMs() {
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
 } // namespace mousefx

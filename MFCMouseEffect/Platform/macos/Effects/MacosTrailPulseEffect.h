@@ -24,7 +24,6 @@ public:
         std::string effectType,
         std::string themeName,
         macos_effect_profile::TrailRenderProfile renderProfile,
-        macos_effect_profile::TrailThrottleProfile throttleProfile,
         TrailRendererParamsConfig trailParams,
         float lineWidth);
     ~MacosTrailPulseEffect() override;
@@ -37,19 +36,15 @@ public:
     void OnMouseMove(const ScreenPoint& pt) override;
 
 private:
-    static uint64_t CurrentTickMs();
-
     std::string effectType_{};
     std::string themeName_{};
     macos_effect_profile::TrailRenderProfile renderProfile_{};
-    macos_effect_profile::TrailThrottleProfile throttleProfile_{};
     TrailRendererParamsConfig trailParams_{};
     float lineWidth_ = 4.0f;
     bool initialized_ = false;
 
     bool hasLastPoint_ = false;
     ScreenPoint lastPoint_{};
-    uint64_t lastEmitTickMs_ = 0;
     macos_trail_pulse::TrailPulseEmissionPlannerConfig emissionPlannerConfig_{};
     bool continuousTrailActive_ = false;
 };

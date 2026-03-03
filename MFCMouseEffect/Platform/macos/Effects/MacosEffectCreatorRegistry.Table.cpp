@@ -25,7 +25,6 @@ std::unique_ptr<IMouseEffect> CreateTrail(const std::string& type, const EffectC
         type,
         config.theme,
         macos_effect_profile::ResolveTrailRenderProfile(config, type),
-        macos_effect_profile::ResolveTrailThrottleProfile(config, type),
         config.trailParams,
         config.trail.lineWidth);
 }
