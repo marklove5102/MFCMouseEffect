@@ -353,7 +353,7 @@ private final class MfxLineTrailState: NSObject {
         tubeLastTarget = .zero
     }
 
-    private func ensureTubeChains() {
+    private func ensureTubeChains(initialTarget: CGPoint) {
         if !tubeChains.isEmpty {
             return
         }
@@ -366,7 +366,7 @@ private final class MfxLineTrailState: NSObject {
         let lags: [CGFloat] = [0.30, 0.40, 0.50]
         tubeChains = (0..<3).map { idx in
             TubeChain(
-                nodes: Array(repeating: .zero, count: nodeCount),
+                nodes: Array(repeating: initialTarget, count: nodeCount),
                 color: tubeColors[idx],
                 lag: lags[idx]
             )
@@ -562,7 +562,6 @@ private final class MfxLineTrailState: NSObject {
         }
 
         if config.style == .tubes {
-            ensureTubeChains()
             let hasInput = !points.isEmpty
             let target: CGPoint
             if let head = points.last {
@@ -575,6 +574,7 @@ private final class MfxLineTrailState: NSObject {
                 CATransaction.commit()
                 return
             }
+            ensureTubeChains(initialTarget: target)
 
             let isIdle = !hasInput || (nowMs > points[points.count - 1].tickMs + 50)
             if !isIdle {
