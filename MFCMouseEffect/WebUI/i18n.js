@@ -677,5 +677,30 @@
       style_custom: "\u81ea\u5b9a\u4e49"
     }
   };
+  // Platform-aware text: macOS uses "menu bar" instead of "tray"
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || '') ||
+                /Mac OS/.test(navigator.userAgent || '');
+  if (isMac) {
+    // en-US: "tray" → "menu bar"
+    const en = I18N["en-US"];
+    if (en) {
+      for (const k of Object.keys(en)) {
+        if (typeof en[k] === 'string') {
+          en[k] = en[k].replace(/\bfrom the tray\b/gi, 'from the menu bar')
+                       .replace(/\bfrom tray\b/gi, 'from menu bar');
+        }
+      }
+    }
+    // zh-CN: "托盘" → "菜单栏"
+    const zh = I18N["zh-CN"];
+    if (zh) {
+      for (const k of Object.keys(zh)) {
+        if (typeof zh[k] === 'string') {
+          zh[k] = zh[k].replace(/托盘/g, '菜单栏');
+        }
+      }
+    }
+  }
+
   window.MfxWebI18n = I18N;
 })();

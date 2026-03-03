@@ -16,6 +16,10 @@ struct ScrollEffectDirectionColorProfile {
 struct ScrollEffectProfile {
     int verticalSizePx = 138;
     int horizontalSizePx = 148;
+    int geometryReferenceSizePx = 160;
+    double baseStartRadiusPx = 8.0;
+    double baseEndRadiusPx = 58.0;
+    double baseStrokeWidthPx = 2.8;
     double baseDurationSec = 0.28;
     double perStrengthStepSec = 0.018;
     int closePaddingMs = 90;
@@ -44,6 +48,9 @@ struct ScrollEffectRenderCommand {
     bool helixMode = false;
     bool twinkleMode = false;
     int sizePx = 138;
+    double startRadiusPx = 8.0;
+    double endRadiusPx = 58.0;
+    double strokeWidthPx = 2.8;
     double durationSec = 0.28;
     int closeAfterMs = 90;
     double baseOpacity = 0.96;

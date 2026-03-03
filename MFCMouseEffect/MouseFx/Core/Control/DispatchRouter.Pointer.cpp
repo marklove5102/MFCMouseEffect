@@ -5,6 +5,7 @@
 #include "DispatchRouter.h"
 
 #include "DispatchRouter.Internal.h"
+#include "MouseFx/Core/Effects/ScrollEffectCompute.h"
 #include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "MouseFx/Interfaces/IMouseEffect.h"
 
@@ -126,12 +127,25 @@ intptr_t DispatchRouter::OnScroll(const DispatchMessage& message) {
     automationFeature_.OnScroll(*ctrl_, delta);
     indicatorFeature_.OnScroll(*ctrl_, ev);
 
+    IMouseEffect* scrollEffect = ctrl_->GetEffect(EffectCategory::Scroll);
+    bool forceBuiltinScrollOnWheel = false;
+    if (scrollEffect != nullptr) {
+        const std::string normalizedScrollType = NormalizeScrollEffectType(scrollEffect->TypeName());
+        // Keep built-in scroll visual types on native effect lane so macOS scroll
+        // rendering stays aligned with Windows behavior under shared compute input.
+        forceBuiltinScrollOnWheel =
+            (normalizedScrollType == "arrow") ||
+            (normalizedScrollType == "helix") ||
+            (normalizedScrollType == "twinkle");
+    }
+
     bool scrollRenderedByWasm = false;
-    const bool scrollRouteActive = wasmFeature_.RouteScroll(*ctrl_, ev, &scrollRenderedByWasm);
-    if ((!scrollRouteActive || !scrollRenderedByWasm) && (ctrl_->GetEffect(EffectCategory::Scroll) != nullptr)) {
-        if (auto* effect = ctrl_->GetEffect(EffectCategory::Scroll)) {
-            effect->OnScroll(ev);
-        }
+    bool scrollRouteActive = false;
+    if (!forceBuiltinScrollOnWheel) {
+        scrollRouteActive = wasmFeature_.RouteScroll(*ctrl_, ev, &scrollRenderedByWasm);
+    }
+    if ((!scrollRouteActive || !scrollRenderedByWasm) && (scrollEffect != nullptr)) {
+        scrollEffect->OnScroll(ev);
     }
     return 0;
 }

@@ -49,6 +49,10 @@
   - 2026-03-03 trail particle cadence parity fix: macOS `particle` timer cadence is capped to 60Hz semantics (`>=16ms`) even when overlay auto-follows high-refresh displays, keeping particle physics step behavior aligned with the Windows particle pipeline.
   - 2026-03-03 trail particle tick-model parity fix: macOS `particle` now uses a tick-driven update model (move event only publishes latest point; burst emission + physics integration + render happen on timer ticks), matching Windows `ParticleTrailOverlayLayer::Update(...)` timing semantics instead of event-frequency-driven rebuild.
   - 2026-03-03 wasm route guard (trail parity): `DispatchRouter::OnMove` now keeps `trail=line|particle` on built-in effect lane (skip wasm move-route override), ensuring macOS line/particle trail stays on the Windows-aligned compute/render pipeline when wasm plugin runtime is enabled.
+  - 2026-03-03 scroll renderer parity upgrade (macOS): kept shared `ComputeScrollEffectRenderCommand(...)` as the only compute source, and upgraded Swift renderer execution from simple rounded-rect pulse to Windows-style semantics (`arrow` multi-chevron glow lanes, `helix` dual-strand/rung composition, `twinkle` burst-particle emitter) while preserving per-command direction/intensity/duration/color inputs.
+  - 2026-03-03 scroll route guard (parity): `DispatchRouter::OnScroll` now keeps built-in scroll types (`arrow/helix/twinkle`) on native effect lane and skips wasm scroll-route override for those types, matching the same parity policy used by built-in trail critical types.
+  - 2026-03-03 scroll compute input parity (macOS): `MacosScrollPulseEffect` now builds runtime scroll compute profile from the same theme scroll style source used by Windows (`GetThemePalette(theme).scroll` + chromatic random style strategy), instead of a macOS-local config-derived scroll profile path.
+  - 2026-03-03 scroll geometry closure (shared compute): `ScrollEffectRenderCommand` now carries shared geometry fields (`start_radius_px/end_radius_px/stroke_width_px`), computed once in `ScrollEffectCompute` from style-derived profile and consumed by platform renderers; Windows adapter now prioritizes command geometry fields, and macOS scroll bridge consumes the same command geometry/intensity/strength inputs.
   - Core effects contract now also enforces trail visibility semantics on macOS:
     - `trail=line` must increase active trail overlay window count in overlay probe.
     - `trail=none` must not increase active trail overlay window count.
@@ -122,9 +126,9 @@
   - Permission degrade + hot recovery behavior is implemented and script-gated.
   - VM suppression diagnostics/state exposure is present.
 - Shell UX:
-  - macOS tray now prefers icon rendering (project logo path fallback + SF Symbol fallback) instead of text-only `MFX`.
+  - macOS tray status item now uses fixed text label `MFX` (no image/SF Symbol fallback) to keep a stable, readable menu bar style.
   - macOS warning notifications now initialize app icon before delivery to avoid generic default sender icon in unbundled runs.
-  - icon resolution supports explicit override via `MFX_MACOS_APP_ICON_PATH` (highest priority), then bundle/dev fallback paths.
+  - notification icon resolution supports explicit override via `MFX_MACOS_APP_ICON_PATH` (highest priority), then bundle/dev fallback paths.
   - Windows tray theme/effect submenus now read from shell snapshots (`GetThemeMenuSnapshotFromShell` / `GetEffectMenuSnapshotFromShell`) with dynamic command fallback for unknown future types; theme/effect apply actions route through `SetThemeFromShell(...)` / `SetEffectFromShell(...)` to keep shell behavior path consistent.
   - Windows tray `Star Project` and `Reload config` actions now route through `OpenProjectRepositoryFromShell(...)` / `ReloadConfigFromShell(...)` (same shell contracts as macOS), removing host-window hardcoded/IPC-only action paths.
   - macOS tray now exposes effect submenus (`click/trail/scroll/hold/hover`) with metadata-driven labels and active-item checks; selection is routed through the same `set_effect` / `clear_effect` command path used on Windows (`AppController::HandleCommand`), closing tray capability parity gap.

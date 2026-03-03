@@ -102,6 +102,8 @@ if(APPLE)
     mfx_add_swift_bridge("Platform/macos/Effects/MacosOverlayRenderSupportBridge.swift" "overlay render-support bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosClickPulseOverlayBridge.swift" "click-pulse overlay bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosScrollPulseOverlayBridge.swift" "scroll-pulse overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Effects/MacosScrollHelixAnimator.swift" "scroll-helix animator bridge")
+    mfx_add_swift_bridge("Platform/macos/Effects/MacosScrollTwinkleAnimator.swift" "scroll-twinkle animator bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosTrailPulseOverlayBridge.swift" "trail-pulse overlay bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosLineTrailOverlayBridge.swift" "line-trail overlay bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosTextEffectFallbackBridge.swift" "text-effect fallback bridge")
@@ -157,6 +159,7 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseOverlayRendererCore.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseOverlayRendererSupport.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollPulseWindowRegistry.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosScrollFrameComputeBridge.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseEffect.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseOverlayStyle.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects/MacosHoverPulseOverlayRenderer.cpp"

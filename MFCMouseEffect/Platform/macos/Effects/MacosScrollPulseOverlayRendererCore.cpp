@@ -2,6 +2,8 @@
 
 #include "Platform/macos/Effects/MacosScrollPulseOverlayRendererCore.h"
 
+#include <algorithm>
+
 namespace mousefx::macos_scroll_pulse {
 
 void ShowScrollPulseOverlayOnMain(
@@ -23,6 +25,10 @@ void ShowScrollPulseOverlayOnMain(
     const ScrollEffectProfile computeProfile{
         profile.verticalSizePx,
         profile.horizontalSizePx,
+        std::max(profile.horizontalSizePx, profile.verticalSizePx),
+        8.0,
+        58.0,
+        2.8,
         profile.baseDurationSec,
         profile.perStrengthStepSec,
         profile.closePaddingMs,

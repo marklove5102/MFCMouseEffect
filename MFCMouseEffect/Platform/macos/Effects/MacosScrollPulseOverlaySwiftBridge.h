@@ -16,6 +16,11 @@ void* mfx_macos_scroll_pulse_overlay_create_v1(
     int overlayY,
     int horizontal,
     int delta,
+    int strengthLevel,
+    double intensity,
+    double startRadiusPx,
+    double endRadiusPx,
+    double strokeWidthPx,
     int helixMode,
     int twinkleMode,
     unsigned int fillArgb,
@@ -26,4 +31,3 @@ void* mfx_macos_scroll_pulse_overlay_create_v1(
 #ifdef __cplusplus
 }
 #endif
-

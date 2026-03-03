@@ -108,6 +108,11 @@ ScrollEffectRenderCommand ComputeScrollEffectRenderCommand(
     const double baseSize = static_cast<double>(horizontal ? profile.horizontalSizePx : profile.verticalSizePx);
     command.sizePx = static_cast<int>(std::lround(
         std::clamp(baseSize * ResolveSizeScale(command, profile), 88.0, 260.0)));
+    const double geometryReference = static_cast<double>(std::max(profile.geometryReferenceSizePx, 1));
+    const double geometryScale = static_cast<double>(command.sizePx) / geometryReference;
+    command.startRadiusPx = std::clamp(profile.baseStartRadiusPx * geometryScale, 0.0, 260.0);
+    command.endRadiusPx = std::clamp(profile.baseEndRadiusPx * geometryScale, 1.0, 360.0);
+    command.strokeWidthPx = std::clamp(profile.baseStrokeWidthPx * geometryScale, 0.5, 24.0);
 
     const double baseDuration =
         profile.baseDurationSec + profile.perStrengthStepSec * static_cast<double>(command.strengthLevel);

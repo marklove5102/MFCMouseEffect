@@ -42,6 +42,10 @@ inline ScrollEffectProfile BuildScrollProfileFromStyle(const RippleStyle& style)
     const int windowSize = std::clamp(style.windowSize, 64, 640);
     profile.verticalSizePx = windowSize;
     profile.horizontalSizePx = windowSize;
+    profile.geometryReferenceSizePx = windowSize;
+    profile.baseStartRadiusPx = std::clamp(static_cast<double>(style.startRadius), 0.0, 640.0);
+    profile.baseEndRadiusPx = std::clamp(static_cast<double>(style.endRadius), 1.0, 800.0);
+    profile.baseStrokeWidthPx = std::clamp(static_cast<double>(style.strokeWidth), 0.1, 64.0);
     profile.baseDurationSec = std::clamp(static_cast<double>(style.durationMs) / 1000.0, 0.05, 5.0);
     profile.perStrengthStepSec = 0.0;
     profile.closePaddingMs = 0;
@@ -70,21 +74,24 @@ inline RippleStyle BuildRippleStyleFromCommand(
         1,
         60000));
 
-    const int templateSize = std::max(styleTemplate.windowSize, 1);
     style.windowSize = std::clamp(command.sizePx, 64, 640);
+    const int templateSize = std::max(styleTemplate.windowSize, 1);
     const double sizeScale = static_cast<double>(style.windowSize) / static_cast<double>(templateSize);
-    style.startRadius = static_cast<float>(std::clamp(
+    const double fallbackStartRadius = std::clamp(
         static_cast<double>(styleTemplate.startRadius) * sizeScale,
         0.0,
-        640.0));
-    style.endRadius = static_cast<float>(std::clamp(
+        640.0);
+    const double fallbackEndRadius = std::clamp(
         static_cast<double>(styleTemplate.endRadius) * sizeScale,
         1.0,
-        800.0));
-    style.strokeWidth = static_cast<float>(std::clamp(
+        800.0);
+    const double fallbackStrokeWidth = std::clamp(
         static_cast<double>(styleTemplate.strokeWidth) * sizeScale,
         0.1,
-        64.0));
+        64.0);
+    style.startRadius = static_cast<float>(command.startRadiusPx > 0.0 ? command.startRadiusPx : fallbackStartRadius);
+    style.endRadius = static_cast<float>(command.endRadiusPx > 0.0 ? command.endRadiusPx : fallbackEndRadius);
+    style.strokeWidth = static_cast<float>(command.strokeWidthPx > 0.0 ? command.strokeWidthPx : fallbackStrokeWidth);
 
     const uint32_t fillArgb = ResolveColorWithFallback(command.fillArgb, styleTemplate.fill.value);
     const uint32_t strokeArgb = ResolveColorWithFallback(command.strokeArgb, styleTemplate.stroke.value);

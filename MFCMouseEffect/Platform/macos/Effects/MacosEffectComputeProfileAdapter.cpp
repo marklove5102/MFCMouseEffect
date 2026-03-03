@@ -60,6 +60,10 @@ ScrollEffectProfile BuildScrollProfile(const macos_effect_profile::ScrollRenderP
     ScrollEffectProfile out{};
     out.verticalSizePx = profile.verticalSizePx;
     out.horizontalSizePx = profile.horizontalSizePx;
+    out.geometryReferenceSizePx = std::max(profile.horizontalSizePx, profile.verticalSizePx);
+    out.baseStartRadiusPx = 8.0;
+    out.baseEndRadiusPx = 58.0;
+    out.baseStrokeWidthPx = 2.8;
     out.baseDurationSec = profile.baseDurationSec;
     out.perStrengthStepSec = profile.perStrengthStepSec;
     out.closePaddingMs = profile.closePaddingMs;

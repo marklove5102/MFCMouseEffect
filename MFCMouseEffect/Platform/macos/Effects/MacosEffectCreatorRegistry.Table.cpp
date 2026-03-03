@@ -32,8 +32,7 @@ std::unique_ptr<IMouseEffect> CreateTrail(const std::string& type, const EffectC
 std::unique_ptr<IMouseEffect> CreateScroll(const std::string& type, const EffectConfig& config) {
     return std::make_unique<MacosScrollPulseEffect>(
         type,
-        config.theme,
-        macos_effect_profile::ResolveScrollRenderProfile(config));
+        config.theme);
 }
 
 std::unique_ptr<IMouseEffect> CreateHold(const std::string& type, const EffectConfig& config) {
