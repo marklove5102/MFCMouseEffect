@@ -64,6 +64,25 @@ void mfx_compute_tubes_node_render_metrics_v1(
     double* outNodePhase,
     double* outChainPhase);
 
+void mfx_compute_tubes_head_follow_v1(
+    double targetX,
+    double targetY,
+    double currentX,
+    double currentY,
+    double lag,
+    double* outNextX,
+    double* outNextY);
+
+void mfx_compute_tubes_node_follow_v1(
+    double prevX,
+    double prevY,
+    double currentX,
+    double currentY,
+    double lag,
+    double minSegmentDistance,
+    double* outNextX,
+    double* outNextY);
+
 #ifdef __cplusplus
 }
 #endif

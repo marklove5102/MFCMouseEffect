@@ -107,6 +107,29 @@ private func mfxComputeTubesNodeRenderMetrics(
     _ outChainPhase: UnsafeMutablePointer<Double>?
 )
 
+@_silgen_name("mfx_compute_tubes_head_follow_v1")
+private func mfxComputeTubesHeadFollow(
+    _ targetX: Double,
+    _ targetY: Double,
+    _ currentX: Double,
+    _ currentY: Double,
+    _ lag: Double,
+    _ outNextX: UnsafeMutablePointer<Double>?,
+    _ outNextY: UnsafeMutablePointer<Double>?
+)
+
+@_silgen_name("mfx_compute_tubes_node_follow_v1")
+private func mfxComputeTubesNodeFollow(
+    _ prevX: Double,
+    _ prevY: Double,
+    _ currentX: Double,
+    _ currentY: Double,
+    _ lag: Double,
+    _ minSegmentDistance: Double,
+    _ outNextX: UnsafeMutablePointer<Double>?,
+    _ outNextY: UnsafeMutablePointer<Double>?
+)
+
 @MainActor
 private final class MfxLineTrailState: NSObject {
     private struct Point {
@@ -574,26 +597,38 @@ private final class MfxLineTrailState: NSObject {
             for chainIndex in 0..<tubeChains.count {
                 var chain = tubeChains[chainIndex]
                 if !chain.nodes.isEmpty {
-                    let headDx = target.x - chain.nodes[0].x
-                    let headDy = target.y - chain.nodes[0].y
-                    chain.nodes[0].x += headDx * chain.lag
-                    chain.nodes[0].y += headDy * chain.lag
+                    var headNextX = 0.0
+                    var headNextY = 0.0
+                    mfxComputeTubesHeadFollow(
+                        Double(target.x),
+                        Double(target.y),
+                        Double(chain.nodes[0].x),
+                        Double(chain.nodes[0].y),
+                        Double(chain.lag),
+                        &headNextX,
+                        &headNextY
+                    )
+                    chain.nodes[0].x = CGFloat(headNextX)
+                    chain.nodes[0].y = CGFloat(headNextY)
 
                     if chain.nodes.count > 1 {
                         for nodeIndex in 1..<chain.nodes.count {
                             let prev = chain.nodes[nodeIndex - 1]
                             var curr = chain.nodes[nodeIndex]
-                            let ddx = prev.x - curr.x
-                            let ddy = prev.y - curr.y
-                            curr.x += ddx * chain.lag
-                            curr.y += ddy * chain.lag
-                            let dist = sqrt(ddx * ddx + ddy * ddy)
-                            if dist < 3.5, dist > 0.01 {
-                                let nx = ddx / dist
-                                let ny = ddy / dist
-                                curr.x = prev.x - nx * 3.5
-                                curr.y = prev.y - ny * 3.5
-                            }
+                            var nextX = 0.0
+                            var nextY = 0.0
+                            mfxComputeTubesNodeFollow(
+                                Double(prev.x),
+                                Double(prev.y),
+                                Double(curr.x),
+                                Double(curr.y),
+                                Double(chain.lag),
+                                3.5,
+                                &nextX,
+                                &nextY
+                            )
+                            curr.x = CGFloat(nextX)
+                            curr.y = CGFloat(nextY)
                             chain.nodes[nodeIndex] = curr
                         }
                     }

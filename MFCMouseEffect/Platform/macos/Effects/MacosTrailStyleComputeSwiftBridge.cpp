@@ -136,3 +136,41 @@ void mfx_compute_tubes_node_render_metrics_v1(
     WriteValue(outNodePhase, metrics.nodePhase);
     WriteValue(outChainPhase, metrics.chainPhase);
 }
+
+void mfx_compute_tubes_head_follow_v1(
+    double targetX,
+    double targetY,
+    double currentX,
+    double currentY,
+    double lag,
+    double* outNextX,
+    double* outNextY) {
+    mousefx::trail_style_compute::ComputeTubesHeadFollow(
+        targetX,
+        targetY,
+        currentX,
+        currentY,
+        lag,
+        outNextX,
+        outNextY);
+}
+
+void mfx_compute_tubes_node_follow_v1(
+    double prevX,
+    double prevY,
+    double currentX,
+    double currentY,
+    double lag,
+    double minSegmentDistance,
+    double* outNextX,
+    double* outNextY) {
+    mousefx::trail_style_compute::ComputeTubesNodeFollow(
+        prevX,
+        prevY,
+        currentX,
+        currentY,
+        lag,
+        minSegmentDistance,
+        outNextX,
+        outNextY);
+}

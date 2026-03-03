@@ -156,4 +156,55 @@ TubesNodeRenderMetrics ComputeTubesNodeRenderMetrics(
     return metrics;
 }
 
+void ComputeTubesHeadFollow(
+    double targetX,
+    double targetY,
+    double currentX,
+    double currentY,
+    double lag,
+    double* outNextX,
+    double* outNextY) {
+    const double safeLag = ClampDouble(lag, 0.01, 1.0);
+    const double dx = targetX - currentX;
+    const double dy = targetY - currentY;
+    if (outNextX != nullptr) {
+        *outNextX = currentX + dx * safeLag;
+    }
+    if (outNextY != nullptr) {
+        *outNextY = currentY + dy * safeLag;
+    }
+}
+
+void ComputeTubesNodeFollow(
+    double prevX,
+    double prevY,
+    double currentX,
+    double currentY,
+    double lag,
+    double minSegmentDistance,
+    double* outNextX,
+    double* outNextY) {
+    const double safeLag = ClampDouble(lag, 0.01, 1.0);
+    const double safeMinDist = std::max(0.1, minSegmentDistance);
+    const double ddx = prevX - currentX;
+    const double ddy = prevY - currentY;
+    double nextX = currentX + ddx * safeLag;
+    double nextY = currentY + ddy * safeLag;
+
+    const double dist = std::sqrt(ddx * ddx + ddy * ddy);
+    if (dist < safeMinDist && dist > 0.01) {
+        const double nx = ddx / dist;
+        const double ny = ddy / dist;
+        nextX = prevX - nx * safeMinDist;
+        nextY = prevY - ny * safeMinDist;
+    }
+
+    if (outNextX != nullptr) {
+        *outNextX = nextX;
+    }
+    if (outNextY != nullptr) {
+        *outNextY = nextY;
+    }
+}
+
 } // namespace mousefx::trail_style_compute

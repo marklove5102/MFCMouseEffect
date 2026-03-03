@@ -77,4 +77,23 @@ TubesNodeRenderMetrics ComputeTubesNodeRenderMetrics(
     uint32_t nodesCount,
     double fadeScale);
 
+void ComputeTubesHeadFollow(
+    double targetX,
+    double targetY,
+    double currentX,
+    double currentY,
+    double lag,
+    double* outNextX,
+    double* outNextY);
+
+void ComputeTubesNodeFollow(
+    double prevX,
+    double prevY,
+    double currentX,
+    double currentY,
+    double lag,
+    double minSegmentDistance,
+    double* outNextX,
+    double* outNextY);
+
 } // namespace mousefx::trail_style_compute
