@@ -12,7 +12,7 @@ class TrailOverlayLayer final : public IOverlayLayer {
 public:
     TrailOverlayLayer(std::unique_ptr<ITrailRenderer> renderer, int durationMs, int maxPoints, Gdiplus::Color color, bool isChromatic);
 
-    void AddPoint(const ScreenPoint& pt);
+    void AddPoint(const TrailPoint& point);
     void Clear();
 
     void Update(uint64_t nowMs) override;
@@ -28,8 +28,8 @@ private:
     int maxPoints_ = 40;
     Gdiplus::Color color_{220, 100, 255, 218};
     bool isChromatic_ = false;
-    ScreenPoint latestCursorPt_{};
-    bool hasLatestCursorPt_ = false;
+    TrailPoint latestPoint_{};
+    bool hasLatestPoint_ = false;
     ScreenPoint lastSamplePt_{};
     bool hasLastSamplePt_ = false;
 };

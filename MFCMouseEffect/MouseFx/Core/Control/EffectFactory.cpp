@@ -56,17 +56,14 @@ std::unique_ptr<IMouseEffect> CreateClickText(const std::string&, const EffectCo
 }
 
 std::unique_ptr<IMouseEffect> CreateTrailParticle(const std::string&, const EffectConfig& config) {
-    return std::make_unique<ParticleTrailEffect>(config.theme);
+    return std::make_unique<ParticleTrailEffect>(config);
 }
 
 std::unique_ptr<IMouseEffect> CreateTrailGeneric(const std::string& type, const EffectConfig& config) {
-    const auto profile = config.GetTrailHistoryProfile(type);
     return std::make_unique<TrailEffect>(
         config.theme,
         type,
-        profile.durationMs,
-        profile.maxPoints,
-        config.trailParams);
+        config);
 }
 
 std::unique_ptr<IMouseEffect> CreateScroll(const std::string& type, const EffectConfig& config) {

@@ -17,9 +17,9 @@ TrailOverlayLayer::TrailOverlayLayer(std::unique_ptr<ITrailRenderer> renderer, i
     if (maxPoints_ > 240) maxPoints_ = 240;
 }
 
-void TrailOverlayLayer::AddPoint(const ScreenPoint& pt) {
-    latestCursorPt_ = pt;
-    hasLatestCursorPt_ = true;
+void TrailOverlayLayer::AddPoint(const TrailPoint& point) {
+    latestPoint_ = point;
+    hasLatestPoint_ = true;
 }
 
 void TrailOverlayLayer::Clear() {
@@ -30,7 +30,8 @@ void TrailOverlayLayer::Clear() {
 void TrailOverlayLayer::Update(uint64_t nowMs) {
     SampleCursorPoint(nowMs);
     while (!points_.empty()) {
-        if (nowMs - points_.front().addedTime > (uint64_t)durationMs_) {
+        const int pointDurationMs = trail_point_style::ResolveDurationMs(points_.front(), durationMs_);
+        if (nowMs - points_.front().addedTime > static_cast<uint64_t>(pointDurationMs)) {
             points_.pop_front();
         } else {
             break;
@@ -46,11 +47,13 @@ void TrailOverlayLayer::Render(Gdiplus::Graphics& graphics) {
 }
 
 void TrailOverlayLayer::SampleCursorPoint(uint64_t nowMs) {
+    TrailPoint incoming{};
     ScreenPoint pt{};
     bool havePoint = false;
-    if (hasLatestCursorPt_) {
-        pt = latestCursorPt_;
-        hasLatestCursorPt_ = false;
+    if (hasLatestPoint_) {
+        incoming = latestPoint_;
+        pt = incoming.pt;
+        hasLatestPoint_ = false;
         havePoint = true;
     } else if (TryGetCursorScreenPoint(&pt)) {
         havePoint = true;
@@ -61,9 +64,24 @@ void TrailOverlayLayer::SampleCursorPoint(uint64_t nowMs) {
         return;
     }
 
-    TrailPoint trailPoint{};
+    TrailPoint trailPoint = incoming;
     trailPoint.pt = pt;
     trailPoint.addedTime = nowMs;
+    if (trailPoint.durationMs <= 0) {
+        trailPoint.durationMs = durationMs_;
+    }
+    if (trailPoint.lineWidthPx <= 0.0) {
+        trailPoint.lineWidthPx = 4.0;
+    }
+    if (trailPoint.strokeArgb == 0) {
+        trailPoint.strokeArgb = (0xFFu << 24) |
+            (static_cast<uint32_t>(color_.GetR()) << 16) |
+            (static_cast<uint32_t>(color_.GetG()) << 8) |
+            static_cast<uint32_t>(color_.GetB());
+    }
+    if (trailPoint.fillArgb == 0) {
+        trailPoint.fillArgb = (0x66u << 24) | (trailPoint.strokeArgb & 0x00FFFFFFu);
+    }
     points_.push_back(trailPoint);
     if (points_.size() > (size_t)maxPoints_) {
         points_.pop_front();

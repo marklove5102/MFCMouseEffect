@@ -10,7 +10,7 @@ public:
     bool Create() override;
     void Shutdown() override;
     void Configure(bool isChromatic, int durationMs, int maxPoints, std::unique_ptr<ITrailRenderer> renderer) override;
-    void AddPoint(const ScreenPoint& pt) override;
+    void AddPoint(const TrailPoint& point) override;
 
 private:
     TrailWindow window_{};

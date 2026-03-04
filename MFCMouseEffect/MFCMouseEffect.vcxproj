@@ -388,9 +388,11 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClInclude Include="MouseFx\Core\Effects\ClickEffectCompute.h" />
     <ClInclude Include="MouseFx\Core\Effects\TextEffectCompute.h" />
     <ClInclude Include="MouseFx\Core\Effects\TrailEffectCompute.h" />
+    <ClInclude Include="MouseFx\Core\Effects\TrailStyleCompute.h" />
     <ClInclude Include="MouseFx\Core\Effects\ScrollEffectCompute.h" />
     <ClInclude Include="MouseFx\Core\Effects\HoverEffectCompute.h" />
     <ClInclude Include="MouseFx\Core\Effects\HoldEffectCompute.h" />
+    <ClInclude Include="MouseFx\Effects\TrailEffectCommandAdapter.h" />
     <ClInclude Include="Settings\SettingsOptions.h" />
     <ClInclude Include="Settings\EmojiUtils.h" />
     <ClInclude Include="pch.h" />
@@ -438,6 +440,7 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClCompile Include="MouseFx\Core\Effects\ClickEffectCompute.cpp" />
     <ClCompile Include="MouseFx\Core\Effects\TextEffectCompute.cpp" />
     <ClCompile Include="MouseFx\Core\Effects\TrailEffectCompute.cpp" />
+    <ClCompile Include="MouseFx\Core\Effects\TrailStyleCompute.cpp" />
     <ClCompile Include="MouseFx\Core\Effects\ScrollEffectCompute.cpp" />
     <ClCompile Include="MouseFx\Core\Effects\HoverEffectCompute.cpp" />
     <ClCompile Include="MouseFx\Core\Effects\HoldEffectCompute.cpp" />

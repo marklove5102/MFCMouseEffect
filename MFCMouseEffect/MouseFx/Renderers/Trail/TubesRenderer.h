@@ -1,11 +1,13 @@
 #pragma once
 #include "../../Interfaces/ITrailRenderer.h"
+#include "MouseFx/Core/Effects/TrailStyleCompute.h"
 #include "MouseFx/Compute/EffectComputeExecutor.h"
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Utils/TrailColor.h"
 #include "MouseFx/Utils/TimeUtils.h"
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include <gdiplus.h>
 
 namespace mousefx {
@@ -68,6 +70,12 @@ public:
 
         // Global Alpha management for Disappearance
         const uint64_t now = NowMs();
+        const float motionIntensity = hasInput
+            ? trail_point_style::ResolveIntensity(points.back(), 1.0f)
+            : 1.0f;
+        const Gdiplus::Color strokeColor = hasInput
+            ? trail_point_style::ResolveStrokeColor(points.back(), color, 255)
+            : color;
         bool isIdle = !hasInput || (now - points.back().addedTime > 50);
 
         if (!isIdle) {
@@ -111,7 +119,6 @@ public:
 
         const float fadeScale = fadeAlpha_ / 255.0f;
         const float frameTime = (float)now * 0.005f;
-        const float chromaBaseHue = std::fmod((float)now * 0.2f, 360.0f);
 
         // 3. Render
         // Draw from tail to head
@@ -128,28 +135,44 @@ public:
 
             const int nodesCount = (int)chain.nodes.size();
             if (nodesCount <= 0) continue;
-            const float invNodesCount = 1.0f / (float)nodesCount;
-            const float chainPhase = (float)c * (2.0f * 3.14159f / 3.0f); // 0/120/240 degrees
             Gdiplus::Color chainBaseColor = chain.color;
             if (isChromatic) {
-                const float hue = std::fmod(chromaBaseHue + (float)c * 30.0f, 360.0f);
+                const float hue = static_cast<float>(trail_style_compute::ComputeTrailChromaticHueDeg(
+                    now,
+                    4,
+                    0,
+                    static_cast<uint32_t>(c)));
                 chainBaseColor = trail_color::HslToRgbColor(hue, 0.9f, 0.6f, 255);
+            } else if (hasInput) {
+                const int r = static_cast<int>(strokeColor.GetR());
+                const int gch = static_cast<int>(strokeColor.GetG());
+                const int b = static_cast<int>(strokeColor.GetB());
+                if (c == 0) {
+                    chainBaseColor = Gdiplus::Color(
+                        static_cast<BYTE>(std::clamp(r + 34, 0, 255)),
+                        static_cast<BYTE>(std::clamp(gch - 12, 0, 255)),
+                        static_cast<BYTE>(std::clamp(b + 20, 0, 255)));
+                } else if (c == 1) {
+                    chainBaseColor = Gdiplus::Color(
+                        static_cast<BYTE>(std::clamp(r - 16, 0, 255)),
+                        static_cast<BYTE>(std::clamp(gch + 28, 0, 255)),
+                        static_cast<BYTE>(std::clamp(b - 14, 0, 255)));
+                } else {
+                    chainBaseColor = Gdiplus::Color(
+                        static_cast<BYTE>(std::clamp(r + 8, 0, 255)),
+                        static_cast<BYTE>(std::clamp(gch + 4, 0, 255)),
+                        static_cast<BYTE>(std::clamp(b + 34, 0, 255)));
+                }
             }
 
             for (int i = nodesCount - 1; i >= 0; --i) {
                 const auto& node = chain.nodes[i];
-                
-                // Size tapers from Head(large) to Tail(small) or vice versa?
-                // Visual check: usually Head is lead, fairly large. Tail fades out.
-                // Let's try: Head = 20px, Tail = 2px.
-                
-                const float ratio = 1.0f - (float)i * invNodesCount; // 1.0 at head, ~0.0 at tail
-                float radius = 2.0f + 7.0f * ratio; // Reduced from 12.0f
-                
-                // Shrink when fading
-                if (fadeAlpha_ < 255.0f) {
-                    radius *= fadeScale;
-                } 
+                const auto nodeMetrics = trail_style_compute::ComputeTubesNodeRenderMetrics(
+                    static_cast<uint32_t>(c),
+                    static_cast<uint32_t>(i),
+                    static_cast<uint32_t>(nodesCount),
+                    fadeScale);
+                float radius = static_cast<float>(nodeMetrics.radiusPx);
                 
                 const ScreenPoint nodePt{
                     static_cast<int32_t>(std::lround(node.x)),
@@ -158,24 +181,9 @@ public:
                 float renderX = (float)localPt.x;
                 float renderY = (float)localPt.y;
                 
-                // --- Helix/Weave Offset ---
-                // To prevent them from merging into a single line, we add a perpendicular or radial offset.
-                // We simulate a spiral around the central path.
-                
-                // Offset based on node index (to create the spiral wave along the tail)
-                const float nodePhase = (float)i * 0.3f; 
-                
-                // Amplitude tapers off at the tail? Or fully thick?
-                // Visual choice: Tapering amplitude makes it look like a drill/tornado.
-                // Constant amplitude makes it look like a cable. 
-                // Let's use constant amplitude relative to radius, but maybe scale by ratio to keep head tight?
-                // Actually, loose tail looks better.
-                float amplitude = 8.0f; 
-                
-                // If disappearing, reduce amplitude to 0 to converge cleanly
-                if (fadeAlpha_ < 255.0f) {
-                    amplitude *= fadeScale;
-                }
+                const float nodePhase = static_cast<float>(nodeMetrics.nodePhase);
+                const float chainPhase = static_cast<float>(nodeMetrics.chainPhase);
+                float amplitude = static_cast<float>(nodeMetrics.amplitudePx) * (0.6f + motionIntensity * 0.8f);
 
                 const float oscX = std::cos(frameTime + nodePhase + chainPhase) * amplitude;
                 const float oscY = std::sin(frameTime + nodePhase + chainPhase) * amplitude;
@@ -193,8 +201,7 @@ public:
                 // Center is whitish, surround is the chain color
                 const Gdiplus::Color base = chainBaseColor;
 
-                int alpha = (int)(255 * ratio); // Tail fades out alpha too
-                alpha = (int)(alpha * fadeScale); // Apply global fade
+                int alpha = static_cast<int>(std::lround(nodeMetrics.alpha * 255.0));
                 
                 // Adjust base color with alpha
                 Gdiplus::Color surroundC(0, base.GetR(), base.GetG(), base.GetB()); // 0 alpha at edge
@@ -228,29 +235,36 @@ private:
 
         // Update head.
         auto& head = chain->nodes[0];
-        const float dx = targetX - head.x;
-        const float dy = targetY - head.y;
-        head.x += dx * chain->lag;
-        head.y += dy * chain->lag;
+        double nextHeadX = head.x;
+        double nextHeadY = head.y;
+        trail_style_compute::ComputeTubesHeadFollow(
+            targetX,
+            targetY,
+            head.x,
+            head.y,
+            chain->lag,
+            &nextHeadX,
+            &nextHeadY);
+        head.x = static_cast<float>(nextHeadX);
+        head.y = static_cast<float>(nextHeadY);
 
         // Propagate to tail with minimum segment distance to avoid clumping.
         for (size_t i = 1; i < chain->nodes.size(); ++i) {
             auto& curr = chain->nodes[i];
             auto& prev = chain->nodes[i - 1];
-
-            const float ddx = prev.x - curr.x;
-            const float ddy = prev.y - curr.y;
-            curr.x += ddx * chain->lag;
-            curr.y += ddy * chain->lag;
-
-            constexpr float kMinSegmentDist = 3.5f;
-            const float dist = std::sqrt(ddx * ddx + ddy * ddy);
-            if (dist < kMinSegmentDist && dist > 0.01f) {
-                const float nx = ddx / dist;
-                const float ny = ddy / dist;
-                curr.x = prev.x - nx * kMinSegmentDist;
-                curr.y = prev.y - ny * kMinSegmentDist;
-            }
+            double nextX = curr.x;
+            double nextY = curr.y;
+            trail_style_compute::ComputeTubesNodeFollow(
+                prev.x,
+                prev.y,
+                curr.x,
+                curr.y,
+                chain->lag,
+                3.5,
+                &nextX,
+                &nextY);
+            curr.x = static_cast<float>(nextX);
+            curr.y = static_cast<float>(nextY);
         }
     }
 

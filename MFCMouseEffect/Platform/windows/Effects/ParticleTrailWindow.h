@@ -2,9 +2,11 @@
 
 #include <windows.h>
 #include <gdiplus.h>
+#include <cstdint>
 #include <vector>
 #include <memory>
-#include "MouseFx/Core/Protocol/InputTypes.h"
+
+#include "MouseFx/Core/Effects/TrailEffectCompute.h"
 
 namespace mousefx {
 
@@ -15,9 +17,8 @@ public:
 
     bool Create();
     void Shutdown();
-    
-    void Emit(const ScreenPoint& pt, int count = 5);
-    void UpdateCursor(const ScreenPoint& pt);
+
+    void AddCommand(const TrailEffectRenderCommand& command);
     void Clear();
     void SetChromatic(bool b) { isChromatic_ = b; }
 
@@ -44,6 +45,11 @@ private:
         float life;      // 1.0 (new) to 0.0 (dead)
         float hue;       // 0 to 360
         float size;
+        float renderRadiusPx;
+        float renderOpacity;
+        float decayScale;
+        uint32_t baseArgb;
+        bool useHue;
     };
 
     static const wchar_t* ClassName();
@@ -61,10 +67,10 @@ private:
     int height_ = 0;
     uint64_t lastTopmostEnsureMs_ = 0;
     HWINEVENTHOOK foregroundHook_ = nullptr;
-    ScreenPoint latestCursorPt_{};
-    bool hasLatestCursorPt_ = false;
-    ScreenPoint lastEmitCursorPt_{};
-    bool hasLastEmitCursorPt_ = false;
+    float globalHue_ = 0.0f;
+    uint32_t rngState_ = 0x7F4A7C15u;
+
+    void Emit(const TrailEffectRenderCommand& command, int count);
 };
 
 } // namespace mousefx

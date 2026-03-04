@@ -89,9 +89,9 @@ bool TrailWindow::Create() {
     return true;
 }
 
-void TrailWindow::AddPoint(const ScreenPoint& pt) {
-    latestCursorPt_ = pt;
-    hasLatestCursorPt_ = true;
+void TrailWindow::AddPoint(const TrailPoint& point) {
+    latestPoint_ = point;
+    hasLatestPoint_ = true;
 }
 
 void TrailWindow::Clear() {
@@ -144,7 +144,8 @@ void TrailWindow::OnTick() {
     
     // Remove old points
     while (!points_.empty()) {
-        if (now - points_.front().addedTime > (uint64_t)durationMs_) {
+        const int pointDurationMs = trail_point_style::ResolveDurationMs(points_.front(), durationMs_);
+        if (now - points_.front().addedTime > static_cast<uint64_t>(pointDurationMs)) {
             points_.pop_front();
         } else {
             break;
@@ -157,11 +158,13 @@ void TrailWindow::OnTick() {
 }
 
 void TrailWindow::SampleCursorPoint(uint64_t nowMs) {
+    TrailPoint incoming{};
     ScreenPoint pt{};
     bool havePoint = false;
-    if (hasLatestCursorPt_) {
-        pt = latestCursorPt_;
-        hasLatestCursorPt_ = false;
+    if (hasLatestPoint_) {
+        incoming = latestPoint_;
+        pt = incoming.pt;
+        hasLatestPoint_ = false;
         havePoint = true;
     } else {
         if (TryGetCursorScreenPoint(&pt)) {
@@ -174,10 +177,25 @@ void TrailWindow::SampleCursorPoint(uint64_t nowMs) {
         return;
     }
 
-    TrailPoint tp;
+    TrailPoint tp = incoming;
     tp.pt.x = pt.x;
     tp.pt.y = pt.y;
     tp.addedTime = nowMs;
+    if (tp.durationMs <= 0) {
+        tp.durationMs = durationMs_;
+    }
+    if (tp.lineWidthPx <= 0.0) {
+        tp.lineWidthPx = 4.0;
+    }
+    if (tp.strokeArgb == 0) {
+        tp.strokeArgb = (0xFFu << 24) |
+            (static_cast<uint32_t>(color_.GetR()) << 16) |
+            (static_cast<uint32_t>(color_.GetG()) << 8) |
+            static_cast<uint32_t>(color_.GetB());
+    }
+    if (tp.fillArgb == 0) {
+        tp.fillArgb = (0x66u << 24) | (tp.strokeArgb & 0x00FFFFFFu);
+    }
     points_.push_back(tp);
     if (points_.size() > (size_t)maxPoints_) {
         points_.pop_front();
@@ -288,17 +306,19 @@ void TrailWindow::Render() {
             const auto& p1 = points_[i];
             const auto& p2 = points_[i+1];
             
+            const int pointDurationMs = trail_point_style::ResolveDurationMs(p1, durationMs_);
             uint64_t age = now - p1.addedTime;
-            float life = 1.0f - ((float)age / (float)durationMs_);
+            float life = 1.0f - (static_cast<float>(age) / static_cast<float>(pointDurationMs));
             if (life < 0) life = 0;
             
             int alpha = (int)(life * 255);
-            Gdiplus::Color c(alpha, color_.GetR(), color_.GetG(), color_.GetB());
+            Gdiplus::Color c = trail_point_style::ResolveStrokeColor(p1, color_, alpha);
              if (isChromatic_) {
                  float hue = std::fmod((float)now * 0.1f + i * 10.0f, 360.0f);
                  c = trail_color::HslToRgbColor(hue, 0.8f, 0.6f, (BYTE)alpha);
             }
-            Gdiplus::Pen p(c, 4.0f); 
+            const float width = trail_point_style::ResolveLineWidthPx(p1, 4.0f);
+            Gdiplus::Pen p(c, width); 
             p.SetStartCap(Gdiplus::LineCapRound);
             p.SetEndCap(Gdiplus::LineCapRound);
             g.DrawLine(&p, (int)p1.pt.x - x_offset, (int)p1.pt.y - y_offset, (int)p2.pt.x - x_offset, (int)p2.pt.y - y_offset);

@@ -24,11 +24,11 @@ void Win32TrailEffectFallback::Configure(bool isChromatic, int durationMs, int m
     window_.SetChromatic(isChromatic);
 }
 
-void Win32TrailEffectFallback::AddPoint(const ScreenPoint& pt) {
+void Win32TrailEffectFallback::AddPoint(const TrailPoint& point) {
     if (!created_) {
         return;
     }
-    window_.AddPoint(pt);
+    window_.AddPoint(point);
 }
 
 } // namespace mousefx

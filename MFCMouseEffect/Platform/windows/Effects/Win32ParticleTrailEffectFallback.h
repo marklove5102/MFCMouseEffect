@@ -10,7 +10,8 @@ public:
     bool Create() override;
     void Shutdown() override;
     void SetChromatic(bool chromatic) override;
-    void UpdateCursor(const ScreenPoint& pt) override;
+    void AddCommand(const TrailEffectRenderCommand& command) override;
+    void Clear() override;
 
 private:
     ParticleTrailWindow window_{};

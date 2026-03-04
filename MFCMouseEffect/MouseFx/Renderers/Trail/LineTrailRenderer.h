@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MouseFx/Interfaces/ITrailRenderer.h"
+#include "MouseFx/Core/Effects/TrailStyleCompute.h"
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Utils/TrailColor.h"
 #include "MouseFx/Utils/TrailMath.h"
@@ -34,20 +35,26 @@ public:
             const ScreenPoint lp1 = ScreenToOverlayPoint(p1.pt);
             const ScreenPoint lp2 = ScreenToOverlayPoint(p2.pt);
 
+            const int pointDurationMs = trail_point_style::ResolveDurationMs(p1, durationMs_);
             const uint64_t age = now - p1.addedTime;
-            float life = 1.0f - ((float)age / (float)durationMs_);
+            float life = 1.0f - (static_cast<float>(age) / static_cast<float>(pointDurationMs));
             life = trail_math::Clamp01(life) * idleFactor;
             if (life <= 0.0f) continue;
 
             const int alpha = (int)(life * 255.0f);
 
-            Gdiplus::Color c(alpha, color.GetR(), color.GetG(), color.GetB());
+            Gdiplus::Color c = trail_point_style::ResolveStrokeColor(p1, color, alpha);
             if (isChromatic) {
-                float hue = std::fmod((float)now * 0.10f + (float)i * 12.0f, 360.0f);
+                float hue = static_cast<float>(trail_style_compute::ComputeTrailChromaticHueDeg(
+                    now,
+                    0,
+                    static_cast<uint32_t>(i),
+                    0));
                 c = trail_color::HslToRgbColor(hue, 0.85f, 0.60f, (BYTE)alpha);
             }
 
-            Gdiplus::Pen pen(c, 4.0f);
+            const float width = trail_point_style::ResolveLineWidthPx(p1, 4.0f);
+            Gdiplus::Pen pen(c, width);
             pen.SetStartCap(Gdiplus::LineCapRound);
             pen.SetEndCap(Gdiplus::LineCapRound);
             pen.SetLineJoin(Gdiplus::LineJoinRound);

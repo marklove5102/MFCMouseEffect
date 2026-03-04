@@ -9,7 +9,8 @@ public:
     bool Create() override { return false; }
     void Shutdown() override {}
     void SetChromatic(bool) override {}
-    void UpdateCursor(const ScreenPoint&) override {}
+    void AddCommand(const TrailEffectRenderCommand&) override {}
+    void Clear() override {}
 };
 
 } // namespace mousefx

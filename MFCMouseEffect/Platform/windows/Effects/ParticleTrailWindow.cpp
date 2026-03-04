@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ParticleTrailWindow.h"
-#include "MouseFx/Core/System/CursorPositionProvider.h"
+#include "MouseFx/Core/Effects/TrailStyleCompute.h"
 #include "MouseFx/Utils/TimeUtils.h"
 #include <algorithm>
 #include <cmath>
@@ -26,6 +26,19 @@ static Gdiplus::Color HslToRgb(float h, float s, float l, BYTE alpha) {
     else { r = c; g = 0; b = x; }
 
     return Gdiplus::Color(alpha, (BYTE)((r + m) * 255), (BYTE)((g + m) * 255), (BYTE)((b + m) * 255));
+}
+
+static Gdiplus::Color ArgbWithOpacity(uint32_t argb, float opacityScale) {
+    const int baseAlpha = static_cast<int>((argb >> 24) & 0xFFu);
+    const int alpha = std::clamp(
+        static_cast<int>(std::lround(static_cast<float>(baseAlpha) * opacityScale)),
+        0,
+        255);
+    return Gdiplus::Color(
+        static_cast<BYTE>(alpha),
+        static_cast<BYTE>((argb >> 16) & 0xFFu),
+        static_cast<BYTE>((argb >> 8) & 0xFFu),
+        static_cast<BYTE>(argb & 0xFFu));
 }
 
 ParticleTrailWindow::ParticleTrailWindow() = default;
@@ -92,6 +105,10 @@ bool ParticleTrailWindow::Create() {
     EnsureSurface(w, h);
     
     lastTick_ = NowMs();
+    rngState_ = static_cast<uint32_t>(lastTick_ & 0xFFFFFFFFu);
+    if (rngState_ == 0u) {
+        rngState_ = 0x7F4A7C15u;
+    }
     SetTimer(hwnd_, kTimerId, 16, nullptr);
     ShowWindow(hwnd_, SW_SHOWNA);
     RegisterForegroundHook();
@@ -100,40 +117,57 @@ bool ParticleTrailWindow::Create() {
     return true;
 }
 
-void ParticleTrailWindow::UpdateCursor(const ScreenPoint& pt) {
-    latestCursorPt_ = pt;
-    hasLatestCursorPt_ = true;
+void ParticleTrailWindow::AddCommand(const TrailEffectRenderCommand& command) {
+    if (command.normalizedType == "none") {
+        Clear();
+        return;
+    }
+    if (!command.emit || command.normalizedType != "particle") {
+        return;
+    }
+
+    const int emitCount = trail_style_compute::ComputeParticleEmitCount(std::max(1.0, command.speedPx));
+    if (emitCount <= 0) {
+        return;
+    }
+    Emit(command, emitCount);
 }
 
-void ParticleTrailWindow::Emit(const ScreenPoint& pt, int count) {
+void ParticleTrailWindow::Emit(const TrailEffectRenderCommand& command, int count) {
     if (!hwnd_ && !Create()) return;
 
     int x_offset = GetSystemMetrics(SM_XVIRTUALSCREEN);
     int y_offset = GetSystemMetrics(SM_YVIRTUALSCREEN);
 
-    static float globalHue = 0;
-    globalHue = std::fmod(globalHue + 5.0f, 360.0f);
+    globalHue_ = std::fmod(globalHue_ + 5.0f, 360.0f);
+    const float intensityScale = std::clamp(static_cast<float>(0.75 + command.intensity * 0.60), 0.60f, 1.80f);
+    const float sizeScale = std::clamp(static_cast<float>(command.sizePx / 56.0), 0.45f, 2.40f);
+    const float durationSec = std::clamp(static_cast<float>(command.durationSec), 0.08f, 3.0f);
+    const float decayScale = std::clamp(0.22f / durationSec, 0.35f, 2.5f);
+    const uint32_t baseArgb = command.strokeArgb != 0 ? command.strokeArgb : command.fillArgb;
+    const bool useHue = isChromatic_;
+    const float spawnOpacity = std::clamp(static_cast<float>(command.baseOpacity), 0.10f, 1.0f);
 
     for (int i = 0; i < count; ++i) {
         Particle p;
-        p.x = (float)pt.x - x_offset;
-        p.y = (float)pt.y - y_offset;
-        
-        // Random velocity
-        float angle = (float)(rand() % 360) * 3.14159f / 180.0f;
-        float speed = (float)(rand() % 100) / 30.0f + 0.5f;
-        p.vx = std::cos(angle) * speed;
-        p.vy = std::sin(angle) * speed;
+        p.x = static_cast<float>(command.overlayPoint.x) - static_cast<float>(x_offset);
+        p.y = static_cast<float>(command.overlayPoint.y) - static_cast<float>(y_offset);
+        const auto spawn = trail_style_compute::ComputeParticleSpawnMetrics(
+            &rngState_,
+            isChromatic_,
+            globalHue_);
+        const float speed = static_cast<float>(spawn.speedPxPerTick) * intensityScale;
+        p.vx = std::cos(static_cast<float>(spawn.angleRad)) * speed;
+        p.vy = std::sin(static_cast<float>(spawn.angleRad)) * speed;
         
         p.life = 1.0f;
-        if (isChromatic_) {
-             // Fully random for Chromatic
-             p.hue = (float)(rand() % 360);
-        } else {
-             // Sequential cycling for standard (Rainbow Trace)
-             p.hue = globalHue + (rand() % 40 - 20); // Variety
-        }
-        p.size = (float)(rand() % 40) / 10.0f + 2.0f;
+        p.hue = static_cast<float>(spawn.hueDeg);
+        p.size = static_cast<float>(spawn.sizePx) * sizeScale;
+        p.renderRadiusPx = p.size * 0.5f;
+        p.renderOpacity = spawnOpacity;
+        p.decayScale = decayScale;
+        p.baseArgb = baseArgb;
+        p.useHue = useHue;
         
         particles_.push_back(p);
     }
@@ -186,43 +220,24 @@ void ParticleTrailWindow::OnTick() {
     if (dt > 0.1f) dt = 0.1f;
     lastTick_ = now;
 
-    ScreenPoint pt{};
-    bool havePt = false;
-    if (hasLatestCursorPt_) {
-        pt = latestCursorPt_;
-        hasLatestCursorPt_ = false;
-        havePt = true;
-    } else {
-        if (TryGetCursorScreenPoint(&pt)) {
-            havePt = true;
-        }
-    }
-
-    if (havePt) {
-        if (!hasLastEmitCursorPt_) {
-            lastEmitCursorPt_ = pt;
-            hasLastEmitCursorPt_ = true;
-        }
-        const float dx = (float)(pt.x - lastEmitCursorPt_.x);
-        const float dy = (float)(pt.y - lastEmitCursorPt_.y);
-        const float dist = std::sqrt(dx * dx + dy * dy);
-        if (dist >= 1.0f) {
-            int emitCount = (int)(dist * 0.18f) + 2;
-            if (emitCount < 2) emitCount = 2;
-            if (emitCount > 12) emitCount = 12;
-            Emit(pt, emitCount);
-            lastEmitCursorPt_ = pt;
-        }
-    }
-
     // Update particles
     for (auto it = particles_.begin(); it != particles_.end(); ) {
-        it->x += it->vx;
-        it->y += it->vy;
-        it->vy += 0.05f; // Gravity
-        it->life -= dt * 1.5f; // Die over ~0.6s
-        
-        if (it->life <= 0) {
+        const auto step = trail_style_compute::ComputeParticleStepMetrics(
+            it->x,
+            it->y,
+            it->vx,
+            it->vy,
+            it->life,
+            it->size,
+            dt * it->decayScale);
+        it->x = static_cast<float>(step.nextX);
+        it->y = static_cast<float>(step.nextY);
+        it->vx = static_cast<float>(step.nextVx);
+        it->vy = static_cast<float>(step.nextVy);
+        it->life = static_cast<float>(step.nextLife);
+        it->renderRadiusPx = static_cast<float>(step.renderRadiusPx);
+        it->renderOpacity = static_cast<float>(step.renderOpacity);
+        if (it->life <= 0.0f) {
             it = particles_.erase(it);
         } else {
             ++it;
@@ -313,11 +328,16 @@ void ParticleTrailWindow::Render() {
     g.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 
     for (const auto& p : particles_) {
-        BYTE alpha = (BYTE)(p.life * 255);
-        Gdiplus::Color color = HslToRgb(p.hue, 0.8f, 0.6f, alpha);
+        BYTE alpha = static_cast<BYTE>(std::clamp<int>(
+            static_cast<int>(std::lround(p.renderOpacity * 255.0f)),
+            0,
+            255));
+        Gdiplus::Color color = p.useHue
+            ? HslToRgb(p.hue, 0.8f, 0.6f, alpha)
+            : ArgbWithOpacity(p.baseArgb, p.renderOpacity);
         Gdiplus::SolidBrush brush(color);
         
-        float s = p.size * p.life;
+        float s = std::max(0.0f, p.renderRadiusPx * 2.0f);
         g.FillEllipse(&brush, p.x - s/2, p.y - s/2, s, s);
     }
     

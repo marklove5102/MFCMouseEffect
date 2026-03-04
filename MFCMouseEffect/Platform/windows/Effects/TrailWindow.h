@@ -19,7 +19,7 @@ public:
     void Shutdown();
     
     // Add a new point to the trail. 
-    void AddPoint(const ScreenPoint& pt);
+    void AddPoint(const TrailPoint& point);
     
     // Clear trail immediately.
     void Clear();
@@ -79,8 +79,8 @@ private:
     int height_ = 0;
     uint64_t lastTopmostEnsureMs_ = 0;
     HWINEVENTHOOK foregroundHook_ = nullptr;
-    ScreenPoint latestCursorPt_{};
-    bool hasLatestCursorPt_ = false;
+    TrailPoint latestPoint_{};
+    bool hasLatestPoint_ = false;
     ScreenPoint lastSamplePt_{};
     bool hasLastSamplePt_ = false;
 

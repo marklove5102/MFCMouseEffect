@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MouseFx/Interfaces/ITrailRenderer.h"
+#include "MouseFx/Core/Effects/TrailStyleCompute.h"
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Utils/TrailColor.h"
 #include "MouseFx/Utils/TrailMath.h"
@@ -40,25 +41,34 @@ public:
 
             const float t = (n <= 2) ? 1.0f : (float)i / (float)(n - 1); // 0 tail -> 1 head
 
+            const int pointDurationMs = trail_point_style::ResolveDurationMs(p1, durationMs_);
             const uint64_t age = now - p1.addedTime;
-            float life = 1.0f - ((float)age / (float)durationMs_);
+            float life = 1.0f - (static_cast<float>(age) / static_cast<float>(pointDurationMs));
             life = trail_math::Clamp01(life) * idleFactor;
             if (life <= 0.0f) continue;
 
-            // Strong head, soft tail.
-            const float head = std::pow(std::max(0.0f, t), params_.headPower);
-            const float w = 2.0f + 18.0f * head * life;
+            const float baseWidth = trail_point_style::ResolveLineWidthPx(p1, 4.0f);
+            const float widthScale = std::max(0.35f, baseWidth / 4.0f);
+            const auto metrics = trail_style_compute::ComputeStreamerSegmentMetrics(
+                t,
+                life,
+                static_cast<double>(params_.headPower));
+            const float w = static_cast<float>(metrics.widthPx * widthScale);
 
-            int alphaCore = (int)(220.0f * head * life);
-            int alphaGlow = (int)(90.0f * head * life);
+            int alphaCore = static_cast<int>(std::lround(255.0 * metrics.coreOpacity));
+            int alphaGlow = static_cast<int>(std::lround(255.0 * metrics.glowOpacity));
             alphaCore = (int)trail_math::Clamp((float)alphaCore, 0.0f, 255.0f);
             alphaGlow = (int)trail_math::Clamp((float)alphaGlow, 0.0f, 255.0f);
 
-            Gdiplus::Color cCore(alphaCore, color.GetR(), color.GetG(), color.GetB());
-            Gdiplus::Color cGlow(alphaGlow, color.GetR(), color.GetG(), color.GetB());
+            Gdiplus::Color cCore = trail_point_style::ResolveStrokeColor(p1, color, alphaCore);
+            Gdiplus::Color cGlow = trail_point_style::ResolveStrokeColor(p1, color, alphaGlow);
 
             if (isChromatic) {
-                float hue = std::fmod((float)now * 0.18f + (float)i * 6.0f, 360.0f);
+                float hue = static_cast<float>(trail_style_compute::ComputeTrailChromaticHueDeg(
+                    now,
+                    1,
+                    static_cast<uint32_t>(i),
+                    0));
                 cCore = trail_color::HslToRgbColor(hue, 0.95f, 0.62f, (BYTE)alphaCore);
                 cGlow = trail_color::HslToRgbColor(hue, 0.95f, 0.58f, (BYTE)alphaGlow);
             }

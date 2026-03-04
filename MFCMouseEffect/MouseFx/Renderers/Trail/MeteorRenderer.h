@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Interfaces/ITrailRenderer.h"
+#include "MouseFx/Core/Effects/TrailStyleCompute.h"
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Utils/TrailColor.h"
 #include "MouseFx/Utils/TrailMath.h"
@@ -111,20 +112,38 @@ public:
                 float ratio = (float)i / (float)pathPoints.size(); // 0 at tail, ~1 at head
                 
                 // Age-based fade
+                const int pointDurationMs = trail_point_style::ResolveDurationMs(points[i], durationMs_);
                 float age = (float)(now - points[i].addedTime);
-                float life = std::max(0.0f, 1.0f - (age / (float)durationMs_));
+                float life = std::max(0.0f, 1.0f - (age / static_cast<float>(pointDurationMs)));
                 life *= idleFactor;
                 if (life <= 0) continue;
 
-                float width = 1.0f + 12.0f * ratio * life;
-                BYTE alpha = (BYTE)(180 * ratio * life);
+                const auto metrics = trail_style_compute::ComputeMeteorSegmentMetrics(
+                    ratio,
+                    life);
+                const float baseWidth = trail_point_style::ResolveLineWidthPx(points[i], 3.0f);
+                const float widthScale = std::max(0.35f, baseWidth / 4.0f);
+                float width = static_cast<float>(metrics.widthPx * widthScale);
+                BYTE alpha = static_cast<BYTE>(std::clamp<int>(
+                    static_cast<int>(std::lround(metrics.trailOpacity * 255.0)),
+                    0,
+                    255));
 
-                Gdiplus::Color c = color;
+                Gdiplus::Color c = trail_point_style::ResolveStrokeColor(points[i], color, alpha);
                 if (isChromatic) {
-                    c = trail_color::HslToRgbColor(std::fmod((float)now * 0.15f + (float)i * 8.0f, 360.0f), 0.9f, 0.6f, alpha);
+                    const float hue = static_cast<float>(trail_style_compute::ComputeTrailChromaticHueDeg(
+                        now,
+                        3,
+                        static_cast<uint32_t>(i),
+                        0));
+                    c = trail_color::HslToRgbColor(hue, 0.9f, 0.6f, alpha);
                 } else {
-                    // Meteor identity: warm tail (less neon-ribbon-like).
-                    c = Gdiplus::Color(alpha, 255, 220, 160);
+                    // Meteor identity: keep warm bias while respecting configured stroke color.
+                    c = Gdiplus::Color(
+                        alpha,
+                        static_cast<BYTE>(std::min(255, c.GetR() + 24)),
+                        static_cast<BYTE>(std::min(255, c.GetG() + 18)),
+                        static_cast<BYTE>(std::max(100, c.GetB())));
                 }
 
                 Gdiplus::Pen pen(c, width);
@@ -135,9 +154,13 @@ public:
                 g.DrawLine(&pen, pathPoints[i], pathPoints[i+1]);
                 
                 // Add a "core" white line for extra brightness near the head
-                if (ratio > 0.6f) {
-                    float coreWidth = width * 0.3f;
-                    Gdiplus::Pen corePen(Gdiplus::Color((BYTE)(alpha * 0.8f), 255, 255, 255), coreWidth);
+                if (metrics.emitCore) {
+                    float coreWidth = std::max(1.0f, static_cast<float>(metrics.coreWidthPx * widthScale));
+                    const BYTE coreAlpha = static_cast<BYTE>(std::clamp<int>(
+                        static_cast<int>(std::lround(metrics.coreOpacity * 255.0)),
+                        0,
+                        255));
+                    Gdiplus::Pen corePen(Gdiplus::Color(coreAlpha, 255, 255, 255), coreWidth);
                     corePen.SetStartCap(Gdiplus::LineCapRound);
                     corePen.SetEndCap(Gdiplus::LineCapRound);
                     g.DrawLine(&corePen, pathPoints[i], pathPoints[i+1]);

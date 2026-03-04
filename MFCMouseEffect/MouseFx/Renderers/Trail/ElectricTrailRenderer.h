@@ -1,11 +1,11 @@
 #pragma once
 
 #include "MouseFx/Interfaces/ITrailRenderer.h"
+#include "MouseFx/Core/Effects/TrailStyleCompute.h"
 #include "MouseFx/Core/Overlay/OverlayCoordSpace.h"
 #include "MouseFx/Utils/TrailColor.h"
 #include "MouseFx/Utils/TrailMath.h"
 #include "MouseFx/Utils/TimeUtils.h"
-#include "MouseFx/Utils/XorShift.h"
 #include <algorithm>
 #include <cmath>
 
@@ -37,14 +37,11 @@ public:
             const ScreenPoint lp1 = ScreenToOverlayPoint(p1.pt);
             const ScreenPoint lp2 = ScreenToOverlayPoint(p2.pt);
 
+            const int pointDurationMs = trail_point_style::ResolveDurationMs(p1, durationMs_);
             const uint64_t age = now - p1.addedTime;
-            float life = 1.0f - ((float)age / (float)durationMs_);
+            float life = 1.0f - (static_cast<float>(age) / static_cast<float>(pointDurationMs));
             life = trail_math::Clamp01(life) * idleFactor;
             if (life <= 0.0f) continue;
-
-            // Seed per segment + frame bucket for animated but stable arcs.
-            uint32_t seed = prng::Mix32((uint32_t)frameKey ^ (uint32_t)(i * 0x9E3779B9u));
-            prng::XorShift32 rng(seed);
 
             float x1 = (float)lp1.x;
             float y1 = (float)lp1.y;
@@ -56,37 +53,55 @@ public:
             float len = std::sqrt(dx * dx + dy * dy);
             if (len < 0.5f) continue;
 
+            const auto metrics = trail_style_compute::ComputeElectricSegmentMetrics(
+                frameKey,
+                static_cast<uint32_t>(i),
+                life,
+                len,
+                static_cast<double>(params_.amplitudeScale),
+                static_cast<double>(params_.forkChance));
+
             float invLen = 1.0f / len;
             float nx = -dy * invLen;
             float ny = dx * invLen;
 
-            float amp = std::min(10.0f, std::max(2.0f, len * 0.12f)) * life * params_.amplitudeScale;
-            float o1 = rng.Range(-1.0f, 1.0f) * amp;
-            float o2 = rng.Range(-1.0f, 1.0f) * amp;
+            float o1 = static_cast<float>(metrics.jitterA);
+            float o2 = static_cast<float>(metrics.jitterB);
 
             Gdiplus::PointF a(x1, y1);
             Gdiplus::PointF b(x1 + dx * 0.35f + nx * o1, y1 + dy * 0.35f + ny * o1);
             Gdiplus::PointF c(x1 + dx * 0.70f + nx * o2, y1 + dy * 0.70f + ny * o2);
             Gdiplus::PointF d(x2, y2);
 
-            const float coreW = std::max(1.0f, 2.2f * life);
-            const float glowW = coreW * 3.0f;
+            const float baseWidth = trail_point_style::ResolveLineWidthPx(
+                p1,
+                static_cast<float>(metrics.coreWidthPx > 0.0 ? metrics.coreWidthPx : 2.2));
+            const float coreW = std::max(1.0f, baseWidth * life);
+            const float glowW = std::max(
+                coreW,
+                static_cast<float>((metrics.glowWidthPx > 0.0 ? metrics.glowWidthPx : metrics.coreWidthPx * 3.0) * std::max(0.35f, baseWidth / 2.2f)));
 
-            int alpha = (int)trail_math::Clamp(255.0f * life, 0.0f, 255.0f);
+            int alpha = static_cast<int>(std::lround(255.0 * metrics.coreOpacity));
+            alpha = (int)trail_math::Clamp((float)alpha, 0.0f, 255.0f);
+            const int glowAlpha = static_cast<int>(std::lround(255.0 * metrics.glowOpacity));
 
-            Gdiplus::Color cGlow(alpha / 2, 70, 235, 255);
+            Gdiplus::Color cGlow = trail_point_style::ResolveStrokeColor(p1, color, glowAlpha);
             Gdiplus::Color cCore(alpha, 255, 255, 255);
 
             if (isChromatic) {
-                float hue = std::fmod((float)now * 0.55f + (float)i * 18.0f, 360.0f);
-                cGlow = trail_color::HslToRgbColor(hue, 1.0f, 0.60f, (BYTE)(alpha / 2));
+                float hue = static_cast<float>(trail_style_compute::ComputeTrailChromaticHueDeg(
+                    now,
+                    2,
+                    static_cast<uint32_t>(i),
+                    0));
+                cGlow = trail_color::HslToRgbColor(hue, 1.0f, 0.60f, (BYTE)glowAlpha);
                 cCore = trail_color::HslToRgbColor(std::fmod(hue + 30.0f, 360.0f), 1.0f, 0.75f, (BYTE)alpha);
             } else {
                 // Let theme tint the glow slightly, but keep a white core for "electric" identity.
-                cGlow = Gdiplus::Color(alpha / 2,
-                                       (BYTE)std::max<int>(70, color.GetR()),
-                                       (BYTE)std::max<int>(200, color.GetG()),
-                                       (BYTE)std::max<int>(220, color.GetB()));
+                cGlow = Gdiplus::Color(glowAlpha,
+                                       (BYTE)std::max<int>(70, cGlow.GetR()),
+                                       (BYTE)std::max<int>(200, cGlow.GetG()),
+                                       (BYTE)std::max<int>(220, cGlow.GetB()));
             }
 
             // Glow stroke
@@ -112,15 +127,19 @@ public:
             }
 
             // Occasional fork to make it feel less like a "jittery ribbon".
-            float forkChance = params_.forkChance * life;
-            if (rng.Next01() < forkChance) {
-                float t = rng.Range(0.35f, 0.75f);
+            if (metrics.emitFork) {
+                float t = static_cast<float>(metrics.forkT);
                 Gdiplus::PointF base(x1 + dx * t, y1 + dy * t);
-                float forkLen = rng.Range(10.0f, 22.0f) * life;
-                float forkSide = (rng.Next01() < 0.5f) ? -1.0f : 1.0f;
+                float forkLen = static_cast<float>(metrics.forkLengthPx);
+                float forkSide = static_cast<float>(metrics.forkSide < 0 ? -1 : 1);
                 Gdiplus::PointF tip(base.X + nx * forkSide * forkLen + dx * 0.05f, base.Y + ny * forkSide * forkLen + dy * 0.05f);
 
-                Gdiplus::Pen forkPen(cGlow, std::max(1.0f, coreW * 1.2f));
+                const float widthScale = std::max(0.35f, baseWidth / 2.2f);
+                const float forkWidth = std::max(1.0f, static_cast<float>(metrics.forkWidthPx * widthScale));
+                const int forkAlpha = static_cast<int>(std::lround(255.0 * metrics.forkOpacity));
+                Gdiplus::Color forkColor = cGlow;
+                forkColor.SetValue((static_cast<uint32_t>(std::clamp(forkAlpha, 0, 255)) << 24) | (forkColor.GetValue() & 0x00FFFFFFu));
+                Gdiplus::Pen forkPen(forkColor, forkWidth);
                 forkPen.SetLineJoin(Gdiplus::LineJoinRound);
                 forkPen.SetStartCap(Gdiplus::LineCapRound);
                 forkPen.SetEndCap(Gdiplus::LineCapRound);

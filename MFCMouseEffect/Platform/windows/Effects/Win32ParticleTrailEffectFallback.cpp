@@ -21,11 +21,18 @@ void Win32ParticleTrailEffectFallback::SetChromatic(bool chromatic) {
     window_.SetChromatic(chromatic);
 }
 
-void Win32ParticleTrailEffectFallback::UpdateCursor(const ScreenPoint& pt) {
+void Win32ParticleTrailEffectFallback::AddCommand(const TrailEffectRenderCommand& command) {
     if (!created_) {
         return;
     }
-    window_.UpdateCursor(pt);
+    window_.AddCommand(command);
+}
+
+void Win32ParticleTrailEffectFallback::Clear() {
+    if (!created_) {
+        return;
+    }
+    window_.Clear();
 }
 
 } // namespace mousefx

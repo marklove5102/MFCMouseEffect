@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "MouseFx/Core/Effects/HoverEffectCompute.h"
-#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosHoverPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosHoverPulseOverlayRendererCore.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
@@ -58,34 +56,6 @@ void ShowHoverPulseOverlay(const HoverEffectRenderCommand& command, const std::s
     };
     macos_overlay_support::RunOnMainThreadAsync(&ShowHoverPulseOverlayCallback, context);
 #endif
-}
-
-void ShowHoverPulseOverlay(
-    const ScreenPoint& overlayPt,
-    const std::string& effectType,
-    const std::string& themeName,
-    const macos_effect_profile::HoverRenderProfile& profile) {
-#if !defined(__APPLE__)
-    (void)overlayPt;
-    (void)effectType;
-    (void)themeName;
-    (void)profile;
-    return;
-#else
-    const HoverEffectRenderCommand command =
-        ComputeHoverEffectRenderCommand(
-            overlayPt,
-            effectType,
-            macos_effect_compute_profile::BuildHoverProfile(profile));
-    ShowHoverPulseOverlay(command, themeName);
-#endif
-}
-
-void ShowHoverPulseOverlay(
-    const ScreenPoint& overlayPt,
-    const std::string& effectType,
-    const std::string& themeName) {
-    ShowHoverPulseOverlay(overlayPt, effectType, themeName, macos_effect_profile::DefaultHoverRenderProfile());
 }
 
 void CloseHoverPulseOverlay() {

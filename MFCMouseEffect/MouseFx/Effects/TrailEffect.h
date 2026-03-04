@@ -2,6 +2,7 @@
 
 #include "MouseFx/Interfaces/IMouseEffect.h"
 #include "MouseFx/Core/Config/EffectConfig.h"
+#include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "MouseFx/Interfaces/ITrailEffectFallback.h"
 #include <memory>
 
@@ -12,7 +13,7 @@ class TrailOverlayLayer;
 
 class TrailEffect final : public IMouseEffect {
 public:
-    TrailEffect(const std::string& themeName, const std::string& type, int durationMs, int maxPoints, const TrailRendererParamsConfig& params);
+    TrailEffect(const std::string& themeName, const std::string& type, const EffectConfig& config);
     ~TrailEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Trail; }
@@ -28,8 +29,14 @@ private:
     std::unique_ptr<ITrailEffectFallback> fallback_;
     TrailOverlayLayer* hostLayer_ = nullptr;
     std::string type_;
+    TrailEffectProfile computeProfile_{};
+    TrailEffectThrottleProfile throttleProfile_{};
+    ScreenPoint lastPoint_{};
+    bool hasLastPoint_ = false;
+    uint64_t lastEmitTickMs_ = 0;
     int durationMs_ = 350;
     int maxPoints_ = 40;
+    float lineWidth_ = 4.0f;
     TrailRendererParamsConfig params_{};
     bool isChromatic_ = false;
 };

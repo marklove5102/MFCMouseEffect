@@ -11,7 +11,7 @@ public:
     bool Create() override { return false; }
     void Shutdown() override {}
     void Configure(bool, int, int, std::unique_ptr<ITrailRenderer>) override {}
-    void AddPoint(const ScreenPoint&) override {}
+    void AddPoint(const TrailPoint&) override {}
 };
 
 } // namespace mousefx

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "TrailEffect.h"
+#include "MouseFx/Effects/TrailEffectCommandAdapter.h"
+#include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "MouseFx/Core/Overlay/OverlayHostService.h"
 #include "MouseFx/Layers/TrailOverlayLayer.h"
 #include "MouseFx/Styles/ThemeStyle.h"
@@ -7,18 +9,24 @@
 #include "MouseFx/Renderers/Trail/TubesRenderer.h"
 #include "MouseFx/Renderers/Trail/MeteorRenderer.h"
 #include "Platform/PlatformEffectFallbackFactory.h"
+#include "MouseFx/Utils/TimeUtils.h"
 #include <algorithm>
 #include <cctype>
 #include <string>
 
 namespace mousefx {
 
-TrailEffect::TrailEffect(const std::string& themeName, const std::string& type, int durationMs, int maxPoints, const TrailRendererParamsConfig& params)
+TrailEffect::TrailEffect(const std::string& themeName, const std::string& type, const EffectConfig& config)
     : fallback_(platform::CreateTrailEffectFallback()), type_(type) {
+    type_ = NormalizeTrailEffectType(type_);
     isChromatic_ = (ToLowerAscii(themeName) == "chromatic");
-    durationMs_ = durationMs;
-    maxPoints_ = maxPoints;
-    params_ = params;
+    const TrailHistoryProfile history = config.GetTrailHistoryProfile(type_);
+    durationMs_ = history.durationMs;
+    maxPoints_ = history.maxPoints;
+    params_ = config.trailParams;
+    lineWidth_ = config.trail.lineWidth;
+    computeProfile_ = trail_effect_adapter::BuildTrailProfileFromConfig(config, type_, durationMs_);
+    throttleProfile_ = trail_effect_adapter::ResolveTrailThrottleProfile();
 }
 
 TrailEffect::~TrailEffect() {
@@ -43,15 +51,51 @@ void TrailEffect::Shutdown() {
     if (fallback_) {
         fallback_->Shutdown();
     }
+    hasLastPoint_ = false;
+    lastEmitTickMs_ = 0;
 }
 
 void TrailEffect::OnMouseMove(const ScreenPoint& pt) {
+    if (!hasLastPoint_) {
+        hasLastPoint_ = true;
+        lastPoint_ = pt;
+        return;
+    }
+
+    const uint64_t nowMs = NowMs();
+    const TrailEffectEmissionResult emission = ComputeTrailEffectEmission(
+        pt,
+        lastPoint_,
+        nowMs,
+        lastEmitTickMs_,
+        throttleProfile_);
+    if (!emission.shouldEmit) {
+        lastPoint_ = pt;
+        return;
+    }
+
+    const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
+        pt,
+        emission.deltaX,
+        emission.deltaY,
+        type_,
+        computeProfile_);
+    lastPoint_ = pt;
+    lastEmitTickMs_ = nowMs;
+    if (!command.emit) {
+        if (hostLayer_) {
+            hostLayer_->Clear();
+        }
+        return;
+    }
+
+    const TrailPoint trailPoint = trail_effect_adapter::BuildTrailPointFromCommand(command, nowMs);
     if (hostLayer_) {
-        hostLayer_->AddPoint(pt);
+        hostLayer_->AddPoint(trailPoint);
         return;
     }
     if (fallback_) {
-        fallback_->AddPoint(pt);
+        fallback_->AddPoint(trailPoint);
     }
 }
 

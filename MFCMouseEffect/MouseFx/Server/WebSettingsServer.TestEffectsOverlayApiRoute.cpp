@@ -10,6 +10,10 @@
 
 #include "MouseFx/Core/Protocol/InputTypes.h"
 #include "MouseFx/Core/Control/EffectFactory.h"
+#include "MouseFx/Core/Effects/ClickEffectCompute.h"
+#include "MouseFx/Core/Effects/HoverEffectCompute.h"
+#include "MouseFx/Core/Effects/ScrollEffectCompute.h"
+#include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "MouseFx/Effects/TextEffect.h"
 #include "MouseFx/Server/HttpServer.h"
 #include "MouseFx/Server/WebSettingsServer.TestRouteCommon.h"
@@ -19,6 +23,7 @@
 #if MFX_PLATFORM_MACOS
 #include "Platform/macos/Effects/MacosClickPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosClickPulseWindowRegistry.h"
+#include "Platform/macos/Effects/MacosEffectComputeProfileAdapter.h"
 #include "Platform/macos/Effects/MacosHoldPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosHoverPulseOverlayRenderer.h"
 #include "Platform/macos/Effects/MacosLineTrailOverlay.h"
@@ -271,7 +276,12 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
 #if MFX_PLATFORM_MACOS
     const ScreenPoint overlayPoint{x, y};
     if (emitClick) {
-        macos_click_pulse::ShowClickPulseOverlay(overlayPoint, ParseMouseButton(button), clickType, "");
+        const ClickEffectRenderCommand command = ComputeClickEffectRenderCommand(
+            overlayPoint,
+            ParseMouseButton(button),
+            clickType,
+            macos_effect_compute_profile::BuildClickProfile(macos_effect_profile::DefaultClickRenderProfile()));
+        macos_click_pulse::ShowClickPulseOverlay(command, "");
     }
     if (emitClickViaEffectFactory) {
         TextConfig textConfig = EffectConfig::GetDefault().textClick;
@@ -299,7 +309,13 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         }
     }
     if (emitTrail) {
-        macos_trail_pulse::ShowTrailPulseOverlay(overlayPoint, 20.0, 10.0, trailType, "");
+        const TrailEffectRenderCommand command = ComputeTrailEffectRenderCommand(
+            overlayPoint,
+            20.0,
+            10.0,
+            trailType,
+            macos_effect_compute_profile::BuildTrailProfile(macos_effect_profile::DefaultTrailRenderProfile(trailType)));
+        macos_trail_pulse::ShowTrailPulseOverlay(command, "");
     }
     if (emitLineTrail) {
         macos_line_trail::LineTrailConfig lineTrailConfig{};
@@ -317,14 +333,24 @@ bool HandleWebSettingsTestEffectsOverlayApiRoute(
         }
     }
     if (emitScroll) {
-        macos_scroll_pulse::ShowScrollPulseOverlay(overlayPoint, scrollHorizontal, scrollDelta, scrollType, "");
+        const ScrollEffectRenderCommand command = ComputeScrollEffectRenderCommand(
+            overlayPoint,
+            scrollHorizontal,
+            scrollDelta,
+            scrollType,
+            macos_effect_compute_profile::BuildScrollProfile(macos_effect_profile::DefaultScrollRenderProfile()));
+        macos_scroll_pulse::ShowScrollPulseOverlay(command, "");
     }
     if (emitHold) {
         macos_hold_pulse::StartHoldPulseOverlay(overlayPoint, ParseMouseButton(button), holdType, "");
         macos_hold_pulse::UpdateHoldPulseOverlay(overlayPoint, 280);
     }
     if (emitHover) {
-        macos_hover_pulse::ShowHoverPulseOverlay(overlayPoint, hoverType, "");
+        const HoverEffectRenderCommand command = ComputeHoverEffectRenderCommand(
+            overlayPoint,
+            hoverType,
+            macos_effect_compute_profile::BuildHoverProfile(macos_effect_profile::DefaultHoverRenderProfile()));
+        macos_hover_pulse::ShowHoverPulseOverlay(command, "");
     }
 #endif
 
