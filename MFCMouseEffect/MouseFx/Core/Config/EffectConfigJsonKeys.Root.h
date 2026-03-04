@@ -18,5 +18,14 @@ inline constexpr const char kWasm[] = "wasm";
 inline constexpr const char kTrailParams[] = "trail_params";
 inline constexpr const char kTrailProfiles[] = "trail_profiles";
 inline constexpr const char kEffects[] = "effects";
+inline constexpr const char kEffectSizeScales[] = "effect_size_scales";
+
+namespace effect_size_scale {
+inline constexpr const char kClick[] = "click";
+inline constexpr const char kTrail[] = "trail";
+inline constexpr const char kScroll[] = "scroll";
+inline constexpr const char kHold[] = "hold";
+inline constexpr const char kHover[] = "hover";
+} // namespace effect_size_scale
 
 } // namespace mousefx::config_json::keys

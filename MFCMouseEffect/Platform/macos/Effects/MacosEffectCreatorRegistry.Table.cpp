@@ -32,7 +32,8 @@ std::unique_ptr<IMouseEffect> CreateTrail(const std::string& type, const EffectC
 std::unique_ptr<IMouseEffect> CreateScroll(const std::string& type, const EffectConfig& config) {
     return std::make_unique<MacosScrollPulseEffect>(
         type,
-        config.theme);
+        config.theme,
+        config.effectSizeScales.scroll);
 }
 
 std::unique_ptr<IMouseEffect> CreateHold(const std::string& type, const EffectConfig& config) {
@@ -47,7 +48,7 @@ std::unique_ptr<IMouseEffect> CreateHover(const std::string& type, const EffectC
     return std::make_unique<MacosHoverPulseEffect>(
         type,
         config.theme,
-        macos_effect_profile::ResolveHoverRenderProfile(config));
+        config.effectSizeScales.hover);
 }
 
 } // namespace

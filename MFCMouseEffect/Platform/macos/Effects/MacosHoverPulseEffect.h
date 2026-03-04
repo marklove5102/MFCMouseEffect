@@ -1,7 +1,8 @@
 #pragma once
 
+#include "MouseFx/Core/Effects/HoverEffectCompute.h"
 #include "MouseFx/Interfaces/IMouseEffect.h"
-#include "Platform/macos/Effects/MacosEffectRenderProfile.h"
+#include "MouseFx/Styles/RippleStyle.h"
 
 #include <string>
 
@@ -9,7 +10,7 @@ namespace mousefx {
 
 class MacosHoverPulseEffect final : public IMouseEffect {
 public:
-    MacosHoverPulseEffect(std::string effectType, std::string themeName, macos_effect_profile::HoverRenderProfile renderProfile);
+    MacosHoverPulseEffect(std::string effectType, std::string themeName, int sizeScalePercent);
     ~MacosHoverPulseEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Hover; }
@@ -23,7 +24,10 @@ public:
 private:
     std::string effectType_{};
     std::string themeName_{};
-    macos_effect_profile::HoverRenderProfile renderProfile_{};
+    int sizeScalePercent_ = 100;
+    RippleStyle style_{};
+    HoverEffectProfile computeProfile_{};
+    bool isChromatic_ = false;
     bool initialized_ = false;
 };
 

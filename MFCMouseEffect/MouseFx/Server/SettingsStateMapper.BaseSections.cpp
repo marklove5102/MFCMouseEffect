@@ -37,6 +37,14 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
         {"hold", EnsureUtf8(cfg.active.hold)},
         {"hover", EnsureUtf8(cfg.active.hover)},
     };
+    const EffectSizeScaleConfig scales = config_internal::SanitizeEffectSizeScaleConfig(cfg.effectSizeScales);
+    (*out)["effect_size_scales"] = {
+        {"click", scales.click},
+        {"trail", scales.trail},
+        {"scroll", scales.scroll},
+        {"hold", scales.hold},
+        {"hover", scales.hover},
+    };
 
     std::string text;
     for (size_t i = 0; i < cfg.textClick.texts.size(); ++i) {

@@ -48,10 +48,15 @@ double ScaleOpacity(double baseOpacity, double opacityScale) {
     return detail::ScaleDouble(baseOpacity, opacityScale, 0.05, 1.0);
 }
 
+double ResolveCategorySizeScale(int percent) {
+    return detail::ClampDouble(static_cast<double>(ClampInt(percent, 50, 200)) / 100.0, 0.5, 2.0);
+}
+
 } // namespace
 
 ScrollRenderProfile ResolveScrollRenderProfile(const EffectConfig& config) {
     const TestProfileTuning tuning = ResolveTestProfileTuning();
+    const double scrollSizeScale = ResolveCategorySizeScale(config.effectSizeScales.scroll);
     ScrollRenderProfile profile{};
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     const double rawBaseDurationSec =
@@ -71,6 +76,8 @@ ScrollRenderProfile ResolveScrollRenderProfile(const EffectConfig& config) {
         detail::ScaleInt(ClampInt(config.ripple.windowSize + 34, 116, 236), tuning.sizeScale, 80, 420);
     profile.verticalSizePx =
         detail::ScaleInt(ClampInt(config.ripple.windowSize + 24, 108, 224), tuning.sizeScale, 72, 400);
+    profile.horizontalSizePx = detail::ScaleInt(profile.horizontalSizePx, scrollSizeScale, 72, 640);
+    profile.verticalSizePx = detail::ScaleInt(profile.verticalSizePx, scrollSizeScale, 72, 640);
     profile.closePaddingMs = 90;
     profile.baseOpacity = ScaleOpacity(0.96, tuning.opacityScale);
 
@@ -90,6 +97,7 @@ ScrollRenderProfile ResolveScrollRenderProfile(const EffectConfig& config) {
 
 HoldRenderProfile ResolveHoldRenderProfile(const EffectConfig& config) {
     const TestProfileTuning tuning = ResolveTestProfileTuning();
+    const double holdSizeScale = ResolveCategorySizeScale(config.effectSizeScales.hold);
     HoldRenderProfile profile{};
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     const double rawBreatheDurationSec =
@@ -98,6 +106,7 @@ HoldRenderProfile ResolveHoldRenderProfile(const EffectConfig& config) {
     const double rawRotateDurationFastSec = detail::ClampDouble(rawRotateDurationSec * 0.68, 0.7, 2.4);
     profile.sizePx =
         detail::ScaleInt(ClampInt(config.ripple.windowSize + 68, 140, 260), tuning.sizeScale, 96, 520);
+    profile.sizePx = detail::ScaleInt(profile.sizePx, holdSizeScale, 96, 780);
     profile.progressFullMs = detail::ScaleInt(
         ClampInt(static_cast<int>(std::lround(rippleDurationMs * 4.0)), 800, 3000),
         tuning.durationScale,
@@ -133,6 +142,7 @@ HoldRenderProfile ResolveHoldRenderProfile(const EffectConfig& config) {
 
 HoverRenderProfile ResolveHoverRenderProfile(const EffectConfig& config) {
     const TestProfileTuning tuning = ResolveTestProfileTuning();
+    const double hoverSizeScale = ResolveCategorySizeScale(config.effectSizeScales.hover);
     HoverRenderProfile profile{};
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     const double rawBreatheDurationSec =
@@ -140,6 +150,8 @@ HoverRenderProfile ResolveHoverRenderProfile(const EffectConfig& config) {
     const double rawSpinDurationSec = detail::ClampDouble(rawBreatheDurationSec * 1.88, 1.0, 3.8);
     profile.sizePx =
         detail::ScaleInt(ClampInt(config.ripple.windowSize + 52, 120, 240), tuning.sizeScale, 84, 460);
+    profile.sizePx = detail::ScaleInt(profile.sizePx, hoverSizeScale, 84, 720);
+    profile.sizePx = detail::ScaleInt(profile.sizePx, 0.72, 64, 620);
     profile.breatheDurationSec = detail::ScaleDouble(
         rawBreatheDurationSec,
         tuning.durationScale,

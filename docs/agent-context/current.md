@@ -23,6 +23,15 @@
 - Renamed `Active Effects` (特效选择) top-level section to `Visual Effects` (视觉特效) to better represent its combined scope.
 - Sub-tabs renamed with dedicated i18n keys (`Effect Channel`, `Text Config`, `Trail Tuning`) preventing translation clobbering from the sidebar.
 - Moved WebUI status message badge from the top-left floating corner to the center of the main header component (`TopBar.svelte`) for better visual balance and flow.
+- macOS hover overlay bridge was adjusted to Windows parity semantics while keeping shared compute:
+  - `glow`: removed platform-local center-fill draw path; keep crosshair ticks + orbiting dot timing only.
+  - `tubes`: switched to global monotonic tick sampling and fixed 200-alpha node gradient semantics (Windows-aligned), while preserving Swift-only rendering execution.
+- macOS hover breathe tempo source now follows Windows path semantics: `MacosHoverPulseEffect` builds `HoverEffectProfile` from `ThemePalette.hover.durationMs/windowSize/colors` (and chromatic runtime style), replacing the older config-ripple-derived profile path that caused over-fast breathing.
+- Visual Effects now includes a secondary tab for per-category size scaling (`effect_size_scales.click/trail/scroll/hold/hover`, 50%-200%, default `100` except `hover=85`). The setting is persisted in `config.json`, returned by `/api/state`, and applied immediately on macOS by re-creating active effects.
+- Effect size sliders now show explicit edge bounds (`50%` left / `200%` right) in each row to match interaction boundary semantics.
+- Effect size sliders now use a deterministic visual shell (custom track/fill/thumb) while native `range` only handles input events; thumb center is bound directly to `0%..100%`, so min/max are visually pinned to absolute left/right endpoints.
+- Hover breathing default size baseline is reduced on macOS (new default `effect_size_scales.hover=85` plus tighter hover profile baseline) to avoid oversized default glow.
+- Trail size scaling no longer changes line-width tuning semantics; line width remains controlled by trail line-width settings (and `line` type no longer applies speed-driven width scaling), keeping contracts and Windows behavior intent stable.
 
 ## Current Capability Status
 - Effects:
@@ -64,6 +73,7 @@
   - 2026-03-03 scroll route guard (parity): `DispatchRouter::OnScroll` now keeps built-in scroll types (`arrow/helix/twinkle`) on native effect lane and skips wasm scroll-route override for those types, matching the same parity policy used by built-in trail critical types.
   - 2026-03-03 scroll compute input parity (macOS): `MacosScrollPulseEffect` now builds runtime scroll compute profile from the same theme scroll style source used by Windows (`GetThemePalette(theme).scroll` + chromatic random style strategy), instead of a macOS-local config-derived scroll profile path.
   - 2026-03-03 scroll geometry closure (shared compute): `ScrollEffectRenderCommand` now carries shared geometry fields (`start_radius_px/end_radius_px/stroke_width_px`), computed once in `ScrollEffectCompute` from style-derived profile and consumed by platform renderers; Windows adapter now prioritizes command geometry fields, and macOS scroll bridge consumes the same command geometry/intensity/strength inputs.
+  - 2026-03-04 hover execution parity closure (macOS): `MacosHoverPulseOverlayBridge.swift` now consumes the shared `HoverEffectRenderCommand` without extra center-fill styling in `glow`, and `tubes` animation timing/alpha semantics are aligned to the Windows renderer model (global tick + fixed node alpha), keeping compute decisions in Core and render execution on platform side.
   - Core effects contract now also enforces trail visibility semantics on macOS:
     - `trail=line` must increase active trail overlay window count in overlay probe.
     - `trail=none` must not increase active trail overlay window count.

@@ -11,7 +11,7 @@ namespace mousefx {
 
 class MacosScrollPulseEffect final : public IMouseEffect {
 public:
-    MacosScrollPulseEffect(std::string effectType, std::string themeName);
+    MacosScrollPulseEffect(std::string effectType, std::string themeName, int sizeScalePercent);
     ~MacosScrollPulseEffect() override;
 
     EffectCategory Category() const override { return EffectCategory::Scroll; }
@@ -25,6 +25,7 @@ private:
     static uint64_t CurrentTickMs();
     std::string effectType_{};
     std::string themeName_{};
+    int sizeScalePercent_ = 100;
     RippleStyle style_{};
     ScrollEffectProfile computeProfile_{};
     bool isChromatic_ = false;

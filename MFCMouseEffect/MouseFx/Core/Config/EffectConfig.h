@@ -196,6 +196,15 @@ struct WasmConfig {
     double maxEventExecutionMs = 1.0;
 };
 
+struct EffectSizeScaleConfig {
+    // Percentage scale per effect category (100 = default size).
+    int click = 100;
+    int trail = 100;
+    int scroll = 100;
+    int hold = 100;
+    int hover = 100;
+};
+
 // Active effect selections per category (persisted).
 struct ActiveEffectConfig {
     std::string click = "text";
@@ -233,6 +242,7 @@ struct EffectConfig {
     TrailRendererParamsConfig trailParams;
     IconConfig icon;
     TextConfig textClick;
+    EffectSizeScaleConfig effectSizeScales;
     InputIndicatorConfig inputIndicator;
     InputAutomationConfig automation;
     WasmConfig wasm;

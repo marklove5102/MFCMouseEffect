@@ -4,6 +4,7 @@
 #include "Platform/macos/Effects/MacosHoverPulseOverlayRendererCore.Internal.h"
 #include "Platform/macos/Effects/MacosHoverPulseOverlaySwiftBridge.h"
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
+#include "MouseFx/Utils/StringUtils.h"
 
 namespace mousefx::macos_hover_pulse {
 
@@ -39,10 +40,10 @@ void ShowHoverPulseOverlayOnMain(
     (void)themeName;
     return;
 #else
-    (void)themeName;
     CloseHoverPulseOverlayOnMain();
 
     const HoverPulseRenderPlan plan = BuildHoverPulseRenderPlan(command);
+    const bool chromaticMode = (ToLowerAscii(themeName) == "chromatic");
     void* windowHandle = mfx_macos_hover_pulse_overlay_create_v1(
         static_cast<double>(plan.frame.origin.x),
         static_cast<double>(plan.frame.origin.y),
@@ -55,7 +56,8 @@ void ShowHoverPulseOverlayOnMain(
         command.baseOpacity,
         static_cast<double>(plan.breatheDurationSec),
         static_cast<double>(plan.tubesSpinDurationSec),
-        command.tubesMode ? 1 : 0);
+        command.tubesMode ? 1 : 0,
+        chromaticMode ? 1 : 0);
     if (windowHandle == nullptr) {
         return;
     }

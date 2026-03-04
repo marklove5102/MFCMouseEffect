@@ -129,6 +129,23 @@
     return !!(node && node.checked);
   }
 
+  function clampScalePercent(value) {
+    const parsed = Number(value);
+    const safe = Number.isFinite(parsed) ? Math.round(parsed) : 100;
+    return Math.min(200, Math.max(50, safe));
+  }
+
+  function normalizeEffectSizeScalesPayload(value) {
+    const source = value || {};
+    return {
+      click: clampScalePercent(source.click),
+      trail: clampScalePercent(source.trail),
+      scroll: clampScalePercent(source.scroll),
+      hold: clampScalePercent(source.hold),
+      hover: clampScalePercent(source.hover),
+    };
+  }
+
   function syncIndicatorPositionUi() {
     const section = inputIndicatorSection();
     if (section && typeof section.syncIndicatorPositionUi === 'function') {
@@ -466,12 +483,17 @@
     const effectsState = (effects && typeof effects.read === 'function')
       ? effects.read()
       : {
-        click: getText('click'),
-        trail: getText('trail'),
-        scroll: getText('scroll'),
-        hold: getText('hold'),
-        hover: getText('hover'),
+        active: {
+          click: getText('click'),
+          trail: getText('trail'),
+          scroll: getText('scroll'),
+          hold: getText('hold'),
+          hover: getText('hover'),
+        },
+        effect_size_scales: normalizeEffectSizeScalesPayload({}),
       };
+    const activeEffectsState = effectsState?.active || effectsState || {};
+    const effectSizeScales = normalizeEffectSizeScalesPayload(effectsState?.effect_size_scales || {});
 
     const textState = (text && typeof text.read === 'function')
       ? text.read()
@@ -535,7 +557,14 @@
       overlay_target_fps: Number(generalState.overlay_target_fps ?? 0),
       hold_follow_mode: generalState.hold_follow_mode,
       hold_presenter_backend: generalState.hold_presenter_backend || 'auto',
-      active: effectsState,
+      active: {
+        click: activeEffectsState.click || '',
+        trail: activeEffectsState.trail || '',
+        scroll: activeEffectsState.scroll || '',
+        hold: activeEffectsState.hold || '',
+        hover: activeEffectsState.hover || '',
+      },
+      effect_size_scales: effectSizeScales,
       text_content: textState.text_content,
       text_font_size: textState.text_font_size,
       trail_style: trailState.trail_style,

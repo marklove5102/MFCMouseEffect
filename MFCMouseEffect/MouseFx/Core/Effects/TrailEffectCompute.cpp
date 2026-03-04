@@ -131,7 +131,9 @@ TrailEffectRenderCommand ComputeTrailEffectRenderCommand(
     command.baseOpacity = std::clamp(profile.baseOpacity, 0.05, 1.0);
     const double baseLineWidth = std::clamp(profile.lineWidthPx, 1.0, 18.0);
     const double typeLineScale = ResolveLineWidthScale(command.normalizedType);
-    const double speedLineScale = 0.88 + command.intensity * 0.52;
+    const double speedLineScale = (command.normalizedType == "line")
+        ? 1.0
+        : (0.88 + command.intensity * 0.52);
     command.lineWidthPx = std::clamp(baseLineWidth * typeLineScale * speedLineScale, 1.0, 24.0);
     command.fillArgb = color.fillArgb;
     command.strokeArgb = color.strokeArgb;

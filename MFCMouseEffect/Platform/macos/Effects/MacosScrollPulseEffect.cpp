@@ -10,14 +10,20 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <utility>
 
 namespace mousefx {
 namespace {
 
-ScrollEffectProfile BuildScrollProfileFromThemeStyle(const RippleStyle& style) {
+int ResolveScaledWindowSize(int baseWindowSize, int sizeScalePercent) {
+    const double sizeScale = std::clamp(static_cast<double>(sizeScalePercent) / 100.0, 0.5, 2.0);
+    return std::clamp(static_cast<int>(std::lround(static_cast<double>(baseWindowSize) * sizeScale)), 64, 720);
+}
+
+ScrollEffectProfile BuildScrollProfileFromThemeStyle(const RippleStyle& style, int sizeScalePercent) {
     ScrollEffectProfile profile{};
-    const int windowSize = std::clamp(style.windowSize, 64, 640);
+    const int windowSize = ResolveScaledWindowSize(std::clamp(style.windowSize, 64, 640), sizeScalePercent);
     profile.verticalSizePx = windowSize;
     profile.horizontalSizePx = windowSize;
     profile.geometryReferenceSizePx = windowSize;
@@ -46,12 +52,14 @@ ScrollEffectProfile BuildScrollProfileFromThemeStyle(const RippleStyle& style) {
 
 MacosScrollPulseEffect::MacosScrollPulseEffect(
     std::string effectType,
-    std::string themeName)
+    std::string themeName,
+    int sizeScalePercent)
     : effectType_(std::move(effectType)),
-      themeName_(std::move(themeName)) {
+      themeName_(std::move(themeName)),
+      sizeScalePercent_(std::clamp(sizeScalePercent, 50, 200)) {
     effectType_ = NormalizeScrollEffectType(effectType_);
     style_ = GetThemePalette(themeName_).scroll;
-    computeProfile_ = BuildScrollProfileFromThemeStyle(style_);
+    computeProfile_ = BuildScrollProfileFromThemeStyle(style_, sizeScalePercent_);
     isChromatic_ = (ToLowerAscii(themeName_) == "chromatic");
 }
 
@@ -93,7 +101,7 @@ void MacosScrollPulseEffect::OnScroll(const ScrollEvent& event) {
 
     const RippleStyle runtimeStyle = isChromatic_ ? MakeRandomStyle(style_) : style_;
     const ScrollEffectProfile runtimeProfile = isChromatic_
-        ? BuildScrollProfileFromThemeStyle(runtimeStyle)
+        ? BuildScrollProfileFromThemeStyle(runtimeStyle, sizeScalePercent_)
         : computeProfile_;
     const ScrollEffectRenderCommand command = ComputeScrollEffectRenderCommand(
         ScreenToOverlayPoint(event.pt),

@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import ActiveEffectsFields from "./ActiveEffectsFields.svelte";
+  import EffectSizeFields from "./EffectSizeFields.svelte";
 
   export let effectProps = {};
   export let activeTab = "active";
@@ -10,6 +11,7 @@
   const TAB_ACTIVE = "active";
   const TAB_TEXT = "text";
   const TAB_TRAIL = "trail";
+  const TAB_SIZE = "size";
 
   function normalizeTab(tabId) {
     if (tabId === TAB_TEXT) {
@@ -17,6 +19,9 @@
     }
     if (tabId === TAB_TRAIL) {
       return TAB_TRAIL;
+    }
+    if (tabId === TAB_SIZE) {
+      return TAB_SIZE;
     }
     return TAB_ACTIVE;
   }
@@ -40,9 +45,14 @@
   $: isActiveTab = selectedTab === TAB_ACTIVE;
   $: isTextTab = selectedTab === TAB_TEXT;
   $: isTrailTab = selectedTab === TAB_TRAIL;
+  $: isSizeTab = selectedTab === TAB_SIZE;
 
   function handleActiveEffectChange(event) {
     dispatch("activeChange", event?.detail || {});
+  }
+
+  function handleSizeScaleChange(event) {
+    dispatch("sizeChange", event?.detail || {});
   }
 
   function normalizeEffectProps(input) {
@@ -57,6 +67,7 @@
       active: value.active || {},
       effectsProfile: value.effectsProfile || {},
       showEffectsProfile: !!value.showEffectsProfile,
+      effectSizeScales: value.effectSizeScales || {},
     };
   }
 
@@ -102,6 +113,17 @@
     >
       Trail Tuning
     </button>
+    <button
+      type="button"
+      role="tab"
+      class="effects-subtab-btn"
+      class:is-active={isSizeTab}
+      aria-selected={isSizeTab ? "true" : "false"}
+      data-i18n="tab_effect_size"
+      on:click={() => selectTab(TAB_SIZE)}
+    >
+      Effect Size
+    </button>
   </div>
 
   <div
@@ -140,6 +162,18 @@
     aria-label="trail-tuning"
   >
     <div id="trail_settings_mount"></div>
+  </div>
+
+  <div
+    class="effects-subtab-panel"
+    role="tabpanel"
+    style:display={isSizeTab ? "" : "none"}
+    aria-label="effect-size"
+  >
+    <EffectSizeFields
+      scales={normalizedEffectProps.effectSizeScales}
+      on:change={handleSizeScaleChange}
+    />
   </div>
 </div>
 

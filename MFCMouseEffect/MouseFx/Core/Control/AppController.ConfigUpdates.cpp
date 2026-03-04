@@ -98,6 +98,35 @@ void AppController::SetTrailLineWidth(float lineWidth) {
     }
 }
 
+void AppController::SetEffectSizeScales(const EffectSizeScaleConfig& scales) {
+    const EffectSizeScaleConfig normalized = config_internal::SanitizeEffectSizeScaleConfig(scales);
+    if (config_.effectSizeScales.click == normalized.click &&
+        config_.effectSizeScales.trail == normalized.trail &&
+        config_.effectSizeScales.scroll == normalized.scroll &&
+        config_.effectSizeScales.hold == normalized.hold &&
+        config_.effectSizeScales.hover == normalized.hover) {
+        return;
+    }
+    config_.effectSizeScales = normalized;
+    PersistConfig();
+
+    if (IsActiveEffectEnabled(EffectCategory::Click)) {
+        ReapplyActiveEffect(EffectCategory::Click);
+    }
+    if (IsActiveEffectEnabled(EffectCategory::Trail)) {
+        ReapplyActiveEffect(EffectCategory::Trail);
+    }
+    if (IsActiveEffectEnabled(EffectCategory::Scroll)) {
+        ReapplyActiveEffect(EffectCategory::Scroll);
+    }
+    if (IsActiveEffectEnabled(EffectCategory::Hold)) {
+        ReapplyActiveEffect(EffectCategory::Hold);
+    }
+    if (IsActiveEffectEnabled(EffectCategory::Hover)) {
+        ReapplyActiveEffect(EffectCategory::Hover);
+    }
+}
+
 void AppController::SetThemeCatalogRootPath(const std::string& rootPath) {
     const std::string normalizedRootPath = TrimAscii(rootPath);
     if (config_.themeCatalogRootPath == normalizedRootPath) {

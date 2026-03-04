@@ -35,6 +35,15 @@ int SanitizeOverlayTargetFps(int targetFps) {
     return ClampInt(targetFps, 0, 360);
 }
 
+EffectSizeScaleConfig SanitizeEffectSizeScaleConfig(EffectSizeScaleConfig scales) {
+    scales.click = ClampInt(scales.click, 50, 200);
+    scales.trail = ClampInt(scales.trail, 50, 200);
+    scales.scroll = ClampInt(scales.scroll, 50, 200);
+    scales.hold = ClampInt(scales.hold, 50, 200);
+    scales.hover = ClampInt(scales.hover, 50, 200);
+    return scales;
+}
+
 TrailHistoryProfile SanitizeTrailHistoryProfile(TrailHistoryProfile profile) {
     if (profile.durationMs < 80) {
         profile.durationMs = 80;

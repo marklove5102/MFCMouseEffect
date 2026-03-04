@@ -31,6 +31,21 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
         config.active.hold = parse_internal::GetOr<std::string>(active, keys::active::kHold, config.active.hold);
     }
 
+    if (root.contains(keys::kEffectSizeScales) && root[keys::kEffectSizeScales].is_object()) {
+        const auto& scales = root[keys::kEffectSizeScales];
+        config.effectSizeScales.click =
+            parse_internal::GetOr<int>(scales, keys::effect_size_scale::kClick, config.effectSizeScales.click);
+        config.effectSizeScales.trail =
+            parse_internal::GetOr<int>(scales, keys::effect_size_scale::kTrail, config.effectSizeScales.trail);
+        config.effectSizeScales.scroll =
+            parse_internal::GetOr<int>(scales, keys::effect_size_scale::kScroll, config.effectSizeScales.scroll);
+        config.effectSizeScales.hold =
+            parse_internal::GetOr<int>(scales, keys::effect_size_scale::kHold, config.effectSizeScales.hold);
+        config.effectSizeScales.hover =
+            parse_internal::GetOr<int>(scales, keys::effect_size_scale::kHover, config.effectSizeScales.hover);
+    }
+    config.effectSizeScales = config_internal::SanitizeEffectSizeScaleConfig(config.effectSizeScales);
+
     parse_internal::ParseInputIndicator(root, config);
     parse_internal::ParseAutomation(root, config);
     parse_internal::ParseWasm(root, config);

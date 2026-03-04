@@ -14,7 +14,7 @@ struct HoverEffectColorProfile {
 };
 
 struct HoverEffectProfile {
-    int sizePx = 172;
+    int sizePx = 80;
     double breatheDurationSec = 0.85;
     double spinDurationSec = 1.6;
     double baseOpacity = 0.9;

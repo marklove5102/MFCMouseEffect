@@ -52,10 +52,15 @@ double ScaleOpacity(double baseOpacity, double opacityScale) {
     return detail::ScaleDouble(baseOpacity, opacityScale, 0.05, 1.0);
 }
 
+double ResolveCategorySizeScale(int percent) {
+    return detail::ClampDouble(static_cast<double>(ClampInt(percent, 50, 200)) / 100.0, 0.5, 2.0);
+}
+
 } // namespace
 
 ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
     const TestProfileTuning tuning = ResolveTestProfileTuning();
+    const double clickSizeScale = ResolveCategorySizeScale(config.effectSizeScales.click);
     ClickRenderProfile profile{};
     const int rippleDurationMs = ClampInt(config.ripple.durationMs, 180, 1200);
     const int textDurationMs = ClampInt(config.textClick.durationMs, 220, 1800);
@@ -112,6 +117,16 @@ ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
         tuning.sizeScale,
         0.1,
         48.0);
+    profile.normalSizePx = detail::ScaleInt(profile.normalSizePx, clickSizeScale, 60, 520);
+    profile.textSizePx = detail::ScaleInt(profile.textSizePx, clickSizeScale, 72, 560);
+    profile.textFontSizePx = detail::ScaleDouble(profile.textFontSizePx, clickSizeScale, 8.0, 300.0);
+    profile.textFloatDistancePx = detail::ScaleDouble(profile.textFloatDistancePx, clickSizeScale, 0.0, 500.0);
+    profile.rippleStartRadiusPx = detail::ScaleDouble(profile.rippleStartRadiusPx, clickSizeScale, 0.0, 320.0);
+    profile.rippleEndRadiusPx = detail::ScaleDouble(profile.rippleEndRadiusPx, clickSizeScale, 1.0, 420.0);
+    profile.rippleStrokeWidthPx = detail::ScaleDouble(profile.rippleStrokeWidthPx, clickSizeScale, 0.1, 64.0);
+    profile.starStartRadiusPx = detail::ScaleDouble(profile.starStartRadiusPx, clickSizeScale, 0.0, 320.0);
+    profile.starEndRadiusPx = detail::ScaleDouble(profile.starEndRadiusPx, clickSizeScale, 1.0, 420.0);
+    profile.starStrokeWidthPx = detail::ScaleDouble(profile.starStrokeWidthPx, clickSizeScale, 0.1, 64.0);
     profile.closePaddingMs = 60;
     profile.baseOpacity = ScaleOpacity(0.95, tuning.opacityScale);
     profile.leftButton.fillArgb = config.ripple.leftClick.fill.value;
@@ -128,6 +143,7 @@ ClickRenderProfile ResolveClickRenderProfile(const EffectConfig& config) {
 
 TrailRenderProfile ResolveTrailRenderProfile(const EffectConfig& config, const std::string& trailType) {
     const TestProfileTuning tuning = ResolveTestProfileTuning();
+    const double trailSizeScale = ResolveCategorySizeScale(config.effectSizeScales.trail);
     TrailRenderProfile profile{};
     const std::string normalizedTrailType = detail::NormalizeTrailTypeAlias(trailType);
     const TrailHistoryProfile history = config.GetTrailHistoryProfile(normalizedTrailType);
@@ -139,6 +155,8 @@ TrailRenderProfile ResolveTrailRenderProfile(const EffectConfig& config, const s
     profile.particleSizePx =
         detail::ScaleInt(ClampInt(40 + history.maxPoints / 6, 40, 72), tuning.sizeScale, 28, 160);
     profile.lineWidthPx = detail::ClampDouble(static_cast<double>(config.trail.lineWidth), 1.0, 18.0);
+    profile.normalSizePx = detail::ScaleInt(profile.normalSizePx, trailSizeScale, 32, 340);
+    profile.particleSizePx = detail::ScaleInt(profile.particleSizePx, trailSizeScale, 20, 280);
     profile.closePaddingMs = 40;
     profile.baseOpacity = ScaleOpacity(0.95, tuning.opacityScale);
     const uint32_t trailBaseStroke = config.trail.color.value;

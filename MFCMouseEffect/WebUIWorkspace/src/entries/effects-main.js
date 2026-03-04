@@ -2,12 +2,19 @@ import EffectsSectionTabs from '../effects/EffectsSectionTabs.svelte';
 import { normalizeEffectsProfile } from '../effects/profile-model.js';
 import { createLazyMountBridge } from './lazy-mount.js';
 
-let currentState = {
+let currentActiveState = {
   click: '',
   trail: '',
   scroll: '',
   hold: '',
   hover: '',
+};
+let currentSizeScales = {
+  click: 100,
+  trail: 100,
+  scroll: 100,
+  hold: 100,
+  hover: 100,
 };
 
 let currentCapabilities = {
@@ -28,6 +35,9 @@ function normalizeActiveTab(input) {
   }
   if (value === 'trail') {
     return 'trail';
+  }
+  if (value === 'size') {
+    return 'size';
   }
   return 'active';
 }
@@ -62,6 +72,23 @@ function normalizeActive(input) {
   };
 }
 
+function clampScalePercent(value) {
+  const parsed = Number(value);
+  const safe = Number.isFinite(parsed) ? Math.round(parsed) : 100;
+  return Math.min(200, Math.max(50, safe));
+}
+
+function normalizeEffectSizeScales(input) {
+  const value = input || {};
+  return {
+    click: clampScalePercent(value.click),
+    trail: clampScalePercent(value.trail),
+    scroll: clampScalePercent(value.scroll),
+    hold: clampScalePercent(value.hold),
+    hover: clampScalePercent(value.hover),
+  };
+}
+
 function normalizeEffectCapabilities(input) {
   const value = input || {};
   return {
@@ -84,7 +111,8 @@ const bridge = createLazyMountBridge({
       holdOptions: [],
       hoverOptions: [],
       effectCapabilities: currentCapabilities,
-      active: currentState,
+      active: currentActiveState,
+      effectSizeScales: currentSizeScales,
       effectsProfile: currentEffectsProfile,
       showEffectsProfile,
     },
@@ -96,7 +124,11 @@ const bridge = createLazyMountBridge({
     });
     instance.$on('activeChange', (event) => {
       const detail = event?.detail || {};
-      currentState = normalizeActive(detail);
+      currentActiveState = normalizeActive(detail);
+    });
+    instance.$on('sizeChange', (event) => {
+      const detail = event?.detail || {};
+      currentSizeScales = normalizeEffectSizeScales(detail);
     });
     instance.$on('tabChange', (event) => {
       currentActiveTab = normalizeActiveTab(event?.detail?.tabId);
@@ -109,10 +141,12 @@ function render(payload) {
   const schema = payload?.schema || {};
   const appState = payload?.state || {};
   const active = normalizeActive(appState.active || {});
+  const effectSizeScales = normalizeEffectSizeScales(appState.effect_size_scales || {});
   const effectCapabilities = normalizeEffectCapabilities(schema.capabilities?.effects || {});
   const effectsProfile = normalizeEffectsProfile(appState.effects_profile || {});
   showEffectsProfile = resolveEffectsProfileDebugFlag();
-  currentState = active;
+  currentActiveState = active;
+  currentSizeScales = effectSizeScales;
   currentCapabilities = effectCapabilities;
   currentEffectsProfile = effectsProfile;
   bridge.updateProps({
@@ -125,6 +159,7 @@ function render(payload) {
       hoverOptions: schema.effects?.hover || [],
       effectCapabilities,
       active,
+      effectSizeScales,
       effectsProfile,
       showEffectsProfile,
     },
@@ -132,7 +167,10 @@ function render(payload) {
 }
 
 function read() {
-  return normalizeActive(currentState);
+  return {
+    active: normalizeActive(currentActiveState),
+    effect_size_scales: normalizeEffectSizeScales(currentSizeScales),
+  };
 }
 
 window.MfxEffectsSection = {

@@ -3,6 +3,7 @@
 #include "CommandHandler.ApplySettings.Internal.h"
 
 #include "AppController.h"
+#include "MouseFx/Core/Config/EffectConfigInternal.h"
 #include "MouseFx/Utils/MathUtils.h"
 #include "MouseFx/Utils/StringUtils.h"
 #include "Settings/SettingsOptions.h"
@@ -349,6 +350,37 @@ void ApplyTrailTuningSettings(const json& payload, AppController* controller) {
     if (std::fabs(cfg.trail.lineWidth - lineWidth) > 0.01f) {
         controller->SetTrailLineWidth(lineWidth);
     }
+}
+
+void ApplyEffectSizeScaleSettings(const json& payload, AppController* controller) {
+    if (!controller) {
+        return;
+    }
+    if (!payload.contains("effect_size_scales") || !payload["effect_size_scales"].is_object()) {
+        return;
+    }
+
+    EffectSizeScaleConfig scales = controller->Config().effectSizeScales;
+    const json& source = payload["effect_size_scales"];
+    auto applyOne = [&](const char* key, int* dst) {
+        if (!dst || !source.contains(key)) {
+            return;
+        }
+        if (source[key].is_number_integer()) {
+            *dst = source[key].get<int>();
+            return;
+        }
+        if (source[key].is_number()) {
+            *dst = static_cast<int>(source[key].get<double>());
+        }
+    };
+
+    applyOne("click", &scales.click);
+    applyOne("trail", &scales.trail);
+    applyOne("scroll", &scales.scroll);
+    applyOne("hold", &scales.hold);
+    applyOne("hover", &scales.hover);
+    controller->SetEffectSizeScales(config_internal::SanitizeEffectSizeScaleConfig(scales));
 }
 
 } // namespace mousefx::command_handler_apply_settings

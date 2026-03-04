@@ -23,6 +23,14 @@ nlohmann::json BuildRootFromConfig(const EffectConfig& config) {
     root[keys::kTrailProfiles] = serialize_internal::BuildTrailProfilesJson(config.trailProfiles);
     root[keys::kTrailParams] = serialize_internal::BuildTrailParamsJson(config.trailParams);
     root[keys::kActiveEffects] = serialize_internal::BuildActiveEffectsJson(config.active);
+    const EffectSizeScaleConfig scales = config_internal::SanitizeEffectSizeScaleConfig(config.effectSizeScales);
+    root[keys::kEffectSizeScales] = {
+        {keys::effect_size_scale::kClick, scales.click},
+        {keys::effect_size_scale::kTrail, scales.trail},
+        {keys::effect_size_scale::kScroll, scales.scroll},
+        {keys::effect_size_scale::kHold, scales.hold},
+        {keys::effect_size_scale::kHover, scales.hover},
+    };
     root[keys::kEffects] = serialize_internal::BuildEffectsJson(config);
     return root;
 }

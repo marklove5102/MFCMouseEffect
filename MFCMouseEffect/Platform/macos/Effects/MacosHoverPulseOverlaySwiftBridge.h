@@ -16,7 +16,8 @@ void* mfx_macos_hover_pulse_overlay_create_v1(
     double baseOpacity,
     double breatheDurationSec,
     double tubesSpinDurationSec,
-    int tubesMode);
+    int tubesMode,
+    int chromaticMode);
 
 #ifdef __cplusplus
 }

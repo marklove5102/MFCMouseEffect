@@ -102,6 +102,7 @@ public:
     void SetTrailTuning(const std::string& style, const TrailProfilesConfig& profiles, const TrailRendererParamsConfig& params);
     // Set trail line width (persisted).
     void SetTrailLineWidth(float lineWidth);
+    void SetEffectSizeScales(const EffectSizeScaleConfig& scales);
 
     // Get the current effect for a category (may be null).
     IMouseEffect* GetEffect(EffectCategory category) const;
