@@ -50,7 +50,12 @@ private:
     };
 
     struct TimerThreadSlot {
-        std::shared_ptr<std::atomic<bool>> running;
+        struct StopSignal {
+            std::mutex mutex{};
+            std::condition_variable cv{};
+            bool stop = false;
+        };
+        std::shared_ptr<StopSignal> stopSignal;
         std::thread thread;
     };
 

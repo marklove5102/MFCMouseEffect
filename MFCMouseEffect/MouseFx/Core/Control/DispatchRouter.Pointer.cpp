@@ -297,6 +297,16 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
         ScreenPoint pt{};
         int button = 0;
         if (ctrl_->ConsumePendingHold(&pt, &button)) {
+            ScreenPoint holdStartPt = pt;
+            ScreenPoint liveCursorPt{};
+            if (ctrl_->QueryCursorScreenPoint(&liveCursorPt)) {
+                holdStartPt = liveCursorPt;
+            }
+#if MFX_PLATFORM_MACOS
+            RepairMacPointerPoint(ctrl_, &holdStartPt, false);
+#else
+            ctrl_->RememberLastPointerPoint(holdStartPt);
+#endif
             if (moveOnlyPolicy) {
                 // In move-only mode, keep long-press lane disabled so trail
                 // rendering is not interrupted by hold start/end churn.
@@ -308,13 +318,13 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
             bool holdRenderedByWasm = false;
             const bool holdRouteActive = wasmFeature_.RouteHoldStart(
                 *ctrl_,
-                pt,
+                holdStartPt,
                 button,
                 static_cast<uint32_t>(ctrl_->CurrentHoldDurationMs()),
                 &holdRenderedByWasm);
             if (!holdRouteActive || !holdRenderedByWasm) {
                 if (auto* effect = ctrl_->GetEffect(EffectCategory::Hold)) {
-                    effect->OnHoldStart(pt, button);
+                    effect->OnHoldStart(holdStartPt, button);
                 }
             }
             if (ShouldSuppressClickAfterHold(ctrl_)) {

@@ -21,18 +21,23 @@ bool MacosDispatchMessageHost::SetTimer(uintptr_t timerId, uint32_t intervalMs) 
     KillTimer(timerId);
 
     TimerThreadSlot slot{};
-    slot.running = std::make_shared<std::atomic<bool>>(true);
-    slot.thread = std::thread([this, timerId, intervalMs, running = slot.running]() {
+    slot.stopSignal = std::make_shared<TimerThreadSlot::StopSignal>();
+    slot.thread = std::thread([this, timerId, intervalMs, stopSignal = slot.stopSignal]() {
         const std::chrono::milliseconds interval(intervalMs);
-        while (running->load(std::memory_order_acquire)) {
-            std::this_thread::sleep_for(interval);
-            if (!running->load(std::memory_order_acquire)) {
+        std::unique_lock<std::mutex> lock(stopSignal->mutex);
+        for (;;) {
+            if (stopSignal->cv.wait_for(
+                    lock,
+                    interval,
+                    [stopSignal]() { return stopSignal->stop; })) {
                 break;
             }
+            lock.unlock();
             PostAsync(
                 MacosDispatchMessageCodec::kTimerMessageId,
                 static_cast<uintptr_t>(timerId),
                 0);
+            lock.lock();
         }
     });
 
@@ -60,8 +65,12 @@ void MacosDispatchMessageHost::KillTimer(uintptr_t timerId) {
         return;
     }
 
-    if (slot.running) {
-        slot.running->store(false, std::memory_order_release);
+    if (slot.stopSignal) {
+        {
+            std::lock_guard<std::mutex> lock(slot.stopSignal->mutex);
+            slot.stopSignal->stop = true;
+        }
+        slot.stopSignal->cv.notify_all();
     }
     if (slot.thread.joinable()) {
         slot.thread.join();
@@ -77,8 +86,12 @@ void MacosDispatchMessageHost::StopAllTimers() {
 
     for (auto& entry : timers) {
         TimerThreadSlot& slot = entry.second;
-        if (slot.running) {
-            slot.running->store(false, std::memory_order_release);
+        if (slot.stopSignal) {
+            {
+                std::lock_guard<std::mutex> lock(slot.stopSignal->mutex);
+                slot.stopSignal->stop = true;
+            }
+            slot.stopSignal->cv.notify_all();
         }
     }
     for (auto& entry : timers) {

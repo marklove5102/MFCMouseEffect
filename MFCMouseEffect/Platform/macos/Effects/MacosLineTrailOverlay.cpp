@@ -6,12 +6,19 @@
 #include "Platform/macos/Effects/MacosLineTrailOverlaySwiftBridge.h"
 
 #include <algorithm>
+#include <chrono>
 #include <mutex>
 
 namespace mousefx::macos_line_trail {
 
 #if defined(__APPLE__)
 namespace {
+
+uint64_t MonotonicNowMs() {
+    using namespace std::chrono;
+    return static_cast<uint64_t>(
+        duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count());
+}
 
 class LineTrailBridgeState final {
 public:
@@ -25,6 +32,13 @@ public:
         if (handle_ == nullptr) {
             return;
         }
+        const uint64_t nowMs = MonotonicNowMs();
+        if (lastUpdateDispatchTickMs_ != 0 &&
+            nowMs >= lastUpdateDispatchTickMs_ &&
+            (nowMs - lastUpdateDispatchTickMs_) < kMinDispatchIntervalMs) {
+            return;
+        }
+        lastUpdateDispatchTickMs_ = nowMs;
 
         const int durationMs = std::max(1, config.durationMs);
         const float lineWidth = std::max(0.2f, config.lineWidth);
@@ -92,6 +106,8 @@ private:
 
     std::mutex mutex_{};
     void* handle_ = nullptr;
+    uint64_t lastUpdateDispatchTickMs_ = 0;
+    static constexpr uint64_t kMinDispatchIntervalMs = 10;
 };
 
 LineTrailBridgeState& BridgeState() {
