@@ -106,7 +106,7 @@ void Wasm3Runtime::UnloadModule() {
 }
 
 bool Wasm3Runtime::IsModuleLoaded() const {
-    return moduleLoaded_ && runtime_ && fnGetApiVersion_ && fnOnEvent_;
+    return moduleLoaded_ && runtime_ && fnGetApiVersion_ && fnOnInput_ && fnOnFrame_;
 }
 
 bool Wasm3Runtime::CreateRuntime(std::string* outError) {
@@ -136,7 +136,8 @@ bool Wasm3Runtime::CreateRuntime(std::string* outError) {
 void Wasm3Runtime::ReleaseRuntime() {
     moduleLoaded_ = false;
     fnGetApiVersion_ = nullptr;
-    fnOnEvent_ = nullptr;
+    fnOnInput_ = nullptr;
+    fnOnFrame_ = nullptr;
     fnReset_ = nullptr;
     moduleBytes_.clear();
     if (runtime_) {

@@ -18,7 +18,7 @@ export function mfx_plugin_get_api_version(): u32 {
 
 export function mfx_plugin_reset(): void {}
 
-export function mfx_plugin_on_event(
+export function mfx_plugin_on_input(
   inputPtr: usize,
   inputLen: u32,
   outputPtr: usize,
@@ -68,4 +68,13 @@ export function mfx_plugin_on_event(
     (seed >> 4) % 8,
   );
   return BURST_OUTPUT_BYTES;
+}
+
+export function mfx_plugin_on_frame(
+  inputPtr: usize,
+  inputLen: u32,
+  outputPtr: usize,
+  outputCap: u32,
+): u32 {
+  return 0;
 }

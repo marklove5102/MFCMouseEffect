@@ -3,6 +3,7 @@ import {
   compileAssemblyScript,
   copyRelativeFiles,
   parseArgs,
+  resetOutputDir,
   resolveTemplateRoot,
   writeManifest,
 } from "./build-lib.mjs";
@@ -23,6 +24,7 @@ const watPath = resolve(outputDir, "effect.wat");
 const manifestPath = resolve(outputDir, "plugin.json");
 
 try {
+  resetOutputDir(outputDir);
   compileAssemblyScript({
     rootDir,
     entryRelativePath: preset.source,
@@ -33,9 +35,11 @@ try {
     id: preset.id,
     name: preset.name,
     version: preset.version,
-    api_version: 1,
+    api_version: 2,
     entry: "effect.wasm",
     image_assets: Array.isArray(preset.imageAssets) ? preset.imageAssets : [],
+    input_kinds: Array.isArray(preset.inputKinds) ? preset.inputKinds : undefined,
+    enable_frame_tick: typeof preset.enableFrameTick === "boolean" ? preset.enableFrameTick : undefined,
   });
   copyRelativeFiles(rootDir, outputDir, preset.imageAssets);
   console.log(`Sample build complete: ${preset.key}`);

@@ -24,6 +24,26 @@ void ResetInvokeDiagnostics(HostDiagnostics* diagnostics) {
     diagnostics->lastRenderedByWasm = false;
     diagnostics->lastExecutedTextCommands = 0;
     diagnostics->lastExecutedImageCommands = 0;
+    diagnostics->lastExecutedPulseCommands = 0;
+    diagnostics->lastExecutedPolylineCommands = 0;
+    diagnostics->lastExecutedPathStrokeCommands = 0;
+    diagnostics->lastExecutedPathFillCommands = 0;
+    diagnostics->lastExecutedGlowBatchCommands = 0;
+    diagnostics->lastExecutedSpriteBatchCommands = 0;
+    diagnostics->lastExecutedGlowEmitterCommands = 0;
+    diagnostics->lastExecutedGlowEmitterRemoveCommands = 0;
+    diagnostics->lastExecutedSpriteEmitterCommands = 0;
+    diagnostics->lastExecutedSpriteEmitterRemoveCommands = 0;
+    diagnostics->lastExecutedParticleEmitterCommands = 0;
+    diagnostics->lastExecutedParticleEmitterRemoveCommands = 0;
+    diagnostics->lastExecutedRibbonTrailCommands = 0;
+    diagnostics->lastExecutedRibbonTrailRemoveCommands = 0;
+    diagnostics->lastExecutedQuadFieldCommands = 0;
+    diagnostics->lastExecutedQuadFieldRemoveCommands = 0;
+    diagnostics->lastExecutedGroupRemoveCommands = 0;
+    diagnostics->lastExecutedGroupPresentationCommands = 0;
+    diagnostics->lastExecutedGroupClipRectCommands = 0;
+    diagnostics->lastExecutedGroupLayerCommands = 0;
     diagnostics->lastThrottledRenderCommands = 0;
     diagnostics->lastThrottledByCapacityRenderCommands = 0;
     diagnostics->lastThrottledByIntervalRenderCommands = 0;
@@ -33,7 +53,31 @@ void ResetInvokeDiagnostics(HostDiagnostics* diagnostics) {
 
 } // namespace
 
-bool WasmEffectHost::InvokeEvent(const EventInvokeInput& input, std::vector<uint8_t>* outCommandBuffer) {
+bool WasmEffectHost::InvokeInput(const EventInvokeInput& input, std::vector<uint8_t>* outCommandBuffer) {
+    const EventInputV2 payload = BuildEventInputV2(input);
+    const auto payloadBytes = SerializeEventInputV2(payload);
+    return InvokePayload(
+        payloadBytes.data(),
+        static_cast<uint32_t>(payloadBytes.size()),
+        false,
+        outCommandBuffer);
+}
+
+bool WasmEffectHost::InvokeFrame(const FrameInvokeInput& input, std::vector<uint8_t>* outCommandBuffer) {
+    const FrameInputV2 payload = BuildFrameInputV2(input);
+    const auto payloadBytes = SerializeFrameInputV2(payload);
+    return InvokePayload(
+        payloadBytes.data(),
+        static_cast<uint32_t>(payloadBytes.size()),
+        true,
+        outCommandBuffer);
+}
+
+bool WasmEffectHost::InvokePayload(
+    const uint8_t* payloadPtr,
+    uint32_t payloadBytes,
+    bool isFrameInvoke,
+    std::vector<uint8_t>* outCommandBuffer) {
     diagnostics_.lifetimeInvokeCalls += 1;
     auto markInvokeFailure = [this]() {
         diagnostics_.lifetimeInvokeFailedCalls += 1;
@@ -67,15 +111,23 @@ bool WasmEffectHost::InvokeEvent(const EventInvokeInput& input, std::vector<uint
     bool ok = false;
 
     const auto start = std::chrono::steady_clock::now();
-    const EventInputV1 eventInput = BuildEventInputV1(input);
-    const auto payload = SerializeEventInputV1(eventInput);
-    ok = runtime_->CallOnEvent(
-        payload.data(),
-        static_cast<uint32_t>(payload.size()),
-        output.data(),
-        static_cast<uint32_t>(output.size()),
-        &writtenBytes,
-        &error);
+    if (isFrameInvoke) {
+        ok = runtime_->CallOnFrame(
+            payloadPtr,
+            payloadBytes,
+            output.data(),
+            static_cast<uint32_t>(output.size()),
+            &writtenBytes,
+            &error);
+    } else {
+        ok = runtime_->CallOnInput(
+            payloadPtr,
+            payloadBytes,
+            output.data(),
+            static_cast<uint32_t>(output.size()),
+            &writtenBytes,
+            &error);
+    }
     const auto end = std::chrono::steady_clock::now();
     diagnostics_.lastCallDurationMicros = static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
@@ -129,7 +181,8 @@ bool WasmEffectHost::InvokeEvent(const EventInvokeInput& input, std::vector<uint
         diagnostics_.lifetimeInvokeRejectedByBudgetCalls += 1;
         output.clear();
         diagnostics_.lastOutputBytes = 0;
-        SetError(std::string("WASM budget rejected event: ") + budgetResult.reason);
+        SetError(std::string("WASM budget rejected ") + (isFrameInvoke ? "frame" : "input") +
+            " invoke: " + budgetResult.reason);
         markInvokeFailure();
         return false;
     }
@@ -140,8 +193,8 @@ bool WasmEffectHost::InvokeEvent(const EventInvokeInput& input, std::vector<uint
     return true;
 }
 
-EventInputV1 WasmEffectHost::BuildEventInputV1(const EventInvokeInput& input) const {
-    EventInputV1 payload{};
+EventInputV2 WasmEffectHost::BuildEventInputV2(const EventInvokeInput& input) const {
+    EventInputV2 payload{};
     payload.x = input.x;
     payload.y = input.y;
     payload.delta = input.delta;
@@ -150,6 +203,17 @@ EventInputV1 WasmEffectHost::BuildEventInputV1(const EventInvokeInput& input) co
     payload.button = input.button;
     payload.flags = input.flags;
     payload.eventTickMs = input.eventTickMs;
+    return payload;
+}
+
+FrameInputV2 WasmEffectHost::BuildFrameInputV2(const FrameInvokeInput& input) const {
+    FrameInputV2 payload{};
+    payload.cursorX = input.cursorX;
+    payload.cursorY = input.cursorY;
+    payload.frameDeltaMs = input.frameDeltaMs;
+    payload.pointerValid = input.pointerValid ? 1u : 0u;
+    payload.holdActive = input.holdActive ? 1u : 0u;
+    payload.frameTickMs = input.frameTickMs;
     return payload;
 }
 

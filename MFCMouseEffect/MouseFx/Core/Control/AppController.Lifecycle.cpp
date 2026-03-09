@@ -64,6 +64,7 @@ bool AppController::Start() {
     lastInputTime_ = CurrentTickMs();
     dispatchMessageHost_->SetTimer(kHoverTimerId, 100);
     dispatchMessageHost_->SetTimer(kInputCaptureHealthTimerId, 500);
+    ArmWasmFrameTimer();
 
     diag_.stage = StartStage::GlobalHook;
     if (!hook_->Start(dispatchMessageHost_.get())) {
@@ -104,6 +105,7 @@ void AppController::Stop() {
         dispatchMessageHost_->KillTimer(kHoldTimerId);
         dispatchMessageHost_->KillTimer(kHoldUpdateTimerId);
         dispatchMessageHost_->KillTimer(kInputCaptureHealthTimerId);
+        dispatchMessageHost_->KillTimer(kWasmFrameTimerId);
     }
     ShutdownWasmHost();
     hook_->SetKeyboardCaptureExclusive(false);

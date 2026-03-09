@@ -125,7 +125,7 @@ bool Win32DllWasmRuntime::CallGetApiVersion(uint32_t* outApiVersion, std::string
     return true;
 }
 
-bool Win32DllWasmRuntime::CallOnEvent(
+bool Win32DllWasmRuntime::CallOnInput(
     const uint8_t* inputPtr,
     uint32_t inputLen,
     uint8_t* outputPtr,
@@ -135,14 +135,47 @@ bool Win32DllWasmRuntime::CallOnEvent(
     if (outWrittenBytes) {
         *outWrittenBytes = 0;
     }
-    if (!onEventFn_ || !runtimeHandle_) {
+    if (!onInputFn_ || !runtimeHandle_) {
         if (outError) {
-            *outError = "Runtime bridge does not support mfx_plugin_on_event.";
+            *outError = "Runtime bridge does not support mfx_plugin_on_input.";
         }
         return false;
     }
     uint32_t written = 0;
-    const int ok = onEventFn_(runtimeHandle_, inputPtr, inputLen, outputPtr, outputCap, &written);
+    const int ok = onInputFn_(runtimeHandle_, inputPtr, inputLen, outputPtr, outputCap, &written);
+    if (!ok) {
+        if (outError) {
+            *outError = ReadBridgeError();
+        }
+        return false;
+    }
+    if (outWrittenBytes) {
+        *outWrittenBytes = written;
+    }
+    if (outError) {
+        outError->clear();
+    }
+    return true;
+}
+
+bool Win32DllWasmRuntime::CallOnFrame(
+    const uint8_t* inputPtr,
+    uint32_t inputLen,
+    uint8_t* outputPtr,
+    uint32_t outputCap,
+    uint32_t* outWrittenBytes,
+    std::string* outError) {
+    if (outWrittenBytes) {
+        *outWrittenBytes = 0;
+    }
+    if (!onFrameFn_ || !runtimeHandle_) {
+        if (outError) {
+            *outError = "Runtime bridge does not support mfx_plugin_on_frame.";
+        }
+        return false;
+    }
+    uint32_t written = 0;
+    const int ok = onFrameFn_(runtimeHandle_, inputPtr, inputLen, outputPtr, outputCap, &written);
     if (!ok) {
         if (outError) {
             *outError = ReadBridgeError();
@@ -176,7 +209,8 @@ bool Win32DllWasmRuntime::ResolveExports(std::string* outError) {
         {"mfx_wasm_runtime_unload_module", reinterpret_cast<void**>(&unloadModuleFn_)},
         {"mfx_wasm_runtime_is_module_loaded", reinterpret_cast<void**>(&isModuleLoadedFn_)},
         {"mfx_wasm_runtime_call_get_api_version", reinterpret_cast<void**>(&getApiVersionFn_)},
-        {"mfx_wasm_runtime_call_on_event", reinterpret_cast<void**>(&onEventFn_)},
+        {"mfx_wasm_runtime_call_on_input", reinterpret_cast<void**>(&onInputFn_)},
+        {"mfx_wasm_runtime_call_on_frame", reinterpret_cast<void**>(&onFrameFn_)},
         {"mfx_wasm_runtime_reset_plugin", reinterpret_cast<void**>(&resetFn_)},
         {"mfx_wasm_runtime_last_error", reinterpret_cast<void**>(&lastErrorFn_)},
     };
@@ -217,7 +251,8 @@ void Win32DllWasmRuntime::Shutdown() {
     unloadModuleFn_ = nullptr;
     isModuleLoadedFn_ = nullptr;
     getApiVersionFn_ = nullptr;
-    onEventFn_ = nullptr;
+    onInputFn_ = nullptr;
+    onFrameFn_ = nullptr;
     resetFn_ = nullptr;
     lastErrorFn_ = nullptr;
     if (module_) {

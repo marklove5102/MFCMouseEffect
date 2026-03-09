@@ -16,6 +16,39 @@ using json = nlohmann::json;
 namespace mousefx {
 using websettings_wasm_routes::SetJsonResponse;
 
+namespace {
+
+json InputKindsToJson(uint32_t mask) {
+    json kinds = json::array();
+    if (mask & wasm::kManifestInputKindClickBit) {
+        kinds.push_back("click");
+    }
+    if (mask & wasm::kManifestInputKindMoveBit) {
+        kinds.push_back("move");
+    }
+    if (mask & wasm::kManifestInputKindScrollBit) {
+        kinds.push_back("scroll");
+    }
+    if (mask & wasm::kManifestInputKindHoldStartBit) {
+        kinds.push_back("hold_start");
+    }
+    if (mask & wasm::kManifestInputKindHoldUpdateBit) {
+        kinds.push_back("hold_update");
+    }
+    if (mask & wasm::kManifestInputKindHoldEndBit) {
+        kinds.push_back("hold_end");
+    }
+    if (mask & wasm::kManifestInputKindHoverStartBit) {
+        kinds.push_back("hover_start");
+    }
+    if (mask & wasm::kManifestInputKindHoverEndBit) {
+        kinds.push_back("hover_end");
+    }
+    return kinds;
+}
+
+} // namespace
+
 bool HandleWebSettingsWasmCatalogQueryApiRoute(
     const HttpRequest& req,
     const std::string& path,
@@ -40,6 +73,8 @@ bool HandleWebSettingsWasmCatalogQueryApiRoute(
             {"name", plugin.manifest.name},
             {"version", plugin.manifest.version},
             {"api_version", plugin.manifest.apiVersion},
+            {"input_kinds", InputKindsToJson(plugin.manifest.inputKindsMask)},
+            {"enable_frame_tick", plugin.manifest.enableFrameTick},
             {"manifest_path", Utf16ToUtf8(plugin.manifestPath.c_str())},
             {"wasm_path", Utf16ToUtf8(plugin.wasmPath.c_str())},
         });

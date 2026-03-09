@@ -69,12 +69,21 @@ bool Wasm3Runtime::ResolvePluginExports(std::string* outError) {
         return false;
     }
 
-    result = m3_FindFunction(&fnOnEvent_, runtime_, "mfx_plugin_on_event");
+    result = m3_FindFunction(&fnOnInput_, runtime_, "mfx_plugin_on_input");
     if (result) {
-        fnOnEvent_ = nullptr;
+        fnOnInput_ = nullptr;
     }
-    if (!fnOnEvent_) {
-        SetOutError(outError, "plugin does not export mfx_plugin_on_event.");
+    if (!fnOnInput_) {
+        SetOutError(outError, "plugin does not export mfx_plugin_on_input.");
+        return false;
+    }
+
+    result = m3_FindFunction(&fnOnFrame_, runtime_, "mfx_plugin_on_frame");
+    if (result) {
+        fnOnFrame_ = nullptr;
+    }
+    if (!fnOnFrame_) {
+        SetOutError(outError, "plugin does not export mfx_plugin_on_frame.");
         return false;
     }
 

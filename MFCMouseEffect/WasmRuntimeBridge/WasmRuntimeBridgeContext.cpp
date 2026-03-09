@@ -142,7 +142,7 @@ void RuntimeBridgeContext::UnloadModule() {
 
 bool RuntimeBridgeContext::IsModuleLoaded() const {
     std::lock_guard<std::mutex> lock(mutex_);
-    return moduleLoaded_ && runtime_ && fnGetApiVersion_ && fnOnEvent_;
+    return moduleLoaded_ && runtime_ && fnGetApiVersion_ && fnOnInput_ && fnOnFrame_;
 }
 
 bool RuntimeBridgeContext::CallGetApiVersion(uint32_t* outApiVersion) {
@@ -188,23 +188,47 @@ bool RuntimeBridgeContext::CallGetApiVersion(uint32_t* outApiVersion) {
     return true;
 }
 
-bool RuntimeBridgeContext::CallOnEvent(
+bool RuntimeBridgeContext::CallOnInput(
     const uint8_t* inputPtr,
     uint32_t inputLen,
     uint8_t* outputPtr,
     uint32_t outputCap,
     uint32_t* outWrittenBytes) {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!moduleLoaded_ || !runtime_ || !fnOnEvent_) {
+    if (!moduleLoaded_ || !runtime_ || !fnOnInput_) {
         if (outWrittenBytes) {
             *outWrittenBytes = 0;
         }
-        SetErrorLocked("plugin module does not export mfx_plugin_on_event.");
+        SetErrorLocked("plugin module does not export mfx_plugin_on_input.");
         return false;
     }
     return CallPluginBufferFunctionLocked(
-        fnOnEvent_,
-        "on_event",
+        fnOnInput_,
+        "on_input",
+        inputPtr,
+        inputLen,
+        outputPtr,
+        outputCap,
+        outWrittenBytes);
+}
+
+bool RuntimeBridgeContext::CallOnFrame(
+    const uint8_t* inputPtr,
+    uint32_t inputLen,
+    uint8_t* outputPtr,
+    uint32_t outputCap,
+    uint32_t* outWrittenBytes) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!moduleLoaded_ || !runtime_ || !fnOnFrame_) {
+        if (outWrittenBytes) {
+            *outWrittenBytes = 0;
+        }
+        SetErrorLocked("plugin module does not export mfx_plugin_on_frame.");
+        return false;
+    }
+    return CallPluginBufferFunctionLocked(
+        fnOnFrame_,
+        "on_frame",
         inputPtr,
         inputLen,
         outputPtr,
@@ -460,7 +484,8 @@ bool RuntimeBridgeContext::LinkHostImportsLocked(M3Module* module) {
 void RuntimeBridgeContext::ReleaseRuntimeLocked() {
     moduleLoaded_ = false;
     fnGetApiVersion_ = nullptr;
-    fnOnEvent_ = nullptr;
+    fnOnInput_ = nullptr;
+    fnOnFrame_ = nullptr;
     fnReset_ = nullptr;
 
     if (runtime_) {
@@ -481,13 +506,22 @@ bool RuntimeBridgeContext::ResolvePluginExportsLocked() {
         return false;
     }
 
-    result = m3_FindFunction(&fnOnEvent_, runtime_, "mfx_plugin_on_event");
+    result = m3_FindFunction(&fnOnInput_, runtime_, "mfx_plugin_on_input");
     if (result) {
-        fnOnEvent_ = nullptr;
+        fnOnInput_ = nullptr;
     }
 
-    if (!fnOnEvent_) {
-        SetErrorLocked("plugin does not export mfx_plugin_on_event.");
+    if (!fnOnInput_) {
+        SetErrorLocked("plugin does not export mfx_plugin_on_input.");
+        return false;
+    }
+
+    result = m3_FindFunction(&fnOnFrame_, runtime_, "mfx_plugin_on_frame");
+    if (result) {
+        fnOnFrame_ = nullptr;
+    }
+    if (!fnOnFrame_) {
+        SetErrorLocked("plugin does not export mfx_plugin_on_frame.");
         return false;
     }
 

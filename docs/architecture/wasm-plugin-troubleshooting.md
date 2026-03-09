@@ -1,6 +1,6 @@
 # WASM Plugin Troubleshooting
 
-Applies to current v1 route:
+Applies to current v2 route:
 - runtime bridge: `mfx_wasm_runtime.dll`
 - diagnostics source: `/api/state` -> `wasm`
 
@@ -27,7 +27,8 @@ Checks:
 - ensure `mfx_wasm_runtime.dll` is beside executable or in search path
 - verify exported bridge symbols:
   - `mfx_wasm_runtime_create`
-  - `mfx_wasm_runtime_call_on_event`
+  - `mfx_wasm_runtime_call_on_input`
+  - `mfx_wasm_runtime_call_on_frame`
   - `mfx_wasm_runtime_last_error`
 
 ## 3. Plugin Loads but Nothing Renders
@@ -45,6 +46,8 @@ Quick fields:
 If parser succeeds but still no output:
 - check focus/VM suppression policy
 - check budget truncation flags
+- check `plugin.json` `input_kinds` includes current lane (for example `scroll`)
+- check `enable_frame_tick` when effect depends on continuous `on_frame` emission
 
 ## 4. `spawn_image` Falls Back to Built-in Image
 
@@ -93,3 +96,21 @@ Checks:
 2. Place `effect.wasm` + `plugin.json` under plugin folder.
 3. Call `/api/wasm/load-manifest` then `/api/wasm/enable`.
 4. Click once and inspect `/api/state` `wasm` block.
+
+## 9. Duplicate `plugin.json.id`
+
+Behavior:
+- catalog keeps only one plugin entry per `plugin.json.id`
+- search-root precedence is:
+  - configured `catalog_root_path`
+  - primary plugin root
+  - executable portable root
+  - debug template `dist`
+- manifests with unsupported `api_version` are ignored by catalog
+- nested `plugin.json` inside another plugin package are ignored by catalog
+
+Checks:
+- if the wrong duplicate wins, inspect `/api/wasm/catalog` -> `search_roots`
+- place the preferred plugin under configured `catalog_root_path` to override built-in/debug copies
+- remove old `api_version=1` plugin folders if you do not need to keep them on disk
+- template default id should be `demo.template.default.v2`; sample ids are `demo.*.<sample>.v2`

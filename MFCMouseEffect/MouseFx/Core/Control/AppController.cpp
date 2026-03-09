@@ -5,6 +5,7 @@
 #include "AppController.h"
 #include "CommandHandler.h"
 #include "DispatchRouter.h"
+#include "WasmDispatchFeature.h"
 #include "MouseFx/Core/Protocol/MouseFxMessages.h"
 #include "MouseFx/Core/Control/NullDispatchMessageHost.h"
 #include "MouseFx/Core/Control/NullDispatchMessageCodec.h"
@@ -22,7 +23,6 @@
 #include "MouseFx/Core/Effects/ScrollEffectCompute.h"
 #include "MouseFx/Core/Effects/TrailEffectCompute.h"
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
-#include "MouseFx/Core/Wasm/WasmEventInvokeExecutor.h"
 #include "MouseFx/Effects/HoldRouteCatalog.h"
 #include "MouseFx/Core/Json/JsonFacade.h"
 #include "MouseFx/Utils/MathUtils.h"
@@ -175,15 +175,8 @@ void AppController::OnDispatchActivity(DispatchMessageKind kind, uint32_t timerI
         } else if (!TryGetLastPointerPoint(&pt)) {
             pt = ScreenPoint{};
         }
-        wasm::EventInvokeInput invoke{};
-        invoke.kind = wasm::EventKind::HoverEnd;
-        invoke.x = pt.x;
-        invoke.y = pt.y;
-        invoke.eventTickMs = CurrentTickMs();
-        const wasm::EventDispatchExecutionResult dispatchResult =
-            wasm::InvokeEventAndRender(*wasmEffectHost_, invoke, config_);
-        hoverWasmRouteActive = dispatchResult.routeActive;
-        hoverEndRenderedByWasm = dispatchResult.render.renderedAny;
+        WasmDispatchFeature wasmDispatch{};
+        hoverWasmRouteActive = wasmDispatch.RouteHoverEnd(*this, pt, &hoverEndRenderedByWasm);
     }
 
     hovering_ = false;
@@ -208,7 +201,12 @@ void AppController::LogDebugClick(const ClickEvent& ev) {
 #endif
 
 void AppController::HandleCommand(const std::string& jsonCmd) {
-    if (!dispatchMessageHost_ || !dispatchMessageHost_->IsCreated()) return;
+    if (!dispatchMessageHost_ || !dispatchMessageHost_->IsCreated()) {
+        // Headless/HTTP-host paths may not have a dispatch window. Execute directly
+        // so runtime policy and config commands still mutate the active controller.
+        commandHandler_->Handle(jsonCmd);
+        return;
+    }
 
     // Thread Safety: Marshal to UI thread if we are on a background thread.
     if (!dispatchMessageHost_->IsOwnerThread()) {

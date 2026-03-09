@@ -6,6 +6,24 @@
 
 namespace mousefx::wasm {
 
+inline constexpr uint32_t kManifestInputKindClickBit = 1u << 0;
+inline constexpr uint32_t kManifestInputKindMoveBit = 1u << 1;
+inline constexpr uint32_t kManifestInputKindScrollBit = 1u << 2;
+inline constexpr uint32_t kManifestInputKindHoldStartBit = 1u << 3;
+inline constexpr uint32_t kManifestInputKindHoldUpdateBit = 1u << 4;
+inline constexpr uint32_t kManifestInputKindHoldEndBit = 1u << 5;
+inline constexpr uint32_t kManifestInputKindHoverStartBit = 1u << 6;
+inline constexpr uint32_t kManifestInputKindHoverEndBit = 1u << 7;
+inline constexpr uint32_t kManifestInputKindAllBits =
+    kManifestInputKindClickBit |
+    kManifestInputKindMoveBit |
+    kManifestInputKindScrollBit |
+    kManifestInputKindHoldStartBit |
+    kManifestInputKindHoldUpdateBit |
+    kManifestInputKindHoldEndBit |
+    kManifestInputKindHoverStartBit |
+    kManifestInputKindHoverEndBit;
+
 struct PluginManifest final {
     std::string id{};
     std::string name{};
@@ -13,6 +31,8 @@ struct PluginManifest final {
     uint32_t apiVersion = 0;
     std::wstring entryWasm{};
     std::vector<std::wstring> imageAssets{};
+    uint32_t inputKindsMask = kManifestInputKindAllBits;
+    bool enableFrameTick = true;
 };
 
 struct PluginManifestLoadResult final {

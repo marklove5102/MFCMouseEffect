@@ -1,353 +1,196 @@
-# Agent Current Context (2026-03-05)
+# Agent Current Context (2026-03-09)
 
 ## Scope and Priority
 - Primary host: macOS.
-- Primary objective: macOS mainline reaches stable Windows-equivalent behavior (behavior parity first, pixel parity later).
+- Primary objective: macOS mainline reaches stable Windows-equivalent behavior first.
 - Hard constraints:
   - No Windows regressions.
   - Linux follows compile + contract coverage.
-  - New macOS features prefer Swift-first; do not expand `.mm` surface.
+  - New macOS features stay Swift-first; do not expand `.mm` surface area.
 
 ## Runtime Lanes
-- Default stable lane: `scaffold`.
-- Progressive lane: `core` (`mfx_entry_posix_host`).
-- Policy: keep scaffold behavior stable while landing core-lane parity increments.
+- Stable lane: `scaffold`
+- Progressive lane: `core` (`mfx_entry_posix_host`)
+- Policy: land new cross-platform capability in `core` while keeping `scaffold` stable.
 
-## Latest Update (2026-03-05)
-- 2026-03-05 effect-conflict policy simplification: `effect_conflict_policy` now exposes only `hold_move_policy` (`hold_only|move_only|blend`), removing `hold_scroll` / `hold_click` / `hover_during_hold` runtime branches and timer paths; legacy read of `hold_move` is still accepted for backward compatibility.
-- 2026-03-05 hold-scroll regression fix: long-press no longer hard-blocks scroll lane in `DispatchRouter::OnScroll`; conflict policy now only controls hold/trail coordination as intended.
-- 2026-03-05 hold-move continuity fix: blend transition now uses live/recent cursor anchor only, and macOS trail anchor reset no longer hard-clears active drag anchors; post-reset emission stays in accumulated-distance mode, removing mid-path blank/restart gaps.
-- 2026-03-05 hold-move policy routing simplification: `move_only` no longer drives hold-lane end/restart on move ticks, and `blend` no longer injects trail-anchor reset on hold-start; policy semantics are now direct:
-  - `move_only`: trail lane unaffected by hold lane.
-  - `blend`: hold + trail run together (no policy-imposed resets).
-  - `hold_only`: trail suppressed while hold button is down.
-- 2026-03-05 macOS trail continuity hardening (hold-move follow-up): `MacosTrailPulseEffect` removed gap/anchor bypass state machine and now uses a single continuous segmented-emission path for all non-`none` trail types; teleport-class deltas are downgraded to single-point continuation (instead of frame drop/reset), eliminating long-press move periods where trail disappeared then restarted.
-- 2026-03-05 macOS origin-connector reset regression fix: both C++ trail effect and Swift line-trail bridge now drop suspicious origin-connector samples without clearing history (`reset/removeAll` removed on this path), preventing mid-drag blank gaps followed by visible restart.
-- 2026-03-05 macOS trail blank-gap follow-up: origin-connector handling no longer short-circuits input updates in Swift (`updateOnMain`), and renderer-level segment break now filters origin-connector segments; C++ trail lane now advances anchor on origin-connector detection. This prevents repeated sample drops that produced ~1s blank windows before trail reappeared.
-- 2026-03-05 macOS hold-update queue pressure fix: hold overlay update dispatch is now coalesced on the C++ bridge (`MacosHoldPulseOverlayRenderer`) so only the latest pending update is drained on main thread; this prevents per-move hold update floods from starving trail update rendering and causing long-press drag blank gaps.
-- 2026-03-05 hold drain loop fix: `DrainHoldPulseOverlayUpdatesCallback` no longer uses unbounded `for(;;)` processing; each callback drains one latest update and re-schedules when backlog remains, avoiding long main-thread monopolization.
-- 2026-03-05 macOS timer stop-blocking fix: `MacosDispatchMessageHost` timer threads now use interruptible `condition_variable` waits, so `KillTimer(kHoldTimerId)` no longer blocks the dispatch worker for up to one timer interval (for example 350ms hold delay), preventing hold-activation-time move-event starvation that caused trail blank/restart.
-- 2026-03-05 line-trail monitor-boundary continuity fix: `MfxLineTrailState.ensureWindow(...)` now preserves only the latest trail anchor when overlay window is recreated on screen/frame switch, avoiding fixed-position stop/restart at cross-screen drag boundaries.
-- 2026-03-05 hold-start live-point fix: `DispatchRouter::OnTimer(kHoldTimerId)` now resolves hold start point from current cursor position (with macOS point repair) instead of stale button-down pending point, preventing delayed/misaligned hold appearance during long-press drag.
-- 2026-03-05 line-trail dispatch throttle fix: `MacosLineTrailOverlay::LineTrailBridgeState::Update` now enforces a `10ms` minimum dispatch interval to main-thread bridge updates, reducing high-frequency segmented trail enqueue pressure that could cause mid-drag blank/restart gaps.
-- 2026-03-05 hold-update timer narrowing: for `hold_move_policy=blend|move_only`, hold visual updates no longer use the 16ms hold-update timer path and stay move-driven; timer-driven updates are kept only for `hold_only` (stationary hold animation path), reducing hold/trail contention and mid-path trail drop risk.
-- 2026-03-05 hold-move blend fix: removed policy-driven trail anchor reset on `button_down`; blend mode no longer injects startup trail restarts.
-- 2026-03-05 input-capture transient error guard: for macOS runtime, non-permission hook errors are now debounced (`1.2s` grace) before entering degraded mode; permission-denied (`13`) now degrades immediately only when runtime trust probe is actually untrusted, while trusted-state false-13 blips are ignored. This prevents short-lived hook jitter from causing trail/effect stop-and-restart loops during long-press movement.
-- 2026-03-05 macOS trail guard refinement: after an explicit `OnTrailAnchorReset(...)`, the next move sample bypasses one-time gap/teleport guard checks (`kTrailInputGapResetMs` and teleport drop), preventing hold-start transition from swallowing the first post-anchor trail segment.
-- 2026-03-05 macOS move-only trail continuity tuning: increased gap-reset threshold (`kTrailInputGapResetMs: 220 -> 480`) and raised teleport guard floor/default (`teleport floor: 400`, planner default `1600`) to reduce false mid-path drop/restart under normal cursor movement jitter.
-- 2026-03-05 macOS line-trail jump handling fix: Swift line-trail runtime no longer clears all points on large per-sample jumps; it now keeps history and skips only oversized segments (`isSegmentBreak`) during render, preventing visible "mid-path disappear then restart" artifacts.
-- 2026-03-05 macOS trail teleport handling fix: `MacosTrailPulseEffect` no longer hard-resets line-trail overlay on teleport-class move gaps; teleport now acts as anchor discontinuity only (no `ResetLineTrail()`), so trail continuity is preserved while old segments fade out naturally.
-- 2026-03-05 hold-move arbitration timing fix: `hold_move_policy=hold_only` trail suppression now applies on button-down state (not only after hold-delay activation), preventing pre-activation trail leakage during long-press startup.
-- 2026-03-05 hold-move move-only fix: when `hold_move_policy=move_only`, `kHoldTimerId` no longer starts hold lane (including hold update timer), so move trail runs without hold start/end interference during drag.
-- 2026-03-05 hold-move trail continuity fix (follow-up):
-  - `EndHoldEffectLaneIfNeeded(...)` now calls `OnHoldEnd()` only when hold effect is actually active, avoiding repeated hold-stop churn on every move tick under `hold_move_policy=move_only`.
-  - Built-in trail types (`line/streamer/electric/meteor/tubes/particle`) are now always rendered on native trail lane (skip wasm move-route override) to avoid route-switch gaps during hold-state transitions.
-  - macOS non-line trail path no longer hard-resets overlay when one emission tick yields no drawable segment; it also no longer advances `lastEmitTickMs` on such no-op ticks, preventing mid-path disappear/restart loops.
-- Settings workspace now enforces focused-only navigation (the old `all sections` workspace mode is removed from the left sidebar).
-- `Text Content` and `Trail Tuning` are now integrated as secondary tabs inside `Active Effects`.
-- `Effect Plugins` remains a dedicated top-level settings section.
-- Effects sub-tab selection is now state-controlled by `effects-main` (`active/text/trail`) to prevent remount/refresh from resetting tab focus.
-- Fixed sub-tab switch regression: local tab state now syncs from prop only on actual prop changes (avoids click-time immediate fallback to default tab).
-- Further hardening for sub-tab click interaction: switched to plain `mousedown/click` handlers (removed propagation modifiers) and raised tab-bar/button pointer-event/z-index priority to avoid event loss under overlapping UI layers.
-- Renamed `Active Effects` (特效选择) top-level section to `Visual Effects` (视觉特效) to better represent its combined scope.
-- Sub-tabs renamed with dedicated i18n keys (`Effect Channel`, `Text Config`, `Trail Tuning`) preventing translation clobbering from the sidebar.
-- Moved WebUI status message badge from the top-left floating corner to the center of the main header component (`TopBar.svelte`) for better visual balance and flow.
-- macOS hover overlay bridge was adjusted to Windows parity semantics while keeping shared compute:
-  - `glow`: removed platform-local center-fill draw path; keep crosshair ticks + orbiting dot timing only.
-  - `tubes`: switched to global monotonic tick sampling and fixed 200-alpha node gradient semantics (Windows-aligned), while preserving Swift-only rendering execution.
-- macOS hover breathe tempo source now follows Windows path semantics: `MacosHoverPulseEffect` builds `HoverEffectProfile` from `ThemePalette.hover.durationMs/windowSize/colors` (and chromatic runtime style), replacing the older config-ripple-derived profile path that caused over-fast breathing.
-- Visual Effects now includes a secondary tab for per-category size scaling (`effect_size_scales.click/trail/scroll/hold/hover`, 50%-200%, default `100` except `hover=85`). The setting is persisted in `config.json`, returned by `/api/state`, and applied immediately on macOS by re-creating active effects.
-- Visual Effects now includes a secondary tab `Hold-Move Policy` (`effect_conflict_policy`) for hold+move arbitration only:
-  - field: `hold_move_policy`
-  - options: `hold_only` / `move_only` / `blend`
-  - default: `hold_move_policy=hold_only`
-  - route behavior: while hold interaction is active, router applies arbitration only between hold lane and trail lane; scroll/click/hover are no longer policy-switched at this config surface.
-  - backward compatibility: settings decode keeps legacy `hold_move` read path, but serialization/state/schema use `hold_move_policy` only.
-  - `hold_move_policy=move_only` now suppresses hold-start rendering at hold-timer stage (instead of start-then-end on first move), eliminating visible hold flash/disappear.
-- Effect size sliders now show explicit edge bounds (`50%` left / `200%` right) in each row to match interaction boundary semantics.
-- Effect size sliders now use a deterministic visual shell (custom track/fill/thumb) while native `range` only handles input events; thumb center is bound directly to `0%..100%`, so min/max are visually pinned to absolute left/right endpoints.
-- macOS click/trail/scroll/hover overlay renderers are now command-only entrypoints (`Show*Overlay(const *RenderCommand&, ...)`); legacy overloads that recomputed commands inside renderer wrappers were removed to keep compute in Core and render in platform execution layer.
-- Windows `TrailEffect` is now compute-command driven at input edge (`ComputeTrailEffectEmission` + `ComputeTrailEffectRenderCommand`), and trail points now carry command-derived render payload (`stroke/fill/line_width/intensity/duration`) through `TrailOverlayLayer`/`TrailWindow` into renderer execution.
-- Windows trail renderer path now consumes command-derived point style fields for lifecycle and drawing baselines (per-point duration, width, and stroke color), reducing legacy local guesswork in `line/streamer/electric/meteor/tubes` render loops.
-- Windows trail renderer style math now reuses shared `TrailStyleCompute` helpers for streamer/electric/meteor/tubes key metrics (segment width/opacity, electric jitter+fork, meteor core emission, tubes follow/render metrics, chromatic hue), with renderer side limited to platform drawing primitives.
-- Windows particle trail overlay/fallback runtime now reuses shared `TrailStyleCompute` particle primitives (`ComputeParticleEmitCount`, `ComputeParticleSpawnMetrics`, `ComputeParticleStepMetrics`) for emission cadence, spawn velocity/size/hue, and integration/fade progression.
-- Windows `ParticleTrailEffect` input path now matches `TrailEffect` command lane: mouse input first passes `ComputeTrailEffectEmission + ComputeTrailEffectRenderCommand`, then `ParticleTrailOverlayLayer` / `Win32ParticleTrailEffectFallback` consume `TrailEffectRenderCommand` directly (`AddCommand`) instead of polling cursor and re-deriving emit cadence.
-- Windows particle overlay/fallback execution is now command-only for cadence/size/duration/intensity: internal `UpdateCursor`/distance sampling was removed from `ParticleTrailOverlayLayer` and `ParticleTrailWindow`, leaving render loops responsible only for particle integration and drawing.
-- Hold start command now includes a compute-owned `stroke_argb` field (`HoldEffectCompute`) so color-route selection (type/button alias matrix) is decided once in Core; both Windows hold runtime adapter and macOS hold overlay consume this field directly.
-- macOS hold overlay entry is now command-only (`StartHoldPulseOverlay(const HoldEffectStartCommand&, ...)` + `UpdateHoldPulseOverlay(const HoldEffectUpdateCommand&)`); legacy raw overloads that re-built hold commands in platform renderer wrappers were removed.
-- Removed unlinked hold visual-spec prototype files (`HoldVisualSpec.h` + `MacosHoldVisualSpecBridge.*`) that were not compiled or referenced, to keep the hold path on one active implementation.
-- macOS hold update dispatch now routes `tech_ring` and `hologram` through dedicated 3D update executors (`mfxUpdateTechRingLayers` / `mfxUpdateHologramLayers`) and `charge` pulse uses shared spec values (`pulse_freq/base/amp` + `bg/glow` alpha fractions), reducing per-platform hardcoded drift.
-- macOS hold update dispatch now also uses dedicated dynamic update executors for `lightning` and `hex` (`mfxUpdateLightningLayers` / `mfxUpdateHexLayers`) instead of static build-time geometry only.
-- macOS hold layer query helper is now recursive (`mfxFindLayerRecursive`), fixing nested sublayer misses in runtime updates (affects tech/hologram/lightning/hex).
-- macOS core startup deadlock (tray theme selfcheck flake `/api/state=000`) is fixed in two places:
-  - manual host helper now isolates every start with a unique single-instance key and per-start probe files (`tools/platform/manual/lib/macos_core_host.sh`), avoiding cross-start probe/key reuse races.
-  - Swift bridges used by dispatch-worker paths no longer hard-block on `DispatchQueue.main.sync` in these critical runtime queries:
-    - foreground process query (`MacosForegroundProcessBridge.swift`) now uses async-main + short timeout fallback.
-    - overlay quartz->cocoa conversion (`MacosOverlayCoordSpaceBridge.swift`) now uses async-main + cached display transform conversion, and timeout path uses desktop-bounds Y-flip fallback (no identity passthrough).
-  - this removes main<->worker lock inversion during tray menu bootstrap and keeps `/api/state` responsive under repeated host restarts.
-  - mirror regression fix: coordinate bridge no longer returns raw Quartz coordinates as successful conversion under timeout, preventing horizontal midline mirrored artifacts in trail/scroll/hover effects.
-- macOS hold render profile baseline is now derived from the same theme hold style source used by Windows (`GetThemePalette(theme).hold` -> `BuildHoldProfileFromStyle`), then scaled by macOS test/size tunables; this removes the previous ripple-derived hold profile branch.
-- macOS trail high-speed stutter fix: non-`line`/non-`particle` trail types (`streamer/electric/meteor/tubes`) now use a two-stage lane: shared emission throttling (`ComputeTrailEffectEmission`) + bounded segmented emission plan (`BuildTrailPulseEmissionPlan`), and throttle distance is accumulated from the last emitted anchor point (not only adjacent samples). This keeps slow-move visibility while preventing high-speed main-thread over-enqueue.
-- macOS line-trail rendering now avoids per-input immediate full path rebuild once timer is active: input updates append points and timer tick drives redraw cadence, while first sample still does one immediate draw. This removes high-frequency input-triggered repaint storms that caused `line` stutter at fast cursor movement.
-- macOS trail emission planner smoothing update: default `maxSegments` raised to `20` and preferred segment step reduced across styles (`streamer/electric/meteor/tubes`) to avoid coarse polyline appearance (especially meteor) while keeping emission bounded.
-- Hover breathing default size baseline is reduced on macOS (new default `effect_size_scales.hover=85` plus tighter hover profile baseline) to avoid oversized default glow.
-- Trail size scaling no longer changes line-width tuning semantics; line width remains controlled by trail line-width settings (and `line` type no longer applies speed-driven width scaling), keeping contracts and Windows behavior intent stable.
+## Current Snapshot
+- Current mainline is no longer “wasm demo” level; it is a cross-platform controlled-effects runtime with retained/group semantics.
+- Primary active capability track is `wasm v3 phase1+`: expand expressive power without exposing raw GPU/shader control.
+- Current stabilization theme is `group_pass` convergence: keep external ABI stable while reducing parser/runtime/style duplication before further widening.
+
+## WASM Capability Summary
+
+### Base Runtime
+- Host accepts `api_version=2` only.
+- Required exports: `mfx_plugin_on_input`, `mfx_plugin_on_frame`; `mfx_plugin_reset` remains optional.
+- Runtime drives frame ticks independently of raw input frequency.
+- Official template/sample matrix now covers `click/move/scroll/hold/hover`.
+- Template manual-validation samples were recently hardened so multi-image/mixed/sprite/pulse presets read clearly in the macOS host: `image-burst`, `mixed-text-image`, `click-sprite-burst`, and `click-pulse-dual` now avoid overlapping anchors or misleading off-center pulse placement.
+- macOS wasm transient lanes were further hardened after manual validation exposed real host bugs: `spawn_pulse` now converts screen coordinates to overlay coordinates before rendering, and shared `clip_rect` tails now resolve from screen space into overlay space before transient/retained clip application.
+
+### Transient Primitives
+- `spawn_text`
+- `spawn_image`
+- `spawn_image_affine`
+- `spawn_pulse`
+- `spawn_polyline`
+- `spawn_path_stroke`
+- `spawn_path_fill`
+- `spawn_glow_batch`
+- `spawn_sprite_batch`
+- `spawn_quad_batch`
+- `spawn_ribbon_strip`
+
+### Retained Primitives
+- `upsert_glow_emitter/remove_glow_emitter`
+- `upsert_sprite_emitter/remove_sprite_emitter`
+- `upsert_particle_emitter/remove_particle_emitter`
+- `upsert_ribbon_trail/remove_ribbon_trail`
+- `upsert_quad_field/remove_quad_field`
+
+### Shared Semantics Already Live
+- Shared render tail:
+  - `blend_mode`
+  - `sort_key`
+  - `group_id`
+- Shared optional clip tail:
+  - path lane
+  - sprite/quad lane
+  - retained emitters
+  - retained ribbon/quad field
+
+### Retained Group Semantics
+- `remove_group`
+- `upsert_group_presentation`
+- `upsert_group_clip_rect`
+- `upsert_group_layer`
+- `upsert_group_transform`
+- `upsert_group_local_origin`
+- `upsert_group_material`
+- `upsert_group_pass`
+
+### Group Clip / Mask
+- Group clip is retained-only and resolves as `instance_clip ∩ group_clip`.
+- Optional group mask tail supports:
+  - `rect`
+  - `round_rect`
+  - `ellipse`
+- Current visible interpretation is macOS-first; Windows keeps ABI/runtime parity first.
+
+### Group Transform
+- Base transform supports group translation.
+- Optional tails now support:
+  - `rotation_rad`
+  - `uniform_scale`
+  - `pivot_x_px/pivot_y_px`
+  - `scale_x/scale_y`
+- Geometry recomposition is active on retained `glow/sprite/particle/ribbon/quad` when the lane opts into `...FLAG_USE_GROUP_LOCAL_ORIGIN`.
+
+### Group Material
+- Group material stays host-owned and bounded.
+- Current grouped material surface includes:
+  - `tint override`
+  - `intensity multiplier`
+  - style presets
+  - response shaping
+  - feedback / feedback mode
+  - feedback stack
+
+### Group Pass
+- `upsert_group_pass` is the dedicated retained-only controlled-pass primitive.
+- Current grouped pass surface is at `v15`.
+- Current pass surface includes:
+  - primary pass: `pass_kind + pass_amount + response_amount`
+  - mode tail
+  - stack tail
+  - secondary stage:
+    - pipeline
+    - blend
+    - routing
+    - lane response
+    - temporal
+    - temporal mode
+  - tertiary stage:
+    - stage tail
+    - routing
+    - lane response
+    - temporal
+    - temporal mode
+    - stack
+- Important boundary:
+  - this is still a host-owned bounded pass surface
+  - not a raw pass graph
+  - not raw shader/material control
+
+### Recent Internal Convergence
+- `group_pass` secondary/tertiary runtime state is now unified under shared `GroupPassStageState`.
+- `TryResolveUpsertGroupPassCommand(...)` now uses one shared optional-tail reader plus one advancing offset cursor.
+- These changes are internal only; external ABI/sample behavior remains unchanged at `v15`.
+
+### Known Boundaries
+- Wasm can now express many complex 2D effects and grouped retained compositions.
+- It still cannot directly own raw GPU/shader/pipeline control like native C++ rendering code.
+- Windows runtime still needs more visible-behavior validation; macOS remains the most complete live lane.
 
 ## Current Capability Status
 - Effects:
-  - macOS supports click/trail/scroll/hold/hover in core lane.
-  - Shared compute-command model is active; renderer path is execution-focused.
-  - macOS click `text` overlay now uses measured text bounds (instead of full-frame label) plus combined float/drift/scale/fade animation in Swift bridge, fixing baseline anchor drift and static-text appearance regression.
-  - macOS click `text` float direction is corrected to upward screen motion semantics (Windows-aligned behavior intent).
-  - 2026-03-03 follow-up: adjusted click text vertical animation sign again based on live feedback to prevent downward drift regression on current macOS runtime.
-  - 2026-03-03 parity fix: macOS `active.click=text` now routes through `MacosClickPulseEffect` (shared click command path) instead of `TextEffect` fallback, so click overlay contracts keep `click_active_overlay_windows` semantics and text-click behavior stays on the same click pipeline as `ripple/star`.
-  - 2026-03-03 position fix: `MacosTextEffectFallback` now uses `ScreenToOverlayPoint(...)` as the single coord-space entry, and text panel layout switched to measured glyph bounds centering (instead of fixed half-height label frame) to remove visible click-anchor offset.
-  - 2026-03-03 text compute closure: `TextEffectCompute` is now the single source for floating-text trajectory/alpha/scale/font-size frame calculation (`ComputeTextEffectRenderCommand/Frame`); both Windows `TextWindow` and macOS `MacosTextEffectFallback` consume computed frames and only execute rendering/window lifecycle.
-  - `ITextEffectFallback` now exposes `ShowTextComputed(...)`; `TextEffect` builds one command in Core and dispatches it to platform fallback paths (Windows/macOS), removing duplicate per-platform drift/sway/easing math.
-  - 2026-03-03 click compute closure (ripple/star): Windows `RippleEffect/IconEffect` now also route through shared `ComputeClickEffectRenderCommand(...)`; platform path only adapts command -> renderer execution (`ClickEffectCommandAdapter`), removing direct effect-side timing/size/color branching.
-  - 2026-03-03 compute-closure follow-up (windows scroll/hover/hold): Windows `ScrollEffect/HoverEffect/HoldEffect` now consume shared `ComputeScrollEffectRenderCommand(...)`, `ComputeHoverEffectRenderCommand(...)`, `ComputeHoldEffectStart/UpdateCommand(...)`; legacy follow-mode smoothing/throttle and scroll direction/intensity shaping are removed from effect classes and moved to Core compute.
-  - Windows path now uses dedicated command adapters for these three categories (`ScrollEffectCommandAdapter`, `HoverEffectCommandAdapter`, `HoldEffectCommandAdapter`) so effect classes only orchestrate event batching/lifecycle and renderer invocation.
-  - 2026-03-03 click geometry parity closure: `ClickEffectRenderCommand` now includes `start_radius_px/end_radius_px/stroke_width_px`; both Windows adapter and macOS click bridge consume these shared geometry fields (plus shared glow color), reducing platform-side guesswork that caused `star too small` / `ripple too large` drift.
-  - 2026-03-03 macOS overlay refresh sync: new config/state/schema field `overlay_target_fps` is wired (`0=auto follow display max refresh, >0=explicit cap`), and Swift overlay support now exposes dynamic timer interval resolution (`mfx_macos_overlay_timer_interval_ms_v1`) consumed by line-trail plus hover/scroll (helix/twinkle) animation timers to avoid fixed low-refresh cadence.
-  - 2026-03-04 windows overlay refresh sync: `overlay_target_fps` is now applied on Windows through shared timer policy (`0=follow target monitor refresh, >0=cap`) for `Win32OverlayHostWindow` (click/scroll/hold/hover lane), `TrailWindow`, `ParticleTrailWindow`, `TextWindow`, and `Win32InputIndicatorOverlay`; fixed `16ms` frame timers were removed from these paths.
-  - 2026-03-04 scroll helix visual contract fix (shared compute): removed ladder-style inter-strand crossbars from `ComputeHelixFrame(...)`; `3D helix` now renders as two independent strands on both Windows and macOS.
-  - Trail `none` hard-disable, line-trail diagnostics, and anti-origin-connector guards are in place.
-  - 2026-03-03 trail parity hardening (macOS): `line/streamer/electric/meteor/tubes` use one continuous line-trail path, and `particle` uses dedicated burst-particle execution; both lanes stay under shared compute inputs and remove pulse-style "matchstick" fragmentation.
-  - 2026-03-03 trail compute/render contract closure: continuous trail path now consumes shared `ComputeTrailEffectRenderCommand(...)` output (duration/line-width/colors/intensity), and Swift line-trail bridge accepts typed style/fill/intensity input so platform layer executes style-specific rendering without re-deriving core timing/type normalization.
-  - 2026-03-03 trail tuning parity fix: macOS line-trail bridge now consumes `trail_params` (`streamer glow/core/head`, `electric amp/fork`, `meteor rate/speed`) and `theme=chromatic` flag through `MacosTrailPulseEffect -> LineTrailConfig`, closing the prior config-chain gap where these Windows-used knobs were not applied on macOS.
-  - 2026-03-03 shared trail style math extraction: new core module `MouseFx/Core/Effects/TrailStyleCompute.*` now owns `streamer/electric/meteor` segment metric formulas (width/opacity/electric jitter+fork/meteor core-emission), and macOS Swift renderer calls this through `MacosTrailStyleComputeSwiftBridge.cpp` instead of duplicating these equations in platform code.
-  - 2026-03-03 trail tubes compute extraction: tubes node render math (radius/amplitude/alpha/node-phase/chain-phase) is now computed in `TrailStyleCompute` and bridged to Swift, removing another chunk of style formula branching from macOS renderer code.
-  - 2026-03-03 trail tubes follow extraction: tubes chain follow-step math (head follow + per-node follow/min-distance clamp) is now computed in `TrailStyleCompute` and called by Swift bridge, so macOS keeps only state update orchestration and drawing.
-  - 2026-03-03 trail chromatic extraction: per-style chromatic hue-time formulas (`line/streamer/electric/meteor/tubes/particle`) are now provided by shared `TrailStyleCompute` and consumed via Swift bridge, reducing scattered platform-local color timing math.
-  - 2026-03-03 trail lane convergence: `MacosTrailPulseEffect` removed the legacy non-continuous pulse emission branch; all non-`none` trail types now stay on one continuous line-trail command lane (compute in Core, render in Swift).
-  - 2026-03-03 tubes corner-origin fix: macOS `tubes` chain bootstrap now seeds nodes from the current target point (instead of `(0,0)`), removing first-frame corner-origin artifacts (left-bottom startup drag on AppKit layer coords).
-  - 2026-03-03 tubes visual parity fix: macOS `tubes` node rendering switched from platform-local `halo + solid core` layering to Windows-aligned radial node semantics (brightened center + fully transparent edge, same shared node radius/phase/alpha compute), reducing major style drift in `scifi` trail appearance.
-  - 2026-03-03 tubes high-refresh parity fix: macOS `tubes` follow lag is now time-step normalized (16.67ms reference) before calling shared follow compute, preventing high-FPS over-convergence that made fast drag trails collapse into a blob.
-  - 2026-03-03 electric fork parity fix: shared electric segment compute now sets fork opacity to glow-opacity-equivalent (Win-consistent), reducing overly bright branch spikes ("thorns") on macOS.
-  - 2026-03-03 electric short-segment fork suppression: shared electric compute now reduces fork chance/length by segment length and suppresses forks on very short segments, removing perpendicular "needle" spikes in dense-sample paths while keeping long-segment electric branching semantics.
-  - 2026-03-03 trail idle-fade default parity fix: macOS line-trail config now resolves `idle_fade_start/end=0` as renderer defaults by trail type (`line 60/220`, `streamer 50/260`, `electric 40/180`, `meteor 50/260`), avoiding accidental `0/1ms` fade that caused slow-move meteor flicker.
-  - 2026-03-03 trail particle parity fix: macOS `particle` renderer no longer draws per-segment dots; it now consumes shared `TrailStyleCompute` burst semantics (`emit_count`, spawn metrics, per-tick physics/life decay) and executes a Windows-aligned particle cloud path (`emit -> vx/vy + gravity -> life fade`) in Swift, removing rainbow trail "matchstick" artifacts.
-- 2026-03-03 trail particle input parity fix: macOS `particle` no longer uses interpolated multi-segment feed in `MacosTrailPulseEffect`; it now follows Windows-style single-point mouse-move feed per event, preventing over-dense burst stacking that made rainbow particle visuals diverge from Windows.
-- 2026-03-05 trail discontinuity guard: `MacosTrailPulseEffect` now resets trail segment anchors when move-input gap exceeds `kTrailInputGapResetMs` (220ms), preventing post-suppression/post-hold stale-point reconnect lines (for example `hold_move_policy=hold_only` ending with a sudden start-end connector).
-  - 2026-03-03 trail particle cadence parity fix: macOS `particle` timer cadence is capped to 60Hz semantics (`>=16ms`) even when overlay auto-follows high-refresh displays, keeping particle physics step behavior aligned with the Windows particle pipeline.
-  - 2026-03-03 trail particle tick-model parity fix: macOS `particle` now uses a tick-driven update model (move event only publishes latest point; burst emission + physics integration + render happen on timer ticks), matching Windows `ParticleTrailOverlayLayer::Update(...)` timing semantics instead of event-frequency-driven rebuild.
-  - 2026-03-03 wasm route guard (trail parity): `DispatchRouter::OnMove` now keeps `trail=line|particle` on built-in effect lane (skip wasm move-route override), ensuring macOS line/particle trail stays on the Windows-aligned compute/render pipeline when wasm plugin runtime is enabled.
-  - 2026-03-03 scroll renderer parity upgrade (macOS): kept shared `ComputeScrollEffectRenderCommand(...)` as the only compute source, and upgraded Swift renderer execution from simple rounded-rect pulse to Windows-style semantics (`arrow` multi-chevron glow lanes, `helix` dual-strand/rung composition, `twinkle` burst-particle emitter) while preserving per-command direction/intensity/duration/color inputs.
-  - 2026-03-03 scroll route guard (parity): `DispatchRouter::OnScroll` now keeps built-in scroll types (`arrow/helix/twinkle`) on native effect lane and skips wasm scroll-route override for those types, matching the same parity policy used by built-in trail critical types.
-  - 2026-03-03 scroll compute input parity (macOS): `MacosScrollPulseEffect` now builds runtime scroll compute profile from the same theme scroll style source used by Windows (`GetThemePalette(theme).scroll` + chromatic random style strategy), instead of a macOS-local config-derived scroll profile path.
-  - 2026-03-03 scroll geometry closure (shared compute): `ScrollEffectRenderCommand` now carries shared geometry fields (`start_radius_px/end_radius_px/stroke_width_px`), computed once in `ScrollEffectCompute` from style-derived profile and consumed by platform renderers; Windows adapter now prioritizes command geometry fields, and macOS scroll bridge consumes the same command geometry/intensity/strength inputs.
-  - 2026-03-04 hover execution parity closure (macOS): `MacosHoverPulseOverlayBridge.swift` now consumes the shared `HoverEffectRenderCommand` without extra center-fill styling in `glow`, and `tubes` animation timing/alpha semantics are aligned to the Windows renderer model (global tick + fixed node alpha), keeping compute decisions in Core and render execution on platform side.
-  - Core effects contract now also enforces trail visibility semantics on macOS:
-    - `trail=line` must increase active trail overlay window count in overlay probe.
-    - `trail=none` must not increase active trail overlay window count.
-  - Core effects contract now enforces trail command parity from `/api/effects/test-render-profiles`:
-    - `active.trail=line` => `command_samples.trail.normalized_type=line` and `emit=true`.
-    - `active.trail=particle` => `command_samples.trail.normalized_type=particle`, `emit=true`, `particle_mode=true`.
-    - `active.trail=none` => `command_samples.trail.normalized_type=none` and `emit=false`.
-  - Core effects contract now enforces render-profile geometry diagnostics:
-    - `effective_timing.click_text_font_size_px` and `click_text_float_distance_px` must stay positive.
-    - for `command_samples.trail.normalized_type=line`, `effective_timing.trail_command_line_width_px` must match `trail_profile_line_width_px`.
-  - Core effects contract now enforces render-profile command parity for remaining categories:
-    - `active.scroll=helix` => `command_samples.scroll.normalized_type=helix`, `emit=true`, `helix_mode=true`.
-    - `active.hover=tubes` => `command_samples.hover.normalized_type=tubes`, `tubes_mode=true`.
-    - `active.hold=hologram` => `command_samples.hold.start.normalized_type=hologram`, `command_samples.hold.update.emit=true`.
-  - Core effects contract now enforces alias/fallback command semantics:
-    - legacy alias group (`textclick/scifi/stardust/scifi3d/suspension`) must map to command types (`text/tubes/twinkle/hologram/tubes`) with matching mode flags.
-    - `none` fallback group (`click/scroll/hover`) must map to command types (`ripple/arrow/glow`) and disable incompatible mode flags (`helix/twinkle/tubes`).
-  - Core effects contract now enforces hold follow-mode command update samples:
-    - `hold_follow_mode_samples.smooth_second` must output smoothed overlay coordinates (`x=635,y=368`) for the fixed sample path.
-    - `hold_follow_mode_samples.efficient_*` must satisfy emit cadence (`first=true`, `suppressed=false`, `resumed=true`).
-  - `ScrollEffectInputShaperProfile` now includes `maxActiveRipples` in Core compute (`default=12`, `helix=8`, `twinkle=3`), consolidating scroll burst/backlog limiting into shared shaping rules instead of per-platform constants.
-  - Theme catalog is now registry-driven in core style layer; schema `options.themes` is sourced from shared theme registry (reduces hardcoded duplication, behavior unchanged).
-  - Windows tray theme submenu now consumes the same shared theme catalog (command ids unchanged), avoiding duplicate hardcoded theme lists.
-  - Theme phase-2 landed: core can now load external theme package JSON files from `theme_catalog_root_path` (`theme.json` or `*.theme.json`) and merge with built-ins at startup/reload (schema + tray consume the same runtime catalog source).
-  - Config/state contract extended with `theme_catalog_root_path`; `apply_settings` now accepts this field and triggers runtime theme catalog reload without restart.
-  - WebUI general section now exposes `theme_catalog_root_path` (text input + native folder picker action) via Svelte shared settings shell; UI action posts to core API without introducing platform-specific frontend branches.
-  - Core API adds `POST /api/theme/catalog-folder-dialog` (probe mode + native pick mode) for theme catalog path selection, reusing `PlatformNativeFolderPicker` contract and token auth path.
-  - Theme catalog runtime metadata is now exposed in both schema and state (`theme_catalog` / `theme_catalog_runtime`: runtime/built-in/external/rejected/scanned counts + picker support), giving one contract source for UI/diagnostics.
-  - WebUI save flow now forces schema refresh when `theme_catalog_root_path` changes, so newly discovered theme options appear immediately after Apply (no manual reload required).
-  - General settings UI now renders `theme_catalog_root_path` as a single-line text input (browse button removed) to keep the section compact; backend path contract and hot-reload behavior stay unchanged.
-  - General settings label `hold_follow_mode` is now presented as `Follow Strategy` / `跟随策略` (instead of `Hold Tracking` / `长按跟随模式`), and copy explicitly states the hold effect follows cursor movement to avoid cursor-direction ambiguity.
-  - Theme selection now resolves through runtime catalog (`ResolveRuntimeThemeName`) during startup/reload/set-theme/set-root-path, preventing persisted `theme` from drifting outside available runtime catalog options.
-  - Windows tray theme submenu now supports runtime external themes via dynamic command mapping (built-in command IDs unchanged), so tray theme selection remains aligned with shared theme catalog.
-  - macOS tray theme submenu now pulls theme entries through `IAppShellHost::GetThemeMenuSnapshotFromShell(...)` (host-side snapshot contract), removing direct `ThemeStyle/StringUtils` dependency from `MacosTrayMenuFactory` and restoring stable `mfx_shell_macos` link boundaries.
-  - `chromatic` theme semantic is preserved in runtime resolution (no forced `chromatic -> neon` rewrite), so chromatic-specific behavior in legacy render paths remains available while still using shared catalog.
-  - Legacy settings option source (`SettingsOptions::ThemeOptions`) now reads from shared runtime theme catalog instead of a hardcoded 5-theme list, removing another Windows-only divergence point.
-  - `SettingsOptions::ThemeOptions` now serves immutable snapshot-backed option pointers (append-only snapshot cache), avoiding pointer invalidation risk during runtime theme catalog refresh.
-  - External theme loader now validates theme `value` token format (`[a-z0-9_-]+`, disallow `none`) before merge; invalid files are rejected and counted in runtime diagnostics.
-  - Core effects contract now asserts `trail=none` consistency across `POST /api/state` -> `GET /api/state` -> `/api/effects/test-render-profiles` active snapshot, preventing silent fallback to `line`.
-  - Core effects contract now asserts legacy alias normalization through runtime state and render-profile snapshot (`textclick/scifi/stardust/scifi3d/suspension + cursor_priority -> text/tubes/twinkle/hologram/tubes + smooth`).
-  - Line-trail runtime diagnostics now include `line_trail_line_width_px` so contract gates can catch thin-line regressions.
-  - Effects profile probe now exposes metadata-derived `catalog_values`; selfcheck asserts full five-category option coverage.
-  - Effects overlay contract parity parser is now fully path-based against current API schema (`profiles.*`, `config_basis.test_tuning.*`, `command_samples.effective_timing.*`, `effects_runtime.*`); legacy alias gate also reads normalized `hold_follow_mode` from top-level state (`/api/state.hold_follow_mode`), removing false-negative parse failures from stale paths.
+  - click/trail/scroll/hold/hover all supported in `core`
+  - shared compute-command model is active
+  - trail continuity fixes and hold-move arbitration hardening are in place
+  - `overlay_target_fps` is wired on both macOS and Windows execution lanes
 - Automation:
-  - App-scope alias normalization (`process:code` / `code.app` / `code.exe`) is gated.
-  - App-scope persistence dedupe is contract-gated: writing equivalent aliases (`process:code.exe/code.app/code`) must collapse to one persisted scope token.
-  - Non-Windows app-scope canonical persistence is now base-token first: `.exe/.app` suffix variants are stripped during normalize/dedupe, and `app_scope` is required to stay equal to `app_scopes[0]`.
-  - Binding-priority contract now asserts selected binding normalized scope token (`selected.app_scopes_normalized`) with platform-aware expectation, and adds alias-tie first-wins deterministic check.
-  - macOS manual app-scope selfcheck now verifies alias-dedupe persistence (`process:code.exe/code.app/code -> process:code`) plus `app_scope` parity.
-  - App-scope mapping parse helpers are now shared between regression contracts and manual selfcheck scripts to avoid dual parser drift.
-  - Nested contract field parser now resolves JSON paths with strict section matching plus one-level compatible fallback (for existing `command_samples.*` call style), removing ambiguous regex parsing while keeping current contracts stable.
-  - Remaining scalar parsers in automation helpers (`first_catalog_process`, `parse_uint_field`, `parse_scalar_field`, `parse_active_field`, `parse_section_scalar_field`) now use JSON traversal instead of `sed` regex extraction; output compatibility is preserved for existing contract assertions.
-  - Core automation contracts now run a parser fixture gate (`core_http_automation_parse_helper_contract_checks.sh`) to lock scalar/section/nested fallback output semantics (`string/number/bool/null`) before HTTP assertions execute.
-  - Parser fixture gate now includes a surface check: legacy compatibility helpers (`parse_scalar/active/section/nested`) are disallowed outside helper-definition + fixture files, preventing fallback-style calls from re-entering contract/manual scripts.
-  - Effects contract command assertions (`normalized_type`/mode flags/hold nested fields) now read from explicit `command_samples.*` paths, and state parity reads from explicit `effects_profile.*` paths, reducing one-level fallback parser coupling.
-  - Effects contract probe parsing now reads `active.*` and category base-opacity fields via strict JSON paths (no first-match scanning), making render-profile contracts deterministic under payload growth.
-  - Effects contract probe scalar metrics (`duration/size/opacity/trail_throttle`, geometry, line-trail width, hold progress) now also use strict JSON paths, removing remaining first-key scalar reads.
-  - Manual effects profile tuning selfcheck now reads profile values through explicit JSON paths (`duration/size/opacity/trail_throttle`), including `effects_profile.*` state fields, to keep manual and regression parser semantics aligned.
-  - Manual effects profile tuning selfcheck now follows `config_basis.test_tuning.*` for both probe/state comparisons, aligned with current test-render-profile payload shape.
-  - Injection selfcheck now asserts both `Cmd+C` and `Cmd+V` on `/api/automation/test-match-and-inject` (`ok/matched/injected/selected_keys`), and app-scope selfcheck remains part of POSIX suite phases.
-- WASM:
-  - macOS runtime path + diagnostics + fallback contracts are active.
-  - Default runtime backend selection is now unified across platforms in one order:
-    - try `wasm3_static` first, then fallback to `dynamic_bridge`, then `null`.
-  - Windows runtime factory now enables `wasm3_static` creation path (with `dynamic_bridge` fallback kept), and VS project wiring now includes `Wasm3Runtime*` plus wasm3 C sources in main app build.
-  - Capability schema/state parity is gated.
-  - Core state gate now asserts wasm runtime backend consistency (`dynamic_bridge|wasm3_static|null|external`) and enforces `runtime_backend=null => runtime_fallback_reason` non-empty.
-  - Core state gate now hard-checks schema wasm platform matrix (`macOS: invoke/render=true`, `Linux: invoke/render=false`) before parity checks.
-  - Shared config resolvers (text/image/runtime value) are single-source.
-- Input indicator / permissions:
-  - Permission degrade + hot recovery behavior is implemented and script-gated.
-  - VM suppression diagnostics/state exposure is present.
-- Shell UX:
-  - macOS tray status item now uses fixed text label `MFX` (no image/SF Symbol fallback) to keep a stable, readable menu bar style.
-  - macOS warning notifications now initialize app icon before delivery to avoid generic default sender icon in unbundled runs.
-  - notification icon resolution supports explicit override via `MFX_MACOS_APP_ICON_PATH` (highest priority), then bundle/dev fallback paths.
-  - Windows tray theme/effect submenus now read from shell snapshots (`GetThemeMenuSnapshotFromShell` / `GetEffectMenuSnapshotFromShell`) with dynamic command fallback for unknown future types; theme/effect apply actions route through `SetThemeFromShell(...)` / `SetEffectFromShell(...)` to keep shell behavior path consistent.
-  - Windows tray `Star Project` and `Reload config` actions now route through `OpenProjectRepositoryFromShell(...)` / `ReloadConfigFromShell(...)` (same shell contracts as macOS), removing host-window hardcoded/IPC-only action paths.
-  - macOS tray now exposes effect submenus (`click/trail/scroll/hold/hover`) with metadata-driven labels and active-item checks; selection is routed through the same `set_effect` / `clear_effect` command path used on Windows (`AppController::HandleCommand`), closing tray capability parity gap.
-  - macOS tray now also exposes `★ Star Project` and `Reload config` actions with Windows-aligned behavior (`OpenProjectRepositoryFromShell` and `reload_config` command dispatch), removing the remaining tray action-surface mismatch.
-  - macOS tray label language now follows runtime `uiLanguage` first (with system-language fallback), so tray text/tooltip stays aligned with app language semantics used on Windows.
-  - macOS tray menu section order now matches Windows (`effects -> theme -> star/settings/reload/exit`) and the settings item text matches Windows punctuation (`Settings...` / `设置...`).
-  - Core lane init order now starts `AppController` before tray startup, so tray theme submenu snapshot is populated from runtime catalog (fixes empty-menu/no-callback race at startup).
-  - tray smoke gate now uses explicit CLI args (`--expect-settings-action`, `--expect-theme-action`, `--expect-effect-action`, `--expect-reload-action`, `--expect-star-action`, `--settings-url`, `--star-url`, `--theme-value`, `--effect-category`, `--effect-value`, capture files) and validates settings/theme/effect/reload/star callback paths; if capture files are not emitted in constrained runners, regression falls back to exit-code gating.
-  - Added macOS tray theme persistence selfcheck: auto-select theme via tray submenu callback, assert `/api/state.theme` changes, restart host, assert persisted theme remains, then restore original theme.
-  - macOS manual core-host startup now performs `/api/state` readiness assertion; if a stale scaffold-lane binary is used (common with `--skip-build` + wrong build dir), scripts fail fast with explicit guidance instead of opaque 404 follow-up errors.
+  - app-scope normalization/persistence/matcher contracts are stable
+  - parser helpers are shared across regression/manual paths
+- Theme catalog:
+  - runtime catalog is registry-driven
+  - external catalog root loading and folder-path settings are already live
 
-## Build and Regression Gates
-- macOS shell CMake Swift bridge registration has been normalized to one helper (`mfx_add_swift_bridge`) plus one source list (`MFX_MACOS_SWIFT_OBJECTS`), removing 20 duplicated compile blocks and reducing bridge drift risk.
-- POSIX effects suite (core automation scope fixed to `effects`, now includes macOS WASM selfcheck by default):
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-effects-regression-suite.sh --platform auto`
-- POSIX scaffold regression:
+## Regression Gates
+- Scaffold:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-scaffold-regression.sh --platform auto`
-  - macOS tray smoke now captures top-level logical layout keys and settings title punctuation (`MFX_TEST_TRAY_MENU_LAYOUT_CAPTURE_FILE`) and asserts Win-aligned order (`effect:click -> effect:trail -> effect:scroll -> effect:hold -> effect:hover -> theme -> star -> settings -> reload -> exit`) plus `Settings.../设置...` ellipsis semantics.
-- POSIX core effects contract:
+- Core effects:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-core-effects-contract-regression.sh --platform auto`
-  - overlay probe now contains explicit trail mode guards:
-    - `emit_trail + trail_type=line` => `after_trail_active_overlay_windows > before`
-    - `emit_trail + trail_type=none` => `after_trail_active_overlay_windows <= before`
-  - render-profile probe now contains explicit trail command guards:
-    - `POST /api/state active.trail=line` => `command_samples.trail.emit=true`
-    - `POST /api/state active.trail=none` => `command_samples.trail.emit=false`
-  - render-profile probe now also asserts click/trail geometry diagnostics:
-    - click text command geometry (`font_size/float_distance`) remains positive
-    - line-trail command/profile line-width parity for normalized `line` trail
-  - render-profile probe now asserts scroll/hover/hold command parity for canonical active types:
-    - `scroll=helix` command emits and helix mode is enabled
-    - `hover=tubes` command resolves tubes mode
-    - `hold=hologram` start/update command semantics remain active
-  - render-profile probe now asserts alias/fallback command parity:
-    - legacy aliases map to expected normalized command types + mode switches
-    - click/scroll/hover `none` inputs map to fallback command types with mode switches off
-  - render-profile probe now asserts hold follow-mode update semantics:
-    - smooth mode uses smoothed overlay coordinates on second update sample
-    - efficient mode enforces update throttling cadence (emit/suppress/resume)
-  - Effects overlay contract script now reuses shared assertion helpers (`active+type`, section flags, nested fields), keeping contract semantics unchanged while reducing duplicated parser/assert blocks.
-  - Core state checks now include theme catalog route probe (`/api/theme/catalog-folder-dialog`, `probe_only=true`) and schema/state presence checks for `theme_catalog_root_path`/`themes`.
-  - Core state checks now assert theme-catalog schema/state parity (`themes` option count == `theme_catalog.runtime_theme_count` == `theme_catalog_runtime.runtime_theme_count`).
-  - Core state checks now assert `state.theme` is always present in `schema.themes` (baseline/apply/restore), preventing invalid theme persistence across external catalog reloads.
-  - Core state checks now include invalid-theme normalization contract (`POST /api/state` with invalid `theme` must auto-resolve to catalog-supported value, and restore path must recover original theme).
-  - Core state checks now include chromatic semantic contract (`POST /api/state` with `theme=chromatic` must remain `chromatic`, not rewritten to `neon`).
-  - Core state checks now include file-driven external theme discovery contract (`*.theme.json` temp package -> apply `theme_catalog_root_path` -> assert schema/state update -> restore original root path).
-  - External theme contract now includes two rejection paths (invalid token + built-in value override) to assert loader/runtime rejection accounting (`scanned=3, external=1, rejected=2`).
-- POSIX core automation contract:
+- Core automation:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-core-automation-contract-regression.sh --platform auto`
-- POSIX wasm suite:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-wasm-regression-suite.sh --platform auto`
-  - macOS wasm runtime selfcheck now asserts fallback diagnostics persistence in `/api/state` after invalid manifest path (`last_load_failure_stage/code` non-empty) and verifies these fields clear after successful reload.
-- POSIX core wasm contract:
+- Core wasm:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-core-wasm-contract-regression.sh --platform auto`
-  - core wasm contract now also asserts `/api/state` fallback diagnostics lifecycle:
-    - invalid manifest load keeps `runtime_backend=wasm3_static` and sets non-empty `last_load_failure_stage/code`
-    - successful reload clears `last_load_failure_stage/code` back to empty
-  - wasm runtime manual selfcheck now mirrors the same `/api/state` failure-diagnostics lifecycle assertions, keeping manual and regression verdict criteria aligned.
-  - wasm platform checks now explicitly assert macOS schema/state/runtime parity in wasm scope (`capabilities.wasm.invoke/render=true`, `state.wasm.invoke_supported/render_supported=true`, `runtime_backend=wasm3_static`).
+- Full wasm suite:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-posix-wasm-regression-suite.sh --platform auto`
 - macOS ObjC++ surface gate:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-macos-objcxx-surface-regression.sh`
-  - Gate now checks both macOS CMake rules and any existing `/tmp/mfx-platform-macos*/compile_commands.json` for hidden Objective-C++ flags.
-- Theme catalog surface gate:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/regression/run-theme-catalog-surface-regression.sh`
-  - Gate enforces single-source runtime theme catalog wiring across legacy settings options, schema theme options, Windows/macOS tray theme menu boundaries, and core HTTP external-theme contract checks.
-- WebUI semantic gate now includes `test:general-state-model`, which asserts `theme_catalog_root_path` and other general settings defaults/round-trip normalization from one shared model.
-- Core HTTP regression teardown now attempts `/api/stop` before TERM/KILL fallback to reduce forced-stop noise and flakiness.
-- Regression lock runner (`mfx_with_lock`) now executes workflow in a strict subshell and captures status explicitly, avoiding `cmd || status=$?` side effects that could hide phase failures under weakened `set -e` semantics.
-- Scaffold HTTP regression now logs startup failure with `stage/code`; `bind EPERM/EACCES (stage=2, code=1/13)` is treated as a controlled skip in sandbox-like runners (override with `MFX_HTTP_SKIP_BIND_EACCES=0`).
-- Scaffold HTTP startup helper now also treats "early exit without startup log" as constrained-runtime skip, and `http.sh` consumes helper return code `2` across default/custom/missing-webui routes so skip paths no longer break under `set -e`.
-- Scaffold/core HTTP gates now support strict non-skip mode (`MFX_HTTP_REQUIRE_EXECUTION=1`, `MFX_CORE_HTTP_REQUIRE_EXECUTION=1`) to force real execution in full-capability environments.
-- Core HTTP startup helper now reports bind permission failures as `EPERM/EACCES (stage=2, code=1/13)` and supports the same constrained-runtime skip intent via `MFX_CORE_HTTP_ALLOW_BIND_EACCES_SKIP`.
-- Core automation contract regression now defaults `MFX_CORE_HTTP_ALLOW_BIND_EACCES_SKIP=1`, aligning with effects/wasm contracts and avoiding noisy false-negative startup failures under constrained runners.
-- Core HTTP startup now short-circuits on the first confirmed bind-permission denial when skip mode is enabled, reducing duplicate retry noise in constrained runners.
-- Core HTTP startup helper now injects an isolated single-instance key per run (`--single-instance-key` + `MFX_SINGLE_INSTANCE_KEY`) to avoid stale-lock collisions with user-running app instances.
-- Core HTTP startup helper now treats no-probe/no-log/no-diagnostics early exits as constrained-runtime skip when skip mode is enabled; strict-mode fail remains controlled by `MFX_CORE_HTTP_REQUIRE_EXECUTION=1`.
-- Core smoke entry helper now also injects an isolated single-instance key (`--single-instance-key` + `MFX_SINGLE_INSTANCE_KEY`) to avoid false-negative early exits after scaffold/core-http phases in the same suite run.
-- Regression entry helpers (`scaffold/core-http/core-smoke`) now allocate FIFO through private temp directories (`mktemp -d` + `mkfifo`) instead of `mktemp -u`, removing TOCTOU race windows in concurrent runs.
-- `mfx_http_code` now converts curl transport failures into HTTP code `000` (while writing curl stderr into the response capture file), so constrained-runtime scaffold gates can reach skip/diagnostic branches instead of aborting on raw curl exit.
-- POSIX text encoding/runtime path no longer relies on deprecated `std::codecvt`/`std::wstring_convert`; `PlatformTextEncoding` now uses explicit UTF-8 codec logic and `PlatformRuntimeEnvironment` reuses that conversion path (Xcode deprecation warnings removed from these files).
-- macOS Swift bridge compile now sets an explicit module cache path (`.../swift-module-cache`) under build dir, reducing cross-target cache interference in repeated local/regression builds.
-- macOS manual selfcheck host helper now returns controlled skip (`MFX_MANUAL_ALLOW_BIND_EACCES_SKIP=1`) for constrained-runtime startup failures (`websettings_start_failed(stage=2,code=1/13)` and no-probe/no-log early exit), avoiding noisy false-negative `host exited early`; POSIX suite enables this skip policy by default for manual selfcheck phases.
-- macOS manual selfchecks now support strict non-skip mode (`MFX_MANUAL_REQUIRE_EXECUTION=1`), failing immediately if constrained-runtime startup would otherwise be treated as skip.
-- Startup options now support explicit single-instance key override (`--single-instance-key=...` / `MFX_SINGLE_INSTANCE_KEY`); manual selfchecks can auto-isolate lock key under constrained-runtime skip mode to avoid stale-lock false negatives.
-- Full POSIX suite passed on macOS on 2026-03-02 after effects/runtime parity parser path migration:
-  - `./tools/platform/regression/run-posix-regression-suite.sh --platform auto`
 
-## High-Value Manual Entrypoints (macOS)
-- One-command launcher:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/mfx`
-  - primary commands: `run`, `run-no-build`, `effects` (legacy aliases `start`, `fast` remain supported).
-  - supports `--seconds` for quick auto-stop runs (e.g. `./mfx run-no-build --seconds 30`).
-  - regression shortcuts: `verify-effects` (daily gate) and `verify-full` (full suite).
-  - strict mode: `effects --strict`, `verify-effects --strict`, `verify-full --strict` force fail on constrained-runtime skip paths.
-- Core web settings manual run:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60`
-- Effects parity selfcheck:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build`
-- Automation injection selfcheck:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build`
-- WASM runtime selfcheck:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build`
-- Manual host helper teardown now prefers `/api/stop` and falls back to TERM/KILL (same policy used by auto-stop scheduler).
+## High-Value Manual Entrypoints
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/mfx`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build`
 
-## Key Contracts (Do Not Break)
-- `settings schema` vs `runtime diagnostics` capability parity.
-- `capabilities.effects/input/wasm` platform matrix must remain schema-consistent (mac/linux contract checks in core state gate).
-- `effects active type` normalization consistency across core/runtime/web state.
-- `trail=none` must remain no-render residual.
-- Permission revoke/regrant must not require process restart.
-- Windows behavior semantics must remain unchanged when touching shared/core paths.
+## Key Contracts
+- Keep `stdin` JSON command compatibility.
+- Wasm ABI changes must remain backward compatible within the current v2 surface unless an explicit breaking migration is approved.
+- Group/material/pass semantics stay host-owned and bounded; do not open raw shader/post-process control without an explicit architecture review.
+- New macOS capability work stays Swift-first.
 
 ## Docs Governance State
-- Active structure:
-  - `P0`: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/AGENTS.md`
-  - `P1`: this file + `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
-  - `P2`: targeted docs under `docs/architecture`, `docs/issues`, `docs/refactoring`
-  - `P3`: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/archive/README.md`
-- Cleanup baseline (2026-03-01):
-  - non-referenced historical docs in issues/refactoring/architecture/root were removed
-  - first-read docs were compacted for low-token navigation
-  - WASM architecture/operator docs were rewritten as contract/checklist format
-  - phase52-phase54 standalone refactoring notes were merged back into roadmap + git history and removed from active docs
-  - wasm phase3/4 issue-slice documents were removed from active docs; long-form chronology stays in git history
-- Current inventory (after cleanup):
-  - `docs/architecture`: 16
-  - `docs/refactoring`: 2
-  - `docs/issues`: 1
-  - `docs` total markdown: 23
+- `current.md` is intentionally a compact first-read summary, not a change log.
+- Detailed capability evolution belongs in:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.zh-CN.md`
 
 ## Where to Read History
-- For full chronological details, use:
+- Phase and acceptance history:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/phase-roadmap-macos-m1-status.md`
-  - targeted docs under `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/refactoring/`
+- Wasm architecture contract:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.md`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.zh-CN.md`
+- WASM v3 direction:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-abi-v3-design.zh-CN.md`
 
 ## Next Focus
-- Continue macOS behavior parity hardening for effects and WASM observable contracts.
-- Keep cleanup incremental: delete only unreferenced historical docs, then run link integrity checks.
+- Keep `group_pass` converged before widening it again.
+- Shift near-term effort from “add one more tail” toward:
+  - Windows visible-runtime validation
+  - sample/regression matrix hardening
+  - doc/index noise control

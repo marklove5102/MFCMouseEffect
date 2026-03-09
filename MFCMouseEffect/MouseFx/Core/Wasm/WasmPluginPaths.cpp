@@ -138,6 +138,10 @@ std::vector<std::wstring> WasmPluginPaths::ResolveSearchRoots(const std::wstring
     std::vector<std::wstring> roots{};
     std::set<std::wstring> seenKeys{};
 
+    if (!configuredRoot.empty()) {
+        AddRootUnique(std::filesystem::path(configuredRoot), &seenKeys, &roots);
+    }
+
     const std::wstring primary = ResolvePrimaryPluginRoot();
     if (!primary.empty()) {
         AddRootIfValid(std::filesystem::path(primary), &seenKeys, &roots);
@@ -148,10 +152,6 @@ std::vector<std::wstring> WasmPluginPaths::ResolveSearchRoots(const std::wstring
 #ifdef _DEBUG
     AddRootIfValid(ResolveDevelopmentTemplateDistPath(), &seenKeys, &roots);
 #endif
-
-    if (!configuredRoot.empty()) {
-        AddRootUnique(std::filesystem::path(configuredRoot), &seenKeys, &roots);
-    }
 
     return roots;
 }

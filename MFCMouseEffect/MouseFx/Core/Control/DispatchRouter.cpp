@@ -97,26 +97,19 @@ intptr_t DispatchRouter::OnClick(const DispatchMessage& message) {
     if (ev) {
         ctrl_->RememberLastPointerPoint(ev->pt);
         const bool suppressClickEffectByPolicy = ShouldSuppressClickEffectForHoldPolicy(ctrl_);
-        const IMouseEffect* clickEffect = ctrl_->GetEffect(EffectCategory::Click);
-        const bool effectIsText = (clickEffect != nullptr) &&
-            (NormalizeClickEffectType(clickEffect->TypeName()) == "text");
-        const bool configIsText =
-            (NormalizeClickEffectType(ctrl_->Config().active.click) == "text");
-        const bool forceBuiltinTextClick = effectIsText || configIsText;
         bool renderedByWasm = false;
         bool wasmRouteActive = false;
-        if (!forceBuiltinTextClick && !suppressClickEffectByPolicy) {
+        if (!suppressClickEffectByPolicy) {
             wasmRouteActive = wasmFeature_.RouteClick(*ctrl_, *ev, &renderedByWasm);
         }
         automationFeature_.OnClick(*ctrl_, *ev);
         indicatorFeature_.OnClick(*ctrl_, *ev);
         ctrl_->LogDebugClick(*ev);
         const bool shouldFallbackToBuiltin =
-            forceBuiltinTextClick ||
             ((!wasmRouteActive) || ctrl_->ShouldFallbackToBuiltinClickWhenWasmActive());
         if (!suppressClickEffectByPolicy &&
             shouldFallbackToBuiltin &&
-            (forceBuiltinTextClick || !renderedByWasm)) {
+            !renderedByWasm) {
             if (auto* effect = ctrl_->GetEffect(EffectCategory::Click)) {
                 effect->OnClick(*ev);
             }

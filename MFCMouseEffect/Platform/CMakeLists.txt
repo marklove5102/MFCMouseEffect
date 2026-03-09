@@ -282,6 +282,11 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmEffectHost.Invoke.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmEventInvokeExecutor.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmExecutionBudgetGuard.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRetainedGlowEmitterRuntime.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRetainedParticleEmitterRuntime.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRetainedQuadFieldRuntime.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRetainedRibbonTrailRuntime.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRetainedSpriteEmitterRuntime.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmPluginManifest.Load.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmPluginManifest.Validate.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmPluginCatalog.cpp"
@@ -354,6 +359,14 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Server/WebUiAssets.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Utils/StringUtils.cpp"
         )
+        if(MFX_ENTRY_PLATFORM STREQUAL "windows")
+            target_sources(mfx_entry_runtime_common PRIVATE
+                "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmPathFillCommandExecutor.cpp"
+                "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmPathStrokeCommandExecutor.cpp"
+                "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmRibbonStripCommandExecutor.cpp"
+                "${MFX_PROJECT_ROOT}/MouseFx/Core/Wasm/WasmSpriteBatchCommandExecutor.cpp"
+            )
+        endif()
         target_link_libraries(mfx_entry_runtime_common PRIVATE mfx_wasm3_core_runtime)
     endif()
 

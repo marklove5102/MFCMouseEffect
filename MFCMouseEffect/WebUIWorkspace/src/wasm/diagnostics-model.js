@@ -80,6 +80,18 @@ export function buildWasmLifetimeRenderText(snapshot, translate) {
     + `${t('label_wasm_metric_rendered', 'Rendered')}=${value.lifetime_rendered_by_wasm_dispatches || 0}, `
     + `${t('label_wasm_metric_text_commands', 'TextCmd')}=${value.lifetime_executed_text_commands || 0}, `
     + `${t('label_wasm_metric_image_commands', 'ImgCmd')}=${value.lifetime_executed_image_commands || 0}, `
+    + `pulse=${value.lifetime_executed_pulse_commands || 0}, `
+    + `polyline=${value.lifetime_executed_polyline_commands || 0}, `
+    + `pathStroke=${value.lifetime_executed_path_stroke_commands || 0}, `
+    + `pathFill=${value.lifetime_executed_path_fill_commands || 0}, `
+    + `glow=${value.lifetime_executed_glow_batch_commands || 0}, `
+    + `sprite=${value.lifetime_executed_sprite_batch_commands || 0}, `
+    + `glowEmitter=${value.lifetime_executed_glow_emitter_commands || 0}, `
+    + `spriteEmitter=${value.lifetime_executed_sprite_emitter_commands || 0}, `
+    + `particleEmitter=${value.lifetime_executed_particle_emitter_commands || 0}, `
+    + `ribbonTrail=${value.lifetime_executed_ribbon_trail_commands || 0}, `
+    + `quadField=${value.lifetime_executed_quad_field_commands || 0}, `
+    + `groupRemove=${value.lifetime_executed_group_remove_commands || 0}, `
     + `${t('label_wasm_metric_throttled', 'Throttled')}=${value.lifetime_throttled_render_commands || 0} `
     + `(cap=${value.lifetime_throttled_by_capacity_render_commands || 0}, int=${value.lifetime_throttled_by_interval_render_commands || 0}), `
     + `${t('label_wasm_metric_dropped', 'Dropped')}=${value.lifetime_dropped_render_commands || 0}`;

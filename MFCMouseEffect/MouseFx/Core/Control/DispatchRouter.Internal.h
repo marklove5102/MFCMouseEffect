@@ -22,6 +22,9 @@ inline bool IsKnownTimerId(uintptr_t timerId) {
     if (timerId == AppController::HoldUpdateTimerId()) {
         return true;
     }
+    if (timerId == AppController::WasmFrameTimerId()) {
+        return true;
+    }
 #ifdef _DEBUG
     static constexpr uintptr_t kSelfTestTimerId = 0x4D46;
     if (timerId == kSelfTestTimerId) {

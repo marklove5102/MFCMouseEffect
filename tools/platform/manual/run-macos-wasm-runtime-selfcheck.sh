@@ -161,6 +161,25 @@ code_catalog="$(mfx_http_code "$catalog_file" "$MFX_MANUAL_BASE_URL/api/wasm/cat
 mfx_assert_eq "$code_catalog" "200" "selfcheck wasm catalog status"
 mfx_assert_file_contains "$catalog_file" "\"ok\":true" "selfcheck wasm catalog ok"
 mfx_assert_file_contains "$catalog_file" "\"plugins\":" "selfcheck wasm catalog plugins field"
+mfx_wasm_selfcheck_assert_catalog_capability_fields "wasm catalog capability fields" "$catalog_file"
+
+catalog_missing_input_kinds_file="$tmp_dir/wasm-catalog-fixture-missing-input-kinds.out"
+mfx_wasm_selfcheck_write_catalog_negative_fixture "$catalog_file" "$catalog_missing_input_kinds_file" "drop_input_kinds"
+mfx_wasm_selfcheck_assert_catalog_capability_fields_rejects \
+    "wasm catalog negative fixture missing input_kinds" \
+    "$catalog_missing_input_kinds_file"
+
+catalog_missing_enable_frame_tick_file="$tmp_dir/wasm-catalog-fixture-missing-enable-frame-tick.out"
+mfx_wasm_selfcheck_write_catalog_negative_fixture "$catalog_file" "$catalog_missing_enable_frame_tick_file" "drop_enable_frame_tick"
+mfx_wasm_selfcheck_assert_catalog_capability_fields_rejects \
+    "wasm catalog negative fixture missing enable_frame_tick" \
+    "$catalog_missing_enable_frame_tick_file"
+
+catalog_count_mismatch_file="$tmp_dir/wasm-catalog-fixture-count-mismatch.out"
+mfx_wasm_selfcheck_write_catalog_negative_fixture "$catalog_file" "$catalog_count_mismatch_file" "count_mismatch"
+mfx_wasm_selfcheck_assert_catalog_capability_fields_rejects \
+    "wasm catalog negative fixture count mismatch" \
+    "$catalog_count_mismatch_file"
 
 import_dialog_probe_file="$tmp_dir/wasm-import-dialog-probe.out"
 mfx_wasm_selfcheck_assert_import_dialog_probe_supported \
@@ -280,7 +299,7 @@ mfx_wasm_selfcheck_assert_load_manifest_ok \
 mfx_wasm_fixture_write_manifest_with_api_version \
     "$reload_api_manifest_path" \
     "reload-api-unsupported-plugin" \
-    "2" \
+    "3" \
     "$reload_api_entry_relative"
 
 reload_api_unsupported_file="$tmp_dir/wasm-reload-api-unsupported.out"
@@ -489,7 +508,7 @@ cat > "$invalid_schema_manifest_path" <<'EOF'
   "id": "",
   "name": "invalid-schema",
   "version": "1.0.0",
-  "api_version": 1,
+  "api_version": 2,
   "entry": "effect.wasm"
 }
 EOF
@@ -504,7 +523,7 @@ cat > "$unsupported_api_manifest_path" <<'EOF'
   "id": "unsupported-api-plugin",
   "name": "unsupported-api-plugin",
   "version": "1.0.0",
-  "api_version": 2,
+  "api_version": 3,
   "entry": "effect.wasm"
 }
 EOF
@@ -519,7 +538,7 @@ cat > "$missing_wasm_manifest_path" <<'EOF'
   "id": "missing-wasm-plugin",
   "name": "missing-wasm-plugin",
   "version": "1.0.0",
-  "api_version": 1,
+  "api_version": 2,
   "entry": "missing.wasm"
 }
 EOF

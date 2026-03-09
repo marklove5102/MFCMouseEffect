@@ -26,7 +26,13 @@ public:
     bool IsModuleLoaded() const;
 
     bool CallGetApiVersion(uint32_t* outApiVersion);
-    bool CallOnEvent(
+    bool CallOnInput(
+        const uint8_t* inputPtr,
+        uint32_t inputLen,
+        uint8_t* outputPtr,
+        uint32_t outputCap,
+        uint32_t* outWrittenBytes);
+    bool CallOnFrame(
         const uint8_t* inputPtr,
         uint32_t inputLen,
         uint8_t* outputPtr,
@@ -69,7 +75,8 @@ private:
     M3Runtime* runtime_ = nullptr;
 
     M3Function* fnGetApiVersion_ = nullptr;
-    M3Function* fnOnEvent_ = nullptr;
+    M3Function* fnOnInput_ = nullptr;
+    M3Function* fnOnFrame_ = nullptr;
     M3Function* fnReset_ = nullptr;
 
     std::vector<uint8_t> wasmBytes_{};
@@ -79,4 +86,3 @@ private:
 std::unique_ptr<RuntimeBridgeContext> CreateRuntimeBridge();
 
 } // namespace wasm_runtime_bridge
-

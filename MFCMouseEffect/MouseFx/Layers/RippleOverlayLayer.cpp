@@ -130,6 +130,9 @@ void RippleOverlayLayer::Update(uint64_t nowMs) {
         if (t < 0.0f) t = 0.0f;
         if (t > 1.0f) t = 1.0f;
         instance.t = t;
+        if (!instance.renderer->IsAlive()) {
+            instance.active = false;
+        }
     }
 
     instances_.erase(
@@ -141,20 +144,41 @@ void RippleOverlayLayer::Update(uint64_t nowMs) {
 }
 
 void RippleOverlayLayer::Render(Gdiplus::Graphics& graphics) {
+    std::vector<RippleInstance*> renderInstances;
+    renderInstances.reserve(instances_.size());
     for (auto& instance : instances_) {
-        if (!instance.active || !instance.renderer || !instance.renderReady) continue;
+        if (!instance.active || !instance.renderer || !instance.renderReady) {
+            continue;
+        }
+        renderInstances.push_back(&instance);
+    }
 
-        int sizePx = instance.style.windowSize;
+    std::stable_sort(
+        renderInstances.begin(),
+        renderInstances.end(),
+        [](const RippleInstance* lhs, const RippleInstance* rhs) {
+            if (!lhs || !rhs) {
+                return lhs < rhs;
+            }
+            return lhs->params.semantics.sortKey < rhs->params.semantics.sortKey;
+        });
+
+    for (RippleInstance* instance : renderInstances) {
+        if (!instance) {
+            continue;
+        }
+
+        int sizePx = instance->style.windowSize;
         if (sizePx < 64) sizePx = 64;
         if (sizePx > 512) sizePx = 512;
 
-        const ScreenPoint centerPt = ResolveRenderCenter(instance);
+        const ScreenPoint centerPt = ResolveRenderCenter(*instance);
         const int left = centerPt.x - (sizePx / 2);
         const int top = centerPt.y - (sizePx / 2);
 
         const Gdiplus::GraphicsState state = graphics.Save();
         graphics.TranslateTransform((Gdiplus::REAL)left, (Gdiplus::REAL)top);
-        instance.renderer->Render(graphics, instance.t, instance.elapsedMs, sizePx, instance.style);
+        instance->renderer->Render(graphics, instance->t, instance->elapsedMs, sizePx, instance->style);
         graphics.Restore(state);
     }
 }

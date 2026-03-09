@@ -63,7 +63,7 @@ __declspec(dllexport) int __cdecl mfx_wasm_runtime_call_get_api_version(void* ha
     return context->CallGetApiVersion(outApiVersion) ? 1 : 0;
 }
 
-__declspec(dllexport) int __cdecl mfx_wasm_runtime_call_on_event(
+__declspec(dllexport) int __cdecl mfx_wasm_runtime_call_on_input(
     void* handle,
     const uint8_t* inputPtr,
     uint32_t inputLen,
@@ -77,7 +77,24 @@ __declspec(dllexport) int __cdecl mfx_wasm_runtime_call_on_event(
         }
         return 0;
     }
-    return context->CallOnEvent(inputPtr, inputLen, outputPtr, outputCap, outWrittenBytes) ? 1 : 0;
+    return context->CallOnInput(inputPtr, inputLen, outputPtr, outputCap, outWrittenBytes) ? 1 : 0;
+}
+
+__declspec(dllexport) int __cdecl mfx_wasm_runtime_call_on_frame(
+    void* handle,
+    const uint8_t* inputPtr,
+    uint32_t inputLen,
+    uint8_t* outputPtr,
+    uint32_t outputCap,
+    uint32_t* outWrittenBytes) {
+    auto* context = AsContext(handle);
+    if (!context) {
+        if (outWrittenBytes) {
+            *outWrittenBytes = 0;
+        }
+        return 0;
+    }
+    return context->CallOnFrame(inputPtr, inputLen, outputPtr, outputCap, outWrittenBytes) ? 1 : 0;
 }
 
 __declspec(dllexport) void __cdecl mfx_wasm_runtime_reset_plugin(void* handle) {

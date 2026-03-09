@@ -45,6 +45,7 @@ struct TextAnimationState final {
     TextAnimationCommand cmd{};
     uint64_t startTickMs = 0;
     uint64_t generation = 0;
+    int timerIntervalMs = 16;
 };
 
 struct ShowTextContext final {
@@ -168,8 +169,9 @@ void ScheduleTextAnimationTick(TextAnimationState* state) {
     if (state == nullptr) {
         return;
     }
+    const int delayMs = std::clamp(state->timerIntervalMs, 4, 1000);
     dispatch_after_f(
-        dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(16) * NSEC_PER_MSEC),
+        dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(delayMs) * NSEC_PER_MSEC),
         dispatch_get_main_queue(),
         state,
         &TickTextAnimation);
@@ -211,11 +213,13 @@ void StartTextAnimation(void* panelHandle, TextAnimationCommand cmd) {
     if (panelHandle == nullptr) {
         return;
     }
+    const int timerIntervalMs = macos_overlay_support::ResolveOverlayTimerIntervalMs(cmd.startPoint);
     auto* state = new TextAnimationState{
         panelHandle,
         std::move(cmd),
         MonotonicNowMs(),
         AnimationGeneration().load(std::memory_order_acquire),
+        timerIntervalMs,
     };
     TickTextAnimation(state);
 }

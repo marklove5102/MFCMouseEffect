@@ -12,7 +12,14 @@ public:
     bool IsModuleLoaded() const override;
 
     bool CallGetApiVersion(uint32_t* outApiVersion, std::string* outError) override;
-    bool CallOnEvent(
+    bool CallOnInput(
+        const uint8_t* inputPtr,
+        uint32_t inputLen,
+        uint8_t* outputPtr,
+        uint32_t outputCap,
+        uint32_t* outWrittenBytes,
+        std::string* outError) override;
+    bool CallOnFrame(
         const uint8_t* inputPtr,
         uint32_t inputLen,
         uint8_t* outputPtr,
@@ -27,4 +34,3 @@ private:
 };
 
 } // namespace mousefx::wasm
-

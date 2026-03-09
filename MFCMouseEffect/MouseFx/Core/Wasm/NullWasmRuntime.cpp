@@ -36,7 +36,25 @@ bool NullWasmRuntime::CallGetApiVersion(uint32_t* outApiVersion, std::string* ou
     return false;
 }
 
-bool NullWasmRuntime::CallOnEvent(
+bool NullWasmRuntime::CallOnInput(
+    const uint8_t* inputPtr,
+    uint32_t inputLen,
+    uint8_t* outputPtr,
+    uint32_t outputCap,
+    uint32_t* outWrittenBytes,
+    std::string* outError) {
+    (void)inputPtr;
+    (void)inputLen;
+    (void)outputPtr;
+    (void)outputCap;
+    if (outWrittenBytes) {
+        *outWrittenBytes = 0;
+    }
+    SetBackendMissingError(outError);
+    return false;
+}
+
+bool NullWasmRuntime::CallOnFrame(
     const uint8_t* inputPtr,
     uint32_t inputLen,
     uint8_t* outputPtr,
@@ -59,4 +77,3 @@ void NullWasmRuntime::ResetPluginState() {
 }
 
 } // namespace mousefx::wasm
-

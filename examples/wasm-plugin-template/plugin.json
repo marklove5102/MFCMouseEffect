@@ -1,8 +1,12 @@
 {
-  "id": "demo.click.text-rise.v1",
-  "name": "Demo Click Text Rise",
+  "id": "demo.template.default.v2",
+  "name": "Demo Template Default",
   "version": "0.1.0",
-  "api_version": 1,
+  "api_version": 2,
   "entry": "effect.wasm",
-  "image_assets": []
+  "image_assets": [],
+  "input_kinds": [
+    "click"
+  ],
+  "enable_frame_tick": false
 }

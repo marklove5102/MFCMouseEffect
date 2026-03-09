@@ -25,6 +25,36 @@ std::atomic<uint64_t>& ImageOverlayRequestCount() {
     return counter;
 }
 
+std::atomic<uint64_t>& PulseOverlayRequestCount() {
+    static std::atomic<uint64_t> counter{0};
+    return counter;
+}
+
+std::atomic<uint64_t>& PolylineOverlayRequestCount() {
+    static std::atomic<uint64_t> counter{0};
+    return counter;
+}
+
+std::atomic<uint64_t>& PathStrokeOverlayRequestCount() {
+    static std::atomic<uint64_t> counter{0};
+    return counter;
+}
+
+std::atomic<uint64_t>& PathFillOverlayRequestCount() {
+    static std::atomic<uint64_t> counter{0};
+    return counter;
+}
+
+std::atomic<uint64_t>& GlowBatchOverlayRequestCount() {
+    static std::atomic<uint64_t> counter{0};
+    return counter;
+}
+
+std::atomic<uint64_t>& SpriteBatchOverlayRequestCount() {
+    static std::atomic<uint64_t> counter{0};
+    return counter;
+}
+
 std::atomic<uint64_t>& ImageOverlayRequestWithAssetCount() {
     static std::atomic<uint64_t> counter{0};
     return counter;
@@ -125,6 +155,102 @@ WasmImageOverlayRenderCounters GetWasmImageOverlayRenderCounters() {
     counters.applyTintRequests = ImageOverlayApplyTintRequestCount().load(std::memory_order_relaxed);
     counters.applyTintRequestsWithAsset = ImageOverlayApplyTintRequestWithAssetCount().load(std::memory_order_relaxed);
     return counters;
+#endif
+}
+
+void RecordWasmPulseOverlayRenderRequest() {
+#if !defined(__APPLE__)
+    return;
+#else
+    PulseOverlayRequestCount().fetch_add(1u, std::memory_order_relaxed);
+#endif
+}
+
+uint64_t GetWasmPulseOverlayRenderRequestCount() {
+#if !defined(__APPLE__)
+    return 0;
+#else
+    return PulseOverlayRequestCount().load(std::memory_order_relaxed);
+#endif
+}
+
+void RecordWasmPolylineOverlayRenderRequest() {
+#if !defined(__APPLE__)
+    return;
+#else
+    PolylineOverlayRequestCount().fetch_add(1u, std::memory_order_relaxed);
+#endif
+}
+
+uint64_t GetWasmPolylineOverlayRenderRequestCount() {
+#if !defined(__APPLE__)
+    return 0;
+#else
+    return PolylineOverlayRequestCount().load(std::memory_order_relaxed);
+#endif
+}
+
+void RecordWasmPathStrokeOverlayRenderRequest() {
+#if !defined(__APPLE__)
+    return;
+#else
+    PathStrokeOverlayRequestCount().fetch_add(1u, std::memory_order_relaxed);
+#endif
+}
+
+uint64_t GetWasmPathStrokeOverlayRenderRequestCount() {
+#if !defined(__APPLE__)
+    return 0;
+#else
+    return PathStrokeOverlayRequestCount().load(std::memory_order_relaxed);
+#endif
+}
+
+void RecordWasmPathFillOverlayRenderRequest() {
+#if !defined(__APPLE__)
+    return;
+#else
+    PathFillOverlayRequestCount().fetch_add(1u, std::memory_order_relaxed);
+#endif
+}
+
+uint64_t GetWasmPathFillOverlayRenderRequestCount() {
+#if !defined(__APPLE__)
+    return 0;
+#else
+    return PathFillOverlayRequestCount().load(std::memory_order_relaxed);
+#endif
+}
+
+void RecordWasmGlowBatchOverlayRenderRequest() {
+#if !defined(__APPLE__)
+    return;
+#else
+    GlowBatchOverlayRequestCount().fetch_add(1u, std::memory_order_relaxed);
+#endif
+}
+
+uint64_t GetWasmGlowBatchOverlayRenderRequestCount() {
+#if !defined(__APPLE__)
+    return 0;
+#else
+    return GlowBatchOverlayRequestCount().load(std::memory_order_relaxed);
+#endif
+}
+
+void RecordWasmSpriteBatchOverlayRenderRequest() {
+#if !defined(__APPLE__)
+    return;
+#else
+    SpriteBatchOverlayRequestCount().fetch_add(1u, std::memory_order_relaxed);
+#endif
+}
+
+uint64_t GetWasmSpriteBatchOverlayRenderRequestCount() {
+#if !defined(__APPLE__)
+    return 0;
+#else
+    return SpriteBatchOverlayRequestCount().load(std::memory_order_relaxed);
 #endif
 }
 

@@ -3,6 +3,7 @@
 #include <gdiplus.h>
 #include <cstdint>
 #include <string>
+#include "MouseFx/Interfaces/RenderSemantics.h"
 #include "MouseFx/Styles/RippleStyle.h"
 
 namespace mousefx {
@@ -22,6 +23,9 @@ struct RenderParams {
 
     // Optional delay before an instance becomes visible.
     uint32_t startDelayMs = 0;
+
+    // Optional host-owned semantics for ordering and future group features.
+    RenderSemantics semantics{};
 };
 
 class IRippleRenderer {
@@ -44,6 +48,10 @@ public:
 
     // Handle external commands/interaction
     virtual void OnCommand(const std::string& cmd, const std::string& args) {}
+
+    // Optional lifecycle hook for long-lived renderers. When this returns false,
+    // the owning overlay instance is allowed to stop itself.
+    virtual bool IsAlive() const { return true; }
 };
 
 } // namespace mousefx

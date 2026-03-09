@@ -19,7 +19,7 @@ export function mfx_plugin_get_api_version(): u32 {
 
 export function mfx_plugin_reset(): void {}
 
-export function mfx_plugin_on_event(
+export function mfx_plugin_on_input(
   inputPtr: usize,
   inputLen: u32,
   outputPtr: usize,
@@ -35,10 +35,10 @@ export function mfx_plugin_on_event(
 
   writeSpawnText(
     outputPtr,
-    x,
-    y,
-    <f32>signedFromSeed(seed, 4, 12),
-    -86.0 - <f32>rangedFromSeed(seed, 1, 0, 26),
+    x - 42.0,
+    y + 18.0,
+    -18.0 + <f32>signedFromSeed(seed, 4, 10),
+    -98.0 - <f32>rangedFromSeed(seed, 1, 0, 20),
     0.0,
     160.0,
     1.0,
@@ -52,20 +52,29 @@ export function mfx_plugin_on_event(
 
   writeSpawnImage(
     outputPtr + <usize>SPAWN_TEXT_COMMAND_BYTES,
-    x,
-    y,
-    <f32>signedFromSeed(seed, 11, 70),
-    -155.0 - <f32>rangedFromSeed(seed, 6, 0, 46),
+    x + 78.0,
+    y - 26.0,
+    54.0 + <f32>signedFromSeed(seed, 11, 18),
+    -142.0 - <f32>rangedFromSeed(seed, 6, 0, 22),
     0.0,
     95.0,
-    0.94 + (<f32>rangedFromSeed(seed, 14, 0, 30) / 100.0),
+    1.02 + (<f32>rangedFromSeed(seed, 14, 0, 14) / 100.0),
     0.0,
     0.95,
     colorFromSeed(seed ^ 0x0EDC7431),
-    24,
-    560,
+    0,
+    620,
     (seed >> 3) % 4,
   );
 
   return MIXED_OUTPUT_BYTES;
+}
+
+export function mfx_plugin_on_frame(
+  inputPtr: usize,
+  inputLen: u32,
+  outputPtr: usize,
+  outputCap: u32,
+): u32 {
+  return 0;
 }

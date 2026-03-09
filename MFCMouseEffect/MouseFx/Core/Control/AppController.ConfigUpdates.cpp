@@ -26,6 +26,7 @@ void AppController::ApplyOverlayTargetFpsToPlatform() {
 #elif MFX_PLATFORM_WINDOWS
     win32_overlay_timer_support::SetOverlayTargetFps(config_.overlayTargetFps);
 #endif
+    ArmWasmFrameTimer();
 }
 
 void AppController::SetUiLanguage(const std::string& lang) {

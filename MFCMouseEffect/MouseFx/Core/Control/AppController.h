@@ -154,6 +154,8 @@ public:
     void DisarmHoldTimer();
     void ArmHoldUpdateTimer();
     void DisarmHoldUpdateTimer();
+    void ArmWasmFrameTimer();
+    void DisarmWasmFrameTimer();
     void ClearPendingHold();
     void CancelPendingHold();
     bool ConsumePendingHold(ScreenPoint* outPt, int* outButton);
@@ -175,6 +177,7 @@ public:
     static constexpr uintptr_t HoverTimerId() { return kHoverTimerId; }
     static constexpr uintptr_t HoldTimerId() { return kHoldTimerId; }
     static constexpr uintptr_t HoldUpdateTimerId() { return kHoldUpdateTimerId; }
+    static constexpr uintptr_t WasmFrameTimerId() { return kWasmFrameTimerId; }
     static constexpr uint32_t HoldDelayMs() { return kHoldDelayMs; }
 #ifdef _DEBUG
     void LogDebugClick(const ClickEvent& ev);
@@ -200,6 +203,7 @@ private:
     std::string ResolveConfiguredClickType() const;
     void ApplyConfiguredEffects();
     void ApplyOverlayTargetFpsToPlatform();
+    uint32_t ResolveWasmFrameTimerIntervalMs() const;
     bool NormalizeConfiguredThemeName();
     bool NormalizeActiveEffectTypes();
     void InitializeWasmHost();
@@ -248,6 +252,7 @@ private:
     static constexpr uintptr_t kHoverTimerId = 2;
     static constexpr uint32_t kHoverThresholdMs = 2000;
     static constexpr uintptr_t kInputCaptureHealthTimerId = 6;
+    static constexpr uintptr_t kWasmFrameTimerId = 10;
 
     // Hold delay logic
     static constexpr uintptr_t kHoldTimerId = 5;

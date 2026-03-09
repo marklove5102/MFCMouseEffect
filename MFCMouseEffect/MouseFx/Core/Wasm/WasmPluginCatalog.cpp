@@ -2,6 +2,7 @@
 
 #include "WasmPluginCatalog.h"
 
+#include "WasmPluginAbi.h"
 #include "WasmPluginPaths.h"
 
 #include "MouseFx/Utils/StringUtils.h"
@@ -9,7 +10,7 @@
 #include <algorithm>
 #include <cwctype>
 #include <filesystem>
-#include <set>
+#include <map>
 #include <sstream>
 #include <system_error>
 
@@ -29,6 +30,49 @@ bool EqualsIgnoreCaseAscii(const std::wstring& lhs, const std::wstring& rhs) {
         }
     }
     return true;
+}
+
+std::filesystem::path NormalizePath(const std::filesystem::path& path) {
+    std::error_code ec;
+    const std::filesystem::path canonical = std::filesystem::weakly_canonical(path, ec);
+    if (!ec) {
+        return canonical.lexically_normal();
+    }
+    return path.lexically_normal();
+}
+
+std::wstring BuildPathKey(const std::filesystem::path& path) {
+    std::wstring key = NormalizePath(path).wstring();
+    std::transform(key.begin(), key.end(), key.begin(), [](wchar_t ch) {
+        return static_cast<wchar_t>(std::towlower(ch));
+    });
+    return key;
+}
+
+bool HasAncestorManifestBelowRoot(
+    const std::filesystem::path& rootPath,
+    const std::filesystem::path& manifestPath) {
+    const std::wstring rootKey = BuildPathKey(rootPath);
+    std::filesystem::path current = NormalizePath(manifestPath.parent_path());
+    while (true) {
+        const std::filesystem::path parent = current.parent_path();
+        if (parent.empty() || parent == current) {
+            return false;
+        }
+        current = NormalizePath(parent);
+        if (BuildPathKey(current) == rootKey) {
+            return false;
+        }
+
+        std::error_code ec;
+        const std::filesystem::path ancestorManifest = current / L"plugin.json";
+        if (std::filesystem::exists(ancestorManifest, ec) &&
+            !ec &&
+            std::filesystem::is_regular_file(ancestorManifest, ec) &&
+            !ec) {
+            return true;
+        }
+    }
 }
 
 std::vector<std::filesystem::path> FindManifestFiles(const std::wstring& root) {
@@ -54,6 +98,13 @@ std::vector<std::filesystem::path> FindManifestFiles(const std::wstring& root) {
         if (entry.is_regular_file(localEc) && !localEc) {
             const std::wstring filename = entry.path().filename().wstring();
             if (EqualsIgnoreCaseAscii(filename, L"plugin.json")) {
+                if (HasAncestorManifestBelowRoot(rootPath, entry.path())) {
+                    it.increment(ec);
+                    if (ec) {
+                        ec.clear();
+                    }
+                    continue;
+                }
                 files.push_back(entry.path());
             }
         }
@@ -85,7 +136,7 @@ PluginCatalogResult WasmPluginCatalog::Discover() const {
 
 PluginCatalogResult WasmPluginCatalog::DiscoverFromRoots(const std::vector<std::wstring>& roots) const {
     PluginCatalogResult result{};
-    std::set<std::string> seenPluginIds;
+    std::map<std::string, std::filesystem::path> seenPluginIds;
 
     for (const std::wstring& root : roots) {
         const std::vector<std::filesystem::path> manifests = FindManifestFiles(root);
@@ -95,8 +146,12 @@ PluginCatalogResult WasmPluginCatalog::DiscoverFromRoots(const std::vector<std::
                 AppendCatalogError(manifestPath, load.error, &result.errors);
                 continue;
             }
-            if (seenPluginIds.find(load.manifest.id) != seenPluginIds.end()) {
-                AppendCatalogError(manifestPath, "Duplicated plugin id.", &result.errors);
+            const std::string normalizedId = ToLowerAscii(load.manifest.id);
+            if (load.manifest.apiVersion != kPluginApiVersionCurrent) {
+                continue;
+            }
+            const auto duplicateIt = seenPluginIds.find(normalizedId);
+            if (duplicateIt != seenPluginIds.end()) {
                 continue;
             }
 
@@ -116,7 +171,7 @@ PluginCatalogResult WasmPluginCatalog::DiscoverFromRoots(const std::vector<std::
             plugin.manifestPath = manifestPath.wstring();
             plugin.wasmPath = wasmPath;
             result.plugins.push_back(std::move(plugin));
-            seenPluginIds.insert(load.manifest.id);
+            seenPluginIds[normalizedId] = manifestPath;
         }
     }
 

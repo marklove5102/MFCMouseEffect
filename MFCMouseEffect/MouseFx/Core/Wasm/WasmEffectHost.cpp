@@ -2,6 +2,18 @@
 
 #include "WasmEffectHost.h"
 
+#include "MouseFx/Core/Wasm/WasmRetainedGlowEmitterRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupClipRectRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupLocalOriginRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupPassRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupMaterialRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupLayerRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupPresentationRuntime.h"
+#include "MouseFx/Core/Wasm/WasmGroupTransformRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedParticleEmitterRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedQuadFieldRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedRibbonTrailRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedSpriteEmitterRuntime.h"
 #include "MouseFx/Utils/StringUtils.h"
 
 #include <utility>
@@ -21,6 +33,29 @@ std::string ClassifyManifestLoadFailure(const std::string& message) {
         return "manifest_json_parse_error";
     }
     return "manifest_invalid";
+}
+
+uint32_t InputKindBitForEventKind(EventKind kind) {
+    switch (kind) {
+    case EventKind::Click:
+        return kManifestInputKindClickBit;
+    case EventKind::Move:
+        return kManifestInputKindMoveBit;
+    case EventKind::Scroll:
+        return kManifestInputKindScrollBit;
+    case EventKind::HoldStart:
+        return kManifestInputKindHoldStartBit;
+    case EventKind::HoldUpdate:
+        return kManifestInputKindHoldUpdateBit;
+    case EventKind::HoldEnd:
+        return kManifestInputKindHoldEndBit;
+    case EventKind::HoverStart:
+        return kManifestInputKindHoverStartBit;
+    case EventKind::HoverEnd:
+        return kManifestInputKindHoverEndBit;
+    default:
+        return 0u;
+    }
 }
 
 } // namespace
@@ -77,7 +112,7 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
         diagnostics_.pluginApiVersion = 0;
         return false;
     }
-    if (apiVersion != kPluginApiVersionV1) {
+    if (apiVersion != kPluginApiVersionCurrent) {
         runtime_->UnloadModule();
         ClearActivePluginMetadata();
         SetLoadFailure("validate_api_version", "api_version_unsupported", "Unsupported plugin api_version.");
@@ -88,6 +123,7 @@ bool WasmEffectHost::LoadPlugin(const std::wstring& modulePath) {
 
     diagnostics_.pluginLoaded = true;
     diagnostics_.pluginApiVersion = apiVersion;
+    activeManifest_ = PluginManifest{};
     diagnostics_.activeWasmPath = modulePath;
     ClearLoadFailure();
     ClearError();
@@ -102,7 +138,7 @@ bool WasmEffectHost::LoadPluginFromManifest(const std::wstring& manifestPath) {
         SetLoadFailure("manifest_load", ClassifyManifestLoadFailure(loadError), loadError);
         return false;
     }
-    if (load.manifest.apiVersion != kPluginApiVersionV1) {
+    if (load.manifest.apiVersion != kPluginApiVersionCurrent) {
         SetLoadFailure(
             "manifest_api_version",
             "manifest_api_unsupported",
@@ -141,6 +177,18 @@ bool WasmEffectHost::ReloadPlugin() {
 }
 
 void WasmEffectHost::UnloadPlugin() {
+    if (!diagnostics_.activeManifestPath.empty()) {
+        ResetRetainedGlowEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedParticleEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedQuadFieldsForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedRibbonTrailsForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedSpriteEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetGroupClipRectsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupLocalOriginsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupTransformsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupPresentationsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupMaterialsForManifest(diagnostics_.activeManifestPath);
+    }
     if (runtime_) {
         runtime_->UnloadModule();
     }
@@ -159,6 +207,30 @@ void WasmEffectHost::UnloadPlugin() {
     diagnostics_.lastRenderedByWasm = false;
     diagnostics_.lastExecutedTextCommands = 0;
     diagnostics_.lastExecutedImageCommands = 0;
+    diagnostics_.lastExecutedPulseCommands = 0;
+    diagnostics_.lastExecutedPolylineCommands = 0;
+    diagnostics_.lastExecutedPathStrokeCommands = 0;
+    diagnostics_.lastExecutedPathFillCommands = 0;
+    diagnostics_.lastExecutedGlowBatchCommands = 0;
+    diagnostics_.lastExecutedSpriteBatchCommands = 0;
+    diagnostics_.lastExecutedGlowEmitterCommands = 0;
+    diagnostics_.lastExecutedGlowEmitterRemoveCommands = 0;
+    diagnostics_.lastExecutedSpriteEmitterCommands = 0;
+    diagnostics_.lastExecutedSpriteEmitterRemoveCommands = 0;
+    diagnostics_.lastExecutedParticleEmitterCommands = 0;
+    diagnostics_.lastExecutedParticleEmitterRemoveCommands = 0;
+    diagnostics_.lastExecutedRibbonTrailCommands = 0;
+    diagnostics_.lastExecutedRibbonTrailRemoveCommands = 0;
+    diagnostics_.lastExecutedQuadFieldCommands = 0;
+    diagnostics_.lastExecutedQuadFieldRemoveCommands = 0;
+    diagnostics_.lastExecutedGroupRemoveCommands = 0;
+    diagnostics_.lastExecutedGroupPresentationCommands = 0;
+    diagnostics_.lastExecutedGroupClipRectCommands = 0;
+    diagnostics_.lastExecutedGroupLayerCommands = 0;
+    diagnostics_.lastExecutedGroupTransformCommands = 0;
+    diagnostics_.lastExecutedGroupLocalOriginCommands = 0;
+    diagnostics_.lastExecutedGroupMaterialCommands = 0;
+    diagnostics_.lastExecutedGroupPassCommands = 0;
     diagnostics_.lastThrottledRenderCommands = 0;
     diagnostics_.lastThrottledByCapacityRenderCommands = 0;
     diagnostics_.lastThrottledByIntervalRenderCommands = 0;
@@ -171,6 +243,20 @@ bool WasmEffectHost::IsPluginLoaded() const {
 }
 
 void WasmEffectHost::SetEnabled(bool enabled) {
+    if (!enabled && enabled_ && !diagnostics_.activeManifestPath.empty()) {
+        ResetRetainedGlowEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedParticleEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedQuadFieldsForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedRibbonTrailsForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedSpriteEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetGroupClipRectsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupLayersForManifest(diagnostics_.activeManifestPath);
+        ResetGroupLocalOriginsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupPresentationsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupTransformsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupMaterialsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupPassesForManifest(diagnostics_.activeManifestPath);
+    }
     enabled_ = enabled;
     diagnostics_.enabled = enabled;
 }
@@ -187,6 +273,24 @@ const ExecutionBudget& WasmEffectHost::GetExecutionBudget() const {
     return budget_;
 }
 
+bool WasmEffectHost::SupportsInputEvent(EventKind kind) const {
+    if (!diagnostics_.pluginLoaded) {
+        return false;
+    }
+    const uint32_t bit = InputKindBitForEventKind(kind);
+    if (bit == 0u) {
+        return true;
+    }
+    return (activeManifest_.inputKindsMask & bit) != 0u;
+}
+
+bool WasmEffectHost::SupportsFrameTick() const {
+    if (!diagnostics_.pluginLoaded) {
+        return false;
+    }
+    return activeManifest_.enableFrameTick;
+}
+
 const HostDiagnostics& WasmEffectHost::Diagnostics() const {
     return diagnostics_;
 }
@@ -195,6 +299,30 @@ void WasmEffectHost::RecordRenderExecution(
     bool renderedByWasm,
     uint32_t executedTextCommands,
     uint32_t executedImageCommands,
+    uint32_t executedPulseCommands,
+    uint32_t executedPolylineCommands,
+    uint32_t executedPathStrokeCommands,
+    uint32_t executedPathFillCommands,
+    uint32_t executedGlowBatchCommands,
+    uint32_t executedSpriteBatchCommands,
+    uint32_t executedGlowEmitterCommands,
+    uint32_t executedGlowEmitterRemoveCommands,
+    uint32_t executedSpriteEmitterCommands,
+    uint32_t executedSpriteEmitterRemoveCommands,
+    uint32_t executedParticleEmitterCommands,
+    uint32_t executedParticleEmitterRemoveCommands,
+    uint32_t executedRibbonTrailCommands,
+    uint32_t executedRibbonTrailRemoveCommands,
+    uint32_t executedQuadFieldCommands,
+    uint32_t executedQuadFieldRemoveCommands,
+    uint32_t executedGroupRemoveCommands,
+    uint32_t executedGroupPresentationCommands,
+    uint32_t executedGroupClipRectCommands,
+    uint32_t executedGroupLayerCommands,
+    uint32_t executedGroupTransformCommands,
+    uint32_t executedGroupLocalOriginCommands,
+    uint32_t executedGroupMaterialCommands,
+    uint32_t executedGroupPassCommands,
     uint32_t throttledRenderCommands,
     uint32_t throttledByCapacityRenderCommands,
     uint32_t throttledByIntervalRenderCommands,
@@ -203,6 +331,30 @@ void WasmEffectHost::RecordRenderExecution(
     diagnostics_.lastRenderedByWasm = renderedByWasm;
     diagnostics_.lastExecutedTextCommands = executedTextCommands;
     diagnostics_.lastExecutedImageCommands = executedImageCommands;
+    diagnostics_.lastExecutedPulseCommands = executedPulseCommands;
+    diagnostics_.lastExecutedPolylineCommands = executedPolylineCommands;
+    diagnostics_.lastExecutedPathStrokeCommands = executedPathStrokeCommands;
+    diagnostics_.lastExecutedPathFillCommands = executedPathFillCommands;
+    diagnostics_.lastExecutedGlowBatchCommands = executedGlowBatchCommands;
+    diagnostics_.lastExecutedSpriteBatchCommands = executedSpriteBatchCommands;
+    diagnostics_.lastExecutedGlowEmitterCommands = executedGlowEmitterCommands;
+    diagnostics_.lastExecutedGlowEmitterRemoveCommands = executedGlowEmitterRemoveCommands;
+    diagnostics_.lastExecutedSpriteEmitterCommands = executedSpriteEmitterCommands;
+    diagnostics_.lastExecutedSpriteEmitterRemoveCommands = executedSpriteEmitterRemoveCommands;
+    diagnostics_.lastExecutedParticleEmitterCommands = executedParticleEmitterCommands;
+    diagnostics_.lastExecutedParticleEmitterRemoveCommands = executedParticleEmitterRemoveCommands;
+    diagnostics_.lastExecutedRibbonTrailCommands = executedRibbonTrailCommands;
+    diagnostics_.lastExecutedRibbonTrailRemoveCommands = executedRibbonTrailRemoveCommands;
+    diagnostics_.lastExecutedQuadFieldCommands = executedQuadFieldCommands;
+    diagnostics_.lastExecutedQuadFieldRemoveCommands = executedQuadFieldRemoveCommands;
+    diagnostics_.lastExecutedGroupRemoveCommands = executedGroupRemoveCommands;
+    diagnostics_.lastExecutedGroupPresentationCommands = executedGroupPresentationCommands;
+    diagnostics_.lastExecutedGroupClipRectCommands = executedGroupClipRectCommands;
+    diagnostics_.lastExecutedGroupLayerCommands = executedGroupLayerCommands;
+    diagnostics_.lastExecutedGroupTransformCommands = executedGroupTransformCommands;
+    diagnostics_.lastExecutedGroupLocalOriginCommands = executedGroupLocalOriginCommands;
+    diagnostics_.lastExecutedGroupMaterialCommands = executedGroupMaterialCommands;
+    diagnostics_.lastExecutedGroupPassCommands = executedGroupPassCommands;
     diagnostics_.lastThrottledRenderCommands = throttledRenderCommands;
     diagnostics_.lastThrottledByCapacityRenderCommands = throttledByCapacityRenderCommands;
     diagnostics_.lastThrottledByIntervalRenderCommands = throttledByIntervalRenderCommands;
@@ -214,6 +366,30 @@ void WasmEffectHost::RecordRenderExecution(
     }
     diagnostics_.lifetimeExecutedTextCommands += executedTextCommands;
     diagnostics_.lifetimeExecutedImageCommands += executedImageCommands;
+    diagnostics_.lifetimeExecutedPulseCommands += executedPulseCommands;
+    diagnostics_.lifetimeExecutedPolylineCommands += executedPolylineCommands;
+    diagnostics_.lifetimeExecutedPathStrokeCommands += executedPathStrokeCommands;
+    diagnostics_.lifetimeExecutedPathFillCommands += executedPathFillCommands;
+    diagnostics_.lifetimeExecutedGlowBatchCommands += executedGlowBatchCommands;
+    diagnostics_.lifetimeExecutedSpriteBatchCommands += executedSpriteBatchCommands;
+    diagnostics_.lifetimeExecutedGlowEmitterCommands += executedGlowEmitterCommands;
+    diagnostics_.lifetimeExecutedGlowEmitterRemoveCommands += executedGlowEmitterRemoveCommands;
+    diagnostics_.lifetimeExecutedSpriteEmitterCommands += executedSpriteEmitterCommands;
+    diagnostics_.lifetimeExecutedSpriteEmitterRemoveCommands += executedSpriteEmitterRemoveCommands;
+    diagnostics_.lifetimeExecutedParticleEmitterCommands += executedParticleEmitterCommands;
+    diagnostics_.lifetimeExecutedParticleEmitterRemoveCommands += executedParticleEmitterRemoveCommands;
+    diagnostics_.lifetimeExecutedRibbonTrailCommands += executedRibbonTrailCommands;
+    diagnostics_.lifetimeExecutedRibbonTrailRemoveCommands += executedRibbonTrailRemoveCommands;
+    diagnostics_.lifetimeExecutedQuadFieldCommands += executedQuadFieldCommands;
+    diagnostics_.lifetimeExecutedQuadFieldRemoveCommands += executedQuadFieldRemoveCommands;
+    diagnostics_.lifetimeExecutedGroupRemoveCommands += executedGroupRemoveCommands;
+    diagnostics_.lifetimeExecutedGroupPresentationCommands += executedGroupPresentationCommands;
+    diagnostics_.lifetimeExecutedGroupClipRectCommands += executedGroupClipRectCommands;
+    diagnostics_.lifetimeExecutedGroupLayerCommands += executedGroupLayerCommands;
+    diagnostics_.lifetimeExecutedGroupTransformCommands += executedGroupTransformCommands;
+    diagnostics_.lifetimeExecutedGroupLocalOriginCommands += executedGroupLocalOriginCommands;
+    diagnostics_.lifetimeExecutedGroupMaterialCommands += executedGroupMaterialCommands;
+    diagnostics_.lifetimeExecutedGroupPassCommands += executedGroupPassCommands;
     diagnostics_.lifetimeThrottledRenderCommands += throttledRenderCommands;
     diagnostics_.lifetimeThrottledByCapacityRenderCommands += throttledByCapacityRenderCommands;
     diagnostics_.lifetimeThrottledByIntervalRenderCommands += throttledByIntervalRenderCommands;
@@ -223,6 +399,19 @@ void WasmEffectHost::RecordRenderExecution(
 void WasmEffectHost::ResetPluginState() {
     if (runtime_ && diagnostics_.pluginLoaded) {
         runtime_->ResetPluginState();
+    }
+    if (!diagnostics_.activeManifestPath.empty()) {
+        ResetRetainedGlowEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedParticleEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedQuadFieldsForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedRibbonTrailsForManifest(diagnostics_.activeManifestPath);
+        ResetRetainedSpriteEmittersForManifest(diagnostics_.activeManifestPath);
+        ResetGroupClipRectsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupLayersForManifest(diagnostics_.activeManifestPath);
+        ResetGroupPresentationsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupTransformsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupMaterialsForManifest(diagnostics_.activeManifestPath);
+        ResetGroupPassesForManifest(diagnostics_.activeManifestPath);
     }
 }
 

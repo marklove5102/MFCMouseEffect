@@ -7,20 +7,20 @@
 - 宿主契约版本：`plugin.json` 的 `api_version`
 - ABI 入口函数：
   - `mfx_plugin_get_api_version()`
-  - 当前期望值：`1`
+  - 当前期望值：`2`
 
 两者都需要与宿主支持的 ABI 主版本一致。
 
 ## 2. ABI 兼容规则
 
-对于 ABI v1：
+对于 ABI v2：
 - 现有导出函数名保持不变；
 - 二进制结构体字段顺序保持不变；
 - 新字段只允许“尾部追加”；
 - 已存在枚举值不可修改含义。
-- 当前宿主要求插件导出 `mfx_plugin_on_event` 作为统一事件入口。
+- 当前宿主要求插件同时导出 `mfx_plugin_on_input` 与 `mfx_plugin_on_frame`。
 
-若要修改布局或函数契约，必须升级 ABI 主版本（v2+）。
+若要修改布局或函数契约，必须升级 ABI 主版本（v3+）。
 
 ## 3. Manifest 兼容规则
 
@@ -31,9 +31,15 @@
 - `api_version`
 - `entry`（wasm 相对路径）
 
+可选宿主路由字段：
+- `input_kinds`（字符串数组，默认 `all`）
+- `enable_frame_tick`（布尔值，默认 `true`）
+
 规则：
 - 升级插件时 `id` 应保持稳定；
 - `entry` 必须落在插件目录内；
+- `input_kinds` 只影响宿主输入路由范围，不改变 ABI 入口签名；
+- `enable_frame_tick=false` 时宿主不会调用 `mfx_plugin_on_frame`；
 - 宿主会忽略未知字段，作者可扩展私有元数据。
 
 ## 4. 运行时兜底行为
@@ -48,7 +54,7 @@
 
 ## 5. 给插件作者的升级建议
 
-- 按 ABI 主版本维护分支（如 `v1`、`v2`）；
+- 按 ABI 主版本维护分支（如 `v2`、`v3`）；
 - 用 tag/release 固定模板基线；
 - 宿主 ABI 主版本变化后重新编译插件；
 - 用以下接口验证：
@@ -58,5 +64,6 @@
 
 ## 6. 当前宿主兼容承诺
 
-- v1 宿主只接收 ABI v1 插件；
-- 宿主可增加诊断字段或可选 manifest 字段，不破坏 v1 插件。
+- v2 宿主只接收 ABI v2 插件；
+- 旧 ABI v1 插件当前不再兼容（项目尚未 release，允许破坏性升级）；
+- 宿主可增加诊断字段或可选 manifest 字段，不破坏 v2 插件。

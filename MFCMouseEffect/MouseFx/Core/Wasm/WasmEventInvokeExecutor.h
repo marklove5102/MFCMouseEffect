@@ -23,4 +23,15 @@ EventDispatchExecutionResult InvokeEventAndRender(
     const EffectConfig& config,
     IWasmCommandRenderer& renderer);
 
+EventDispatchExecutionResult InvokeFrameAndRender(
+    WasmEffectHost& host,
+    const FrameInvokeInput& input,
+    const EffectConfig& config);
+
+EventDispatchExecutionResult InvokeFrameAndRender(
+    WasmEffectHost& host,
+    const FrameInvokeInput& input,
+    const EffectConfig& config,
+    IWasmCommandRenderer& renderer);
+
 } // namespace mousefx::wasm

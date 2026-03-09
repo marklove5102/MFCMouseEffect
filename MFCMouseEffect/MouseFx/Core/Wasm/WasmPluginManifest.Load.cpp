@@ -92,6 +92,106 @@ bool TryReadImageAssetsField(
     return true;
 }
 
+std::string NormalizeInputKindToken(std::string token) {
+    token = ToLowerAscii(TrimAscii(token));
+    for (char& ch : token) {
+        if (ch == '-') {
+            ch = '_';
+        }
+    }
+    return token;
+}
+
+bool TryReadInputKindsField(
+    const json& node,
+    uint32_t* outMask,
+    std::string* outError) {
+    if (!outMask) {
+        return false;
+    }
+    if (!node.contains("input_kinds")) {
+        return true;
+    }
+    if (!node["input_kinds"].is_array()) {
+        if (outError) {
+            *outError = "Manifest field 'input_kinds' must be string array.";
+        }
+        return false;
+    }
+
+    uint32_t mask = 0u;
+    bool hasKind = false;
+    for (const auto& item : node["input_kinds"]) {
+        if (!item.is_string()) {
+            if (outError) {
+                *outError = "Manifest field 'input_kinds' must be string array.";
+            }
+            return false;
+        }
+        const std::string token = NormalizeInputKindToken(item.get<std::string>());
+        if (token.empty()) {
+            if (outError) {
+                *outError = "Manifest field 'input_kinds' must not contain empty item.";
+            }
+            return false;
+        }
+        if (token == "all") {
+            mask = kManifestInputKindAllBits;
+            hasKind = true;
+            break;
+        }
+        if (token == "click") {
+            mask |= kManifestInputKindClickBit;
+        } else if (token == "move") {
+            mask |= kManifestInputKindMoveBit;
+        } else if (token == "scroll") {
+            mask |= kManifestInputKindScrollBit;
+        } else if (token == "hold_start" || token == "holdstart") {
+            mask |= kManifestInputKindHoldStartBit;
+        } else if (token == "hold_update" || token == "holdupdate") {
+            mask |= kManifestInputKindHoldUpdateBit;
+        } else if (token == "hold_end" || token == "holdend") {
+            mask |= kManifestInputKindHoldEndBit;
+        } else if (token == "hover_start" || token == "hoverstart") {
+            mask |= kManifestInputKindHoverStartBit;
+        } else if (token == "hover_end" || token == "hoverend") {
+            mask |= kManifestInputKindHoverEndBit;
+        } else {
+            if (outError) {
+                *outError = std::string("Manifest field 'input_kinds' contains unsupported value: ") + token;
+            }
+            return false;
+        }
+        hasKind = true;
+    }
+
+    if (!hasKind || mask == 0u) {
+        if (outError) {
+            *outError = "Manifest field 'input_kinds' must include at least one input kind.";
+        }
+        return false;
+    }
+    *outMask = mask;
+    return true;
+}
+
+bool TryReadEnableFrameTickField(const json& node, bool* outEnable, std::string* outError) {
+    if (!outEnable) {
+        return false;
+    }
+    if (!node.contains("enable_frame_tick")) {
+        return true;
+    }
+    if (!node["enable_frame_tick"].is_boolean()) {
+        if (outError) {
+            *outError = "Manifest field 'enable_frame_tick' must be boolean.";
+        }
+        return false;
+    }
+    *outEnable = node["enable_frame_tick"].get<bool>();
+    return true;
+}
+
 } // namespace
 
 PluginManifestLoadResult WasmPluginManifest::LoadFromFile(const std::wstring& manifestPath) {
@@ -142,6 +242,12 @@ PluginManifestLoadResult WasmPluginManifest::LoadFromFile(const std::wstring& ma
     }
     manifest.entryWasm = Utf8ToWString(entryUtf8);
     if (!TryReadImageAssetsField(root, &manifest.imageAssets, &result.error)) {
+        return result;
+    }
+    if (!TryReadInputKindsField(root, &manifest.inputKindsMask, &result.error)) {
+        return result;
+    }
+    if (!TryReadEnableFrameTickField(root, &manifest.enableFrameTick, &result.error)) {
         return result;
     }
 

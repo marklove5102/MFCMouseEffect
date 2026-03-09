@@ -98,6 +98,13 @@ void SetOverlayTargetFps(int targetFps) {
     mfx_macos_overlay_set_target_fps_v1(static_cast<int32_t>(sanitized));
 }
 
+int ResolveOverlayTimerIntervalMs(const ScreenPoint& overlayPt) {
+    const int intervalMs = mfx_macos_overlay_timer_interval_ms_v1(
+        overlayPt.x,
+        overlayPt.y);
+    return std::clamp(intervalMs, 4, 1000);
+}
+
 bool ResolveScreenFrameForPoint(const ScreenPoint& overlayPt, NSRect* frameOut) {
     if (frameOut == nullptr) {
         return false;

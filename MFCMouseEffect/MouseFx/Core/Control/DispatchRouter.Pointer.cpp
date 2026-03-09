@@ -28,15 +28,6 @@ std::string HoldMovePolicy(AppController* controller) {
     return controller->Config().effectConflictPolicy.holdMovePolicy;
 }
 
-bool ShouldForceBuiltinTrailOnMove(const std::string& normalizedTrailType) {
-    return normalizedTrailType == "line" ||
-           normalizedTrailType == "streamer" ||
-           normalizedTrailType == "electric" ||
-           normalizedTrailType == "meteor" ||
-           normalizedTrailType == "tubes" ||
-           normalizedTrailType == "particle";
-}
-
 bool ShouldSuppressTrailWhileHold(AppController* controller) {
     if (!controller) {
         return false;
@@ -130,18 +121,9 @@ intptr_t DispatchRouter::OnMove(const DispatchMessage& message) {
     const bool suppressHoldUpdateByPolicy = ShouldSuppressHoldUpdateWhileMove(ctrl_);
 
     IMouseEffect* trailEffect = ctrl_->GetEffect(EffectCategory::Trail);
-    bool forceBuiltinTrailOnMove = false;
-    if (trailEffect != nullptr) {
-        const std::string normalizedTrailType = NormalizeTrailEffectType(trailEffect->TypeName());
-        // Built-in trail types are rendered by native trail lane. Keep wasm move
-        // routing out of these types to avoid route-switch gaps during hold state
-        // transitions (blend/move-only).
-        forceBuiltinTrailOnMove = ShouldForceBuiltinTrailOnMove(normalizedTrailType);
-    }
-
     bool moveRenderedByWasm = false;
     bool moveRouteActive = false;
-    if (!forceBuiltinTrailOnMove && !suppressTrailByPolicy) {
+    if (!suppressTrailByPolicy) {
         moveRouteActive = wasmFeature_.RouteMove(*ctrl_, pt, &moveRenderedByWasm);
     }
     if (!suppressTrailByPolicy &&
@@ -186,22 +168,9 @@ intptr_t DispatchRouter::OnScroll(const DispatchMessage& message) {
     indicatorFeature_.OnScroll(*ctrl_, ev);
 
     IMouseEffect* scrollEffect = ctrl_->GetEffect(EffectCategory::Scroll);
-    bool forceBuiltinScrollOnWheel = false;
-    if (scrollEffect != nullptr) {
-        const std::string normalizedScrollType = NormalizeScrollEffectType(scrollEffect->TypeName());
-        // Keep built-in scroll visual types on native effect lane so macOS scroll
-        // rendering stays aligned with Windows behavior under shared compute input.
-        forceBuiltinScrollOnWheel =
-            (normalizedScrollType == "arrow") ||
-            (normalizedScrollType == "helix") ||
-            (normalizedScrollType == "twinkle");
-    }
-
     bool scrollRenderedByWasm = false;
     bool scrollRouteActive = false;
-    if (!forceBuiltinScrollOnWheel) {
-        scrollRouteActive = wasmFeature_.RouteScroll(*ctrl_, ev, &scrollRenderedByWasm);
-    }
+    scrollRouteActive = wasmFeature_.RouteScroll(*ctrl_, ev, &scrollRenderedByWasm);
     if ((!scrollRouteActive || !scrollRenderedByWasm) &&
         (scrollEffect != nullptr)) {
         scrollEffect->OnScroll(ev);
@@ -264,6 +233,15 @@ intptr_t DispatchRouter::OnButtonUp(const DispatchMessage& message) {
 
 intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
     const uintptr_t timerId = static_cast<uintptr_t>(message.timerId);
+    if (timerId == AppController::WasmFrameTimerId()) {
+        if (ctrl_->IsVmEffectsSuppressed()) {
+            return 0;
+        }
+        bool renderedByWasm = false;
+        wasmFeature_.RouteFrameTick(*ctrl_, &renderedByWasm);
+        return 0;
+    }
+
     if (timerId == AppController::HoverTimerId()) {
         if (ctrl_->IsVmEffectsSuppressed()) {
             return 0;

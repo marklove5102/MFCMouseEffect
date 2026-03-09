@@ -7,6 +7,7 @@ EXPORTS
     mfx_wasm_runtime_unload_module
     mfx_wasm_runtime_is_module_loaded
     mfx_wasm_runtime_call_get_api_version
-    mfx_wasm_runtime_call_on_event
+    mfx_wasm_runtime_call_on_input
+    mfx_wasm_runtime_call_on_frame
     mfx_wasm_runtime_reset_plugin
     mfx_wasm_runtime_last_error

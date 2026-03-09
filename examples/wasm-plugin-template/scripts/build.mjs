@@ -3,6 +3,7 @@ import {
   compileAssemblyScript,
   copyRelativeFiles,
   loadTemplateManifest,
+  resetOutputDir,
   resolveTemplateRoot,
   writeManifest,
 } from "./build-lib.mjs";
@@ -12,6 +13,7 @@ const distDir = resolve(rootDir, "dist");
 
 try {
   const manifest = loadTemplateManifest(rootDir);
+  resetOutputDir(distDir, { preserveNames: ["samples"] });
   compileAssemblyScript({
     rootDir,
     entryRelativePath: "assembly/index.ts",

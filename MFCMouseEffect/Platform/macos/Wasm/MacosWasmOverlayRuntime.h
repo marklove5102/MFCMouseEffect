@@ -39,6 +39,18 @@ size_t GetWasmOverlayInFlightCount();
 WasmOverlayThrottleCounters GetWasmOverlayThrottleCounters();
 void RecordWasmImageOverlayRenderRequest(bool hasAsset, bool applyTint);
 WasmImageOverlayRenderCounters GetWasmImageOverlayRenderCounters();
+void RecordWasmPulseOverlayRenderRequest();
+uint64_t GetWasmPulseOverlayRenderRequestCount();
+void RecordWasmPolylineOverlayRenderRequest();
+uint64_t GetWasmPolylineOverlayRenderRequestCount();
+void RecordWasmPathStrokeOverlayRenderRequest();
+uint64_t GetWasmPathStrokeOverlayRenderRequestCount();
+void RecordWasmPathFillOverlayRenderRequest();
+uint64_t GetWasmPathFillOverlayRenderRequestCount();
+void RecordWasmGlowBatchOverlayRenderRequest();
+uint64_t GetWasmGlowBatchOverlayRenderRequestCount();
+void RecordWasmSpriteBatchOverlayRenderRequest();
+uint64_t GetWasmSpriteBatchOverlayRenderRequestCount();
 
 void RegisterWasmOverlayWindow(void* windowHandle);
 bool TakeWasmOverlayWindow(void* windowHandle);

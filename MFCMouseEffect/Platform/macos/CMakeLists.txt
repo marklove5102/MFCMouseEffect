@@ -113,6 +113,15 @@ if(APPLE)
     mfx_add_swift_bridge("Platform/macos/Shell/MacosTrayMenuBridge.swift" "tray menu bridge")
     mfx_add_swift_bridge("Platform/macos/Shell/MacosEventLoopBridge.swift" "event loop bridge")
     mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmImageOverlayBridge.swift" "WASM image overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmPolylineOverlayBridge.swift" "WASM polyline overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmPathStrokeOverlayBridge.swift" "WASM path-stroke overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmPathFillOverlayBridge.swift" "WASM path-fill overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmGlowBatchOverlayBridge.swift" "WASM glow-batch overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmSpriteBatchOverlayBridge.swift" "WASM sprite-batch overlay bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmRetainedGlowEmitterBridge.swift" "WASM retained glow emitter bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmRetainedQuadFieldBridge.swift" "WASM retained quad field bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmRetainedRibbonTrailBridge.swift" "WASM retained ribbon trail bridge")
+    mfx_add_swift_bridge("Platform/macos/Wasm/MacosWasmRetainedSpriteEmitterBridge.swift" "WASM retained sprite emitter bridge")
 endif()
 
 add_library(mfx_shell_macos STATIC
@@ -188,8 +197,25 @@ add_library(mfx_shell_macos STATIC
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.Text.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.Image.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.Pulse.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.Polyline.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.PathStroke.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.PathFill.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.GlowBatch.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.GlowEmitter.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.Group.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.ParticleEmitter.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.QuadField.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.RibbonTrail.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.SpriteEmitter.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderDispatch.SpriteBatch.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmCommandRenderResolvers.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmImageOverlayRenderer.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmPolylineOverlayRenderer.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmPathStrokeOverlayRenderer.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmPathFillOverlayRenderer.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmGlowBatchOverlayRenderer.cpp"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmSpriteBatchOverlayRenderer.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmImageOverlayRendererCore.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmImageOverlayRendererCore.Window.cpp"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm/MacosWasmImageOverlayRendererCore.Plan.cpp"

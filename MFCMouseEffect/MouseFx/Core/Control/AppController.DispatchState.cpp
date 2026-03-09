@@ -3,6 +3,14 @@
 #include "AppController.h"
 
 #include <algorithm>
+#include <cmath>
+
+#include "Platform/PlatformTarget.h"
+#if MFX_PLATFORM_MACOS
+#include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
+#elif MFX_PLATFORM_WINDOWS
+#include "Platform/windows/Overlay/Win32OverlayTimerSupport.h"
+#endif
 
 namespace mousefx {
 
@@ -106,6 +114,20 @@ void AppController::DisarmHoldUpdateTimer() {
     }
 }
 
+void AppController::ArmWasmFrameTimer() {
+    if (!dispatchMessageHost_ || !dispatchMessageHost_->IsCreated()) {
+        return;
+    }
+    dispatchMessageHost_->SetTimer(kWasmFrameTimerId, ResolveWasmFrameTimerIntervalMs());
+}
+
+void AppController::DisarmWasmFrameTimer() {
+    if (!dispatchMessageHost_ || !dispatchMessageHost_->IsCreated()) {
+        return;
+    }
+    dispatchMessageHost_->KillTimer(kWasmFrameTimerId);
+}
+
 void AppController::ClearPendingHold() {
     pendingHold_.active = false;
 }
@@ -178,6 +200,26 @@ bool AppController::TryGetLastPointerPoint(ScreenPoint* outPt) const {
     }
     *outPt = lastPointerPoint_;
     return true;
+}
+
+uint32_t AppController::ResolveWasmFrameTimerIntervalMs() const {
+    ScreenPoint pt{};
+    if (!QueryCursorScreenPoint(&pt) && !TryGetLastPointerPoint(&pt)) {
+        pt.x = 0;
+        pt.y = 0;
+    }
+
+    int intervalMs = 16;
+#if MFX_PLATFORM_MACOS
+    intervalMs = macos_overlay_support::ResolveOverlayTimerIntervalMs(pt);
+#elif MFX_PLATFORM_WINDOWS
+    intervalMs = win32_overlay_timer_support::ResolveTimerIntervalMsForScreenPoint(pt.x, pt.y);
+#else
+    const int targetFps = (config_.overlayTargetFps > 0) ? config_.overlayTargetFps : 60;
+    intervalMs = static_cast<int>(
+        std::lround(1000.0 / static_cast<double>(std::max(1, targetFps))));
+#endif
+    return static_cast<uint32_t>(std::clamp(intervalMs, 4, 1000));
 }
 
 std::string AppController::CurrentForegroundProcessBaseName() {

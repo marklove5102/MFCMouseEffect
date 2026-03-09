@@ -143,6 +143,19 @@ bool WasmPluginManifest::Validate(const PluginManifest& manifest, std::string* o
         }
     }
 
+    if ((manifest.inputKindsMask & ~kManifestInputKindAllBits) != 0u) {
+        if (outError) {
+            *outError = "Manifest input_kinds contains unsupported bits.";
+        }
+        return false;
+    }
+    if (manifest.inputKindsMask == 0u) {
+        if (outError) {
+            *outError = "Manifest input_kinds must include at least one input kind.";
+        }
+        return false;
+    }
+
     if (outError) {
         outError->clear();
     }

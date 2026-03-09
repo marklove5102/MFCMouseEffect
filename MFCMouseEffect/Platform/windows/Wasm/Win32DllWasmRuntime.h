@@ -18,7 +18,14 @@ public:
     bool IsModuleLoaded() const override;
 
     bool CallGetApiVersion(uint32_t* outApiVersion, std::string* outError) override;
-    bool CallOnEvent(
+    bool CallOnInput(
+        const uint8_t* inputPtr,
+        uint32_t inputLen,
+        uint8_t* outputPtr,
+        uint32_t outputCap,
+        uint32_t* outWrittenBytes,
+        std::string* outError) override;
+    bool CallOnFrame(
         const uint8_t* inputPtr,
         uint32_t inputLen,
         uint8_t* outputPtr,
@@ -35,7 +42,8 @@ private:
     using UnloadModuleFn = void(__cdecl*)(void*);
     using IsModuleLoadedFn = int(__cdecl*)(void*);
     using GetApiVersionFn = int(__cdecl*)(void*, uint32_t*);
-    using OnEventFn = int(__cdecl*)(void*, const uint8_t*, uint32_t, uint8_t*, uint32_t, uint32_t*);
+    using OnInputFn = int(__cdecl*)(void*, const uint8_t*, uint32_t, uint8_t*, uint32_t, uint32_t*);
+    using OnFrameFn = int(__cdecl*)(void*, const uint8_t*, uint32_t, uint8_t*, uint32_t, uint32_t*);
     using ResetFn = void(__cdecl*)(void*);
     using LastErrorFn = const char* (__cdecl*)(void*);
 
@@ -51,10 +59,10 @@ private:
     UnloadModuleFn unloadModuleFn_ = nullptr;
     IsModuleLoadedFn isModuleLoadedFn_ = nullptr;
     GetApiVersionFn getApiVersionFn_ = nullptr;
-    OnEventFn onEventFn_ = nullptr;
+    OnInputFn onInputFn_ = nullptr;
+    OnFrameFn onFrameFn_ = nullptr;
     ResetFn resetFn_ = nullptr;
     LastErrorFn lastErrorFn_ = nullptr;
 };
 
 } // namespace mousefx::wasm
-

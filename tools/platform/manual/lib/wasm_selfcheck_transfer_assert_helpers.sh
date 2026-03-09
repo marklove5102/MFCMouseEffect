@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+_mfx_wasm_selfcheck_transfer_assert_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_mfx_wasm_selfcheck_transfer_assert_dir/../../regression/lib/wasm_catalog_contract_helpers.sh"
+
 mfx_wasm_selfcheck_assert_import_selected_ok() {
     local label="$1"
     local output_file="$2"
@@ -103,4 +106,23 @@ mfx_wasm_selfcheck_assert_import_dialog_probe_trimmed_initial_path() {
     local selected_folder_path
     selected_folder_path="$(mfx_wasm_selfcheck_parse_string_field "$output_file" "selected_folder_path")"
     mfx_assert_eq "$selected_folder_path" "$initial_path" "selfcheck $label selected folder path"
+}
+
+mfx_wasm_selfcheck_assert_catalog_capability_fields() {
+    local label="$1"
+    local output_file="$2"
+    mfx_wasm_catalog_assert_capability_fields "$output_file" "selfcheck $label"
+}
+
+mfx_wasm_selfcheck_write_catalog_negative_fixture() {
+    local source_file="$1"
+    local output_file="$2"
+    local mode="$3"
+    mfx_wasm_catalog_write_negative_fixture "$source_file" "$output_file" "$mode"
+}
+
+mfx_wasm_selfcheck_assert_catalog_capability_fields_rejects() {
+    local label="$1"
+    local output_file="$2"
+    mfx_wasm_catalog_assert_capability_fields_rejects "$output_file" "selfcheck $label"
 }

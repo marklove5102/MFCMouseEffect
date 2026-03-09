@@ -7,6 +7,8 @@
 #include "MouseFx/Core/Wasm/WasmEventInvokeExecutor.h"
 #include "MouseFx/Interfaces/IMouseEffect.h"
 
+#include <algorithm>
+
 namespace mousefx {
 
 uint8_t WasmDispatchFeature::ToWasmButton(MouseButton button) {
@@ -54,6 +56,9 @@ bool WasmDispatchFeature::TryInvokeAndRender(
 
     auto* wasmHost = controller.WasmHost();
     if (!wasmHost || !wasmHost->Enabled() || !wasmHost->IsPluginLoaded()) {
+        return false;
+    }
+    if (!wasmHost->SupportsInputEvent(input.kind)) {
         return false;
     }
 
@@ -109,9 +114,7 @@ bool WasmDispatchFeature::RouteClick(AppController& controller, const ClickEvent
     invoke.button = ToWasmButton(ev.button);
     invoke.eventTickMs = controller.CurrentTickMs();
 
-    bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, outRenderedByWasm, &invokeOk);
-    return true;
+    return TryInvokeAndRender(controller, invoke, outRenderedByWasm, nullptr);
 }
 
 bool WasmDispatchFeature::RouteMove(AppController& controller, const ScreenPoint& pt, bool* outRenderedByWasm) {
@@ -128,9 +131,7 @@ bool WasmDispatchFeature::RouteMove(AppController& controller, const ScreenPoint
     invoke.y = pt.y;
     invoke.eventTickMs = controller.CurrentTickMs();
 
-    bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, outRenderedByWasm, &invokeOk);
-    return true;
+    return TryInvokeAndRender(controller, invoke, outRenderedByWasm, nullptr);
 }
 
 bool WasmDispatchFeature::RouteScroll(AppController& controller, const ScrollEvent& ev, bool* outRenderedByWasm) {
@@ -149,9 +150,7 @@ bool WasmDispatchFeature::RouteScroll(AppController& controller, const ScrollEve
     invoke.flags = ev.horizontal ? wasm::kEventFlagScrollHorizontal : 0x00u;
     invoke.eventTickMs = controller.CurrentTickMs();
 
-    bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, outRenderedByWasm, &invokeOk);
-    return true;
+    return TryInvokeAndRender(controller, invoke, outRenderedByWasm, nullptr);
 }
 
 bool WasmDispatchFeature::RouteHoverStart(AppController& controller, const ScreenPoint& pt, bool* outRenderedByWasm) {
@@ -168,8 +167,76 @@ bool WasmDispatchFeature::RouteHoverStart(AppController& controller, const Scree
     invoke.y = pt.y;
     invoke.eventTickMs = controller.CurrentTickMs();
 
-    bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, outRenderedByWasm, &invokeOk);
+    return TryInvokeAndRender(controller, invoke, outRenderedByWasm, nullptr);
+}
+
+bool WasmDispatchFeature::RouteHoverEnd(AppController& controller, const ScreenPoint& pt, bool* outRenderedByWasm) {
+    if (outRenderedByWasm) {
+        *outRenderedByWasm = false;
+    }
+    if (!IsRouteActive(controller)) {
+        return false;
+    }
+
+    wasm::EventInvokeInput invoke{};
+    invoke.kind = wasm::EventKind::HoverEnd;
+    invoke.x = pt.x;
+    invoke.y = pt.y;
+    invoke.eventTickMs = controller.CurrentTickMs();
+
+    return TryInvokeAndRender(controller, invoke, outRenderedByWasm, nullptr);
+}
+
+bool WasmDispatchFeature::RouteFrameTick(AppController& controller, bool* outRenderedByWasm) {
+    if (outRenderedByWasm) {
+        *outRenderedByWasm = false;
+    }
+    if (!IsRouteActive(controller)) {
+        lastFrameTickMs_ = 0;
+        return false;
+    }
+
+    const uint64_t nowTickMs = controller.CurrentTickMs();
+    uint32_t frameDeltaMs = 16;
+    if (lastFrameTickMs_ > 0 && nowTickMs >= lastFrameTickMs_) {
+        const uint64_t delta = nowTickMs - lastFrameTickMs_;
+        frameDeltaMs = static_cast<uint32_t>(std::clamp<uint64_t>(delta, 1, 1000));
+    }
+    lastFrameTickMs_ = nowTickMs;
+
+    ScreenPoint cursorPt{};
+    bool pointerValid = controller.QueryCursorScreenPoint(&cursorPt);
+    if (!pointerValid) {
+        pointerValid = controller.TryGetLastPointerPoint(&cursorPt);
+    } else {
+        controller.RememberLastPointerPoint(cursorPt);
+    }
+    if (!pointerValid) {
+        cursorPt.x = 0;
+        cursorPt.y = 0;
+    }
+
+    wasm::FrameInvokeInput invoke{};
+    invoke.cursorX = cursorPt.x;
+    invoke.cursorY = cursorPt.y;
+    invoke.frameDeltaMs = frameDeltaMs;
+    invoke.pointerValid = pointerValid;
+    invoke.holdActive = controller.IsHoldButtonDown();
+    invoke.frameTickMs = nowTickMs;
+
+    auto* wasmHost = controller.WasmHost();
+    if (!wasmHost || !wasmHost->Enabled() || !wasmHost->IsPluginLoaded()) {
+        return false;
+    }
+    if (!wasmHost->SupportsFrameTick()) {
+        lastFrameTickMs_ = 0;
+        return false;
+    }
+    const wasm::EventDispatchExecutionResult dispatchResult =
+        wasm::InvokeFrameAndRender(*wasmHost, invoke, controller.Config());
+    if (outRenderedByWasm) {
+        *outRenderedByWasm = dispatchResult.render.renderedAny;
+    }
     return true;
 }
 
@@ -196,14 +263,27 @@ bool WasmDispatchFeature::RouteHoldStart(
     invoke.eventTickMs = controller.CurrentTickMs();
 
     bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, outRenderedByWasm, &invokeOk);
-    holdEventActive_ = invokeOk;
-    holdButton_ = invoke.button;
-    return true;
+    const bool routed = TryInvokeAndRender(controller, invoke, outRenderedByWasm, &invokeOk);
+    holdEventActive_ = routed && invokeOk;
+    holdButton_ = holdEventActive_ ? invoke.button : 0;
+    return routed;
 }
 
 void WasmDispatchFeature::RouteHoldUpdateIfActive(AppController& controller, const ScreenPoint& pt, uint32_t holdMs) {
     if (!holdEventActive_) {
+        return;
+    }
+    if (!IsRouteActive(controller)) {
+        ResetHoldState();
+        return;
+    }
+    auto* wasmHost = controller.WasmHost();
+    if (!wasmHost) {
+        ResetHoldState();
+        return;
+    }
+    if (!wasmHost->SupportsInputEvent(wasm::EventKind::HoldUpdate)) {
+        // Keep hold state alive for a potential HoldEnd route.
         return;
     }
 
@@ -217,8 +297,8 @@ void WasmDispatchFeature::RouteHoldUpdateIfActive(AppController& controller, con
 
     bool renderedByWasm = false;
     bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, &renderedByWasm, &invokeOk);
-    if (!invokeOk) {
+    const bool routed = TryInvokeAndRender(controller, invoke, &renderedByWasm, &invokeOk);
+    if (!routed || !invokeOk) {
         ResetHoldState();
     }
 }
@@ -236,8 +316,7 @@ void WasmDispatchFeature::RouteHoldEndIfActive(AppController& controller, const 
     invoke.eventTickMs = controller.CurrentTickMs();
 
     bool renderedByWasm = false;
-    bool invokeOk = false;
-    TryInvokeAndRender(controller, invoke, &renderedByWasm, &invokeOk);
+    TryInvokeAndRender(controller, invoke, &renderedByWasm, nullptr);
     ResetHoldState();
 }
 

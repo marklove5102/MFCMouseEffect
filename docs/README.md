@@ -32,6 +32,10 @@ Compact AI-first index for fast navigation. This file is intentionally short and
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/trail-profiles-config.md`
 
+## Targeted Architecture Docs
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-abi-v3-design.md`
+
 ## Targeted Retrieval
 ```bash
 # latest refactoring docs

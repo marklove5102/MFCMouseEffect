@@ -42,6 +42,10 @@
         name: `${value.name || ''}`.trim(),
         version: `${value.version || ''}`.trim(),
         api_version: Number(value.api_version) || 0,
+        input_kinds: Array.isArray(value.input_kinds)
+          ? value.input_kinds.map((item) => `${item || ''}`.trim()).filter((item) => item.length > 0)
+          : [],
+        enable_frame_tick: value.enable_frame_tick !== false,
         manifest_path: manifestPath,
         wasm_path: `${value.wasm_path || ''}`.trim(),
       });
@@ -85,9 +89,17 @@
     const version = `${plugin?.version || ''}`.trim();
     const title = name || id || text('wasm_text_unknown_plugin', 'Unknown plugin');
     if (!version) {
-      return title;
+      return `${title}${pluginRouteLabel(plugin)}`;
     }
-    return `${title} (${version})`;
+    return `${title} (${version})${pluginRouteLabel(plugin)}`;
+  }
+
+  function pluginRouteLabel(plugin) {
+    const kinds = Array.isArray(plugin?.input_kinds) && plugin.input_kinds.length > 0
+      ? plugin.input_kinds.join('/')
+      : 'all';
+    const frame = plugin?.enable_frame_tick === false ? 'frame:off' : 'frame:on';
+    return ` [${kinds}; ${frame}]`;
   }
 
   function normalizeManifestPathForCompare(path) {
@@ -100,8 +112,10 @@
 
   function renderStatsText(snapshot) {
     const s = snapshot || normalizeWasmState({});
-    return `${text('label_wasm_last_rendered', 'Rendered by WASM')}: ${boolText(s.last_rendered_by_wasm)}, `
+      return `${text('label_wasm_last_rendered', 'Rendered by WASM')}: ${boolText(s.last_rendered_by_wasm)}, `
       + `text=${s.last_executed_text_commands}, image=${s.last_executed_image_commands}, `
+      + `pulse=${s.last_executed_pulse_commands}, polyline=${s.last_executed_polyline_commands}, pathStroke=${s.last_executed_path_stroke_commands}, pathFill=${s.last_executed_path_fill_commands}, glow=${s.last_executed_glow_batch_commands}, sprite=${s.last_executed_sprite_batch_commands}, `
+      + `glowEmitter=${s.last_executed_glow_emitter_commands}, spriteEmitter=${s.last_executed_sprite_emitter_commands}, `
       + `${text('label_wasm_throttled_commands', 'Throttled')}=${s.last_throttled_render_commands} `
       + `(cap=${s.last_throttled_by_capacity_render_commands}, int=${s.last_throttled_by_interval_render_commands}), `
       + `${text('label_wasm_dropped_commands', 'Dropped commands')}=${s.last_dropped_render_commands}`;

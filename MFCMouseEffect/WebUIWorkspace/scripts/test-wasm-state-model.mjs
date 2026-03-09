@@ -25,6 +25,22 @@ runTest('empty input returns zeroed lifetime diagnostics', () => {
   assert.equal(state.lifetime_rendered_by_wasm_dispatches, 0);
   assert.equal(state.lifetime_executed_text_commands, 0);
   assert.equal(state.lifetime_executed_image_commands, 0);
+  assert.equal(state.lifetime_executed_pulse_commands, 0);
+  assert.equal(state.lifetime_executed_polyline_commands, 0);
+  assert.equal(state.lifetime_executed_path_stroke_commands, 0);
+  assert.equal(state.lifetime_executed_path_fill_commands, 0);
+  assert.equal(state.lifetime_executed_glow_batch_commands, 0);
+  assert.equal(state.lifetime_executed_sprite_batch_commands, 0);
+  assert.equal(state.lifetime_executed_glow_emitter_commands, 0);
+  assert.equal(state.lifetime_executed_sprite_emitter_commands, 0);
+  assert.equal(state.lifetime_executed_particle_emitter_commands, 0);
+  assert.equal(state.lifetime_executed_ribbon_trail_commands, 0);
+  assert.equal(state.lifetime_executed_quad_field_commands, 0);
+  assert.equal(state.lifetime_executed_group_remove_commands, 0);
+  assert.equal(state.lifetime_executed_group_presentation_commands, 0);
+  assert.equal(state.lifetime_executed_group_clip_rect_commands, 0);
+  assert.equal(state.lifetime_executed_group_layer_commands, 0);
+  assert.equal(state.lifetime_executed_group_transform_commands, 0);
   assert.equal(state.lifetime_throttled_render_commands, 0);
   assert.equal(state.lifetime_throttled_by_capacity_render_commands, 0);
   assert.equal(state.lifetime_throttled_by_interval_render_commands, 0);
@@ -43,6 +59,31 @@ runTest('normalizes lifetime diagnostics from numeric input', () => {
     lifetime_rendered_by_wasm_dispatches: 6,
     lifetime_executed_text_commands: 32,
     lifetime_executed_image_commands: 14,
+    lifetime_executed_pulse_commands: 5,
+    lifetime_executed_polyline_commands: 7,
+    lifetime_executed_path_stroke_commands: 3,
+    lifetime_executed_path_fill_commands: 2,
+    lifetime_executed_glow_batch_commands: 9,
+    lifetime_executed_sprite_batch_commands: 4,
+    lifetime_executed_glow_emitter_commands: 2,
+    lifetime_executed_sprite_emitter_commands: 3,
+    lifetime_executed_particle_emitter_commands: 5,
+    lifetime_executed_particle_emitter_remove_commands: 1,
+    lifetime_executed_ribbon_trail_commands: 2,
+    lifetime_executed_ribbon_trail_remove_commands: 1,
+    lifetime_executed_quad_field_commands: 3,
+    lifetime_executed_quad_field_remove_commands: 1,
+    lifetime_executed_group_remove_commands: 2,
+    lifetime_executed_group_presentation_commands: 4,
+    lifetime_executed_group_clip_rect_commands: 3,
+    lifetime_executed_group_layer_commands: 5,
+    lifetime_executed_group_transform_commands: 6,
+    retained_ribbon_trail_upsert_requests: 4,
+    retained_ribbon_trail_remove_requests: 1,
+    retained_ribbon_trail_active_count: 1,
+    retained_quad_field_upsert_requests: 2,
+    retained_quad_field_remove_requests: 1,
+    retained_quad_field_active_count: 1,
     lifetime_throttled_render_commands: 5,
     lifetime_throttled_by_capacity_render_commands: 3,
     lifetime_throttled_by_interval_render_commands: 2,
@@ -59,6 +100,31 @@ runTest('normalizes lifetime diagnostics from numeric input', () => {
   assert.equal(state.lifetime_rendered_by_wasm_dispatches, 6);
   assert.equal(state.lifetime_executed_text_commands, 32);
   assert.equal(state.lifetime_executed_image_commands, 14);
+  assert.equal(state.lifetime_executed_pulse_commands, 5);
+  assert.equal(state.lifetime_executed_polyline_commands, 7);
+  assert.equal(state.lifetime_executed_path_stroke_commands, 3);
+  assert.equal(state.lifetime_executed_path_fill_commands, 2);
+  assert.equal(state.lifetime_executed_glow_batch_commands, 9);
+  assert.equal(state.lifetime_executed_sprite_batch_commands, 4);
+  assert.equal(state.lifetime_executed_glow_emitter_commands, 2);
+  assert.equal(state.lifetime_executed_sprite_emitter_commands, 3);
+  assert.equal(state.lifetime_executed_particle_emitter_commands, 5);
+  assert.equal(state.lifetime_executed_particle_emitter_remove_commands, 1);
+  assert.equal(state.lifetime_executed_ribbon_trail_commands, 2);
+  assert.equal(state.lifetime_executed_ribbon_trail_remove_commands, 1);
+  assert.equal(state.lifetime_executed_quad_field_commands, 3);
+  assert.equal(state.lifetime_executed_quad_field_remove_commands, 1);
+  assert.equal(state.lifetime_executed_group_remove_commands, 2);
+  assert.equal(state.lifetime_executed_group_presentation_commands, 4);
+  assert.equal(state.lifetime_executed_group_clip_rect_commands, 3);
+  assert.equal(state.lifetime_executed_group_layer_commands, 5);
+  assert.equal(state.lifetime_executed_group_transform_commands, 6);
+  assert.equal(state.retained_ribbon_trail_upsert_requests, 4);
+  assert.equal(state.retained_ribbon_trail_remove_requests, 1);
+  assert.equal(state.retained_ribbon_trail_active_count, 1);
+  assert.equal(state.retained_quad_field_upsert_requests, 2);
+  assert.equal(state.retained_quad_field_remove_requests, 1);
+  assert.equal(state.retained_quad_field_active_count, 1);
   assert.equal(state.lifetime_throttled_render_commands, 5);
   assert.equal(state.lifetime_throttled_by_capacity_render_commands, 3);
   assert.equal(state.lifetime_throttled_by_interval_render_commands, 2);
@@ -74,6 +140,22 @@ runTest('invalid lifetime diagnostics fallback to zero', () => {
     lifetime_render_dispatches: 'x',
     lifetime_executed_text_commands: -1,
     lifetime_executed_image_commands: '',
+    lifetime_executed_pulse_commands: 'bad',
+    lifetime_executed_polyline_commands: null,
+    lifetime_executed_path_stroke_commands: undefined,
+    lifetime_executed_path_fill_commands: undefined,
+    lifetime_executed_glow_batch_commands: undefined,
+    lifetime_executed_sprite_batch_commands: {},
+    lifetime_executed_glow_emitter_commands: null,
+    lifetime_executed_sprite_emitter_commands: undefined,
+    lifetime_executed_particle_emitter_commands: undefined,
+    lifetime_executed_ribbon_trail_commands: undefined,
+    lifetime_executed_quad_field_commands: undefined,
+    lifetime_executed_group_remove_commands: undefined,
+    lifetime_executed_group_presentation_commands: undefined,
+    lifetime_executed_group_clip_rect_commands: undefined,
+    lifetime_executed_group_layer_commands: undefined,
+    lifetime_executed_group_transform_commands: undefined,
     lifetime_throttled_render_commands: {},
     lifetime_dropped_render_commands: [],
   });
@@ -85,6 +167,22 @@ runTest('invalid lifetime diagnostics fallback to zero', () => {
   assert.equal(state.lifetime_render_dispatches, 0);
   assert.equal(state.lifetime_executed_text_commands, -1);
   assert.equal(state.lifetime_executed_image_commands, 0);
+  assert.equal(state.lifetime_executed_pulse_commands, 0);
+  assert.equal(state.lifetime_executed_polyline_commands, 0);
+  assert.equal(state.lifetime_executed_path_stroke_commands, 0);
+  assert.equal(state.lifetime_executed_path_fill_commands, 0);
+  assert.equal(state.lifetime_executed_glow_batch_commands, 0);
+  assert.equal(state.lifetime_executed_sprite_batch_commands, 0);
+  assert.equal(state.lifetime_executed_glow_emitter_commands, 0);
+  assert.equal(state.lifetime_executed_sprite_emitter_commands, 0);
+  assert.equal(state.lifetime_executed_particle_emitter_commands, 0);
+  assert.equal(state.lifetime_executed_ribbon_trail_commands, 0);
+  assert.equal(state.lifetime_executed_quad_field_commands, 0);
+  assert.equal(state.lifetime_executed_group_remove_commands, 0);
+  assert.equal(state.lifetime_executed_group_presentation_commands, 0);
+  assert.equal(state.lifetime_executed_group_clip_rect_commands, 0);
+  assert.equal(state.lifetime_executed_group_layer_commands, 0);
+  assert.equal(state.lifetime_executed_group_transform_commands, 0);
   assert.equal(state.lifetime_throttled_render_commands, 0);
   assert.equal(state.lifetime_dropped_render_commands, 0);
 });

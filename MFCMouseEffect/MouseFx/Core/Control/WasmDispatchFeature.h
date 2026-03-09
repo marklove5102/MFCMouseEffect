@@ -20,6 +20,8 @@ public:
     bool RouteMove(AppController& controller, const ScreenPoint& pt, bool* outRenderedByWasm);
     bool RouteScroll(AppController& controller, const ScrollEvent& ev, bool* outRenderedByWasm);
     bool RouteHoverStart(AppController& controller, const ScreenPoint& pt, bool* outRenderedByWasm);
+    bool RouteHoverEnd(AppController& controller, const ScreenPoint& pt, bool* outRenderedByWasm);
+    bool RouteFrameTick(AppController& controller, bool* outRenderedByWasm);
     bool RouteHoldStart(
         AppController& controller,
         const ScreenPoint& pt,
@@ -43,6 +45,7 @@ private:
 private:
     bool holdEventActive_ = false;
     uint8_t holdButton_ = 0;
+    uint64_t lastFrameTickMs_ = 0;
 };
 
 } // namespace mousefx

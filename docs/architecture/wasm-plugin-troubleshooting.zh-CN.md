@@ -1,6 +1,6 @@
 # WASM 插件排错手册
 
-适用范围（v1 路线）：
+适用范围（v2 路线）：
 - 运行时桥接：`mfx_wasm_runtime.dll`
 - 诊断入口：`/api/state` -> `wasm`
 
@@ -27,7 +27,8 @@
 - 确认 `mfx_wasm_runtime.dll` 在可执行同目录或搜索路径
 - 确认桥接导出：
   - `mfx_wasm_runtime_create`
-  - `mfx_wasm_runtime_call_on_event`
+  - `mfx_wasm_runtime_call_on_input`
+  - `mfx_wasm_runtime_call_on_frame`
   - `mfx_wasm_runtime_last_error`
 
 ## 3. 已加载但无可见效果
@@ -45,6 +46,8 @@
 若解析成功仍无效果：
 - 检查前台/VM 抑制策略
 - 检查预算截断标记
+- 检查 `plugin.json` 的 `input_kinds` 是否包含当前通道（例如 `scroll`）
+- 依赖持续喷射的特效需检查 `enable_frame_tick` 是否开启
 
 ## 4. `spawn_image` 回退内置图形
 
@@ -93,3 +96,21 @@
 2. 放置 `effect.wasm` + `plugin.json` 到插件目录。
 3. 调用 `/api/wasm/load-manifest`、`/api/wasm/enable`。
 4. 点击一次并检查 `/api/state` 的 `wasm` 字段。
+
+## 9. 重复 `plugin.json.id`
+
+当前行为：
+- catalog 对同一个 `plugin.json.id` 只保留一份
+- 扫描根优先级为：
+  - 显式配置的 `catalog_root_path`
+  - 主插件目录
+  - 可执行文件旁路目录
+  - Debug 模板 `dist`
+- catalog 会忽略不支持的 `api_version`
+- catalog 会忽略另一个插件包内部的嵌套 `plugin.json`
+
+检查：
+- 如果实际生效的不是你想要的那一份，先查看 `/api/wasm/catalog` 的 `search_roots`
+- 需要覆盖内置/Debug 副本时，把目标插件放到配置的 `catalog_root_path`
+- 如果磁盘里仍保留旧的 `api_version=1` 插件目录，建议清理
+- 模板默认 id 应为 `demo.template.default.v2`，样例 id 形如 `demo.*.<sample>.v2`

@@ -6,8 +6,14 @@
 
 namespace mousefx::wasm {
 
-std::array<uint8_t, sizeof(EventInputV1)> SerializeEventInputV1(const EventInputV1& input) {
-    std::array<uint8_t, sizeof(EventInputV1)> bytes{};
+std::array<uint8_t, sizeof(EventInputV2)> SerializeEventInputV2(const EventInputV2& input) {
+    std::array<uint8_t, sizeof(EventInputV2)> bytes{};
+    std::memcpy(bytes.data(), &input, sizeof(input));
+    return bytes;
+}
+
+std::array<uint8_t, sizeof(FrameInputV2)> SerializeFrameInputV2(const FrameInputV2& input) {
+    std::array<uint8_t, sizeof(FrameInputV2)> bytes{};
     std::memcpy(bytes.data(), &input, sizeof(input));
     return bytes;
 }
@@ -33,4 +39,3 @@ bool TryReadCommandHeaderV1(
 }
 
 } // namespace mousefx::wasm
-

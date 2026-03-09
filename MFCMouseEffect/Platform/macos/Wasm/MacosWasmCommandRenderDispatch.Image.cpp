@@ -4,6 +4,7 @@
 
 #include "Platform/macos/Wasm/MacosWasmCommandRenderResolvers.h"
 #include "Platform/macos/Wasm/MacosWasmTransientOverlay.h"
+#include "MouseFx/Core/Wasm/WasmCommandCoordinateSemantics.h"
 #include "MouseFx/Core/Wasm/WasmImageCommandConfig.h"
 #include "MouseFx/Core/Wasm/WasmImageRuntimeConfig.h"
 #include "MouseFx/Core/Wasm/WasmPluginAbi.h"
@@ -28,10 +29,18 @@ WasmImageOverlayRequest BuildImageOverlayRequest(
     request.alpha = mousefx::wasm::ResolveSpawnImageAlpha(cmd.alpha);
     request.lifeMs = mousefx::wasm::ResolveSpawnImageLifeMs(cmd.lifeMs, config.icon.durationMs);
     request.delayMs = mousefx::wasm::ResolveSpawnImageDelayMs(cmd.delayMs);
-    request.velocityX = cmd.vx;
-    request.velocityY = cmd.vy;
-    request.accelerationX = cmd.ax;
-    request.accelerationY = cmd.ay;
+    const mousefx::wasm::WasmCommandMotion overlayMotion =
+        mousefx::wasm::ConvertMotionToOverlayYUp(
+            mousefx::wasm::WasmCommandMotion{
+                cmd.vx,
+                cmd.vy,
+                cmd.ax,
+                cmd.ay,
+            });
+    request.velocityX = overlayMotion.velocityX;
+    request.velocityY = overlayMotion.velocityY;
+    request.accelerationX = overlayMotion.accelerationX;
+    request.accelerationY = overlayMotion.accelerationY;
     request.rotationRad = cmd.rotation;
     request.applyTint = mousefx::wasm::ResolveSpawnImageApplyTint(cmd.tintRgba);
     return request;

@@ -58,6 +58,58 @@ bool ExecuteParsedCommand(
         return HandleSpawnImageCommand(raw, config, activeManifestPath, outResult, outThrottleCounters);
     case mousefx::wasm::CommandKind::SpawnImageAffine:
         return HandleSpawnImageAffineCommand(raw, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnPulse:
+        return HandleSpawnPulseCommand(raw, config, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnPolyline:
+        return HandleSpawnPolylineCommand(raw, record.sizeBytes, config, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnPathStroke:
+        return HandleSpawnPathStrokeCommand(raw, record.sizeBytes, config, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnPathFill:
+        return HandleSpawnPathFillCommand(raw, record.sizeBytes, config, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnRibbonStrip:
+        return HandleSpawnRibbonStripCommand(raw, record.sizeBytes, config, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnGlowBatch:
+        return HandleSpawnGlowBatchCommand(raw, record.sizeBytes, config, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnSpriteBatch:
+        return HandleSpawnSpriteBatchCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::SpawnQuadBatch:
+        return HandleSpawnQuadBatchCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGlowEmitter:
+        return HandleUpsertGlowEmitterCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::RemoveGlowEmitter:
+        return HandleRemoveGlowEmitterCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertSpriteEmitter:
+        return HandleUpsertSpriteEmitterCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::RemoveSpriteEmitter:
+        return HandleRemoveSpriteEmitterCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertParticleEmitter:
+        return HandleUpsertParticleEmitterCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::RemoveParticleEmitter:
+        return HandleRemoveParticleEmitterCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertRibbonTrail:
+        return HandleUpsertRibbonTrailCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::RemoveRibbonTrail:
+        return HandleRemoveRibbonTrailCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertQuadField:
+        return HandleUpsertQuadFieldCommand(raw, record.sizeBytes, config, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::RemoveQuadField:
+        return HandleRemoveQuadFieldCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::RemoveGroup:
+        return HandleRemoveGroupCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupPresentation:
+        return HandleUpsertGroupPresentationCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupClipRect:
+        return HandleUpsertGroupClipRectCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupLayer:
+        return HandleUpsertGroupLayerCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupTransform:
+        return HandleUpsertGroupTransformCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupLocalOrigin:
+        return HandleUpsertGroupLocalOriginCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupMaterial:
+        return HandleUpsertGroupMaterialCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
+    case mousefx::wasm::CommandKind::UpsertGroupPass:
+        return HandleUpsertGroupPassCommand(raw, record.sizeBytes, activeManifestPath, outResult, outThrottleCounters);
     default:
         outResult->droppedCommands += 1;
         return true;

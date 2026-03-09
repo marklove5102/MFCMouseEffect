@@ -6,9 +6,9 @@
 namespace mousefx::platform::macos {
 
 struct MacosWasmOverlayPolicy final {
-    size_t maxInFlightOverlays = 64;
-    uint32_t minImageIntervalMs = 4;
-    uint32_t minTextIntervalMs = 8;
+    size_t maxInFlightOverlays = 384;
+    uint32_t minImageIntervalMs = 0;
+    uint32_t minTextIntervalMs = 4;
 };
 
 const MacosWasmOverlayPolicy& GetMacosWasmOverlayPolicy();

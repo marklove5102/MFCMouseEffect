@@ -43,7 +43,9 @@ bool Wasm3Runtime::CallGetApiVersion(uint32_t* outApiVersion, std::string* outEr
     return true;
 }
 
-bool Wasm3Runtime::CallOnEvent(
+bool Wasm3Runtime::CallPluginBufferFunction(
+    M3Function* function,
+    const char* stageTag,
     const uint8_t* inputPtr,
     uint32_t inputLen,
     uint8_t* outputPtr,
@@ -55,7 +57,11 @@ bool Wasm3Runtime::CallOnEvent(
         *outWrittenBytes = 0;
     }
     if (!IsModuleLoaded()) {
-        SetOutError(outError, "plugin does not export mfx_plugin_on_event.");
+        SetOutError(outError, "plugin module is not loaded.");
+        return false;
+    }
+    if (!function) {
+        SetOutError(outError, "plugin export function is missing.");
         return false;
     }
     if (inputLen > 0 && inputPtr == nullptr) {
@@ -94,17 +100,20 @@ bool Wasm3Runtime::CallOnEvent(
         &argOutputCap,
     };
 
-    M3Result result = m3_Call(fnOnEvent_, 4, argPointers);
+    M3Result result = m3_Call(function, 4, argPointers);
     if (result) {
-        SetOutError(outError, BuildWasm3Error("m3_Call(on_event) failed", result));
+        const std::string prefix = std::string("m3_Call(") + (stageTag ? stageTag : "plugin") + ") failed";
+        SetOutError(outError, BuildWasm3Error(prefix.c_str(), result));
         return false;
     }
 
     uint32_t writtenBytes = 0;
     const void* retPointers[1] = { &writtenBytes };
-    result = m3_GetResults(fnOnEvent_, 1, retPointers);
+    result = m3_GetResults(function, 1, retPointers);
     if (result) {
-        SetOutError(outError, BuildWasm3Error("m3_GetResults(on_event) failed", result));
+        const std::string prefix =
+            std::string("m3_GetResults(") + (stageTag ? stageTag : "plugin") + ") failed";
+        SetOutError(outError, BuildWasm3Error(prefix.c_str(), result));
         return false;
     }
     if (writtenBytes > outputCap) {
@@ -132,6 +141,42 @@ bool Wasm3Runtime::CallOnEvent(
     }
     SetOutError(outError, "");
     return true;
+}
+
+bool Wasm3Runtime::CallOnInput(
+    const uint8_t* inputPtr,
+    uint32_t inputLen,
+    uint8_t* outputPtr,
+    uint32_t outputCap,
+    uint32_t* outWrittenBytes,
+    std::string* outError) {
+    return CallPluginBufferFunction(
+        fnOnInput_,
+        "on_input",
+        inputPtr,
+        inputLen,
+        outputPtr,
+        outputCap,
+        outWrittenBytes,
+        outError);
+}
+
+bool Wasm3Runtime::CallOnFrame(
+    const uint8_t* inputPtr,
+    uint32_t inputLen,
+    uint8_t* outputPtr,
+    uint32_t outputCap,
+    uint32_t* outWrittenBytes,
+    std::string* outError) {
+    return CallPluginBufferFunction(
+        fnOnFrame_,
+        "on_frame",
+        inputPtr,
+        inputLen,
+        outputPtr,
+        outputCap,
+        outWrittenBytes,
+        outError);
 }
 
 void Wasm3Runtime::ResetPluginState() {

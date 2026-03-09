@@ -12,7 +12,7 @@ CGFloat ClampFloat(CGFloat value, CGFloat lo, CGFloat hi) {
 
 CGFloat ClampScale(float scale) {
     const CGFloat raw = (scale > 0.0f) ? static_cast<CGFloat>(scale) : 1.0;
-    return ClampFloat(raw, 0.25, 6.0);
+    return ClampFloat(raw, 0.04, 6.0);
 }
 
 uint32_t ClampLifeMs(uint32_t lifeMs) {

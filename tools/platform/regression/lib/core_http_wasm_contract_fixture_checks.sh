@@ -62,7 +62,7 @@ _mfx_core_http_wasm_contract_fixture_checks() {
     mfx_wasm_fixture_write_manifest_with_api_version \
         "$reload_api_manifest_path" \
         "reload-api-unsupported-plugin" \
-        "2" \
+        "3" \
         "$reload_api_entry_relative"
 
     _mfx_core_http_assert_wasm_reload_failure \

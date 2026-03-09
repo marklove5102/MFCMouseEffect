@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -46,6 +46,23 @@ function toPosixRelative(rootDir, targetPath) {
 
 export function ensureDistDir(dirPath) {
   mkdirSync(dirPath, { recursive: true });
+}
+
+export function resetOutputDir(dirPath, options = {}) {
+  const preserveNames = Array.isArray(options.preserveNames) ? options.preserveNames : [];
+  const preserved = new Set(
+    preserveNames
+      .map((name) => `${name || ""}`.trim())
+      .filter((name) => name.length > 0)
+  );
+
+  ensureDistDir(dirPath);
+  for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+    if (preserved.has(entry.name)) {
+      continue;
+    }
+    rmSync(resolve(dirPath, entry.name), { recursive: true, force: true });
+  }
 }
 
 export function compileAssemblyScript({

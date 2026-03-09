@@ -75,7 +75,9 @@ _mfx_core_http_run_wasm_contract_checks() {
             "$platform" \
             "$tmp_dir" \
             "$base_url" \
-            "$token"
+            "$token" \
+            "$repo_root" \
+            "$wasm_manifest_path"
 
         local invalid_manifest_path="${wasm_manifest_path}.missing"
         _mfx_core_http_assert_wasm_load_manifest_failure \

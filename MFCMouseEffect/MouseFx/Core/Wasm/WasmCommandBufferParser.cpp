@@ -16,6 +16,58 @@ bool IsSupportedKind(CommandKind kind, uint16_t commandSizeBytes) {
         return commandSizeBytes >= sizeof(SpawnImageCommandV1);
     case CommandKind::SpawnImageAffine:
         return commandSizeBytes >= sizeof(SpawnImageAffineCommandV1);
+    case CommandKind::SpawnPulse:
+        return commandSizeBytes >= sizeof(SpawnPulseCommandV1);
+    case CommandKind::SpawnPolyline:
+        return commandSizeBytes >= sizeof(SpawnPolylineCommandV1);
+    case CommandKind::SpawnPathStroke:
+        return commandSizeBytes >= sizeof(SpawnPathStrokeCommandV1);
+    case CommandKind::SpawnPathFill:
+        return commandSizeBytes >= sizeof(SpawnPathFillCommandV1);
+    case CommandKind::SpawnGlowBatch:
+        return commandSizeBytes >= sizeof(SpawnGlowBatchCommandV1);
+    case CommandKind::SpawnSpriteBatch:
+        return commandSizeBytes >= sizeof(SpawnSpriteBatchCommandV1);
+    case CommandKind::SpawnQuadBatch:
+        return commandSizeBytes >= sizeof(SpawnQuadBatchCommandV1);
+    case CommandKind::SpawnRibbonStrip:
+        return commandSizeBytes >= sizeof(SpawnRibbonStripCommandV1);
+    case CommandKind::UpsertRibbonTrail:
+        return commandSizeBytes >= sizeof(UpsertRibbonTrailCommandV1);
+    case CommandKind::RemoveRibbonTrail:
+        return commandSizeBytes >= sizeof(RemoveRibbonTrailCommandV1);
+    case CommandKind::UpsertQuadField:
+        return commandSizeBytes >= sizeof(UpsertQuadFieldCommandV1);
+    case CommandKind::RemoveQuadField:
+        return commandSizeBytes >= sizeof(RemoveQuadFieldCommandV1);
+    case CommandKind::RemoveGroup:
+        return commandSizeBytes >= sizeof(RemoveGroupCommandV1);
+    case CommandKind::UpsertGroupPresentation:
+        return commandSizeBytes >= sizeof(UpsertGroupPresentationCommandV1);
+    case CommandKind::UpsertGroupClipRect:
+        return commandSizeBytes >= sizeof(UpsertGroupClipRectCommandV1);
+    case CommandKind::UpsertGroupLayer:
+        return commandSizeBytes >= sizeof(UpsertGroupLayerCommandV1);
+    case CommandKind::UpsertGroupTransform:
+        return commandSizeBytes >= sizeof(UpsertGroupTransformCommandV1);
+    case CommandKind::UpsertGroupLocalOrigin:
+        return commandSizeBytes >= sizeof(UpsertGroupLocalOriginCommandV1);
+    case CommandKind::UpsertGroupMaterial:
+        return commandSizeBytes >= sizeof(UpsertGroupMaterialCommandV1);
+    case CommandKind::UpsertGroupPass:
+        return commandSizeBytes >= sizeof(UpsertGroupPassCommandV1);
+    case CommandKind::UpsertGlowEmitter:
+        return commandSizeBytes >= sizeof(UpsertGlowEmitterCommandV1);
+    case CommandKind::RemoveGlowEmitter:
+        return commandSizeBytes >= sizeof(RemoveGlowEmitterCommandV1);
+    case CommandKind::UpsertSpriteEmitter:
+        return commandSizeBytes >= sizeof(UpsertSpriteEmitterCommandV1);
+    case CommandKind::RemoveSpriteEmitter:
+        return commandSizeBytes >= sizeof(RemoveSpriteEmitterCommandV1);
+    case CommandKind::UpsertParticleEmitter:
+        return commandSizeBytes >= sizeof(UpsertParticleEmitterCommandV1);
+    case CommandKind::RemoveParticleEmitter:
+        return commandSizeBytes >= sizeof(RemoveParticleEmitterCommandV1);
     default:
         return false;
     }
@@ -100,4 +152,3 @@ CommandParseResult WasmCommandBufferParser::Parse(const uint8_t* buffer, size_t 
 }
 
 } // namespace mousefx::wasm
-

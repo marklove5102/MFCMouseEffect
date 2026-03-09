@@ -4,6 +4,11 @@
 
 #include "MouseFx/Core/Control/AppController.h"
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
+#include "MouseFx/Core/Wasm/WasmRetainedGlowEmitterRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedParticleEmitterRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedQuadFieldRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedRibbonTrailRuntime.h"
+#include "MouseFx/Core/Wasm/WasmRetainedSpriteEmitterRuntime.h"
 #include "MouseFx/Server/SettingsWasmCapabilities.h"
 #include "MouseFx/Utils/StringUtils.h"
 #if MFX_PLATFORM_MACOS
@@ -60,6 +65,30 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["last_rendered_by_wasm"] = diag.lastRenderedByWasm;
     out["last_executed_text_commands"] = diag.lastExecutedTextCommands;
     out["last_executed_image_commands"] = diag.lastExecutedImageCommands;
+    out["last_executed_pulse_commands"] = diag.lastExecutedPulseCommands;
+    out["last_executed_polyline_commands"] = diag.lastExecutedPolylineCommands;
+    out["last_executed_path_stroke_commands"] = diag.lastExecutedPathStrokeCommands;
+    out["last_executed_path_fill_commands"] = diag.lastExecutedPathFillCommands;
+    out["last_executed_glow_batch_commands"] = diag.lastExecutedGlowBatchCommands;
+    out["last_executed_sprite_batch_commands"] = diag.lastExecutedSpriteBatchCommands;
+    out["last_executed_glow_emitter_commands"] = diag.lastExecutedGlowEmitterCommands;
+    out["last_executed_glow_emitter_remove_commands"] = diag.lastExecutedGlowEmitterRemoveCommands;
+    out["last_executed_sprite_emitter_commands"] = diag.lastExecutedSpriteEmitterCommands;
+    out["last_executed_sprite_emitter_remove_commands"] = diag.lastExecutedSpriteEmitterRemoveCommands;
+    out["last_executed_particle_emitter_commands"] = diag.lastExecutedParticleEmitterCommands;
+    out["last_executed_particle_emitter_remove_commands"] = diag.lastExecutedParticleEmitterRemoveCommands;
+    out["last_executed_ribbon_trail_commands"] = diag.lastExecutedRibbonTrailCommands;
+    out["last_executed_ribbon_trail_remove_commands"] = diag.lastExecutedRibbonTrailRemoveCommands;
+    out["last_executed_quad_field_commands"] = diag.lastExecutedQuadFieldCommands;
+    out["last_executed_quad_field_remove_commands"] = diag.lastExecutedQuadFieldRemoveCommands;
+    out["last_executed_group_remove_commands"] = diag.lastExecutedGroupRemoveCommands;
+    out["last_executed_group_presentation_commands"] = diag.lastExecutedGroupPresentationCommands;
+    out["last_executed_group_clip_rect_commands"] = diag.lastExecutedGroupClipRectCommands;
+    out["last_executed_group_layer_commands"] = diag.lastExecutedGroupLayerCommands;
+    out["last_executed_group_transform_commands"] = diag.lastExecutedGroupTransformCommands;
+    out["last_executed_group_local_origin_commands"] = diag.lastExecutedGroupLocalOriginCommands;
+    out["last_executed_group_material_commands"] = diag.lastExecutedGroupMaterialCommands;
+    out["last_executed_group_pass_commands"] = diag.lastExecutedGroupPassCommands;
     out["last_throttled_render_commands"] = diag.lastThrottledRenderCommands;
     out["last_throttled_by_capacity_render_commands"] = diag.lastThrottledByCapacityRenderCommands;
     out["last_throttled_by_interval_render_commands"] = diag.lastThrottledByIntervalRenderCommands;
@@ -74,6 +103,30 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["lifetime_rendered_by_wasm_dispatches"] = diag.lifetimeRenderedByWasmDispatches;
     out["lifetime_executed_text_commands"] = diag.lifetimeExecutedTextCommands;
     out["lifetime_executed_image_commands"] = diag.lifetimeExecutedImageCommands;
+    out["lifetime_executed_pulse_commands"] = diag.lifetimeExecutedPulseCommands;
+    out["lifetime_executed_polyline_commands"] = diag.lifetimeExecutedPolylineCommands;
+    out["lifetime_executed_path_stroke_commands"] = diag.lifetimeExecutedPathStrokeCommands;
+    out["lifetime_executed_path_fill_commands"] = diag.lifetimeExecutedPathFillCommands;
+    out["lifetime_executed_glow_batch_commands"] = diag.lifetimeExecutedGlowBatchCommands;
+    out["lifetime_executed_sprite_batch_commands"] = diag.lifetimeExecutedSpriteBatchCommands;
+    out["lifetime_executed_glow_emitter_commands"] = diag.lifetimeExecutedGlowEmitterCommands;
+    out["lifetime_executed_glow_emitter_remove_commands"] = diag.lifetimeExecutedGlowEmitterRemoveCommands;
+    out["lifetime_executed_sprite_emitter_commands"] = diag.lifetimeExecutedSpriteEmitterCommands;
+    out["lifetime_executed_sprite_emitter_remove_commands"] = diag.lifetimeExecutedSpriteEmitterRemoveCommands;
+    out["lifetime_executed_particle_emitter_commands"] = diag.lifetimeExecutedParticleEmitterCommands;
+    out["lifetime_executed_particle_emitter_remove_commands"] = diag.lifetimeExecutedParticleEmitterRemoveCommands;
+    out["lifetime_executed_ribbon_trail_commands"] = diag.lifetimeExecutedRibbonTrailCommands;
+    out["lifetime_executed_ribbon_trail_remove_commands"] = diag.lifetimeExecutedRibbonTrailRemoveCommands;
+    out["lifetime_executed_quad_field_commands"] = diag.lifetimeExecutedQuadFieldCommands;
+    out["lifetime_executed_quad_field_remove_commands"] = diag.lifetimeExecutedQuadFieldRemoveCommands;
+    out["lifetime_executed_group_remove_commands"] = diag.lifetimeExecutedGroupRemoveCommands;
+    out["lifetime_executed_group_presentation_commands"] = diag.lifetimeExecutedGroupPresentationCommands;
+    out["lifetime_executed_group_clip_rect_commands"] = diag.lifetimeExecutedGroupClipRectCommands;
+    out["lifetime_executed_group_layer_commands"] = diag.lifetimeExecutedGroupLayerCommands;
+    out["lifetime_executed_group_transform_commands"] = diag.lifetimeExecutedGroupTransformCommands;
+    out["lifetime_executed_group_local_origin_commands"] = diag.lifetimeExecutedGroupLocalOriginCommands;
+    out["lifetime_executed_group_material_commands"] = diag.lifetimeExecutedGroupMaterialCommands;
+    out["lifetime_executed_group_pass_commands"] = diag.lifetimeExecutedGroupPassCommands;
     out["lifetime_throttled_render_commands"] = diag.lifetimeThrottledRenderCommands;
     out["lifetime_throttled_by_capacity_render_commands"] = diag.lifetimeThrottledByCapacityRenderCommands;
     out["lifetime_throttled_by_interval_render_commands"] = diag.lifetimeThrottledByIntervalRenderCommands;
@@ -82,6 +135,31 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["last_load_failure_stage"] = diag.lastLoadFailureStage;
     out["last_load_failure_code"] = diag.lastLoadFailureCode;
     out["last_error"] = diag.lastError;
+    const wasm::RetainedGlowEmitterRuntimeCounters retainedGlowEmitterCounters =
+        wasm::GetRetainedGlowEmitterRuntimeCounters();
+    out["retained_glow_emitter_upsert_requests"] = retainedGlowEmitterCounters.upsertRequests;
+    out["retained_glow_emitter_remove_requests"] = retainedGlowEmitterCounters.removeRequests;
+    out["retained_glow_emitter_active_count"] = retainedGlowEmitterCounters.activeEmitters;
+    const wasm::RetainedSpriteEmitterRuntimeCounters retainedSpriteEmitterCounters =
+        wasm::GetRetainedSpriteEmitterRuntimeCounters();
+    out["retained_sprite_emitter_upsert_requests"] = retainedSpriteEmitterCounters.upsertRequests;
+    out["retained_sprite_emitter_remove_requests"] = retainedSpriteEmitterCounters.removeRequests;
+    out["retained_sprite_emitter_active_count"] = retainedSpriteEmitterCounters.activeEmitters;
+    const wasm::RetainedParticleEmitterRuntimeCounters retainedParticleEmitterCounters =
+        wasm::GetRetainedParticleEmitterRuntimeCounters();
+    out["retained_particle_emitter_upsert_requests"] = retainedParticleEmitterCounters.upsertRequests;
+    out["retained_particle_emitter_remove_requests"] = retainedParticleEmitterCounters.removeRequests;
+    out["retained_particle_emitter_active_count"] = retainedParticleEmitterCounters.activeEmitters;
+    const wasm::RetainedRibbonTrailRuntimeCounters retainedRibbonTrailCounters =
+        wasm::GetRetainedRibbonTrailRuntimeCounters();
+    out["retained_ribbon_trail_upsert_requests"] = retainedRibbonTrailCounters.upsertRequests;
+    out["retained_ribbon_trail_remove_requests"] = retainedRibbonTrailCounters.removeRequests;
+    out["retained_ribbon_trail_active_count"] = retainedRibbonTrailCounters.activeTrails;
+    const wasm::RetainedQuadFieldRuntimeCounters retainedQuadFieldCounters =
+        wasm::GetRetainedQuadFieldRuntimeCounters();
+    out["retained_quad_field_upsert_requests"] = retainedQuadFieldCounters.upsertRequests;
+    out["retained_quad_field_remove_requests"] = retainedQuadFieldCounters.removeRequests;
+    out["retained_quad_field_active_count"] = retainedQuadFieldCounters.activeFields;
 #if MFX_PLATFORM_MACOS
     const auto& overlayPolicy = platform::macos::GetMacosWasmOverlayPolicy();
     out["overlay_max_inflight"] = overlayPolicy.maxInFlightOverlays;
@@ -93,6 +171,12 @@ json BuildWasmState(const EffectConfig& cfg, const AppController* controller) {
     out["mac_image_overlay_requests_with_asset"] = imageOverlayCounters.requestsWithAsset;
     out["mac_image_overlay_apply_tint_requests"] = imageOverlayCounters.applyTintRequests;
     out["mac_image_overlay_apply_tint_requests_with_asset"] = imageOverlayCounters.applyTintRequestsWithAsset;
+    out["mac_pulse_overlay_requests"] = platform::macos::GetWasmPulseOverlayRenderRequestCount();
+    out["mac_polyline_overlay_requests"] = platform::macos::GetWasmPolylineOverlayRenderRequestCount();
+    out["mac_path_stroke_overlay_requests"] = platform::macos::GetWasmPathStrokeOverlayRenderRequestCount();
+    out["mac_path_fill_overlay_requests"] = platform::macos::GetWasmPathFillOverlayRenderRequestCount();
+    out["mac_glow_batch_overlay_requests"] = platform::macos::GetWasmGlowBatchOverlayRenderRequestCount();
+    out["mac_sprite_batch_overlay_requests"] = platform::macos::GetWasmSpriteBatchOverlayRenderRequestCount();
 #endif
     return out;
 }

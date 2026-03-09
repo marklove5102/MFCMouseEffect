@@ -23,7 +23,14 @@ public:
     bool IsModuleLoaded() const override;
 
     bool CallGetApiVersion(uint32_t* outApiVersion, std::string* outError) override;
-    bool CallOnEvent(
+    bool CallOnInput(
+        const uint8_t* inputPtr,
+        uint32_t inputLen,
+        uint8_t* outputPtr,
+        uint32_t outputCap,
+        uint32_t* outWrittenBytes,
+        std::string* outError) override;
+    bool CallOnFrame(
         const uint8_t* inputPtr,
         uint32_t inputLen,
         uint8_t* outputPtr,
@@ -34,6 +41,15 @@ public:
     void ResetPluginState() override;
 
 private:
+    bool CallPluginBufferFunction(
+        M3Function* function,
+        const char* stageTag,
+        const uint8_t* inputPtr,
+        uint32_t inputLen,
+        uint8_t* outputPtr,
+        uint32_t outputCap,
+        uint32_t* outWrittenBytes,
+        std::string* outError);
     bool CreateRuntime(std::string* outError);
     void ReleaseRuntime();
     bool LoadModuleFromCachedBytes(std::string* outError);
@@ -50,7 +66,8 @@ private:
     M3Environment* environment_ = nullptr;
     M3Runtime* runtime_ = nullptr;
     M3Function* fnGetApiVersion_ = nullptr;
-    M3Function* fnOnEvent_ = nullptr;
+    M3Function* fnOnInput_ = nullptr;
+    M3Function* fnOnFrame_ = nullptr;
     M3Function* fnReset_ = nullptr;
     std::vector<uint8_t> moduleBytes_{};
     bool moduleLoaded_ = false;
