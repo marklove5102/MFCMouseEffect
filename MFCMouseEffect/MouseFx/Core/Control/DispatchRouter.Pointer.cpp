@@ -49,7 +49,10 @@ bool ShouldUseHoldUpdateTimer(AppController* controller) {
     if (!controller) {
         return false;
     }
-    return HoldMovePolicy(controller) == "hold_only";
+    // Stationary hold effects must keep receiving periodic updates in both
+    // hold_only and blend modes. move_only remains the only policy that keeps
+    // the dedicated hold lane disabled.
+    return HoldMovePolicy(controller) != "move_only";
 }
 
 bool ShouldSuppressClickAfterHold(AppController* controller) {

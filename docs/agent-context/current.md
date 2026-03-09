@@ -17,6 +17,9 @@
 - Current mainline is no longer “wasm demo” level; it is a cross-platform controlled-effects runtime with retained/group semantics.
 - Primary active capability track is `wasm v3 phase1+`: expand expressive power without exposing raw GPU/shader control.
 - Current stabilization theme is `group_pass` convergence: keep external ABI stable while reducing parser/runtime/style duplication before further widening.
+- macOS hold-behavior baseline was recently corrected so `blend` no longer stalls stationary hold animation waiting for a pointer move; periodic hold updates now stay enabled for both `hold_only` and `blend`, with `move_only` remaining the only mode that disables the dedicated hold lane.
+- macOS hold charge/neon overlays also now disable implicit Core Animation actions during timer-driven updates, so the orbit-head marker stays pinned to the ring instead of drifting through the circle interior between frames.
+- macOS hold style parity was tightened again so only `charge` and `neon` keep the explicit outer progress arc/head marker; `lightning/hex/techRing/hologram/quantumHalo/fluxField` no longer inherit the shared circle that their Windows contracts do not render.
 
 ## WASM Capability Summary
 

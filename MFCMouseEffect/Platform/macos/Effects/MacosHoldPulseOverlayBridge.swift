@@ -195,6 +195,15 @@ private func mfxResolveSpinDuration(
     }
 }
 
+private func mfxStyleUsesProgressArc(_ style: HoldStyleCode) -> Bool {
+    switch style {
+    case .charge, .neon:
+        return true
+    case .lightning, .hex, .techRing, .hologram, .quantumHalo, .fluxField:
+        return false
+    }
+}
+
 // MARK: - Per-type layer builders
 
 /// Charge: background ring (stroke-only) + glow arc + progress arc + orbiting dot head.
@@ -367,22 +376,7 @@ private func mfxBuildLightningLayers(
         boltContainer.addSublayer(bolt)
     }
 
-    // 4) Progress layer (shared name for update path)
-    let ringInset = mfxScaleMetric(size, 24.0, 160.0, 10.0, 44.0)
-    let progress = CAShapeLayer()
-    progress.name = "mfx_hold_progress"
-    progress.frame = bounds
-    progress.path = CGPath(ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset), transform: nil)
-    progress.fillColor = NSColor.clear.cgColor
-    progress.strokeColor = baseColor.withAlphaComponent(0.6).cgColor
-    progress.lineWidth = 2.0
-    progress.lineCap = .round
-    progress.strokeStart = 0.0
-    progress.strokeEnd = 0.0
-    progress.transform = CATransform3DMakeRotation(-CGFloat.pi / 2.0, 0.0, 0.0, 1.0)
-    contentLayer.addSublayer(progress)
-
-    // 5) Core pulse animation
+    // 4) Core pulse animation
     let pulse = CABasicAnimation(keyPath: "opacity")
     pulse.fromValue = 0.5
     pulse.toValue = 1.0
@@ -492,21 +486,6 @@ private func mfxBuildHexLayers(
     accent.frame = bounds
     contentLayer.addSublayer(accent)
 
-    // Progress arc
-    let ringInset = mfxScaleMetric(size, 24.0, 160.0, 10.0, 44.0)
-    let progress = CAShapeLayer()
-    progress.name = "mfx_hold_progress"
-    progress.frame = bounds
-    progress.path = CGPath(ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset), transform: nil)
-    progress.fillColor = NSColor.clear.cgColor
-    progress.strokeColor = baseColor.withAlphaComponent(0.7).cgColor
-    progress.lineWidth = 2.0
-    progress.lineCap = .round
-    progress.strokeStart = 0.0
-    progress.strokeEnd = 0.0
-    progress.transform = CATransform3DMakeRotation(-CGFloat.pi / 2.0, 0.0, 0.0, 1.0)
-    contentLayer.addSublayer(progress)
-
     // Breathe animation on container
     let breathe = CABasicAnimation(keyPath: "opacity")
     breathe.fromValue = 0.5
@@ -603,21 +582,6 @@ private func mfxBuildTechRingLayers(
     accent.name = "mfx_hold_accent"
     accent.frame = bounds
     contentLayer.addSublayer(accent)
-
-    // Progress arc
-    let ringInset = mfxScaleMetric(size, 24.0, 160.0, 10.0, 44.0)
-    let progress = CAShapeLayer()
-    progress.name = "mfx_hold_progress"
-    progress.frame = bounds
-    progress.path = CGPath(ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset), transform: nil)
-    progress.fillColor = NSColor.clear.cgColor
-    progress.strokeColor = baseColor.withAlphaComponent(0.6).cgColor
-    progress.lineWidth = 2.0
-    progress.lineCap = .round
-    progress.strokeStart = 0.0
-    progress.strokeEnd = 0.0
-    progress.transform = CATransform3DMakeRotation(-CGFloat.pi / 2.0, 0.0, 0.0, 1.0)
-    contentLayer.addSublayer(progress)
 
     // Breathe
     let breathe = CABasicAnimation(keyPath: "opacity")
@@ -741,20 +705,6 @@ private func mfxBuildHologramLayers(
     core.backgroundColor = baseColor.withAlphaComponent(0.0).cgColor
     contentLayer.addSublayer(core)
 
-    // Progress arc
-    let ringInset = mfxScaleMetric(size, 24.0, 160.0, 10.0, 44.0)
-    let progress = CAShapeLayer()
-    progress.name = "mfx_hold_progress"
-    progress.frame = bounds
-    progress.path = CGPath(ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset), transform: nil)
-    progress.fillColor = NSColor.clear.cgColor
-    progress.strokeColor = baseColor.withAlphaComponent(0.6).cgColor
-    progress.lineWidth = 2.0
-    progress.lineCap = .round
-    progress.strokeStart = 0.0
-    progress.strokeEnd = 0.0
-    progress.transform = CATransform3DMakeRotation(-CGFloat.pi / 2.0, 0.0, 0.0, 1.0)
-    contentLayer.addSublayer(progress)
 }
 
 /// FluxField: 6 concentric pulsing rings + 4 rotating arc bands + orbit particles + center glow.
@@ -880,20 +830,6 @@ private func mfxBuildFluxFieldLayers(
     core.cornerRadius = coreSize * 3
     contentLayer.addSublayer(core)
 
-    // Progress arc
-    let ringInset = mfxScaleMetric(size, 24.0, 160.0, 10.0, 44.0)
-    let progress = CAShapeLayer()
-    progress.name = "mfx_hold_progress"
-    progress.frame = bounds
-    progress.path = CGPath(ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset), transform: nil)
-    progress.fillColor = NSColor.clear.cgColor
-    progress.strokeColor = baseColor.withAlphaComponent(0.6).cgColor
-    progress.lineWidth = 2.0
-    progress.lineCap = .round
-    progress.strokeStart = 0.0
-    progress.strokeEnd = 0.0
-    progress.transform = CATransform3DMakeRotation(-CGFloat.pi / 2.0, 0.0, 0.0, 1.0)
-    contentLayer.addSublayer(progress)
 }
 
 /// Neon3D: glass ring + inner scanner + progress arc + crystal seed.
@@ -1199,6 +1135,13 @@ private func mfxUpdateHoldPulseOverlayOnMainThread(
         )
     }
 
+    // Timer-driven hold updates should mutate the presentation immediately.
+    // Leaving implicit Core Animation actions enabled causes the orbit head to
+    // interpolate across the circle interior instead of staying on the ring.
+    CATransaction.begin()
+    CATransaction.setDisableActions(true)
+    defer { CATransaction.commit() }
+
     let frame = window.frame
     let width = frame.width
     let bounds = CGRect(origin: .zero, size: frame.size)
@@ -1261,25 +1204,27 @@ private func mfxUpdateHoldPulseOverlayOnMainThread(
     }
 
     if let content = window.contentView, let root = content.layer {
-        let ringInset = mfxScaleMetric(width, 24.0, 160.0, 10.0, 44.0)
-        if let progressLayer = mfxFindShapeLayer(root, named: "mfx_hold_progress") {
-            progressLayer.path = CGPath(
-                ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset),
-                transform: nil)
-            progressLayer.strokeEnd = progress
-            let progressAlpha = mfxResolveOpacity(baseOpacityValue, -0.12 + progress * 0.32, 0.16)
-            progressLayer.opacity = Float(progressAlpha)
-        }
+        if mfxStyleUsesProgressArc(style) {
+            let ringInset = mfxScaleMetric(width, 24.0, 160.0, 10.0, 44.0)
+            if let progressLayer = mfxFindShapeLayer(root, named: "mfx_hold_progress") {
+                progressLayer.path = CGPath(
+                    ellipseIn: bounds.insetBy(dx: ringInset, dy: ringInset),
+                    transform: nil)
+                progressLayer.strokeEnd = progress
+                let progressAlpha = mfxResolveOpacity(baseOpacityValue, -0.12 + progress * 0.32, 0.16)
+                progressLayer.opacity = Float(progressAlpha)
+            }
 
-        if let headLayer = mfxFindLayer(root, named: "mfx_hold_head") {
-            let radius = max(1.0, width * 0.5 - ringInset)
-            let angle = -CGFloat.pi / 2.0 + progress * CGFloat.pi * 2.0
-            let cx = width * 0.5
-            let cy = frame.height * 0.5
-            headLayer.position = CGPoint(
-                x: cx + cos(angle) * radius,
-                y: cy + sin(angle) * radius)
-            headLayer.opacity = Float(mfxResolveOpacity(baseOpacityValue, -0.08 + progress * 0.38, 0.2))
+            if let headLayer = mfxFindLayer(root, named: "mfx_hold_head") {
+                let radius = max(1.0, width * 0.5 - ringInset)
+                let angle = -CGFloat.pi / 2.0 + progress * CGFloat.pi * 2.0
+                let cx = width * 0.5
+                let cy = frame.height * 0.5
+                headLayer.position = CGPoint(
+                    x: cx + cos(angle) * radius,
+                    y: cy + sin(angle) * radius)
+                headLayer.opacity = Float(mfxResolveOpacity(baseOpacityValue, -0.08 + progress * 0.38, 0.2))
+            }
         }
     }
 }
