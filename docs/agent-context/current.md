@@ -22,6 +22,7 @@
 - macOS hold style parity was tightened again so only `charge` and `neon` keep the explicit outer progress arc/head marker; `lightning/hex/techRing/hologram/quantumHalo/fluxField` no longer inherit the shared circle that their Windows contracts do not render.
 - macOS input-indicator placement is now aligned to the same top-left screen-space contract used by Windows and the shared WASM/docs layer; both `relative` offsets and `absolute` coordinates are interpreted with `+Y` pointing down, and the final panel origin is translated into Cocoa window coordinates only at the last presentation step.
 - macOS input-indicator visuals no longer use the earlier text-only panel. The Swift bridge now draws a Windows-aligned mouse/keyboard indicator surface directly (mouse body, button highlights, wheel arrow, key panel), and scroll labels were normalized to `W+ / W-` to match the Windows indicator contract.
+- macOS and Windows input-indicator keyboard labels now reuse the same shared formatter/streak semantics instead of drifting apart. macOS no longer falls back to opaque labels like `K88`; it now resolves readable key tokens (`Cmd+Tab`, `Key`, `X x2`) using the same combo/streak rules as Windows, while keeping `Cmd` as the platform-facing meta label.
 
 ## WASM Capability Summary
 

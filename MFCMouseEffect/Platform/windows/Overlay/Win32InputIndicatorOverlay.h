@@ -6,6 +6,7 @@
 #include <string>
 
 #include "MouseFx/Core/Config/EffectConfig.h"
+#include "MouseFx/Core/Overlay/InputIndicatorLabelFormatter.h"
 #include "MouseFx/Core/Overlay/IInputIndicatorOverlay.h"
 #include "MouseFx/Renderers/Indicator/IndicatorRenderer.h"
 
@@ -72,11 +73,7 @@ private:
     uint64_t lastScrollTickMs_ = 0;
     int lastScrollDelta_ = 0;
 
-    // Key Streak
-    uint32_t lastKeyVkCode_ = 0;
-    uint32_t lastKeyModifiers_ = 0; // Packed modifiers
-    int keyStreak_ = 0;
-    uint64_t lastKeyTickMs_ = 0;
+    InputIndicatorKeyStreakState keyStreakState_{};
 
     std::wstring eventLabel_{};
     int renderWidthPx_ = 72;

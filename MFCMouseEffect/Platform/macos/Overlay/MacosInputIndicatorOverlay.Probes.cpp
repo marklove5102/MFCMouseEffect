@@ -4,7 +4,18 @@
 
 #include "Platform/macos/Overlay/MacosInputIndicatorOverlayInternals.h"
 
+#include <chrono>
+
 namespace mousefx {
+
+namespace {
+
+uint64_t TickNowMs() {
+    const auto now = std::chrono::steady_clock::now().time_since_epoch();
+    return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+}
+
+} // namespace
 
 void MacosInputIndicatorOverlay::OnClick(const ClickEvent& ev) {
     ShowAt(ev.pt, macos_input_indicator::MouseButtonLabel(ev.button));
@@ -18,7 +29,13 @@ void MacosInputIndicatorOverlay::OnKey(const KeyEvent& ev) {
     if (!ShouldShowKeyboard()) {
         return;
     }
-    ShowAt(ev.pt, macos_input_indicator::KeyLabel(ev));
+
+    const uint64_t now = TickNowMs();
+    const uint64_t timeoutMs = 1000;
+    const int streak = AdvanceInputIndicatorKeyStreak(&keyStreakState_, ev, now, timeoutMs);
+    std::string label = macos_input_indicator::KeyLabel(ev);
+    label = AppendInputIndicatorKeyStreak(std::move(label), streak);
+    ShowAt(ev.pt, label);
 }
 
 bool MacosInputIndicatorOverlay::ReadDebugState(InputIndicatorDebugState* outState) const {
@@ -75,19 +92,28 @@ bool MacosInputIndicatorOverlay::RunKeyboardLabelProbe(std::vector<std::string>*
     metaKey.pt = ScreenPoint{128, 128};
     metaKey.meta = true;
     metaKey.vkCode = 9;
-    const bool metaOk = CaptureExpectedLabel("Cmd+K9", outAppliedLabels, [this, metaKey]() {
+    const bool metaOk = CaptureExpectedLabel("Cmd+Tab", outAppliedLabels, [this, metaKey]() {
         OnKey(metaKey);
     });
 
     KeyEvent plainKey{};
     plainKey.pt = ScreenPoint{128, 128};
     plainKey.vkCode = 6;
-    const bool plainOk = CaptureExpectedLabel("K6", outAppliedLabels, [this, plainKey]() {
+    const bool plainOk = CaptureExpectedLabel("Key", outAppliedLabels, [this, plainKey]() {
         OnKey(plainKey);
+    });
+
+    KeyEvent repeatKey{};
+    repeatKey.pt = ScreenPoint{128, 128};
+    repeatKey.text = L"X";
+    repeatKey.vkCode = 'X';
+    OnKey(repeatKey);
+    const bool repeatOk = CaptureExpectedLabel("X x2", outAppliedLabels, [this, repeatKey]() {
+        OnKey(repeatKey);
     });
     RestoreProbeConfig(oldConfig);
 
-    return textOk && metaOk && plainOk;
+    return textOk && metaOk && plainOk && repeatOk;
 }
 
 } // namespace mousefx

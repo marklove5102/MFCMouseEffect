@@ -29,5 +29,5 @@ _mfx_core_http_automation_contract_indicator_checks() {
     mfx_assert_file_contains "$tmp_dir/input-indicator-keyboard-labels.out" "\"ok\":true" "core input-indicator keyboard labels probe ok"
     mfx_assert_file_contains "$tmp_dir/input-indicator-keyboard-labels.out" "\"supported\":true" "core input-indicator keyboard labels probe supported"
     mfx_assert_file_contains "$tmp_dir/input-indicator-keyboard-labels.out" "\"matched\":true" "core input-indicator keyboard labels probe matched"
-    mfx_assert_file_contains "$tmp_dir/input-indicator-keyboard-labels.out" "\"labels\":[\"A\",\"Cmd+K9\",\"K6\"]" "core input-indicator keyboard labels probe labels"
+    mfx_assert_file_contains "$tmp_dir/input-indicator-keyboard-labels.out" "\"labels\":[\"A\",\"Cmd+Tab\",\"Key\",\"X x2\"]" "core input-indicator keyboard labels probe labels"
 }

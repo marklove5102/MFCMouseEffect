@@ -216,6 +216,9 @@
     <ClInclude Include="MouseFx\Core\Overlay\IInputIndicatorOverlay.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
+    <ClInclude Include="MouseFx\Core\Overlay\InputIndicatorLabelFormatter.h">
+      <Filter>头文件\MouseFx</Filter>
+    </ClInclude>
     <ClInclude Include="MouseFx\Core\Overlay\NullInputIndicatorOverlay.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>

@@ -2,13 +2,12 @@
 
 #include "Platform/macos/Overlay/MacosInputIndicatorOverlayInternals.h"
 
-#include "MouseFx/Utils/StringUtils.h"
+#include "MouseFx/Core/Overlay/InputIndicatorLabelFormatter.h"
 
 #include <algorithm>
 #if defined(__APPLE__)
 #include <pthread.h>
 #endif
-#include <sstream>
 
 namespace mousefx::macos_input_indicator {
 
@@ -34,24 +33,9 @@ std::string ScrollLabel(int delta) {
 }
 
 std::string KeyLabel(const KeyEvent& ev) {
-    if (!ev.text.empty()) {
-        return Utf16ToUtf8(ev.text.c_str());
-    }
-    std::ostringstream oss;
-    if (ev.ctrl) {
-        oss << "Ctrl+";
-    }
-    if (ev.shift) {
-        oss << "Shift+";
-    }
-    if (ev.alt) {
-        oss << "Alt+";
-    }
-    if (ev.meta || ev.win) {
-        oss << "Cmd+";
-    }
-    oss << "K" << ev.vkCode;
-    return oss.str();
+    InputIndicatorKeyLabelOptions options{};
+    options.metaModifierLabel = "Cmd";
+    return BuildInputIndicatorKeyLabel(ev, options);
 }
 
 #if defined(__APPLE__)

@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 
+#include "MouseFx/Utils/StringUtils.h"
 #include "Platform/windows/Protocol/Win32InputTypes.h"
 #include "Platform/PlatformDisplayTopology.h"
 
@@ -71,37 +72,6 @@ struct GdiRenderContext {
     GdiRenderContext(const GdiRenderContext&) = delete;
     GdiRenderContext& operator=(const GdiRenderContext&) = delete;
 };
-
-// Build a combo-key display string from a KeyEvent.
-static std::wstring BuildComboLabel(const KeyEvent& ev) {
-    std::wstring result;
-    const auto append = [&](const wchar_t* part) {
-        if (!result.empty()) result += L'+';
-        result += part;
-    };
-
-    // If the pressed key IS a modifier key, show only that modifier name.
-    const bool keyIsModifier =
-        ev.vkCode == VK_CONTROL || ev.vkCode == VK_LCONTROL || ev.vkCode == VK_RCONTROL ||
-        ev.vkCode == VK_SHIFT   || ev.vkCode == VK_LSHIFT   || ev.vkCode == VK_RSHIFT   ||
-        ev.vkCode == VK_MENU    || ev.vkCode == VK_LMENU    || ev.vkCode == VK_RMENU    ||
-        ev.vkCode == VK_LWIN    || ev.vkCode == VK_RWIN;
-
-    if (keyIsModifier) {
-        return ev.text.empty() ? L"Key" : ev.text;
-    }
-
-    // Prepend held modifier names.
-    if (ev.ctrl)  append(L"Ctrl");
-    if (ev.shift) append(L"Shift");
-    if (ev.alt)   append(L"Alt");
-    if (ev.win)   append(L"Win");
-
-    const std::wstring keyName = ev.text.empty() ? L"Key" : ev.text;
-    if (!result.empty()) result += L'+';
-    result += keyName;
-    return result;
-}
 
 } // namespace
 
@@ -269,29 +239,12 @@ void Win32InputIndicatorOverlay::OnKey(const KeyEvent& ev) {
         }
     }
 
-    // Streak Logic
     const uint64_t now = TickNow();
-    // Modifiers mask: 1=Ctrl, 2=Shift, 4=Alt, 8=Win
-    uint32_t mods = (ev.ctrl ? 1 : 0) | (ev.shift ? 2 : 0) | (ev.alt ? 4 : 0) | (ev.win ? 8 : 0);
-    
-    // Configurable timeout? Use DoubleClickTime + delta as heuristic
     const uint64_t timeout = static_cast<uint64_t>(GetDoubleClickTime()) * 2; // e.g. 1000ms
-
-    if (ev.vkCode == lastKeyVkCode_ && mods == lastKeyModifiers_ && 
-        (now >= lastKeyTickMs_) && (now - lastKeyTickMs_ < timeout)) {
-        keyStreak_++;
-    } else {
-        keyStreak_ = 1;
-    }
-    
-    lastKeyVkCode_ = ev.vkCode;
-    lastKeyModifiers_ = mods;
-    lastKeyTickMs_ = now;
-
-    std::wstring label = BuildComboLabel(ev);
-    if (keyStreak_ > 1) {
-        label += L" x" + std::to_wstring(keyStreak_);
-    }
+    const int streak = AdvanceInputIndicatorKeyStreak(&keyStreakState_, ev, now, timeout);
+    std::string labelUtf8 = BuildInputIndicatorKeyLabel(ev);
+    labelUtf8 = AppendInputIndicatorKeyStreak(std::move(labelUtf8), streak);
+    std::wstring label = Utf8ToWString(labelUtf8);
 
     Trigger(IndicatorEventKind::KeyInput, ToNativePoint(ev.pt), std::move(label), /*isKeyboard=*/true);
 }

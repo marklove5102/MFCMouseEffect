@@ -237,6 +237,7 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClInclude Include="MouseFx\Core\Overlay\IOverlayHostBackend.h" />
     <ClInclude Include="MouseFx\Core\Overlay\OverlayHostService.h" />
     <ClInclude Include="MouseFx\Core\Overlay\IInputIndicatorOverlay.h" />
+    <ClInclude Include="MouseFx\Core\Overlay\InputIndicatorLabelFormatter.h" />
     <ClInclude Include="MouseFx\Core\Overlay\NullInputIndicatorOverlay.h" />
     <ClInclude Include="MouseFx\Core\Shell\IAppShellHost.h" />
     <ClInclude Include="MouseFx\Core\Shell\AppShellCore.h" />

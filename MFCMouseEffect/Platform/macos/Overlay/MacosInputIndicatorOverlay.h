@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MouseFx/Core/Overlay/InputIndicatorLabelFormatter.h"
 #include "MouseFx/Core/Overlay/IInputIndicatorOverlay.h"
 
 #include <atomic>
@@ -48,6 +49,7 @@ private:
     mutable std::mutex debugMutex_{};
     std::string lastAppliedLabel_{};
     uint64_t applyCount_ = 0;
+    InputIndicatorKeyStreakState keyStreakState_{};
 
     void* panel_ = nullptr;
 };

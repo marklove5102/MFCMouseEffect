@@ -109,10 +109,11 @@ bool HandleWebSettingsTestWasmInputApiRoute(
         std::vector<std::string> labels;
         const bool supported = controller->IndicatorOverlay().RunKeyboardLabelProbe(&labels);
         const bool matched = supported &&
-                             labels.size() == 3 &&
+                             labels.size() == 4 &&
                              labels[0] == "A" &&
-                             labels[1] == "Cmd+K9" &&
-                             labels[2] == "K6";
+                             labels[1] == "Cmd+Tab" &&
+                             labels[2] == "Key" &&
+                             labels[3] == "X x2";
         InputIndicatorDebugState debugState{};
         const bool debugStateOk = controller->IndicatorOverlay().ReadDebugState(&debugState);
 
@@ -120,7 +121,7 @@ bool HandleWebSettingsTestWasmInputApiRoute(
             {"ok", true},
             {"supported", supported},
             {"matched", matched},
-            {"expected", json::array({"A", "Cmd+K9", "K6"})},
+            {"expected", json::array({"A", "Cmd+Tab", "Key", "X x2"})},
             {"labels", labels},
             {"debug_state_available", debugStateOk},
             {"last_applied_label", debugStateOk ? debugState.lastAppliedLabel : std::string{}},
