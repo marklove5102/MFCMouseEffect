@@ -129,6 +129,8 @@ struct InputIndicatorConfig {
     bool keyboardEnabled = true;
 
     // --- Position settings (shared by mouse and keyboard) ---
+    // Cross-platform contract uses top-left screen-space semantics:
+    // +X points right, +Y points down.
     std::string positionMode = "relative"; // relative | absolute
     int offsetX = 24;
     int offsetY = 24;

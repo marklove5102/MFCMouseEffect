@@ -20,6 +20,7 @@
 - macOS hold-behavior baseline was recently corrected so `blend` no longer stalls stationary hold animation waiting for a pointer move; periodic hold updates now stay enabled for both `hold_only` and `blend`, with `move_only` remaining the only mode that disables the dedicated hold lane.
 - macOS hold charge/neon overlays also now disable implicit Core Animation actions during timer-driven updates, so the orbit-head marker stays pinned to the ring instead of drifting through the circle interior between frames.
 - macOS hold style parity was tightened again so only `charge` and `neon` keep the explicit outer progress arc/head marker; `lightning/hex/techRing/hologram/quantumHalo/fluxField` no longer inherit the shared circle that their Windows contracts do not render.
+- macOS input-indicator placement is now aligned to the same top-left screen-space contract used by Windows and the shared WASM/docs layer; both `relative` offsets and `absolute` coordinates are interpreted with `+Y` pointing down, and the final panel origin is translated into Cocoa window coordinates only at the last presentation step.
 
 ## WASM Capability Summary
 
