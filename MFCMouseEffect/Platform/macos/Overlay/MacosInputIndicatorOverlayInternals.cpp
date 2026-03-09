@@ -30,7 +30,7 @@ std::string MouseButtonLabel(MouseButton button) {
 }
 
 std::string ScrollLabel(int delta) {
-    return delta >= 0 ? "SCR +" : "SCR -";
+    return delta >= 0 ? "W+" : "W-";
 }
 
 std::string KeyLabel(const KeyEvent& ev) {
