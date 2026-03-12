@@ -50,6 +50,7 @@ bool PosixCoreAppShell::Initialize(const AppShellStartOptions& options) {
     backgroundMode_ = !options.showTrayIcon || !services_.trayService;
 
     appController_ = std::make_unique<AppController>();
+    appController_->SetRuntimeDiagnosticsEnabled(options.enableRuntimeDiagnostics);
     if (!appController_ || !appController_->Start()) {
         if (services_.notifier) {
             services_.notifier->ShowWarning(

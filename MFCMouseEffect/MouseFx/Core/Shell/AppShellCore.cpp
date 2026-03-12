@@ -269,6 +269,7 @@ bool AppShellCore::Initialize(const AppShellStartOptions& options) {
     backgroundMode_ = !options.showTrayIcon || !trayService_;
 
     mouseFx_ = std::make_unique<AppController>();
+    mouseFx_->SetRuntimeDiagnosticsEnabled(options.enableRuntimeDiagnostics);
     if (!mouseFx_->Start()) {
 #ifdef _DEBUG
         NotifyWarning("MFCMouseEffect", BuildStartupFailureMessage(mouseFx_.get()));

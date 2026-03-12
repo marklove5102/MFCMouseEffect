@@ -82,7 +82,7 @@ uint32_t ParseNamedKey(const std::string& token) {
 uint32_t ParseModifier(const std::string& token) {
     if (token == "ctrl" || token == "control") return vk::kControl;
     if (token == "shift") return vk::kShift;
-    if (token == "alt" || token == "menu") return vk::kMenu;
+    if (token == "alt" || token == "menu" || token == "option" || token == "opt") return vk::kMenu;
     if (token == "win" || token == "windows" || token == "meta" ||
         token == "cmd" || token == "command") {
         return vk::kLWin;

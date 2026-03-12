@@ -15,6 +15,7 @@ nlohmann::json BuildGpuRouteNotice(
     const std::string& lang,
     const std::string& activeHoldType);
 nlohmann::json BuildInputIndicatorWasmRouteStatusState(const AppController* controller);
+nlohmann::json BuildInputAutomationGestureRouteStatusState(const AppController* controller);
 nlohmann::json BuildWasmState(const EffectConfig& cfg, const AppController* controller);
 nlohmann::json BuildEffectsRuntimeState();
 nlohmann::json BuildEffectsProfileState(const EffectConfig& cfg);

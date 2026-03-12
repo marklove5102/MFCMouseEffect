@@ -1,4 +1,5 @@
 <script>
+  import GestureRouteDebugPanel from './GestureRouteDebugPanel.svelte';
   import MappingPanel from './MappingPanel.svelte';
   import {
     DEFAULT_GESTURE_MAX_DIRECTIONS,
@@ -63,6 +64,7 @@
   let uiText = {};
   let mousePanelTexts = {};
   let gesturePanelTexts = {};
+  let gestureDebugTexts = {};
   let runtimePlatform = 'windows';
 
   function safeStringify(value) {
@@ -158,7 +160,7 @@
     const options = optionsForKind(kind);
     const fallback = defaultTriggerForKind(kind);
     const source = Array.isArray(rows) ? rows : [];
-    return source.map((item) => createRow(item, fallback, options));
+    return source.map((item) => createRow(item, fallback, options, kind));
   }
 
   function tryRestoreDraftSnapshot(signature) {
@@ -264,7 +266,7 @@
     };
   }
 
-  function createRow(binding, fallbackTrigger, options) {
+  function createRow(binding, fallbackTrigger, options, kind = 'mouse') {
     const triggerChain = normalizeTriggerChain(binding?.triggerChain || binding?.trigger, options, fallbackTrigger);
     const scope = parseAppScopes(
       binding?.app_scopes || binding?.appScopes || binding?.app_scope || binding?.appScope,
@@ -279,7 +281,9 @@
       ? 'exact'
       : sourceModifierMode === 'none'
         ? 'none'
-        : ((sourcePrimary || sourceShift || sourceAlt) ? 'exact' : 'none');
+        : ((sourcePrimary || sourceShift || sourceAlt)
+          ? 'exact'
+          : (kind === 'gesture' ? 'none' : 'any'));
     const normalizedPrimary = normalizedModifierMode === 'exact' ? sourcePrimary : false;
     const normalizedShift = normalizedModifierMode === 'exact' ? sourceShift : false;
     const normalizedAlt = normalizedModifierMode === 'exact' ? sourceAlt : false;
@@ -362,9 +366,10 @@
     }
 
     const weight = {
-      left: 0,
-      middle: 1,
-      right: 2,
+      none: 0,
+      left: 1,
+      middle: 2,
+      right: 3,
     };
 
     return localized.slice().sort((a, b) => {
@@ -389,6 +394,7 @@
   function validationMessages() {
     const isMac = runtimePlatform === 'macos';
     return {
+      missingShortcut: t('auto_missing_shortcut', 'Shortcut is required for enabled mapping.'),
       duplicate: t('auto_conflict_trigger', 'Duplicate trigger chain + app scope. Keep only one enabled mapping per key.'),
       invalidScope: isMac
         ? t('auto_missing_scope_app_macos', 'Please add at least one target app name when selected-app scope is enabled.')
@@ -487,7 +493,7 @@
   function addMapping(kind, binding) {
     const options = optionsForKind(kind);
     const fallback = defaultTriggerForKind(kind);
-    const nextRows = rowCollection(kind).concat(createRow(binding, fallback, options));
+    const nextRows = rowCollection(kind).concat(createRow(binding, fallback, options, kind));
     setRowCollection(kind, nextRows);
     runValidation(kind);
   }
@@ -539,7 +545,7 @@
       bindings,
       options,
       fallback,
-      (binding) => createRow(binding, fallback, options),
+      (binding) => createRow(binding, fallback, options, kind),
       runtimePlatform);
 
     setRowCollection(kind, nextRows);
@@ -590,9 +596,9 @@
     gestureMaxDirections = normalized.gestureMaxDirections;
 
     mouseRows = normalized.mouseMappings.map((item) =>
-      createRow(item, defaultMouseTrigger, mouseOptions));
+      createRow(item, defaultMouseTrigger, mouseOptions, 'mouse'));
     gestureRows = normalized.gestureMappings.map((item) =>
-      createRow(item, defaultGestureTrigger, gestureOptions));
+      createRow(item, defaultGestureTrigger, gestureOptions, 'gesture'));
 
     tryRestoreDraftSnapshot(signature);
     runValidation('mouse');
@@ -716,6 +722,27 @@
         'hint_automation',
         'Action chain trigger format: action1>action2 (for example left_click>scroll_down).'),
     };
+    gestureDebugTexts = {
+      title: t('label_auto_gesture_debug', '手势实时调试（Debug）'),
+      lastStage: t('label_auto_gesture_debug_last_stage', '阶段'),
+      lastReason: t('label_auto_gesture_debug_last_reason', '原因'),
+      lastGesture: t('label_auto_gesture_debug_last_gesture', '识别手势'),
+      triggerButton: t('label_auto_gesture_debug_trigger_button', '触发按键'),
+      matched: t('label_auto_gesture_debug_matched', '命中映射'),
+      injected: t('label_auto_gesture_debug_injected', '快捷键已注入'),
+      source: t('label_auto_gesture_debug_source', '匹配来源'),
+      samples: t('label_auto_gesture_debug_samples', '采样点'),
+      modifiers: t('label_auto_gesture_debug_modifiers', '修饰键'),
+      mappings: t('label_auto_gesture_debug_mappings', '映射数量'),
+      buttonless: t('label_auto_gesture_debug_buttonless', '无按键手势'),
+      pointerDown: t('label_auto_gesture_debug_pointer_down', '指针按下中'),
+      sourceCustom: t('text_auto_gesture_debug_source_custom', '自定义'),
+      sourcePreset: t('text_auto_gesture_debug_source_preset', '预设'),
+      sourceUnknown: t('text_auto_gesture_debug_source_unknown', '未命中'),
+      modifierEmpty: t('text_auto_gesture_debug_modifier_empty', '无'),
+      yes: t('text_common_yes', '是'),
+      no: t('text_common_no', '否'),
+    };
     mousePanelTexts = panelTextsForKind('mouse');
     gesturePanelTexts = panelTextsForKind('gesture');
   }
@@ -780,6 +807,12 @@
           : t('auto_validation_missing_scope_app', 'At least one enabled mapping uses selected-app scope but has no app exe name.'),
       };
     }
+    if (mouseValidation.hasMissingShortcut) {
+      return {
+        ok: false,
+        message: t('auto_validation_missing_shortcut', 'At least one enabled mapping has empty shortcut text.'),
+      };
+    }
     if (mouseValidation.hasDuplicateTrigger) {
       return {
         ok: false,
@@ -795,6 +828,12 @@
         message: isMac
           ? t('auto_validation_missing_scope_app_macos', 'At least one enabled mapping uses selected-app scope but has no app name.')
           : t('auto_validation_missing_scope_app', 'At least one enabled mapping uses selected-app scope but has no app exe name.'),
+      };
+    }
+    if (gestureValidation.hasMissingShortcut) {
+      return {
+        ok: false,
+        message: t('auto_validation_missing_shortcut', 'At least one enabled mapping has empty shortcut text.'),
       };
     }
     if (gestureValidation.hasDuplicateTrigger) {
@@ -889,6 +928,11 @@
           <label for="auto_gesture_max_dirs">{uiText.gestureMaxDirections}</label>
           <input id="auto_gesture_max_dirs" type="number" min="1" max="8" bind:value={gestureMaxDirections} />
         </div>
+        <GestureRouteDebugPanel
+          payloadState={payloadState}
+          platform={runtimePlatform}
+          texts={gestureDebugTexts}
+        />
       </div>
       <div class="automation-mapping-shell automation-mapping-shell--gesture">
         <MappingPanel

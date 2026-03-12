@@ -10,7 +10,13 @@ int AbsInt(int v) {
 
 char QuantizeDirection(const ScreenPoint& from, const ScreenPoint& to) {
     const int dx = to.x - from.x;
-    const int dy = to.y - from.y;
+    int dy = to.y - from.y;
+#if MFX_PLATFORM_MACOS
+    // Keep gesture semantics consistent across platforms: "down" means
+    // moving toward larger screen Y in a top-left-origin mental model.
+    // Quartz reports Y-up coordinates, so invert dy on macOS.
+    dy = -dy;
+#endif
     if (dx == 0 && dy == 0) {
         return '\0';
     }
@@ -44,21 +50,48 @@ const char* DirectionWord(char dir) {
     }
 }
 
+bool IsCardinalDirection(char dir) {
+    return dir == 'L' || dir == 'R' || dir == 'U' || dir == 'D';
+}
+
+void SimplifyDirectionChain(std::vector<char>* dirs) {
+    if (!dirs) {
+        return;
+    }
+    bool changed = true;
+    while (changed && dirs->size() >= 3) {
+        changed = false;
+        for (size_t i = 1; i + 1 < dirs->size(); ++i) {
+            const char prev = (*dirs)[i - 1];
+            const char mid = (*dirs)[i];
+            const char next = (*dirs)[i + 1];
+            // Remove cardinal jitter between same diagonals/axes: A-B-A -> A.
+            if (prev == next && IsCardinalDirection(mid)) {
+                dirs->erase(dirs->begin() + static_cast<std::ptrdiff_t>(i),
+                    dirs->begin() + static_cast<std::ptrdiff_t>(i + 2));
+                changed = true;
+                break;
+            }
+        }
+    }
+}
+
 } // namespace
 
 std::vector<char> GestureRecognizer::QuantizeDirections() const {
     std::vector<char> dirs;
-    if (totalDistancePx_ < config_.minStrokeDistancePx || samples_.size() < 2) {
+    const std::vector<ScreenPoint> points = BuildEvaluationSamples();
+    if (totalDistancePx_ < config_.minStrokeDistancePx || points.size() < 2) {
         return dirs;
     }
 
     const int stepSq = config_.sampleStepPx * config_.sampleStepPx;
     char prev = '\0';
-    for (size_t i = 1; i < samples_.size(); ++i) {
-        if (DistanceSquared(samples_[i - 1], samples_[i]) < stepSq) {
+    for (size_t i = 1; i < points.size(); ++i) {
+        if (DistanceSquared(points[i - 1], points[i]) < stepSq) {
             continue;
         }
-        const char dir = QuantizeDirection(samples_[i - 1], samples_[i]);
+        const char dir = QuantizeDirection(points[i - 1], points[i]);
         if (dir == '\0' || dir == prev) {
             continue;
         }
@@ -68,6 +101,7 @@ std::vector<char> GestureRecognizer::QuantizeDirections() const {
             break;
         }
     }
+    SimplifyDirectionChain(&dirs);
     return dirs;
 }
 

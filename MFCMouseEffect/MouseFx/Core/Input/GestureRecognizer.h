@@ -33,11 +33,14 @@ public:
     void OnButtonDown(const ScreenPoint& pt, int button);
     void OnMouseMove(const ScreenPoint& pt);
     Result OnButtonUp(const ScreenPoint& pt, int button);
+    Result Snapshot() const;
+    bool IsActive() const { return active_; }
 
 private:
     static bool IsTrackedButton(int button);
     static std::string BuildGestureId(const std::vector<char>& dirs);
 
+    std::vector<ScreenPoint> BuildEvaluationSamples() const;
     std::vector<char> QuantizeDirections() const;
     long long DistanceSquared(const ScreenPoint& a, const ScreenPoint& b) const;
 

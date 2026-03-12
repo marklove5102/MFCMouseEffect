@@ -744,11 +744,15 @@
   }
 
   function gestureButtonForRow(row) {
-    const value = `${row?.triggerButton || 'left'}`.trim().toLowerCase();
-    if (value === 'left' || value === 'middle' || value === 'right') {
+    const fallback = `${gestureButtonOptions?.[0]?.value || 'right'}`.trim().toLowerCase();
+    const value = `${row?.triggerButton || fallback}`.trim().toLowerCase();
+    if (value === 'left' || value === 'middle' || value === 'right' || value === 'none') {
       return value;
     }
-    return 'left';
+    if (fallback === 'left' || fallback === 'middle' || fallback === 'right' || fallback === 'none') {
+      return fallback;
+    }
+    return 'right';
   }
 
   function gestureButtonLabel(value) {

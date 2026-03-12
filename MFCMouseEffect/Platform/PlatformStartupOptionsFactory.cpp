@@ -84,6 +84,52 @@ bool TryParseInlineSingleInstanceKey(std::string_view arg, std::string_view* out
     return false;
 }
 
+bool ParseBoolAscii(std::string_view value, bool* out) {
+    if (!out) {
+        return false;
+    }
+    if (value.empty()) {
+        return false;
+    }
+    if (EqualsIgnoreCaseAscii(value, "1") ||
+        EqualsIgnoreCaseAscii(value, "true") ||
+        EqualsIgnoreCaseAscii(value, "yes") ||
+        EqualsIgnoreCaseAscii(value, "on")) {
+        *out = true;
+        return true;
+    }
+    if (EqualsIgnoreCaseAscii(value, "0") ||
+        EqualsIgnoreCaseAscii(value, "false") ||
+        EqualsIgnoreCaseAscii(value, "no") ||
+        EqualsIgnoreCaseAscii(value, "off")) {
+        *out = false;
+        return true;
+    }
+    return false;
+}
+
+bool TryParseInlineDebug(std::string_view arg, bool* outEnabled) {
+    if (!outEnabled) {
+        return false;
+    }
+    constexpr std::string_view kDebugPrefixShort = "-debug=";
+    constexpr std::string_view kDebugPrefixLong = "--debug=";
+    constexpr std::string_view kRuntimeDebugPrefix = "--runtime-debug=";
+    const std::string_view prefixes[] = {kDebugPrefixShort, kDebugPrefixLong, kRuntimeDebugPrefix};
+    for (const std::string_view prefix : prefixes) {
+        if (!StartsWithIgnoreCaseAscii(arg, prefix)) {
+            continue;
+        }
+        bool enabled = false;
+        if (!ParseBoolAscii(arg.substr(prefix.size()), &enabled)) {
+            return false;
+        }
+        *outEnabled = enabled;
+        return true;
+    }
+    return false;
+}
+
 void ApplyModeArg(std::string_view mode, AppShellStartOptions* options) {
     if (!options) {
         return;
@@ -95,6 +141,13 @@ void ApplyModeArg(std::string_view mode, AppShellStartOptions* options) {
     if (EqualsIgnoreCaseAscii(mode, "tray") || EqualsIgnoreCaseAscii(mode, "normal")) {
         options->showTrayIcon = true;
     }
+}
+
+void ApplyRuntimeDebugArg(bool enabled, AppShellStartOptions* options) {
+    if (!options) {
+        return;
+    }
+    options->enableRuntimeDiagnostics = enabled;
 }
 
 void ApplySingleInstanceKeyArg(std::string_view key, AppShellStartOptions* options) {
@@ -113,6 +166,23 @@ void ApplySingleInstanceKeyEnv(AppShellStartOptions* options) {
         return;
     }
     ApplySingleInstanceKeyArg(envKey, options);
+}
+
+void ApplyRuntimeDebugEnv(AppShellStartOptions* options) {
+    if (!options) {
+        return;
+    }
+    const char* envValue = std::getenv("MFX_RUNTIME_DEBUG");
+    if (!envValue || *envValue == '\0') {
+        envValue = std::getenv("MFX_DEBUG");
+    }
+    if (!envValue || *envValue == '\0') {
+        return;
+    }
+    bool enabled = false;
+    if (ParseBoolAscii(envValue, &enabled)) {
+        ApplyRuntimeDebugArg(enabled, options);
+    }
 }
 
 #if MFX_PLATFORM_WINDOWS
@@ -143,12 +213,18 @@ std::string WideToUtf8(const wchar_t* wideText) {
 AppShellStartOptions ParseStartupOptionsFromArgs(const PlatformEntryArgs& entryArgs) {
     AppShellStartOptions options{};
     ApplySingleInstanceKeyEnv(&options);
+    ApplyRuntimeDebugEnv(&options);
     const auto& args = entryArgs.argvUtf8;
     for (size_t i = 0; i < args.size(); ++i) {
         const std::string_view arg = args[i];
         std::string_view inlineKey{};
         if (TryParseInlineSingleInstanceKey(arg, &inlineKey)) {
             ApplySingleInstanceKeyArg(inlineKey, &options);
+            continue;
+        }
+        bool inlineDebugEnabled = false;
+        if (TryParseInlineDebug(arg, &inlineDebugEnabled)) {
+            ApplyRuntimeDebugArg(inlineDebugEnabled, &options);
             continue;
         }
         std::string_view inlineMode{};
@@ -172,6 +248,17 @@ AppShellStartOptions ParseStartupOptionsFromArgs(const PlatformEntryArgs& entryA
                 continue;
             }
             ApplySingleInstanceKeyArg(args[i + 1], &options);
+            continue;
+        }
+        if (EqualsIgnoreCaseAscii(arg, "-debug") ||
+            EqualsIgnoreCaseAscii(arg, "--debug") ||
+            EqualsIgnoreCaseAscii(arg, "--runtime-debug")) {
+            ApplyRuntimeDebugArg(true, &options);
+            continue;
+        }
+        if (EqualsIgnoreCaseAscii(arg, "--no-debug") ||
+            EqualsIgnoreCaseAscii(arg, "--no-runtime-debug")) {
+            ApplyRuntimeDebugArg(false, &options);
             continue;
         }
     }

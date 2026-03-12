@@ -372,6 +372,24 @@
       </label>
     </div>
   </div>
+  <div class="gesture-pattern-editor__threshold-control">
+    <label class="gesture-pattern-editor__threshold-label" for={`gesture_threshold_${row?.id || 'row'}`}>
+      {texts.threshold}
+    </label>
+    <input
+      id={`gesture_threshold_${row?.id || 'row'}`}
+      class="gesture-pattern-editor__threshold-input"
+      type="number"
+      min={MIN_THRESHOLD_PERCENT}
+      max={MAX_THRESHOLD_PERCENT}
+      step="1"
+      disabled={disabled}
+      value={localThresholdPercent}
+      on:input={onThresholdInput}
+      on:wheel={onThresholdWheel}
+    />
+    <span class="gesture-pattern-editor__threshold-unit">%</span>
+  </div>
 
   {#if localMode === 'preset'}
     <div class="gesture-pattern-editor__section">
@@ -442,24 +460,6 @@
         <div class="gesture-pattern-editor__meta-item">
           <span>{texts.canvasStrokeCount || 'Stroke'}</span>
           <strong>{customStrokeCount}</strong>
-        </div>
-        <div class="gesture-pattern-editor__threshold-control">
-          <label class="gesture-pattern-editor__threshold-label" for={`gesture_threshold_${row?.id || 'row'}`}>
-            {texts.threshold}
-          </label>
-          <input
-            id={`gesture_threshold_${row?.id || 'row'}`}
-            class="gesture-pattern-editor__threshold-input"
-            type="number"
-            min={MIN_THRESHOLD_PERCENT}
-            max={MAX_THRESHOLD_PERCENT}
-            step="1"
-            disabled={disabled}
-            value={localThresholdPercent}
-            on:input={onThresholdInput}
-            on:wheel={onThresholdWheel}
-          />
-          <span class="gesture-pattern-editor__threshold-unit">%</span>
         </div>
         <div class="gesture-pattern-editor__meta-item gesture-pattern-editor__meta-item--end">
           <strong>{customPointCount}</strong>

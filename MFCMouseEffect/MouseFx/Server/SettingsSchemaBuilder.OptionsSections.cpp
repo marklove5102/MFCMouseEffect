@@ -132,6 +132,7 @@ void AppendSettingsSchemaOptionsSections(const EffectConfig& config, json* out) 
         {{"value","right"},{"label", LabelByLang(L"\u53f3\u952e\u62d6\u62fd (\u63a8\u8350)", L"Right Drag (Recommended)", lang)}},
         {{"value","middle"},{"label", LabelByLang(L"\u4e2d\u952e\u62d6\u62fd", L"Middle Drag", lang)}},
         {{"value","left"},{"label", LabelByLang(L"\u5de6\u952e\u62d6\u62fd", L"Left Drag", lang)}},
+        {{"value","none"},{"label", LabelByLang(L"\u65e0\u6309\u952e\uff08\u4ec5\u624b\u52bf\uff09", L"No Button (Gesture Only)", lang)}},
     });
     (*out)["automation_gesture_patterns"] = json::array({
         {{"value","line_right"},{"label", LabelByLang(L"\u4e00 / \u5411\u53f3", L"Line Right", lang)}},

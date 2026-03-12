@@ -244,6 +244,9 @@ run_inject_probe "Cmd+C" "$inject_copy_file"
 inject_paste_file="$tmp_dir/match-and-inject-paste.out"
 run_inject_probe "Cmd+V" "$inject_paste_file"
 
+inject_option_file="$tmp_dir/match-and-inject-option-space.out"
+run_inject_probe "Option+Space" "$inject_option_file"
+
 scope_probe_file="$tmp_dir/app-scope-alias-probe.out"
 scope_probe_code="$(mfx_http_code "$scope_probe_file" "$MFX_MANUAL_BASE_URL/api/automation/test-app-scope-match" \
     -X POST \

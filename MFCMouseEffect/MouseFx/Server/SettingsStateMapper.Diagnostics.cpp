@@ -113,4 +113,36 @@ json BuildInputIndicatorWasmRouteStatusState(const AppController* controller) {
     return out;
 }
 
+json BuildInputAutomationGestureRouteStatusState(const AppController* controller) {
+    if (!controller || !controller->RuntimeDiagnosticsEnabled()) {
+        return {};
+    }
+
+    const InputAutomationEngine::Diagnostics diag =
+        controller->InputAutomation().ReadDiagnostics();
+
+    json out = json::object();
+    out["automation_enabled"] = diag.automationEnabled;
+    out["gesture_enabled"] = diag.gestureEnabled;
+    out["buttonless_gesture_enabled"] = diag.buttonlessGestureEnabled;
+    out["pointer_button_down"] = diag.pointerButtonDown;
+    out["gesture_mapping_count"] = diag.gestureMappingCount;
+    out["buttonless_gesture_mapping_count"] = diag.buttonlessGestureMappingCount;
+    out["last_stage"] = diag.lastStage;
+    out["last_reason"] = diag.lastReason;
+    out["last_gesture_id"] = diag.lastGestureId;
+    out["last_trigger_button"] = diag.lastTriggerButton;
+    out["last_matched"] = diag.lastMatched;
+    out["last_injected"] = diag.lastInjected;
+    out["last_used_custom"] = diag.lastUsedCustom;
+    out["last_used_preset"] = diag.lastUsedPreset;
+    out["last_sample_point_count"] = diag.lastSamplePointCount;
+    out["last_modifiers"] = {
+        {"primary", diag.lastModifiers.primary},
+        {"shift", diag.lastModifiers.shift},
+        {"alt", diag.lastModifiers.alt},
+    };
+    return out;
+}
+
 } // namespace mousefx

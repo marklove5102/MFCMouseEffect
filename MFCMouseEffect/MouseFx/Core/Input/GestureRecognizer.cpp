@@ -8,6 +8,7 @@
 
 namespace mousefx {
 namespace {
+constexpr int kButtonNone = 0;
 constexpr int kButtonLeft = 1;
 constexpr int kButtonRight = 2;
 constexpr int kButtonMiddle = 3;
@@ -76,13 +77,43 @@ GestureRecognizer::Result GestureRecognizer::OnButtonUp(const ScreenPoint& pt, i
     Result result;
     result.gestureId = BuildGestureId(dirs);
     result.button = button;
-    result.samplePoints = samples_;
+    result.samplePoints = BuildEvaluationSamples();
     Reset();
     return result;
 }
 
+GestureRecognizer::Result GestureRecognizer::Snapshot() const {
+    Result result;
+    if (!active_) {
+        return result;
+    }
+    result.gestureId = BuildGestureId(QuantizeDirections());
+    result.button = activeButton_;
+    result.samplePoints = BuildEvaluationSamples();
+    return result;
+}
+
 bool GestureRecognizer::IsTrackedButton(int button) {
-    return button == kButtonLeft || button == kButtonMiddle || button == kButtonRight;
+    return button == kButtonNone ||
+           button == kButtonLeft ||
+           button == kButtonMiddle ||
+           button == kButtonRight;
+}
+
+std::vector<ScreenPoint> GestureRecognizer::BuildEvaluationSamples() const {
+    std::vector<ScreenPoint> points = samples_;
+    if (!active_) {
+        return points;
+    }
+    if (points.empty()) {
+        points.push_back(lastRawPt_);
+        return points;
+    }
+    const ScreenPoint& tail = points.back();
+    if (tail.x != lastRawPt_.x || tail.y != lastRawPt_.y) {
+        points.push_back(lastRawPt_);
+    }
+    return points;
 }
 
 } // namespace mousefx

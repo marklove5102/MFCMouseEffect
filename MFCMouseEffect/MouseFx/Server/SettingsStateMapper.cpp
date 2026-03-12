@@ -33,6 +33,11 @@ std::string BuildSettingsStateJson(const EffectConfig& cfg, const AppController*
     if (inputIndicatorWasmRouteStatus.is_object() && !inputIndicatorWasmRouteStatus.empty()) {
         out["input_indicator_wasm_route_status"] = inputIndicatorWasmRouteStatus;
     }
+    const json inputAutomationGestureRouteStatus =
+        BuildInputAutomationGestureRouteStatusState(controller);
+    if (inputAutomationGestureRouteStatus.is_object() && !inputAutomationGestureRouteStatus.empty()) {
+        out["input_automation_gesture_route_status"] = inputAutomationGestureRouteStatus;
+    }
 
     const json wasmState = BuildWasmState(cfg, controller);
     if (wasmState.is_object() && !wasmState.empty()) {

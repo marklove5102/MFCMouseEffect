@@ -213,8 +213,11 @@ function normalizeGesturePatternMode(value) {
 
 function normalizeGestureTriggerButton(value, fallback = DEFAULT_GESTURE_TRIGGER_BUTTON) {
   const button = asText(value).toLowerCase();
-  if (button === 'left' || button === 'middle' || button === 'right') {
+  if (button === 'left' || button === 'middle' || button === 'right' || button === 'none') {
     return button;
+  }
+  if (button === 'no' || button === 'no_button' || button === 'nobutton') {
+    return 'none';
   }
   return fallback;
 }
@@ -488,6 +491,7 @@ export function evaluateRows(rows, options, fallbackTrigger, messages, platform 
   const normalizedFallback = defaultOptionValue(options, fallbackTrigger || '');
   const duplicateMessage = asText(messages?.duplicate);
   const invalidScopeMessage = asText(messages?.invalidScope);
+  const missingShortcutMessage = asText(messages?.missingShortcut);
 
   const nextRows = [];
   const buckets = new Map();
@@ -532,6 +536,9 @@ export function evaluateRows(rows, options, fallbackTrigger, messages, platform 
       continue;
     }
     if (!next.keys) {
+      hasMissingShortcut = true;
+      next.hasConflict = true;
+      next.note = missingShortcutMessage;
       continue;
     }
 

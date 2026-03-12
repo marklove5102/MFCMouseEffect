@@ -184,6 +184,7 @@ struct AutomationKeyBinding {
 
     bool enabled = true;
     std::string trigger;
+    // left | middle | right | none (gesture-only, no button required)
     std::string triggerButton = "left";
     // Scope list format:
     // - "all"
@@ -201,6 +202,7 @@ struct AutomationKeyBinding {
 
 struct GestureAutomationConfig {
     bool enabled = false;
+    // left | middle | right | none (default button for new gesture mappings)
     std::string triggerButton = "left";
     int minStrokeDistancePx = 80;
     int sampleStepPx = 10;

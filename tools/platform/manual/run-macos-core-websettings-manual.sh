@@ -21,6 +21,8 @@ Options:
   --probe-file <path>         Probe file path (default: /tmp/mfx-core-websettings.probe)
   --jobs <num>                Build jobs (sets MFX_BUILD_JOBS)
   --skip-build                Skip cmake configure/build
+  --debug                     Enable runtime diagnostics (gesture routing/status)
+  --no-debug                  Disable runtime diagnostics explicitly
   --no-open                   Do not open browser automatically
   -h, --help                  Show this help
 EOF
@@ -33,6 +35,7 @@ probe_file="/tmp/mfx-core-websettings.probe"
 skip_build=0
 open_browser=1
 build_jobs=""
+debug_mode=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -63,6 +66,14 @@ while [[ $# -gt 0 ]]; do
         ;;
     --skip-build)
         skip_build=1
+        shift
+        ;;
+    --debug)
+        debug_mode=1
+        shift
+        ;;
+    --no-debug)
+        debug_mode=0
         shift
         ;;
     --no-open)
@@ -97,7 +108,11 @@ trap cleanup_lock EXIT
 mfx_manual_prepare_core_host_binary "$repo_root" "$build_dir" "$skip_build"
 host_bin="$MFX_MANUAL_HOST_BIN"
 start_status=0
-mfx_manual_start_core_host "$host_bin" "$probe_file" "$log_file" || start_status=$?
+extra_env=()
+if [[ "$debug_mode" -eq 1 ]]; then
+    extra_env+=(MFX_RUNTIME_DEBUG=1)
+fi
+mfx_manual_start_core_host "$host_bin" "$probe_file" "$log_file" "${extra_env[@]}" || start_status=$?
 if [[ "$start_status" -eq 2 ]]; then
     mfx_ok "manual websettings runner skipped: $MFX_MANUAL_STARTUP_SKIP_REASON"
     exit 0

@@ -80,6 +80,7 @@ AppController::AppController()
     shortcutCaptureSession_.SetClockService(monotonicClockService_.get());
     inputAutomationEngine_.SetForegroundProcessService(foregroundProcessService_.get());
     inputAutomationEngine_.SetKeyboardInjector(keyboardInjector_.get());
+    inputAutomationEngine_.SetDiagnosticsEnabled(runtimeDiagnosticsEnabled_);
     if (!inputIndicatorOverlay_) {
         inputIndicatorOverlay_ = std::make_unique<NullInputIndicatorOverlay>();
     }
@@ -100,6 +101,15 @@ EffectConfig AppController::GetConfigSnapshot() const {
     EffectConfig snapshot{};
     dispatchMessageHost_->SendSync(WM_MFX_GET_CONFIG, 0, reinterpret_cast<intptr_t>(&snapshot));
     return snapshot;
+}
+
+void AppController::SetRuntimeDiagnosticsEnabled(bool enabled) {
+    runtimeDiagnosticsEnabled_ = enabled;
+    inputAutomationEngine_.SetDiagnosticsEnabled(enabled);
+}
+
+bool AppController::RuntimeDiagnosticsEnabled() const {
+    return runtimeDiagnosticsEnabled_;
 }
 
 void AppController::PersistConfig() {

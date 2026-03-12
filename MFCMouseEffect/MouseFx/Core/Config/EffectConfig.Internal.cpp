@@ -215,10 +215,11 @@ std::vector<std::string> NormalizeAutomationAppScopes(std::vector<std::string> v
 
 std::string NormalizeGestureButton(std::string value) {
     value = NormalizeId(std::move(value));
+    if (value == "none" || value == "no_button" || value == "nobutton" || value == "no") return "none";
     if (value == "l" || value == "left_button") return "left";
     if (value == "m" || value == "middle_button") return "middle";
     if (value == "r" || value == "right_button") return "right";
-    if (value != "left" && value != "middle" && value != "right") {
+    if (value != "left" && value != "middle" && value != "right" && value != "none") {
         return "right";
     }
     return value;

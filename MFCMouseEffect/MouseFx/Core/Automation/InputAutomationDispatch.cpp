@@ -43,7 +43,11 @@ bool DispatchAction(
     const InputModifierState& modifiers,
     automation_match::NormalizeActionIdFn normalizeActionId,
     IForegroundProcessService* foregroundProcessService,
-    IKeyboardInjector* keyboardInjector) {
+    IKeyboardInjector* keyboardInjector,
+    DispatchTrace* outTrace) {
+    if (outTrace) {
+        *outTrace = DispatchTrace{};
+    }
     if (!keyboardInjector || rawActionId.empty() || !normalizeActionId) {
         return false;
     }
@@ -51,6 +55,10 @@ bool DispatchAction(
     const std::string normalizedActionId = normalizeActionId(rawActionId);
     if (normalizedActionId.empty()) {
         return false;
+    }
+    if (outTrace) {
+        outTrace->actionAccepted = true;
+        outTrace->normalizedActionId = normalizedActionId;
     }
 
     AppendActionHistory(history, normalizedActionId, historyCap, timingLimit);
@@ -67,8 +75,18 @@ bool DispatchAction(
     if (!match.binding) {
         return false;
     }
+    if (outTrace) {
+        outTrace->bindingMatched = true;
+        outTrace->bindingIndex = match.bindingIndex;
+        outTrace->chainLength = match.chainLength;
+        outTrace->scopeSpecificity = match.scopeSpecificity;
+    }
 
-    return keyboardInjector->SendChord(TrimAscii(match.binding->keys));
+    const bool injected = keyboardInjector->SendChord(TrimAscii(match.binding->keys));
+    if (outTrace) {
+        outTrace->injected = injected;
+    }
+    return injected;
 }
 
 } // namespace mousefx::automation_dispatch

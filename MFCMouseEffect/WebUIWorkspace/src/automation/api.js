@@ -4,8 +4,25 @@ function emptyValidationResult() {
   return { ok: true };
 }
 
-function fallbackReadResult() {
-  return createDefaultAutomationState();
+function fallbackReadResult(payloadState) {
+  const fallback = createDefaultAutomationState();
+  if (!payloadState || typeof payloadState !== 'object') {
+    return fallback;
+  }
+
+  const gesture = (payloadState.gesture && typeof payloadState.gesture === 'object')
+    ? payloadState.gesture
+    : {};
+
+  return {
+    enabled: payloadState.enabled === true,
+    mouse_mappings: Array.isArray(payloadState.mouse_mappings) ? payloadState.mouse_mappings : [],
+    gesture: {
+      ...fallback.gesture,
+      ...gesture,
+      mappings: Array.isArray(gesture.mappings) ? gesture.mappings : [],
+    },
+  };
 }
 
 export function createAutomationApi(Component, mountId) {
@@ -86,7 +103,7 @@ export function createAutomationApi(Component, mountId) {
     },
 
     read() {
-      return invoke('read', fallbackReadResult);
+      return invoke('read', () => fallbackReadResult(latestProps.payloadState));
     },
 
     validate() {

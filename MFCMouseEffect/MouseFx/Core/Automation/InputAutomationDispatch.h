@@ -11,6 +11,16 @@
 
 namespace mousefx::automation_dispatch {
 
+struct DispatchTrace final {
+    bool actionAccepted = false;
+    bool bindingMatched = false;
+    bool injected = false;
+    size_t bindingIndex = static_cast<size_t>(-1);
+    size_t chainLength = 0;
+    int scopeSpecificity = -1;
+    std::string normalizedActionId{};
+};
+
 bool DispatchAction(
     const std::vector<AutomationKeyBinding>& mappings,
     std::vector<automation_match::ActionHistoryEntry>* history,
@@ -20,6 +30,7 @@ bool DispatchAction(
     const InputModifierState& modifiers,
     automation_match::NormalizeActionIdFn normalizeActionId,
     IForegroundProcessService* foregroundProcessService,
-    IKeyboardInjector* keyboardInjector);
+    IKeyboardInjector* keyboardInjector,
+    DispatchTrace* outTrace = nullptr);
 
 } // namespace mousefx::automation_dispatch

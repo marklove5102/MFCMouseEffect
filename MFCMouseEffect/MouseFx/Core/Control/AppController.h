@@ -109,6 +109,8 @@ public:
     void SetTextEffectFontSize(float sizePt);
     void SetInputIndicatorConfig(const InputIndicatorConfig& cfg);
     void SetInputAutomationConfig(const InputAutomationConfig& cfg);
+    void SetRuntimeDiagnosticsEnabled(bool enabled);
+    bool RuntimeDiagnosticsEnabled() const;
     // Set hold follow mode (precise|smooth|efficient).
     void SetHoldFollowMode(const std::string& mode);
     // Set hold presenter backend preference (auto or backend id).
@@ -172,6 +174,7 @@ public:
     InputIndicatorWasmRouteStatus ReadInputIndicatorWasmRouteStatus() const;
     IInputIndicatorOverlay& IndicatorOverlay() { return *inputIndicatorOverlay_; }
     InputAutomationEngine& InputAutomation() { return inputAutomationEngine_; }
+    const InputAutomationEngine& InputAutomation() const { return inputAutomationEngine_; }
     bool ConsumeLatestMove(ScreenPoint* outPt);
     uint64_t CurrentTickMs() const;
     uint32_t CurrentHoldDurationMs() const;
@@ -319,6 +322,7 @@ private:
     mutable std::mutex inputIndicatorWasmRouteStatusMutex_{};
     InputIndicatorWasmRouteStatus inputIndicatorWasmRouteStatus_{};
     InputAutomationEngine inputAutomationEngine_{};
+    bool runtimeDiagnosticsEnabled_ = false;
     mutable ShortcutCaptureSession shortcutCaptureSession_{};
     static constexpr size_t kWasmEffectsHostCount = 5;
     std::array<std::unique_ptr<wasm::WasmEffectHost>, kWasmEffectsHostCount> wasmEffectHosts_{};
