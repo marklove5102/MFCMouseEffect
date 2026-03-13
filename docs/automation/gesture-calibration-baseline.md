@@ -1,6 +1,6 @@
 # Gesture Calibration Baseline
 
-Updated: 2026-03-13 10:55:18 +0800
+Updated: 2026-03-13 18:58:34 +0800
 
 ## Sweep Grid
 
@@ -50,7 +50,7 @@ Updated: 2026-03-13 10:55:18 +0800
 
 ## W Probe (margin=4, min_len=18)
 
-- reason=accepted best_id=w best=100.00 runner=10.77 delta=89.23
+- reason=accepted best_id=w best=100.00 runner=-1.00 delta=n/a
 
 ## Reproduce
 

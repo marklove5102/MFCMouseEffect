@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-13T09:59:15.731Z",
+  "generated_at": "2026-03-13T15:11:55.694Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "This file is the compact P1 runtime truth for daily execution.",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 158,
-      "size_bytes": 10496,
-      "estimated_tokens": 2624,
+      "line_count": 201,
+      "size_bytes": 17031,
+      "estimated_tokens": 4258,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "e32cfe9cceab5c5240809a5700b07153c3746afd",
-      "updated_at": "2026-03-13T09:42:09.875Z"
+      "hash_sha1": "177a21085eb7a1454a22b32e7e7a067c4453adc5",
+      "updated_at": "2026-03-13T15:04:03.757Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -550,16 +550,16 @@
         "baseline",
         "macos"
       ],
-      "summary": "Updated: 2026-03-13 10:55:18 +0800",
+      "summary": "Updated: 2026-03-13 18:58:34 +0800",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
       "line_count": 60,
-      "size_bytes": 1268,
+      "size_bytes": 1266,
       "estimated_tokens": 317,
       "max_read_tokens": 437,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "393bbc628d3a5735719469b0f434a7a4e06690a8",
-      "updated_at": "2026-03-13T02:55:18.559Z"
+      "hash_sha1": "927c28ac7c0efef0bddef364a2dd8deae875587e",
+      "updated_at": "2026-03-13T10:58:34.946Z"
     },
     {
       "id": "docs/automation/gesture-matching.md",
@@ -583,14 +583,14 @@
       ],
       "summary": "Updated: 2026-03-13",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 349,
-      "size_bytes": 13741,
-      "estimated_tokens": 3436,
+      "line_count": 431,
+      "size_bytes": 17845,
+      "estimated_tokens": 4462,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "7a69dcf5c13e138caef2f24fbfc3b3da17a87ee7",
-      "updated_at": "2026-03-13T06:48:26.480Z"
+      "hash_sha1": "9e68e144d1447a38c57e817816bcf7d512c118f1",
+      "updated_at": "2026-03-13T12:17:04.538Z"
     },
     {
       "id": "docs/README.md",

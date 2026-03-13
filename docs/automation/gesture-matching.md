@@ -27,6 +27,7 @@ The module owns:
 - resampling
 - stroke similarity scoring
 - unified window-aware candidate scoring (`best/runner-up/window/candidate_count`) for preset + custom
+- recognizer direction-chain cleanup before id generation (`collect -> simplify -> cap`)
 - route-time winner selection is no longer raw-score-only; it now considers template complexity and matched-window coverage so larger gestures are not easily intercepted by simpler sub-shapes
 
 `InputAutomationEngine.cpp` now keeps only automation-specific orchestration:
@@ -109,6 +110,25 @@ Practical effect:
 - if a captured gesture sits between two preset families, runtime now prefers “no trigger” over “wrong trigger”
 - a clear winner still dispatches normally
 
+### Generic Sub-Shape Hijack Suppression
+
+To avoid a family-wide class of failures (complex gesture being intercepted by a simpler sub-shape):
+
+- runtime now compares recognizer chain complexity vs candidate template complexity
+- if recognizer complexity is clearly higher (`+2` direction units or more) but candidate only explains a partial local window (low coverage), that candidate is rejected before dispatch ranking
+
+This rule is generic and applies to the whole preset family set, not only a single pair like `W/V`.
+
+## Preset Dual-Direction Variants
+
+Preset matching now supports dual-direction variants for zig-zag/diagonal families:
+
+- reverse-direction variant
+- horizontal-mirror variant
+- mirror+reverse variant
+
+These variants are evaluated under the same matcher and ambiguity policy, so different drawing direction habits (for example right-to-left `W`) can still match the intended preset family without pair-specific patches.
+
 ### Aspect-Preserving Normalization
 
 Stroke normalization no longer stretches `x` and `y` independently to fill the full `0..100` box.
@@ -137,6 +157,20 @@ Current tuning note:
 
 Scoring range remains `0..100`.
 
+## Recognizer Direction-ID Guardrail
+
+To avoid `W`/multi-turn gestures being cut by early jitter:
+
+- recognizer now collects more raw direction transitions first
+- then applies chain simplification (including diagonal-bridge cardinal jitter cleanup)
+- only then enforces `maxDirections` cap (tail-preferred)
+
+This keeps later intended turns visible in `recognized_gesture_id` and improves downstream preset selection stability.
+
+Additional canonicalization rule:
+
+- `diag_down_right_diag_up_right_diag_down_right_diag_up_right` is normalized to preset `w` id (`diag_down_right_diag_up_right_diag_down_right`) for routing/diagnostics consistency.
+
 ## Custom Gesture = First-Class Runtime
 
 Custom matching now uses the same core matcher as preset and keeps existing config contract:
@@ -152,11 +186,20 @@ Custom matching now uses the same core matcher as preset and keeps existing conf
 
 ### Production defaults
 
-- window coverage search: `30%..100%` (step `12%`, slide divisor `4`)
-- time window search:
-  - window duration: `200..1200ms` (step `160ms`)
-  - anchor sliding step: `90ms`
-  - max evaluated time windows per stroke: `72`
+- pressed-button route (`left/right/middle drag`) window search:
+  - spatial coverage: `18%..100%` (step `7%`, slide divisor `5`)
+  - max spatial candidates: `132`
+  - time window duration: `140..1750ms` (step `110ms`)
+  - time anchor step: `60ms`
+  - max time candidates: `96`
+  - time resample fallback: `22ms` grid, max `108` points
+- buttonless route (`trigger_button=none`) window search:
+  - spatial coverage: `22%..100%` (step `8%`, slide divisor `5`)
+  - max spatial candidates: `88`
+  - time window duration: `160..1450ms` (step `120ms`)
+  - time anchor step: `70ms`
+  - max time candidates: `72`
+  - time resample fallback: `26ms` grid, max `88` points
 - ambiguity margin: adaptive by best score
   - `>=92 -> 1.5`
   - `>=86 -> 2.5`
@@ -170,6 +213,20 @@ Custom matching now uses the same core matcher as preset and keeps existing conf
   - `MFX_GESTURE_AMBIGUITY_MARGIN=<double>` (valid range `0.5..20.0`)
 - env override for custom min effective stroke:
   - `MFX_GESTURE_CUSTOM_MIN_EFFECTIVE_STROKE_PX=<double>` (valid range `0..300`)
+- env overrides for runtime window geometry and candidate budgets:
+  - `MFX_GESTURE_WINDOW_COVERAGE_MIN_PERCENT`
+  - `MFX_GESTURE_WINDOW_COVERAGE_MAX_PERCENT`
+  - `MFX_GESTURE_WINDOW_COVERAGE_STEP_PERCENT`
+  - `MFX_GESTURE_WINDOW_SLIDE_DIVISOR`
+  - `MFX_GESTURE_WINDOW_SPATIAL_MAX_CANDIDATES`
+  - `MFX_GESTURE_WINDOW_TIME_MIN_MS`
+  - `MFX_GESTURE_WINDOW_TIME_MAX_MS`
+  - `MFX_GESTURE_WINDOW_TIME_STEP_MS`
+  - `MFX_GESTURE_WINDOW_TIME_ANCHOR_STEP_MS`
+  - `MFX_GESTURE_WINDOW_TIME_MAX_CANDIDATES`
+- env overrides for time-resample fallback:
+  - `MFX_GESTURE_TIME_RESAMPLE_STEP_MS`
+  - `MFX_GESTURE_TIME_RESAMPLE_MAX_POINTS`
 - test API override for window search geometry:
   - `/api/automation/test-gesture-similarity` request `options`:
     - `window_coverage_min_percent`
@@ -222,6 +279,11 @@ If a live buttonless stroke is still growing, the runtime will re-evaluate the s
 - idles out and resets
 - changes into a different recognized gesture id
 
+Realtime behavior note:
+
+- buttonless route no longer short-circuits only because current recognized id equals the previous one.
+- as the same stroke keeps growing, runtime keeps re-evaluating windows so debug-side recognized updates stay continuous and dispatch can occur when confidence becomes sufficient later in the same stroke.
+
 ### Noisy-Motion Filter (Buttonless)
 
 Before buttonless route dispatch, runtime now drops clearly chaotic strokes and does not enter gesture trigger routing.
@@ -235,6 +297,17 @@ Current filter uses combined signals:
 Filtered routes emit diagnostics reason:
 
 - `buttonless_noisy_motion_filtered`
+
+### Noisy-Motion Filter (Pressed Drag)
+
+Pressed drag route now has an additional conservative noisy-motion rejection before preset/custom routing:
+
+- stage reason: `pressed_noisy_motion_filtered`
+- strategy:
+  - stricter than buttonless (higher min points / higher turn-density requirement)
+  - only blocks chaotic scribble-like drag traces, does not target normal intentional gesture paths
+
+This is a stability guard for accidental fast scribble drag, not a replacement for preset/custom similarity thresholds.
 
 ## Runtime Impact
 
@@ -258,6 +331,15 @@ Each event includes:
 - `stage` / `reason`: route stage and decision reason
 - `gesture_id`: compatibility field (`matched` if available, otherwise `recognized`)
 - `recognized_gesture_id`: live/current recognizer output
+- `preview_points`: lightweight sampled trajectory points for realtime debug drawing
+- `preview_path_hash`: dedupe key so path-shape changes are observable even when other fields stay the same
+
+Preview fidelity policy:
+
+- preview trajectory collection/rendering is debug-only (`RuntimeDiagnosticsEnabled` gate).
+- non-debug runtime does not emit these preview samples.
+- default preview cap is higher for shape fidelity (`180` points), and can be tuned by:
+  - `MFX_GESTURE_DEBUG_PREVIEW_MAX_POINTS` (`32..512`)
 - `matched_gesture_id`: mapping-hit gesture id only (empty when binding not matched)
 - `trigger_button`
 - `matched` / `injected`
