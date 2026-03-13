@@ -959,6 +959,9 @@
                     canvasStrokeCount: texts.gestureCanvasStrokeCount,
                     canvasPointUnit: texts.gestureCanvasPointUnit,
                     canvasNoDirection: texts.gestureCanvasNoDirection,
+                    canvasDraw: texts.gestureCanvasDraw,
+                    canvasSave: texts.gestureCanvasSave,
+                    canvasLockedHint: texts.gestureCanvasLockedHint,
                   }}
                   on:triggerchange={(event) => emitRowChange(row.id, 'triggerChain', event.detail?.trigger)}
                   on:change={(event) => emitRowChange(row.id, 'gesturePattern', event.detail?.gesturePattern)}

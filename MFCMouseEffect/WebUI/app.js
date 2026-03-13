@@ -8,6 +8,10 @@
   let cachedSchema = null;
   let cachedSchemaLang = '';
   let cachedState = null;
+  let gestureDebugPollTimer = 0;
+  let gestureDebugPollInFlight = false;
+
+  const GESTURE_DEBUG_POLL_MS = 200;
 
   const I18N = window.MfxWebI18n || {};
 
@@ -100,6 +104,106 @@
     return null;
   }
 
+  function isObject(value) {
+    return !!value && typeof value === 'object';
+  }
+
+  function currentRuntimePlatform() {
+    return `${cachedSchema?.capabilities?.platform || ''}`.trim();
+  }
+
+  function syncWorkspaceGestureRouteStatus(routeStatus) {
+    if (!window.MfxSectionWorkspace || typeof window.MfxSectionWorkspace.syncRuntimeState !== 'function') {
+      return;
+    }
+    try {
+      window.MfxSectionWorkspace.syncRuntimeState({
+        platform: currentRuntimePlatform(),
+        input_automation_gesture_route_status: isObject(routeStatus) ? routeStatus : null,
+      });
+    } catch (_error) {
+      // Keep runtime state sync best-effort during diagnostics polling.
+    }
+  }
+
+  function hasGestureRouteDiagnosticsPayload() {
+    return isObject(cachedState?.input_automation_gesture_route_status);
+  }
+
+  function shouldRunGestureDebugPolling() {
+    return (
+      connectionState === 'online' &&
+      hasRenderedSettings &&
+      hasGestureRouteDiagnosticsPayload());
+  }
+
+  function clearGestureDebugPollTimer() {
+    if (!gestureDebugPollTimer) {
+      return;
+    }
+    window.clearTimeout(gestureDebugPollTimer);
+    gestureDebugPollTimer = 0;
+  }
+
+  function isAutomationSectionActive() {
+    if (window.MfxSectionWorkspace &&
+        typeof window.MfxSectionWorkspace.isAutomationSectionActive === 'function') {
+      return window.MfxSectionWorkspace.isAutomationSectionActive();
+    }
+    return `${location.hash || ''}`.trim().toLowerCase() === '#automation';
+  }
+
+  async function pollGestureDebugStateOnce() {
+    if (!shouldRunGestureDebugPolling() || !isAutomationSectionActive() || gestureDebugPollInFlight) {
+      return;
+    }
+    gestureDebugPollInFlight = true;
+    try {
+      const latest = await apiGet('/api/state');
+      if (!isObject(latest)) {
+        return;
+      }
+      const routeStatus = latest.input_automation_gesture_route_status;
+      if (!isObject(routeStatus)) {
+        cachedState = {
+          ...(isObject(cachedState) ? cachedState : {}),
+          input_automation_gesture_route_status: null,
+        };
+        syncWorkspaceGestureRouteStatus(null);
+        return;
+      }
+      cachedState = {
+        ...(isObject(cachedState) ? cachedState : {}),
+        input_automation_gesture_route_status: routeStatus,
+      };
+      syncWorkspaceGestureRouteStatus(routeStatus);
+    } catch (_error) {
+      // Diagnostics polling is best-effort; fallback to normal reload flow.
+    } finally {
+      gestureDebugPollInFlight = false;
+    }
+  }
+
+  async function runGestureDebugPollLoop() {
+    await pollGestureDebugStateOnce();
+    if (!shouldRunGestureDebugPolling()) {
+      clearGestureDebugPollTimer();
+      return;
+    }
+    gestureDebugPollTimer = window.setTimeout(runGestureDebugPollLoop, GESTURE_DEBUG_POLL_MS);
+  }
+
+  function refreshGestureDebugPolling() {
+    if (!shouldRunGestureDebugPolling()) {
+      clearGestureDebugPollTimer();
+      return;
+    }
+    if (gestureDebugPollTimer) {
+      return;
+    }
+    gestureDebugPollTimer = window.setTimeout(runGestureDebugPollLoop, GESTURE_DEBUG_POLL_MS);
+  }
+
   function setActionButtonsEnabled(enabled) {
     const shell = shellUi();
     if (shell && typeof shell.setActionsEnabled === 'function') {
@@ -156,20 +260,24 @@
         return;
       }
       setStatus(t.status_ready || 'Ready.', 'ok');
+      refreshGestureDebugPolling();
       return;
     }
     if (next === 'unauthorized') {
       setActionButtonsEnabled(true);
       setStatus(t.unauthorized_hint || 'Unauthorized.', 'warn');
+      clearGestureDebugPollTimer();
       return;
     }
     if (next === 'stopped') {
       setActionButtonsEnabled(true);
       setStatus(t.stopped_hint || 'Server stopped.', 'offline');
+      clearGestureDebugPollTimer();
       return;
     }
     setActionButtonsEnabled(true);
     setStatus(t.disconnected_hint || 'Disconnected from server.', 'offline');
+    clearGestureDebugPollTimer();
   }
 
   function clearReloadRetryTimer() {
@@ -266,9 +374,13 @@
     }
 
     if (window.MfxAutomationUi && typeof window.MfxAutomationUi.render === 'function') {
+      const automationState = {
+        ...(st.automation || {}),
+        input_automation_gesture_route_status: st.input_automation_gesture_route_status || null,
+      };
       window.MfxAutomationUi.render({
         schema,
-        state: st.automation || {},
+        state: automationState,
         i18n,
       });
       if (typeof window.MfxAutomationUi.syncI18n === 'function') {
@@ -278,6 +390,9 @@
           // Keep reload resilient if automation i18n sync fails.
         }
       }
+    }
+    if (window.MfxSectionWorkspace && typeof window.MfxSectionWorkspace.syncRuntimeState === 'function') {
+      syncWorkspaceGestureRouteStatus(st.input_automation_gesture_route_status || null);
     }
     if (window.MfxSectionWorkspace && typeof window.MfxSectionWorkspace.refresh === 'function') {
       window.MfxSectionWorkspace.refresh();
@@ -294,6 +409,7 @@
     hasRenderedSettings = true;
     clearReloadRetryTimer();
     markConnection('online', true);
+    refreshGestureDebugPolling();
     const runtimeNotice = pickRuntimeNotice(st);
     if (runtimeNotice) {
       setStatus(runtimeNotice.message, runtimeNotice.level === 'warn' ? 'warn' : 'ok');
@@ -603,6 +719,10 @@
 
   bindShellActions();
   bindLanguageChange();
+
+  window.addEventListener('hashchange', () => {
+    refreshGestureDebugPolling();
+  });
 
   if (window.MfxSectionWorkspace && typeof window.MfxSectionWorkspace.init === 'function') {
     window.MfxSectionWorkspace.init();

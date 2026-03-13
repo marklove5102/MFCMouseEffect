@@ -1,11 +1,16 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import AutomationSidebarDebugCard from './AutomationSidebarDebugCard.svelte';
 
   export let sections = [];
   export let texts = {
     hint_view_focus: 'Focused view shows one section at a time to reduce noise.',
     section_nav_aria: 'Settings sections',
   };
+  export let activeSectionId = '';
+  export let runtimePlatform = 'windows';
+  export let runtimeState = {};
+  export let i18n = {};
 
   const dispatch = createEventDispatcher();
 
@@ -28,3 +33,11 @@
     </a>
   {/each}
 </div>
+
+{#if activeSectionId === 'automation'}
+  <AutomationSidebarDebugCard
+    payloadState={runtimeState}
+    platform={runtimePlatform}
+    i18n={i18n}
+  />
+{/if}

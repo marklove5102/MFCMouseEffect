@@ -8,6 +8,8 @@ const state = {
   sections: [],
   activeId: '',
   i18n: null,
+  runtimePlatform: 'windows',
+  runtimeState: {},
   component: null,
   contextComponent: null,
 };
@@ -180,6 +182,10 @@ function updateSidebarView() {
   state.component.$set({
     sections: sectionsViewModel(),
     texts: workspaceTexts(),
+    activeSectionId: state.activeId,
+    runtimePlatform: state.runtimePlatform,
+    runtimeState: state.runtimeState,
+    i18n: state.i18n || {},
   });
 }
 
@@ -321,9 +327,37 @@ function syncI18n(i18n) {
   updateContextView();
 }
 
+function normalizePlatform(value) {
+  const text = `${value || ''}`.trim().toLowerCase();
+  if (text === 'macos' || text === 'windows' || text === 'linux') {
+    return text;
+  }
+  return 'windows';
+}
+
+function syncRuntimeState(runtimeState) {
+  const source = (runtimeState && typeof runtimeState === 'object') ? runtimeState : {};
+  state.runtimePlatform = normalizePlatform(source.platform);
+  state.runtimeState = {
+    input_automation_gesture_route_status: source.input_automation_gesture_route_status || null,
+  };
+  updateSidebarView();
+}
+
+function getActiveSectionId() {
+  return `${state.activeId || ''}`.trim();
+}
+
+function isAutomationSectionActive() {
+  return getActiveSectionId() === 'automation';
+}
+
 window.MfxSectionWorkspace = {
   init,
   refresh,
   setMode,
   syncI18n,
+  syncRuntimeState,
+  getActiveSectionId,
+  isAutomationSectionActive,
 };

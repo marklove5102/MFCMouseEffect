@@ -24,9 +24,12 @@
 
   const dispatch = createEventDispatcher();
   let localMode = 'preset';
-  let localCustomStrokes = [];
-  let localStrokeSignature = '[]';
-  let localWritePending = false;
+  let savedCustomStrokes = [];
+  let savedStrokeSignature = '[]';
+  let draftCustomStrokes = [];
+  let draftStrokeSignature = '[]';
+  let customEditEnabled = false;
+  let customSavePending = false;
   let localModeWritePending = false;
   let localThresholdPercent = 75;
   let localThresholdWritePending = false;
@@ -98,7 +101,37 @@
       : 'preset';
     localMode = nextMode;
     localModeWritePending = true;
+    if (nextMode !== 'custom') {
+      customEditEnabled = false;
+    }
     emitPatch({ mode: nextMode });
+  }
+
+  function beginCustomDraw() {
+    if (disabled || localMode !== 'custom') {
+      return;
+    }
+    customEditEnabled = true;
+    draftCustomStrokes = normalizeGestureStrokes(savedCustomStrokes, MAX_CUSTOM_STROKES);
+    draftStrokeSignature = strokesSignature(draftCustomStrokes);
+  }
+
+  function saveCustomDraw() {
+    if (disabled || localMode !== 'custom' || !customEditEnabled) {
+      return;
+    }
+    const normalized = normalizeGestureStrokes(draftCustomStrokes, MAX_CUSTOM_STROKES);
+    savedCustomStrokes = normalized;
+    savedStrokeSignature = strokesSignature(normalized);
+    draftCustomStrokes = normalizeGestureStrokes(normalized, MAX_CUSTOM_STROKES);
+    draftStrokeSignature = savedStrokeSignature;
+    customEditEnabled = false;
+    customSavePending = true;
+    emitPatch({
+      mode: 'custom',
+      customStrokes: normalized,
+      customPoints: flattenGestureStrokes(normalized, MAX_CUSTOM_STROKES),
+    });
   }
 
   function onPresetValueChange(value) {
@@ -302,32 +335,34 @@
   }
 
   function onPadChange(event) {
-    localCustomStrokes = normalizeGestureStrokes(event.detail?.strokes, MAX_CUSTOM_STROKES);
-    localStrokeSignature = strokesSignature(localCustomStrokes);
-    localWritePending = true;
-    emitPatch({
-      mode: 'custom',
-      customStrokes: localCustomStrokes,
-      customPoints: flattenGestureStrokes(localCustomStrokes, MAX_CUSTOM_STROKES),
-    });
+    if (disabled || localMode !== 'custom') {
+      return;
+    }
+    customEditEnabled = true;
+    draftCustomStrokes = normalizeGestureStrokes(event.detail?.strokes, MAX_CUSTOM_STROKES);
+    draftStrokeSignature = strokesSignature(draftCustomStrokes);
   }
 
   $: incomingPattern = row?.gesturePattern || {};
   $: incomingStrokes = normalizePatternStrokes(incomingPattern);
   $: incomingStrokeSignature = strokesSignature(incomingStrokes);
   $: {
-    if (localWritePending) {
-      if (incomingStrokeSignature === localStrokeSignature) {
-        localWritePending = false;
+    if (customSavePending) {
+      if (incomingStrokeSignature === savedStrokeSignature) {
+        customSavePending = false;
       }
-    } else if (incomingStrokeSignature !== localStrokeSignature) {
-      localCustomStrokes = incomingStrokes;
-      localStrokeSignature = incomingStrokeSignature;
+    } else if (incomingStrokeSignature !== savedStrokeSignature) {
+      savedCustomStrokes = incomingStrokes;
+      savedStrokeSignature = incomingStrokeSignature;
+      if (!customEditEnabled) {
+        draftCustomStrokes = normalizeGestureStrokes(incomingStrokes, MAX_CUSTOM_STROKES);
+        draftStrokeSignature = incomingStrokeSignature;
+      }
     }
   }
   $: incomingMode = normalizeModeValue(incomingPattern.mode);
   $: {
-    const fallbackMode = localCustomStrokes.length > 0 ? 'custom' : 'preset';
+    const fallbackMode = incomingStrokes.length > 0 ? 'custom' : 'preset';
     if (localModeWritePending) {
       if ((incomingMode || fallbackMode) === localMode) {
         localModeWritePending = false;
@@ -336,7 +371,9 @@
       localMode = incomingMode || fallbackMode;
     }
   }
-  $: customStrokeSet = localCustomStrokes;
+  $: customStrokeSet = customEditEnabled ? draftCustomStrokes : savedCustomStrokes;
+  $: customPadDisabled = disabled || !customEditEnabled;
+  $: customSaveEnabled = !disabled && customEditEnabled && draftStrokeSignature !== savedStrokeSignature;
   $: customPointCount = gestureStrokePointCount(customStrokeSet);
   $: customStrokeCount = customStrokeSet.length;
   $: customDirections = gestureStrokeDirections(customStrokeSet, 8);
@@ -424,17 +461,40 @@
     <div class="gesture-pattern-editor__section">
       <div class="gesture-pattern-editor__label-row">
         <div class="gesture-pattern-editor__label">{texts.custom}</div>
-        <span
-          class="gesture-pattern-editor__limit-tip"
-          title={texts.canvasLimitHint}
-          aria-label={texts.canvasLimitHint}
-        >
-          {texts.canvasLimitBadge || '!'}
-        </span>
+        <div class="gesture-pattern-editor__custom-actions">
+          <button
+            type="button"
+            class="btn-soft gesture-pattern-editor__custom-btn"
+            disabled={disabled}
+            on:click={beginCustomDraw}
+          >
+            {texts.canvasDraw || 'Draw'}
+          </button>
+          <button
+            type="button"
+            class="btn-soft gesture-pattern-editor__custom-btn"
+            disabled={!customSaveEnabled}
+            on:click={saveCustomDraw}
+          >
+            {texts.canvasSave || 'Save'}
+          </button>
+          <span
+            class="gesture-pattern-editor__limit-tip"
+            title={texts.canvasLimitHint}
+            aria-label={texts.canvasLimitHint}
+          >
+            {texts.canvasLimitBadge || '!'}
+          </span>
+        </div>
       </div>
+      {#if !customEditEnabled}
+        <div class="gesture-pattern-editor__locked-tip">
+          {texts.canvasLockedHint || 'Click "Draw" to edit custom gesture.'}
+        </div>
+      {/if}
       <GesturePatternPad
         strokes={customStrokeSet}
-        disabled={disabled}
+        disabled={customPadDisabled}
         maxStrokes={MAX_CUSTOM_STROKES}
         texts={{
           empty: texts.canvasEmpty,
@@ -469,3 +529,27 @@
     </div>
   {/if}
 </div>
+
+<style>
+  .gesture-pattern-editor__custom-actions {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gesture-pattern-editor__custom-btn {
+    min-width: 68px;
+    padding: 6px 12px;
+  }
+
+  .gesture-pattern-editor__locked-tip {
+    margin-bottom: 8px;
+    border: 1px dashed #bfd5ee;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: #4c6b8f;
+    background: rgba(242, 249, 255, 0.7);
+  }
+</style>

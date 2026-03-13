@@ -21,7 +21,6 @@
   let committedStrokes = [];
   let pointerId = -1;
   let committedSignature = '[]';
-  let localWritePending = false;
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
   }
@@ -51,7 +50,6 @@
     const normalized = normalizeGestureStrokes(nextStrokes, maxStrokes);
     committedStrokes = normalized;
     committedSignature = strokeSignature(normalized);
-    localWritePending = true;
     dispatch('change', { strokes: normalized });
   }
 
@@ -181,11 +179,7 @@
     const normalizedIncoming = normalizeGestureStrokes(strokes, maxStrokes);
     const incomingSignature = strokeSignature(normalizedIncoming);
     if (!drawing) {
-      if (localWritePending) {
-        if (incomingSignature === committedSignature) {
-          localWritePending = false;
-        }
-      } else if (incomingSignature !== committedSignature) {
+      if (incomingSignature !== committedSignature) {
         committedStrokes = normalizedIncoming;
         committedSignature = incomingSignature;
       }

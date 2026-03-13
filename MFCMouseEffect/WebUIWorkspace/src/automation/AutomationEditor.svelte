@@ -1,5 +1,4 @@
 <script>
-  import GestureRouteDebugPanel from './GestureRouteDebugPanel.svelte';
   import MappingPanel from './MappingPanel.svelte';
   import {
     DEFAULT_GESTURE_MAX_DIRECTIONS,
@@ -64,7 +63,6 @@
   let uiText = {};
   let mousePanelTexts = {};
   let gesturePanelTexts = {};
-  let gestureDebugTexts = {};
   let runtimePlatform = 'windows';
 
   function safeStringify(value) {
@@ -699,6 +697,9 @@
       gestureCanvasStrokeCount: t('label_auto_gesture_canvas_strokes', 'Strokes'),
       gestureCanvasPointUnit: t('text_auto_gesture_canvas_point_unit', 'pt'),
       gestureCanvasNoDirection: t('text_auto_gesture_canvas_no_direction', 'No direction'),
+      gestureCanvasDraw: t('btn_auto_gesture_canvas_draw', 'Draw'),
+      gestureCanvasSave: t('btn_auto_gesture_canvas_save', 'Save'),
+      gestureCanvasLockedHint: t('text_auto_gesture_canvas_locked_hint', 'Click "Draw" to edit custom gesture.'),
       templateNone: t('auto_template_none', 'Select quick template'),
       templateTitle: kind === 'gesture'
         ? t('label_auto_gesture_template', 'Gesture quick template')
@@ -721,27 +722,6 @@
       hint: t(
         'hint_automation',
         'Action chain trigger format: action1>action2 (for example left_click>scroll_down).'),
-    };
-    gestureDebugTexts = {
-      title: t('label_auto_gesture_debug', '手势实时调试（Debug）'),
-      lastStage: t('label_auto_gesture_debug_last_stage', '阶段'),
-      lastReason: t('label_auto_gesture_debug_last_reason', '原因'),
-      lastGesture: t('label_auto_gesture_debug_last_gesture', '识别手势'),
-      triggerButton: t('label_auto_gesture_debug_trigger_button', '触发按键'),
-      matched: t('label_auto_gesture_debug_matched', '命中映射'),
-      injected: t('label_auto_gesture_debug_injected', '快捷键已注入'),
-      source: t('label_auto_gesture_debug_source', '匹配来源'),
-      samples: t('label_auto_gesture_debug_samples', '采样点'),
-      modifiers: t('label_auto_gesture_debug_modifiers', '修饰键'),
-      mappings: t('label_auto_gesture_debug_mappings', '映射数量'),
-      buttonless: t('label_auto_gesture_debug_buttonless', '无按键手势'),
-      pointerDown: t('label_auto_gesture_debug_pointer_down', '指针按下中'),
-      sourceCustom: t('text_auto_gesture_debug_source_custom', '自定义'),
-      sourcePreset: t('text_auto_gesture_debug_source_preset', '预设'),
-      sourceUnknown: t('text_auto_gesture_debug_source_unknown', '未命中'),
-      modifierEmpty: t('text_auto_gesture_debug_modifier_empty', '无'),
-      yes: t('text_common_yes', '是'),
-      no: t('text_common_no', '否'),
     };
     mousePanelTexts = panelTextsForKind('mouse');
     gesturePanelTexts = panelTextsForKind('gesture');
@@ -928,11 +908,6 @@
           <label for="auto_gesture_max_dirs">{uiText.gestureMaxDirections}</label>
           <input id="auto_gesture_max_dirs" type="number" min="1" max="8" bind:value={gestureMaxDirections} />
         </div>
-        <GestureRouteDebugPanel
-          payloadState={payloadState}
-          platform={runtimePlatform}
-          texts={gestureDebugTexts}
-        />
       </div>
       <div class="automation-mapping-shell automation-mapping-shell--gesture">
         <MappingPanel
