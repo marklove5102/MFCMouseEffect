@@ -1,9 +1,8 @@
 <script>
   import { createEventDispatcher, onDestroy } from 'svelte';
-  import GesturePatternEditor from './GesturePatternEditor.svelte';
-  import TriggerChainEditor from './TriggerChainEditor.svelte';
+  import MappingScopePanel from './MappingScopePanel.svelte';
+  import MappingShortcutPanel from './MappingShortcutPanel.svelte';
   import { filterCatalogEntries, normalizeCatalogEntries } from './app-catalog.js';
-  import { isMacosPlatform, isWindowsPlatform, normalizeRuntimePlatform } from './platform.js';
   import {
     pollShortcutCapture,
     readAutomationAppCatalog,
@@ -11,7 +10,27 @@
     stopShortcutCapture,
   } from './shortcut-capture-remote.js';
   import { shortcutFromKeyboardEvent } from './shortcuts.js';
-  import { normalizeTriggerChain, serializeTriggerChain } from './trigger-chain.js';
+  import {
+    CAPTURE_TARGET_KEYS,
+    CAPTURE_TARGET_MODIFIERS,
+    buildModifierPayloadFromShortcut,
+    chainForRow as buildChainForRow,
+    catalogMetaText as buildCatalogMetaText,
+    gestureButtonForRow as buildGestureButtonForRow,
+    gestureSummaryForRow as buildGestureSummaryForRow,
+    isModifierOnlyShortcut,
+    modifierInputPlaceholderForRow as buildModifierInputPlaceholderForRow,
+    modifierInputValueForRow as buildModifierInputValueForRow,
+    modifierShortcutTextForRow as buildModifierShortcutTextForRow,
+    normalizedPlatform as resolveNormalizedPlatform,
+    scopeAppsForRow as resolveScopeAppsForRow,
+    scopeDraftForRow as resolveScopeDraftForRow,
+    scopeFileAccept as resolveScopeFileAccept,
+    scopeModeForRow as resolveScopeModeForRow,
+    scopeSummaryForRow as buildScopeSummaryForRow,
+    shortcutSummaryForRow as buildShortcutSummaryForRow,
+    triggerValueFromEvent as buildTriggerValueFromEvent,
+  } from './mapping-panel-helpers.js';
 
   export let kind = 'mouse';
   export let rows = [];
@@ -23,8 +42,6 @@
   export let texts = {};
   export let platform = 'windows';
 
-  const CAPTURE_TARGET_KEYS = 'keys';
-  const CAPTURE_TARGET_MODIFIERS = 'modifiers';
   const dispatch = createEventDispatcher();
   let recordingRowId = '';
   let recordingTarget = CAPTURE_TARGET_KEYS;
@@ -41,17 +58,11 @@
   let scopeFileRowId = '';
 
   function normalizedPlatform() {
-    return normalizeRuntimePlatform(platform);
+    return resolveNormalizedPlatform(platform);
   }
 
   function scopeFileAccept() {
-    if (isMacosPlatform(platform)) {
-      return '.app';
-    }
-    if (isWindowsPlatform(platform)) {
-      return '.exe';
-    }
-    return '';
+    return resolveScopeFileAccept(platform);
   }
 
   function isCapturing(rowId, target = CAPTURE_TARGET_KEYS) {
@@ -108,19 +119,6 @@
     window.removeEventListener('keyup', onGlobalCaptureShortcut, true);
     window.removeEventListener('keypress', onGlobalCaptureShortcut, true);
     globalShortcutSuppressionBound = false;
-  }
-
-  function isModifierToken(token) {
-    const text = `${token || ''}`.trim().toLowerCase();
-    return text === 'ctrl' || text === 'shift' || text === 'alt' || text === 'option' || text === 'cmd' || text === 'command' || text === 'win' || text === 'meta' || text === 'os' || text === 'super';
-  }
-
-  function isModifierOnlyShortcut(shortcut) {
-    const tokens = `${shortcut || ''}`.split('+').map((item) => `${item || ''}`.trim()).filter((item) => !!item);
-    if (tokens.length === 0) {
-      return false;
-    }
-    return tokens.every((token) => isModifierToken(token));
   }
 
   async function endRemoteCapture(sessionId = remoteCaptureSessionId) {
@@ -326,112 +324,24 @@
     return `auto_trigger_modifiers_${kind}_${rowId}`;
   }
 
-  function parseModifierFlagsFromShortcut(shortcutText) {
-    const text = `${shortcutText || ''}`.trim();
-    if (!text) {
-      return { primary: false, shift: false, alt: false };
-    }
-    const tokens = text.split('+').map((item) => `${item || ''}`.trim().toLowerCase());
-    let primary = false;
-    let shift = false;
-    let alt = false;
-    for (const token of tokens) {
-      if (!token) {
-        continue;
-      }
-      if (token === 'ctrl' || token === 'control' || token === 'cmd' || token === 'command' || token === 'meta' || token === 'win' || token === 'windows' || token === 'os' || token === 'super') {
-        primary = true;
-      } else if (token === 'shift') {
-        shift = true;
-      } else if (token === 'alt' || token === 'option' || token === 'opt') {
-        alt = true;
-      }
-    }
-    return { primary, shift, alt };
-  }
-
   function applyTriggerModifierFlags(rowId, shortcut, emptyMode = 'any') {
-    const flags = parseModifierFlagsFromShortcut(shortcut);
-    if (flags.primary || flags.shift || flags.alt) {
-      emitRowChange(rowId, 'modifiers', {
-        mode: 'exact',
-        primary: flags.primary,
-        shift: flags.shift,
-        alt: flags.alt,
-      });
-      return;
-    }
-    emitRowChange(rowId, 'modifiers', {
-      mode: emptyMode === 'none' ? 'none' : 'any',
-      primary: false,
-      shift: false,
-      alt: false,
-    });
+    emitRowChange(rowId, 'modifiers', buildModifierPayloadFromShortcut(shortcut, emptyMode));
   }
 
   function applyTriggerModifierShortcut(rowId, shortcut) {
     applyTriggerModifierFlags(rowId, shortcut, 'none');
   }
 
-  function normalizedModifiersForRow(row) {
-    const source = row?.modifiers || {};
-    const mode = `${source.mode || 'any'}`.trim().toLowerCase();
-    return {
-      mode: mode === 'none' || mode === 'exact' ? mode : 'any',
-      primary: !!source.primary,
-      shift: !!source.shift,
-      alt: !!source.alt,
-    };
-  }
-
-  function modifierPrimaryLabel() {
-    return texts.modifierPrimary || (isMacosPlatform(platform) ? 'Cmd' : 'Ctrl');
-  }
-
-  function modifierAltLabel() {
-    return texts.modifierAlt || (isMacosPlatform(platform) ? 'Option' : 'Alt');
-  }
-
   function modifierShortcutTextForRow(row) {
-    const modifiers = normalizedModifiersForRow(row);
-    if (modifiers.mode === 'any') {
-      return texts.gestureTriggerModifiersAny || 'Any modifier';
-    }
-    if (modifiers.mode === 'none') {
-      return texts.gestureTriggerModifiersNone || 'No modifier';
-    }
-    const parts = [];
-    if (modifiers.primary) {
-      parts.push(modifierPrimaryLabel());
-    }
-    if (modifiers.shift) {
-      parts.push(texts.modifierShift || 'Shift');
-    }
-    if (modifiers.alt) {
-      parts.push(modifierAltLabel());
-    }
-    return parts.length > 0
-      ? parts.join('+')
-      : (texts.gestureTriggerModifiersAny || 'Any modifier');
+    return buildModifierShortcutTextForRow(row, texts, platform);
   }
 
   function modifierInputValueForRow(row) {
-    const modifiers = normalizedModifiersForRow(row);
-    if (modifiers.mode !== 'exact') {
-      return '';
-    }
-    return modifierShortcutTextForRow(row);
+    return buildModifierInputValueForRow(row, texts, platform);
   }
 
   function modifierInputPlaceholderForRow(row) {
-    const modifiers = normalizedModifiersForRow(row);
-    if (modifiers.mode === 'none') {
-      return texts.gestureTriggerModifiersNonePlaceholder || 'Optional (empty means no modifier)';
-    }
-    if (modifiers.mode === 'any') {
-      return texts.gestureTriggerModifiersAny || 'Any modifier';
-    }
-    return texts.gestureTriggerShortcutPlaceholder || 'Cmd / Ctrl+Shift';
+    return buildModifierInputPlaceholderForRow(row, texts, platform);
   }
 
   function onTriggerModifierKeydown(row, event) {
@@ -506,25 +416,11 @@
   }
 
   function chainForRow(row) {
-    return normalizeTriggerChain(row?.triggerChain || row?.trigger || '', options, options[0]?.value || '');
+    return buildChainForRow(row, options);
   }
 
   function triggerValueFromEvent(event, fallbackTrigger) {
-    const detail = event?.detail || {};
-    const fallback = `${fallbackTrigger || options[0]?.value || ''}`;
-
-    if (detail.value !== undefined && detail.value !== null) {
-      return serializeTriggerChain(detail.value, options, fallback);
-    }
-    if (detail.chain !== undefined && detail.chain !== null) {
-      return serializeTriggerChain(detail.chain, options, fallback);
-    }
-
-    if (event?.target && event.target.value !== undefined) {
-      return serializeTriggerChain(event.target.value, options, fallback);
-    }
-
-    return '';
+    return buildTriggerValueFromEvent(event, fallbackTrigger, options);
   }
 
   function onChainChange(row, event) {
@@ -536,16 +432,15 @@
   }
 
   function scopeModeForRow(row) {
-    const mode = `${row?.appScopeMode || row?.appScopeType || 'all'}`.trim().toLowerCase();
-    return mode === 'selected' || mode === 'process' ? 'selected' : 'all';
+    return resolveScopeModeForRow(row);
   }
 
   function scopeAppsForRow(row) {
-    return Array.isArray(row?.appScopeApps) ? row.appScopeApps : [];
+    return resolveScopeAppsForRow(row);
   }
 
   function scopeDraftForRow(row) {
-    return `${row?.appScopeDraft || ''}`;
+    return resolveScopeDraftForRow(row);
   }
 
   function onScopeModeChange(row, event) {
@@ -583,12 +478,7 @@
   }
 
   function catalogMetaText(entry) {
-    const exe = `${entry?.exe || ''}`.trim();
-    const source = `${entry?.source || ''}`.trim().toLowerCase();
-    if (!source) {
-      return exe;
-    }
-    return `${exe} (${source})`;
+    return buildCatalogMetaText(entry);
   }
 
   function addCatalogScopeApp(row, processName) {
@@ -698,92 +588,20 @@
     }
   }
 
-  function triggerLabel(value) {
-    const normalized = `${value || ''}`.trim();
-    if (!normalized) {
-      return '';
-    }
-    for (const option of options || []) {
-      if (`${option?.value || ''}`.trim() === normalized) {
-        return `${option?.label || normalized}`.trim() || normalized;
-      }
-    }
-    return normalized;
-  }
-
-  function triggerSummaryForRow(row) {
-    const labels = chainForRow(row)
-      .map((value) => triggerLabel(value))
-      .filter((value) => !!value);
-    if (labels.length === 0) {
-      return '-';
-    }
-    return labels.join(' -> ');
-  }
-
   function scopeSummaryForRow(row) {
-    if (scopeModeForRow(row) === 'all') {
-      return texts.scopeAllLabel || 'All Apps';
-    }
-    const apps = scopeAppsForRow(row);
-    if (apps.length === 0) {
-      return texts.scopeSelectedEmpty || 'No app selected';
-    }
-    if (apps.length === 1) {
-      return apps[0];
-    }
-    return `${apps[0]} +${apps.length - 1}`;
+    return buildScopeSummaryForRow(row, texts);
   }
 
   function shortcutSummaryForRow(row) {
-    const keys = `${row?.keys || ''}`.trim();
-    if (keys) {
-      return keys;
-    }
-    return texts.shortcutEmpty || 'No shortcut';
+    return buildShortcutSummaryForRow(row, texts);
   }
 
   function gestureButtonForRow(row) {
-    const fallback = `${gestureButtonOptions?.[0]?.value || 'right'}`.trim().toLowerCase();
-    const value = `${row?.triggerButton || fallback}`.trim().toLowerCase();
-    if (value === 'left' || value === 'middle' || value === 'right' || value === 'none') {
-      return value;
-    }
-    if (fallback === 'left' || fallback === 'middle' || fallback === 'right' || fallback === 'none') {
-      return fallback;
-    }
-    return 'right';
-  }
-
-  function gestureButtonLabel(value) {
-    const normalized = `${value || ''}`.trim();
-    if (!normalized) {
-      return '';
-    }
-    for (const option of gestureButtonOptions || []) {
-      if (`${option?.value || ''}`.trim() === normalized) {
-        return `${option?.label || normalized}`.trim() || normalized;
-      }
-    }
-    return normalized;
+    return buildGestureButtonForRow(row, gestureButtonOptions);
   }
 
   function gestureSummaryForRow(row) {
-    if (kind !== 'gesture') {
-      return triggerSummaryForRow(row);
-    }
-    const mode = `${row?.gesturePattern?.mode || 'preset'}`.trim().toLowerCase();
-    if (mode === 'custom') {
-      const thresholdRaw = row?.gesturePattern?.matchThresholdPercent !== undefined
-        ? row.gesturePattern.matchThresholdPercent
-        : row?.gesturePattern?.match_threshold_percent;
-      const threshold = Number(thresholdRaw);
-      const percent = Number.isFinite(threshold)
-        ? Math.max(50, Math.min(95, Math.round(threshold)))
-        : 75;
-      return `${gestureButtonLabel(gestureButtonForRow(row))} · ${texts.gestureModeCustom || 'Custom Draw'} ${percent}%`;
-    }
-    return `${gestureButtonLabel(gestureButtonForRow(row))} · ${triggerSummaryForRow(row)}`;
+    return buildGestureSummaryForRow(row, { kind, options, texts, gestureButtonOptions });
   }
 
   $: {
@@ -875,202 +693,53 @@
             </span>
           </summary>
           <div class="automation-row-body" class:is-scope-all={scopeModeForRow(row) !== 'selected'}>
-            <div class="automation-chain-group automation-col">
-              {#if kind === 'gesture'}
-                <div class="automation-shortcut-label">{texts.gestureTriggerShortcutLabel}</div>
-                <div class="automation-shortcut-head">
-                  <input
-                    id={modifierInputId(row.id)}
-                    class="automation-keys"
-                    type="text"
-                    disabled={!row.enabled}
-                    readonly={isCapturing(row.id, CAPTURE_TARGET_MODIFIERS)}
-                    value={modifierInputValueForRow(row)}
-                    placeholder={modifierInputPlaceholderForRow(row)}
-                    on:keydown={(event) => onTriggerModifierKeydown(row, event)}
-                    on:input={(event) => onTriggerModifierInput(row, event)}
-                  />
-                  <button
-                    class="btn-soft automation-record"
-                    class:is-recording={isCapturing(row.id, CAPTURE_TARGET_MODIFIERS)}
-                    type="button"
-                    disabled={!row.enabled}
-                    on:click={() => toggleRecord(row.id, CAPTURE_TARGET_MODIFIERS)}
-                  >
-                    {isCapturing(row.id, CAPTURE_TARGET_MODIFIERS) ? (texts.recordStop || texts.recording) : texts.record}
-                  </button>
-                </div>
-                <div class="automation-shortcut-label">{texts.gestureOutputShortcutLabel || texts.shortcutLabel}</div>
-              {/if}
-              <div class="automation-shortcut-head">
-                <input
-                  id={shortcutInputId(row.id)}
-                  class="automation-keys"
-                  type="text"
-                  disabled={!row.enabled}
-                  readonly={isCapturing(row.id, CAPTURE_TARGET_KEYS)}
-                  value={row.keys}
-                  placeholder={texts.shortcutPlaceholder}
-                  on:keydown={(event) => onShortcutKeydown(row, event)}
-                  on:input={(event) => onShortcutInput(row, event)}
-                />
-                <button
-                  class="btn-soft automation-record"
-                  class:is-recording={isCapturing(row.id, CAPTURE_TARGET_KEYS)}
-                  type="button"
-                  disabled={!row.enabled}
-                  on:click={() => toggleRecord(row.id, CAPTURE_TARGET_KEYS)}
-                >
-                  {isCapturing(row.id, CAPTURE_TARGET_KEYS) ? (texts.recordStop || texts.recording) : texts.record}
-                </button>
-              </div>
-              {#if kind === 'gesture'}
-                <div class="automation-gesture-trigger-group">
-                  <div class="automation-modifier-label">{texts.gestureTriggerButtonLabel}</div>
-                  <select
-                    class="automation-modifier-mode"
-                    disabled={!row.enabled}
-                    value={gestureButtonForRow(row)}
-                    on:change={(event) => emitRowChange(row.id, 'triggerButton', event.currentTarget.value)}
-                  >
-                    {#each gestureButtonOptions as option (option.value)}
-                      <option value={option.value}>{option.label}</option>
-                    {/each}
-                  </select>
-                </div>
-                <GesturePatternEditor
-                  {row}
-                  options={options}
-                  disabled={!row.enabled}
-                  texts={{
-                    title: texts.gesturePatternTitle,
-                    modePreset: texts.gestureModePreset,
-                    modeCustom: texts.gestureModeCustom,
-                    preset: texts.gesturePatternPreset,
-                    custom: texts.gesturePatternCustom,
-                    threshold: texts.gestureThreshold,
-                    canvasEmpty: texts.gestureCanvasEmpty,
-                    canvasClear: texts.gestureCanvasClear,
-                    canvasUndo: texts.gestureCanvasUndo,
-                    canvasGuide: texts.gestureCanvasGuide,
-                    canvasLimitHint: texts.gestureCanvasLimitHint,
-                    canvasLimitBadge: texts.gestureCanvasLimitBadge,
-                    canvasLimitReached: texts.gestureCanvasLimitReached,
-                    canvasStrokeCount: texts.gestureCanvasStrokeCount,
-                    canvasPointUnit: texts.gestureCanvasPointUnit,
-                    canvasNoDirection: texts.gestureCanvasNoDirection,
-                    canvasDraw: texts.gestureCanvasDraw,
-                    canvasSave: texts.gestureCanvasSave,
-                    canvasLockedHint: texts.gestureCanvasLockedHint,
-                  }}
-                  on:triggerchange={(event) => emitRowChange(row.id, 'triggerChain', event.detail?.trigger)}
-                  on:change={(event) => emitRowChange(row.id, 'gesturePattern', event.detail?.gesturePattern)}
-                />
-              {:else}
-                <TriggerChainEditor
-                  value={chainForRow(row)}
-                  options={options}
-                  disabled={!row.enabled}
-                  texts={{
-                    addNode: texts.addChainNode,
-                    removeNode: texts.removeChainNode,
-                    chainJoiner: texts.chainJoiner,
-                  }}
-                  on:chainchange={(event) => onChainChange(row, event)}
-                />
-              {/if}
-            </div>
-            <div class="automation-scope-group automation-col">
-              <select
-                class="automation-scope-select"
-                disabled={!row.enabled}
-                value={scopeModeForRow(row)}
-                on:change={(event) => onScopeModeChange(row, event)}
-              >
-                {#each scopeOptions as option (option.value)}
-                  <option value={option.value}>{option.label}</option>
-                {/each}
-              </select>
-              {#if scopeModeForRow(row) === 'selected'}
-                <div class="automation-scope-chip-list">
-                  {#each scopeAppsForRow(row) as app (app)}
-                    <span class="automation-scope-chip">
-                      <span>{app}</span>
-                      <button
-                        type="button"
-                        class="automation-scope-chip-remove"
-                        disabled={!row.enabled}
-                        on:click={() => removeScopeApp(row, app)}
-                      >
-                        x
-                      </button>
-                    </span>
-                  {/each}
-                </div>
-              {/if}
-            </div>
-            {#if scopeModeForRow(row) === 'selected'}
-              <div class="automation-shortcut-pane automation-col">
-                <input
-                  class="automation-scope-app"
-                  type="text"
-                  disabled={!row.enabled}
-                  value={scopeDraftForRow(row)}
-                  placeholder={texts.scopeSearchPlaceholder || texts.scopeAppPlaceholder}
-                  on:keydown={(event) => onScopeDraftKeydown(row, event)}
-                  on:input={(event) => onScopeDraftInput(row, event)}
-                />
-                <div class="automation-shortcut-scope">
-                  <div class="automation-scope-tools">
-                    <button
-                      class="btn-soft automation-scope-refresh"
-                      type="button"
-                      disabled={!row.enabled || appCatalogLoading}
-                      on:click={onRefreshAppCatalog}
-                    >
-                      {appCatalogLoading ? texts.scopeRefreshingCatalog : texts.scopeRefreshCatalog}
-                    </button>
-                    <button
-                      class="btn-soft automation-scope-file"
-                      type="button"
-                      disabled={!row.enabled}
-                      on:click={() => onScopeFilePick(row)}
-                    >
-                      {texts.scopePickFromFile}
-                    </button>
-                  </div>
-                  <div class="automation-scope-catalog">
-                    {#if appCatalogLoading}
-                      <div class="automation-scope-catalog-state">{texts.scopeCatalogLoading}</div>
-                    {:else if appCatalogError}
-                      <div class="automation-scope-catalog-state is-error">{appCatalogError}</div>
-                    {:else}
-                      {#if catalogEntriesForRow(row).length === 0}
-                        <div class="automation-scope-catalog-state">{texts.scopeCatalogEmpty}</div>
-                      {:else}
-                        {#each catalogEntriesForRow(row) as app (app.exe)}
-                          <button
-                            type="button"
-                            class="automation-scope-catalog-item"
-                            disabled={!row.enabled}
-                            on:click={() => addCatalogScopeApp(row, app.exe)}
-                          >
-                            <span class="automation-scope-catalog-label">{app.label}</span>
-                            <span
-                              class="automation-scope-catalog-meta"
-                              title={catalogMetaText(app)}
-                              aria-label={catalogMetaText(app)}
-                            >
-                              i
-                            </span>
-                          </button>
-                        {/each}
-                      {/if}
-                    {/if}
-                  </div>
-                </div>
-              </div>
-            {/if}
+            <MappingShortcutPanel
+              rowId={row.id}
+              {row}
+              rowEnabled={row.enabled}
+              rowKeys={row.keys}
+              {kind}
+              {texts}
+              captureTargetKeys={CAPTURE_TARGET_KEYS}
+              captureTargetModifiers={CAPTURE_TARGET_MODIFIERS}
+              modifierInputId={modifierInputId(row.id)}
+              shortcutInputId={shortcutInputId(row.id)}
+              modifierInputValue={modifierInputValueForRow(row)}
+              modifierInputPlaceholder={modifierInputPlaceholderForRow(row)}
+              gestureButtonValue={gestureButtonForRow(row)}
+              {gestureButtonOptions}
+              triggerOptions={options}
+              chainValue={chainForRow(row)}
+              {isCapturing}
+              onModifierKeydown={(event) => onTriggerModifierKeydown(row, event)}
+              onModifierInput={(event) => onTriggerModifierInput(row, event)}
+              onShortcutKeydown={(event) => onShortcutKeydown(row, event)}
+              onShortcutInput={(event) => onShortcutInput(row, event)}
+              onToggleRecord={(target) => toggleRecord(row.id, target)}
+              onTriggerButtonChange={(event) => emitRowChange(row.id, 'triggerButton', event.currentTarget.value)}
+              onGestureTriggerChange={(event) => emitRowChange(row.id, 'triggerChain', event.detail?.trigger)}
+              onGesturePatternChange={(event) => emitRowChange(row.id, 'gesturePattern', event.detail?.gesturePattern)}
+              onChainChange={(event) => onChainChange(row, event)}
+            />
+            <MappingScopePanel
+              rowEnabled={row.enabled}
+              scopeOptions={scopeOptions}
+              scopeMode={scopeModeForRow(row)}
+              scopeApps={scopeAppsForRow(row)}
+              scopeDraft={scopeDraftForRow(row)}
+              {texts}
+              catalogEntries={catalogEntriesForRow(row)}
+              appCatalogLoading={appCatalogLoading}
+              appCatalogError={appCatalogError}
+              onScopeModeChange={(event) => onScopeModeChange(row, event)}
+              onScopeDraftInput={(event) => onScopeDraftInput(row, event)}
+              onScopeDraftKeydown={(event) => onScopeDraftKeydown(row, event)}
+              onRemoveScopeApp={(app) => removeScopeApp(row, app)}
+              onAddCatalogScopeApp={(app) => addCatalogScopeApp(row, app)}
+              onRefreshAppCatalog={onRefreshAppCatalog}
+              onPickFile={() => onScopeFilePick(row)}
+              catalogMetaText={catalogMetaText}
+            />
           </div>
         </details>
         <div class="automation-note" class:is-visible={!!row.note}>{row.note}</div>
