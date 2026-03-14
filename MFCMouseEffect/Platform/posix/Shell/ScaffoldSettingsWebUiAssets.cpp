@@ -3,27 +3,56 @@
 #include "Platform/posix/Shell/ScaffoldSettingsWebUiAssets.h"
 #include "Platform/posix/Shell/ScaffoldSettingsWebUiAssets.Internal.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <string_view>
 #include <utility>
 
 namespace mousefx::platform::scaffold {
 namespace {
 
-void AddWebUiDirIfExists(
+bool PathExists(const std::filesystem::path& path) {
+    std::error_code ec;
+    return std::filesystem::exists(path, ec) && !ec;
+}
+
+bool IsDirectory(const std::filesystem::path& path) {
+    std::error_code ec;
+    return std::filesystem::is_directory(path, ec) && !ec;
+}
+
+bool HasRequiredAsset(const std::filesystem::path& baseDir, std::string_view fileName) {
+    if (baseDir.empty()) {
+        return false;
+    }
+    return PathExists(baseDir / std::filesystem::path(fileName));
+}
+
+bool HasPreferredWebUiAssets(const std::filesystem::path& baseDir) {
+    return HasRequiredAsset(baseDir, "index.html") &&
+        HasRequiredAsset(baseDir, "app.js") &&
+        HasRequiredAsset(baseDir, "app-core.js") &&
+        HasRequiredAsset(baseDir, "app-actions.js") &&
+        HasRequiredAsset(baseDir, "app-gesture-debug.js") &&
+        HasRequiredAsset(baseDir, "settings-form-input-indicator.js") &&
+        HasRequiredAsset(baseDir, "input-indicator-settings.svelte.js");
+}
+
+void AddWebUiDirIfExistsUnique(
     const std::filesystem::path& dir,
     std::vector<std::filesystem::path>* outDirs) {
     if (!outDirs || dir.empty()) {
         return;
     }
-
-    std::error_code ec;
-    if (!std::filesystem::exists(dir, ec) || ec) {
+    if (!IsDirectory(dir)) {
         return;
     }
-    if (!std::filesystem::is_directory(dir, ec) || ec) {
-        return;
+    for (const auto& existing : *outDirs) {
+        if (existing == dir) {
+            return;
+        }
     }
     outDirs->push_back(dir);
 }
@@ -51,14 +80,26 @@ bool TryReadWebUiFile(const std::filesystem::path& filePath, std::vector<uint8_t
 }
 
 void AddSourceTreeWebUiDir(std::vector<std::filesystem::path>* outDirs) {
+    if (!outDirs) {
+        return;
+    }
     const std::filesystem::path sourcePath(__FILE__);
     if (!sourcePath.is_absolute()) {
         return;
     }
 
-    const std::filesystem::path projectDir =
-        sourcePath.parent_path().parent_path().parent_path().parent_path();
-    AddWebUiDirIfExists(projectDir / "WebUI", outDirs);
+    std::filesystem::path cursor = sourcePath.parent_path();
+    while (!cursor.empty()) {
+        const std::filesystem::path candidate = cursor / "WebUI";
+        if (IsDirectory(candidate) && HasRequiredAsset(candidate, "index.html")) {
+            AddWebUiDirIfExistsUnique(candidate, outDirs);
+            return;
+        }
+        if (!cursor.has_parent_path() || cursor.parent_path() == cursor) {
+            break;
+        }
+        cursor = cursor.parent_path();
+    }
 }
 
 } // namespace
@@ -68,7 +109,7 @@ std::vector<std::filesystem::path> BuildWebUiBaseDirs() {
 
     const char* overrideDir = std::getenv("MFX_SCAFFOLD_WEBUI_DIR");
     if (overrideDir && *overrideDir != '\0') {
-        AddWebUiDirIfExists(std::filesystem::path(overrideDir), &dirs);
+        AddWebUiDirIfExistsUnique(std::filesystem::path(overrideDir), &dirs);
         return dirs;
     }
 
@@ -78,9 +119,38 @@ std::vector<std::filesystem::path> BuildWebUiBaseDirs() {
     std::error_code ec;
     const std::filesystem::path cwd = std::filesystem::current_path(ec);
     if (!ec && !cwd.empty()) {
-        AddWebUiDirIfExists(cwd / "MFCMouseEffect" / "WebUI", &dirs);
-        AddWebUiDirIfExists(cwd / "WebUI", &dirs);
-        AddWebUiDirIfExists(cwd.parent_path() / "MFCMouseEffect" / "WebUI", &dirs);
+        AddWebUiDirIfExistsUnique(cwd / "MFCMouseEffect" / "WebUI", &dirs);
+        AddWebUiDirIfExistsUnique(cwd / "WebUI", &dirs);
+        AddWebUiDirIfExistsUnique(cwd.parent_path() / "MFCMouseEffect" / "WebUI", &dirs);
+    }
+
+    std::stable_sort(
+        dirs.begin(),
+        dirs.end(),
+        [](const std::filesystem::path& lhs, const std::filesystem::path& rhs) {
+            const bool lhsPreferred = HasPreferredWebUiAssets(lhs);
+            const bool rhsPreferred = HasPreferredWebUiAssets(rhs);
+            if (lhsPreferred != rhsPreferred) {
+                return lhsPreferred && !rhsPreferred;
+            }
+            return false;
+        });
+    if (!dirs.empty()) {
+        std::vector<std::filesystem::path> deduped;
+        deduped.reserve(dirs.size());
+        for (const auto& dir : dirs) {
+            bool exists = false;
+            for (const auto& existing : deduped) {
+                if (existing == dir) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                deduped.push_back(dir);
+            }
+        }
+        dirs.swap(deduped);
     }
     return dirs;
 }

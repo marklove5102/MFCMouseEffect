@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <filesystem>
+#include <string_view>
 #include <vector>
 
 #include "Platform/PlatformRuntimeEnvironment.h"
@@ -10,18 +11,46 @@
 namespace mousefx {
 namespace {
 
-void AddWebUiDirIfExists(
+bool PathExists(const std::filesystem::path& path) {
+    std::error_code ec;
+    return std::filesystem::exists(path, ec) && !ec;
+}
+
+bool IsDirectory(const std::filesystem::path& path) {
+    std::error_code ec;
+    return std::filesystem::is_directory(path, ec) && !ec;
+}
+
+bool HasRequiredAsset(const std::filesystem::path& baseDir, std::string_view fileName) {
+    if (baseDir.empty()) {
+        return false;
+    }
+    return PathExists(baseDir / std::filesystem::path(fileName));
+}
+
+bool HasPreferredWebUiAssets(const std::filesystem::path& baseDir) {
+    return HasRequiredAsset(baseDir, "index.html") &&
+        HasRequiredAsset(baseDir, "app.js") &&
+        HasRequiredAsset(baseDir, "app-core.js") &&
+        HasRequiredAsset(baseDir, "app-actions.js") &&
+        HasRequiredAsset(baseDir, "app-gesture-debug.js") &&
+        HasRequiredAsset(baseDir, "settings-form-input-indicator.js") &&
+        HasRequiredAsset(baseDir, "input-indicator-settings.svelte.js");
+}
+
+void AddWebUiDirIfExistsUnique(
     const std::filesystem::path& dir,
     std::vector<std::filesystem::path>* outDirs) {
     if (!outDirs || dir.empty()) {
         return;
     }
-    std::error_code ec;
-    if (!std::filesystem::exists(dir, ec) || ec) {
+    if (!IsDirectory(dir)) {
         return;
     }
-    if (!std::filesystem::is_directory(dir, ec) || ec) {
-        return;
+    for (const auto& existing : *outDirs) {
+        if (existing == dir) {
+            return;
+        }
     }
     outDirs->push_back(dir);
 }
@@ -31,7 +60,7 @@ void AddEnvWebUiDir(std::vector<std::filesystem::path>* outDirs) {
     if (envDir == nullptr || envDir[0] == '\0') {
         return;
     }
-    AddWebUiDirIfExists(std::filesystem::path(envDir), outDirs);
+    AddWebUiDirIfExistsUnique(std::filesystem::path(envDir), outDirs);
 }
 
 void AddExecutableWebUiDir(std::vector<std::filesystem::path>* outDirs) {
@@ -39,7 +68,7 @@ void AddExecutableWebUiDir(std::vector<std::filesystem::path>* outDirs) {
     if (exeDir.empty()) {
         return;
     }
-    AddWebUiDirIfExists(std::filesystem::path(exeDir) / L"webui", outDirs);
+    AddWebUiDirIfExistsUnique(std::filesystem::path(exeDir) / L"webui", outDirs);
 }
 
 void AddWorkingDirectoryWebUiDirs(std::vector<std::filesystem::path>* outDirs) {
@@ -49,19 +78,32 @@ void AddWorkingDirectoryWebUiDirs(std::vector<std::filesystem::path>* outDirs) {
         return;
     }
 
-    AddWebUiDirIfExists(cwd / "MFCMouseEffect" / "WebUI", outDirs);
-    AddWebUiDirIfExists(cwd / "WebUI", outDirs);
-    AddWebUiDirIfExists(cwd.parent_path() / "MFCMouseEffect" / "WebUI", outDirs);
+    AddWebUiDirIfExistsUnique(cwd / "MFCMouseEffect" / "WebUI", outDirs);
+    AddWebUiDirIfExistsUnique(cwd / "WebUI", outDirs);
+    AddWebUiDirIfExistsUnique(cwd.parent_path() / "MFCMouseEffect" / "WebUI", outDirs);
 }
 
 void AddSourceTreeWebUiDir(std::vector<std::filesystem::path>* outDirs) {
+    if (!outDirs) {
+        return;
+    }
     const std::filesystem::path sourcePath(__FILE__);
     if (!sourcePath.is_absolute()) {
         return;
     }
-    const std::filesystem::path projectDir =
-        sourcePath.parent_path().parent_path().parent_path();
-    AddWebUiDirIfExists(projectDir / "WebUI", outDirs);
+
+    std::filesystem::path cursor = sourcePath.parent_path();
+    while (!cursor.empty()) {
+        const std::filesystem::path candidate = cursor / "WebUI";
+        if (IsDirectory(candidate) && HasRequiredAsset(candidate, "index.html")) {
+            AddWebUiDirIfExistsUnique(candidate, outDirs);
+            return;
+        }
+        if (!cursor.has_parent_path() || cursor.parent_path() == cursor) {
+            break;
+        }
+        cursor = cursor.parent_path();
+    }
 }
 
 } // namespace
@@ -70,11 +112,19 @@ std::wstring ResolveWebSettingsWebUiBaseDir() {
     std::vector<std::filesystem::path> candidates;
     candidates.reserve(8);
     AddEnvWebUiDir(&candidates);
-    AddExecutableWebUiDir(&candidates);
-    AddWorkingDirectoryWebUiDirs(&candidates);
+    // Prefer source/dev tree assets before executable-side webui bundle so
+    // local iteration picks up freshly built WebUIWorkspace output.
     AddSourceTreeWebUiDir(&candidates);
+    AddWorkingDirectoryWebUiDirs(&candidates);
+    AddExecutableWebUiDir(&candidates);
     if (candidates.empty()) {
         return {};
+    }
+
+    for (const auto& candidate : candidates) {
+        if (HasPreferredWebUiAssets(candidate)) {
+            return candidate.wstring();
+        }
     }
     return candidates.front().wstring();
 }

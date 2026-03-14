@@ -24,9 +24,13 @@ const generatedFiles = [
 const staticWebUiFiles = [
   'index.html',
   'app.js',
+  'app-core.js',
+  'app-actions.js',
+  'app-gesture-debug.js',
   'styles.css',
   'web-api.js',
   'settings-form.js',
+  'settings-form-input-indicator.js',
   'i18n.js',
   'i18n-runtime.js',
   'automation-templates.js',

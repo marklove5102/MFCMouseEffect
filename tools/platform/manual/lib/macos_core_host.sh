@@ -373,11 +373,31 @@ mfx_manual_apply_build_jobs_env() {
     export MFX_BUILD_JOBS="$build_jobs"
 }
 
+mfx_manual_prepare_webui_assets() {
+    local repo_root="$1"
+    local skip_webui_build="${2:-0}"
+    local workspace_dir="$repo_root/MFCMouseEffect/WebUIWorkspace"
+
+    if [[ "$skip_webui_build" -ne 0 ]]; then
+        return 0
+    fi
+    if [[ ! -d "$workspace_dir" ]]; then
+        mfx_fail "WebUIWorkspace not found: $workspace_dir"
+    fi
+
+    mfx_require_cmd pnpm
+    mfx_info "build WebUIWorkspace assets"
+    pnpm --dir "$workspace_dir" run build
+}
+
 mfx_manual_prepare_core_host_binary() {
     local repo_root="$1"
     local build_dir="$2"
     local skip_build="${3:-0}"
+    local skip_webui_build="${4:-0}"
     local host_bin="$build_dir/mfx_entry_posix_host"
+
+    mfx_manual_prepare_webui_assets "$repo_root" "$skip_webui_build"
 
     if [[ "$skip_build" -eq 0 ]]; then
         mfx_require_cmd cmake

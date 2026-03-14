@@ -6,6 +6,8 @@
 #include "MouseFx/Core/Wasm/WasmEffectHost.h"
 #include "MouseFx/Utils/StringUtils.h"
 
+#include <algorithm>
+
 namespace mousefx {
 namespace {
 
@@ -151,6 +153,12 @@ bool IsIndicatorSurface(const std::string& surface) {
     return ToLowerAscii(TrimAscii(surface)) == "indicator";
 }
 
+std::string NormalizeManifestPathForCompare(const std::string& path) {
+    std::string normalized = ToLowerAscii(TrimAscii(path));
+    std::replace(normalized.begin(), normalized.end(), '\\', '/');
+    return normalized;
+}
+
 } // namespace
 
 wasm::WasmEffectHost* AppController::WasmHost() const {
@@ -268,6 +276,30 @@ bool AppController::EnsureInputIndicatorWasmBudgetFloor() {
         wasmIndicatorHost_->SetExecutionBudget(BuildExecutionBudget(config_.wasm));
     }
     return true;
+}
+
+void AppController::SyncInputIndicatorWasmHostToConfig() {
+    if (!wasmIndicatorHost_) {
+        return;
+    }
+
+    wasmIndicatorHost_->SetExecutionBudget(BuildExecutionBudget(config_.wasm));
+    wasmIndicatorHost_->SetEnabled(config_.wasm.enabled);
+
+    const std::string configuredManifestPath = ResolveIndicatorStartupManifestPath(config_);
+    if (configuredManifestPath.empty()) {
+        wasmIndicatorHost_->UnloadPlugin();
+        return;
+    }
+
+    const std::string activeManifestPath = NormalizeManifestPathForCompare(
+        Utf16ToUtf8(wasmIndicatorHost_->Diagnostics().activeManifestPath.c_str()));
+    const std::string expectedManifestPath = NormalizeManifestPathForCompare(configuredManifestPath);
+    if (wasmIndicatorHost_->IsPluginLoaded() && activeManifestPath == expectedManifestPath) {
+        return;
+    }
+
+    wasmIndicatorHost_->LoadPluginFromManifest(Utf8ToWString(configuredManifestPath));
 }
 
 void AppController::ShutdownWasmHost() {

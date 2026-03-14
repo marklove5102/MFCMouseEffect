@@ -32,9 +32,9 @@ std::wstring ResolveConfigDirectory() {
 std::wstring ResolveLocalDiagDirectory() {
     const std::wstring exeDir = platform::GetExecutableDirectoryW();
     if (exeDir.empty()) {
-        return L".\\.local\\diag";
+        return (std::filesystem::path(L".") / L".local" / L"diag").wstring();
     }
-    return exeDir + L"\\.local\\diag";
+    return (std::filesystem::path(exeDir) / L".local" / L"diag").wstring();
 }
 
 } // namespace mousefx

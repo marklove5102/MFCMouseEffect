@@ -1,17 +1,12 @@
 (() => {
   const state = {
     schema: null,
-    indicatorBound: false,
     wasmPendingRender: null,
     wasmRenderRetryTimer: 0,
   };
 
   function el(id) {
     return document.getElementById(id);
-  }
-
-  function inputIndicatorSection() {
-    return window.MfxInputIndicatorSection || null;
   }
 
   function generalSection() {
@@ -32,6 +27,10 @@
 
   function wasmSection() {
     return window.MfxWasmSection || null;
+  }
+
+  function inputIndicatorModule() {
+    return window.MfxSettingsInputIndicator || null;
   }
 
   function clearWasmRetryTimer() {
@@ -153,155 +152,6 @@
     };
   }
 
-  function syncIndicatorPositionUi() {
-    const section = inputIndicatorSection();
-    if (section && typeof section.syncIndicatorPositionUi === 'function') {
-      section.syncIndicatorPositionUi();
-      return;
-    }
-
-    const mode = getText('ii_position_mode') || 'relative';
-    const relativeRow = el('ii_offset_x')?.closest('.pair');
-    const absoluteRow = el('ii_absolute_x')?.closest('.pair');
-    if (relativeRow) {
-      relativeRow.style.opacity = (mode === 'relative') ? '1' : '0.45';
-    }
-    if (absoluteRow) {
-      absoluteRow.style.opacity = (mode === 'absolute') ? '1' : '0.45';
-    }
-
-    const targetMon = getText('ii_target_monitor') || 'cursor';
-    const perMonitorContainer = el('ii_per_monitor_overrides');
-    if (perMonitorContainer) {
-      perMonitorContainer.style.display = (mode === 'absolute' && targetMon === 'custom') ? 'block' : 'none';
-    }
-  }
-
-  function bindIndicatorEvents() {
-    if (state.indicatorBound) {
-      return;
-    }
-    const section = inputIndicatorSection();
-    if (section) {
-      state.indicatorBound = true;
-      return;
-    }
-    state.indicatorBound = true;
-
-    const positionMode = el('ii_position_mode');
-    if (positionMode) {
-      positionMode.addEventListener('change', syncIndicatorPositionUi);
-    }
-    const targetMonitor = el('ii_target_monitor');
-    if (targetMonitor) {
-      targetMonitor.addEventListener('change', syncIndicatorPositionUi);
-    }
-  }
-
-  function buildPerMonitorUI(monitors, overrides, texts) {
-    const container = el('ii_per_monitor_overrides');
-    if (!container) {
-      return;
-    }
-    container.innerHTML = '';
-
-    if (!Array.isArray(monitors) || monitors.length === 0) {
-      const tip = document.createElement('div');
-      tip.className = 'pm-empty';
-      tip.textContent = texts.pm_no_monitors || 'No monitors detected.';
-      container.appendChild(tip);
-      return;
-    }
-
-    const monLabel = texts.pm_monitor || 'Monitor';
-    const primaryBadge = texts.pm_primary_badge || 'Primary';
-    for (let idx = 0; idx < monitors.length; idx += 1) {
-      const monitor = monitors[idx];
-      const monitorId = monitor.id;
-      const width = (monitor.right || 0) - (monitor.left || 0);
-      const height = (monitor.bottom || 0) - (monitor.top || 0);
-      const resolution = (width > 0 && height > 0) ? ` (${width}x${height})` : '';
-      const badge = monitor.is_primary ? ` * ${primaryBadge}` : '';
-      const labelText = `${monLabel} ${idx + 1}${resolution}${badge}`;
-
-      const override = overrides ? overrides[monitorId] : null;
-      const enabled = !!(override && override.enabled);
-      const valueX = (override && override.absolute_x !== undefined) ? override.absolute_x : 40;
-      const valueY = (override && override.absolute_y !== undefined) ? override.absolute_y : 40;
-
-      const row = document.createElement('div');
-      row.className = 'monitor-row';
-      if (!enabled) {
-        row.classList.add('is-disabled');
-      }
-
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = `ii_ov_${monitorId}_en`;
-      checkbox.className = 'monitor-toggle';
-      checkbox.checked = enabled;
-
-      const label = document.createElement('label');
-      label.htmlFor = checkbox.id;
-      label.className = 'monitor-name';
-      label.title = labelText;
-      label.textContent = labelText;
-
-      const inputX = document.createElement('input');
-      inputX.type = 'number';
-      inputX.id = `ii_ov_${monitorId}_x`;
-      inputX.className = 'monitor-input';
-      inputX.value = valueX;
-      inputX.disabled = !enabled;
-      inputX.title = 'X';
-      inputX.placeholder = 'X';
-
-      const inputY = document.createElement('input');
-      inputY.type = 'number';
-      inputY.id = `ii_ov_${monitorId}_y`;
-      inputY.className = 'monitor-input';
-      inputY.value = valueY;
-      inputY.disabled = !enabled;
-      inputY.title = 'Y';
-      inputY.placeholder = 'Y';
-
-      checkbox.addEventListener('change', () => {
-        const checked = checkbox.checked;
-        inputX.disabled = !checked;
-        inputY.disabled = !checked;
-        row.classList.toggle('is-disabled', !checked);
-      });
-
-      row.appendChild(checkbox);
-      row.appendChild(label);
-      row.appendChild(inputX);
-      row.appendChild(inputY);
-      container.appendChild(row);
-    }
-  }
-
-  function readPerMonitorUI(monitors) {
-    const result = {};
-    if (!Array.isArray(monitors)) {
-      return result;
-    }
-    for (const monitor of monitors) {
-      const monitorId = monitor.id;
-      const checkbox = el(`ii_ov_${monitorId}_en`);
-      const inputX = el(`ii_ov_${monitorId}_x`);
-      const inputY = el(`ii_ov_${monitorId}_y`);
-      if (!checkbox || !inputX || !inputY) {
-        continue;
-      }
-      result[monitorId] = {
-        enabled: checkbox.checked,
-        absolute_x: Number(inputX.value),
-        absolute_y: Number(inputY.value),
-      };
-    }
-    return result;
-  }
-
   function renderGeneral(schema, appState, generalAction) {
     const section = generalSection();
     if (section && typeof section.render === 'function') {
@@ -383,54 +233,6 @@
     setNum('k_idle_fade_end', params.idle_fade_end_ms);
   }
 
-  function renderInputIndicator(schema, appState, texts, wasmAction) {
-    const indicator = appState.input_indicator || appState.mouse_indicator || {};
-    const indicatorRouteStatus = appState.input_indicator_wasm_route_status || {};
-    const section = inputIndicatorSection();
-    if (section && typeof section.render === 'function') {
-      section.render({
-        schema,
-        indicator,
-        wasmState: {
-          ...(appState.wasm || {}),
-          input_indicator_wasm_route_status: indicatorRouteStatus,
-        },
-        onWasmAction: wasmAction,
-        texts,
-      });
-      return;
-    }
-
-    fillSelect(
-      'ii_position_mode',
-      schema.input_indicator_position_modes,
-      indicator.position_mode || 'relative');
-    fillSelect(
-      'ii_render_mode',
-      schema.input_indicator_render_modes,
-      indicator.render_mode || 'native');
-    fillSelect('ii_target_monitor', schema.target_monitor_options, indicator.target_monitor || 'cursor');
-    fillSelect('ii_key_display_mode', schema.key_display_modes, indicator.key_display_mode || 'all');
-    fillSelect(
-      'ii_key_label_layout_mode',
-      schema.key_label_layout_modes,
-      indicator.key_label_layout_mode || 'fixed_font');
-
-    buildPerMonitorUI(schema.monitors, indicator.per_monitor_overrides, texts);
-
-    setChecked('ii_enabled', indicator.enabled !== false);
-    setChecked('ii_keyboard_enabled', indicator.keyboard_enabled !== false);
-    setChecked('ii_wasm_fallback', indicator.wasm_fallback_to_native !== false);
-    setNum('ii_offset_x', indicator.offset_x);
-    setNum('ii_offset_y', indicator.offset_y);
-    setNum('ii_absolute_x', indicator.absolute_x);
-    setNum('ii_absolute_y', indicator.absolute_y);
-    setNum('ii_size_px', indicator.size_px);
-    setNum('ii_duration_ms', indicator.duration_ms);
-
-    syncIndicatorPositionUi();
-  }
-
   function renderWasm(schema, appState, texts, wasmAction, wasmStatus) {
     const section = wasmSection();
     if (!section || typeof section.render !== 'function') {
@@ -474,9 +276,18 @@
     renderEffects(schema, appState);
     renderText(appState);
     renderTrail(appState);
-    renderInputIndicator(schema, appState, texts, wasmAction);
+    const indicator = inputIndicatorModule();
+    if (indicator && typeof indicator.renderInputIndicator === 'function') {
+      indicator.renderInputIndicator(schema, appState, texts, wasmAction, {
+        fillSelect,
+        setChecked,
+        setNum,
+      });
+    }
     renderWasm(schema, appState, texts, wasmAction, wasmStatus);
-    bindIndicatorEvents();
+    if (indicator && typeof indicator.bindIndicatorEvents === 'function') {
+      indicator.bindIndicatorEvents();
+    }
   }
 
   function read() {
@@ -485,8 +296,6 @@
     const effects = effectsSection();
     const text = textSection();
     const trail = trailSection();
-    const section = inputIndicatorSection();
-
     const generalState = (general && typeof general.read === 'function')
       ? general.read()
       : {
@@ -554,8 +363,13 @@
         },
       };
 
-    const indicatorState = (section && typeof section.read === 'function')
-      ? section.read()
+    const indicator = inputIndicatorModule();
+    const indicatorState = (indicator && typeof indicator.readInputIndicatorState === 'function')
+      ? indicator.readInputIndicatorState(schema, {
+        getChecked,
+        getNum,
+        getText,
+      })
       : {
         enabled: getChecked('ii_enabled'),
         keyboard_enabled: getChecked('ii_keyboard_enabled'),
@@ -570,7 +384,7 @@
         target_monitor: getText('ii_target_monitor') || 'cursor',
         key_display_mode: getText('ii_key_display_mode') || 'all',
         key_label_layout_mode: getText('ii_key_label_layout_mode') || 'fixed_font',
-        per_monitor_overrides: readPerMonitorUI(schema.monitors),
+        per_monitor_overrides: {},
         size_px: getNum('ii_size_px'),
         duration_ms: getNum('ii_duration_ms'),
       };
@@ -603,6 +417,11 @@
   window.MfxSettingsForm = {
     render,
     read,
-    syncIndicatorPositionUi,
+    syncIndicatorPositionUi: () => {
+      const indicator = inputIndicatorModule();
+      if (indicator && typeof indicator.syncIndicatorPositionUi === 'function') {
+        indicator.syncIndicatorPositionUi();
+      }
+    },
   };
 })();

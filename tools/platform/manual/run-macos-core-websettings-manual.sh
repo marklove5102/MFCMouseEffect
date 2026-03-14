@@ -21,6 +21,7 @@ Options:
   --probe-file <path>         Probe file path (default: /tmp/mfx-core-websettings.probe)
   --jobs <num>                Build jobs (sets MFX_BUILD_JOBS)
   --skip-build                Skip cmake configure/build
+  --skip-webui-build          Skip WebUIWorkspace build (uses existing WebUI/*.svelte.js)
   --debug                     Enable runtime diagnostics (gesture routing/status)
   --no-debug                  Disable runtime diagnostics explicitly
   --no-open                   Do not open browser automatically
@@ -33,6 +34,7 @@ auto_stop_seconds=120
 log_file="/tmp/mfx-core-manual.log"
 probe_file="/tmp/mfx-core-websettings.probe"
 skip_build=0
+skip_webui_build=0
 open_browser=1
 build_jobs=""
 debug_mode=0
@@ -66,6 +68,10 @@ while [[ $# -gt 0 ]]; do
         ;;
     --skip-build)
         skip_build=1
+        shift
+        ;;
+    --skip-webui-build)
+        skip_webui_build=1
         shift
         ;;
     --debug)
@@ -105,10 +111,13 @@ cleanup_lock() {
 }
 trap cleanup_lock EXIT
 
-mfx_manual_prepare_core_host_binary "$repo_root" "$build_dir" "$skip_build"
+mfx_manual_prepare_core_host_binary "$repo_root" "$build_dir" "$skip_build" "$skip_webui_build"
 host_bin="$MFX_MANUAL_HOST_BIN"
+webui_dir="$repo_root/MFCMouseEffect/WebUI"
 start_status=0
 extra_env=()
+extra_env+=("MFX_WEBUI_DIR=$webui_dir")
+extra_env+=("MFX_SCAFFOLD_WEBUI_DIR=$webui_dir")
 if [[ "$debug_mode" -eq 1 ]]; then
     extra_env+=(MFX_RUNTIME_DEBUG=1)
 fi
@@ -124,6 +133,7 @@ fi
 printf 'mfx_pid=%s\n' "$MFX_MANUAL_HOST_PID"
 printf 'settings_url=%s\n' "$MFX_MANUAL_SETTINGS_URL"
 printf 'log_file=%s\n' "$MFX_MANUAL_LOG_FILE"
+printf 'webui_dir=%s\n' "$webui_dir"
 
 if [[ "$open_browser" -eq 1 ]]; then
     mfx_require_cmd open

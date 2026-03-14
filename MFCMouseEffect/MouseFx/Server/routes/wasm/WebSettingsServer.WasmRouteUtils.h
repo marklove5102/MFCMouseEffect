@@ -16,6 +16,7 @@ nlohmann::json ParseObjectOrEmpty(const std::string& body);
 std::string ParseManifestPathUtf8(const nlohmann::json& payload);
 std::string ParseInitialPathUtf8(const nlohmann::json& payload);
 bool IsSameManifestPath(const std::wstring& expected, const std::wstring& actual);
+void ApplyManifestSurfaceHintIfMissing(std::string* surface, const std::string& manifestPathUtf8);
 nlohmann::json BuildWasmResponse(AppController* controller, bool ok);
 nlohmann::json BuildWasmActionResponse(
     AppController* controller,

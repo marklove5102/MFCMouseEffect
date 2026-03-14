@@ -12,6 +12,7 @@
 using json = nlohmann::json;
 
 namespace mousefx {
+using websettings_wasm_routes::ApplyManifestSurfaceHintIfMissing;
 using websettings_wasm_routes::BuildWasmActionResponse;
 using websettings_wasm_routes::IsSameManifestPath;
 using websettings_wasm_routes::ParseManifestPathUtf8;
@@ -55,6 +56,9 @@ bool HandleWebSettingsWasmLoadManifestApiRoute(
         }
         if (payload.contains("effect_channel") && payload["effect_channel"].is_string()) {
             effectChannel = TrimAscii(payload["effect_channel"].get<std::string>());
+        }
+        if (surface.empty() && effectChannel.empty()) {
+            ApplyManifestSurfaceHintIfMissing(&surface, manifestPathUtf8);
         }
         wasm::WasmEffectHost* host = nullptr;
         if (IsIndicatorSurface(surface)) {

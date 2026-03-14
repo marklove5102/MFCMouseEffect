@@ -65,6 +65,7 @@ void AppController::SetInputIndicatorConfig(const InputIndicatorConfig& cfg) {
     }
     inputIndicatorOverlay_->UpdateConfig(config_.inputIndicator);
     PersistConfig();
+    SyncInputIndicatorWasmHostToConfig();
 }
 
 void AppController::SetInputAutomationConfig(const InputAutomationConfig& cfg) {

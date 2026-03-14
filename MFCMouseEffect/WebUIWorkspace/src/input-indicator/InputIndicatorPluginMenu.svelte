@@ -1,5 +1,16 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import {
+    findCatalogItemByManifestPath,
+    findCatalogItemByPluginId,
+    normalizeCatalogErrors,
+    normalizeCatalogItems,
+    normalizeManifestPathForCompare,
+    normalizeRouteStatus,
+    pluginLabel,
+    routeEventText,
+    routeReasonText,
+  } from './input-indicator-plugin-menu-model.js';
 
   export let pluginEnabled = false;
   export let fallbackToNative = true;
@@ -15,88 +26,8 @@
     return value[key] || fallback;
   }
 
-  function normalizeCatalogItems(input) {
-    const source = Array.isArray(input) ? input : [];
-    const out = [];
-    for (const item of source) {
-      const value = item || {};
-      const manifestPath = `${value.manifest_path || ''}`.trim();
-      if (!manifestPath || !supportsIndicatorKinds(value.input_kinds, value.surfaces, value.has_explicit_surfaces)) {
-        continue;
-      }
-      out.push({
-        id: `${value.id || ''}`.trim(),
-        name: `${value.name || ''}`.trim(),
-        version: `${value.version || ''}`.trim(),
-        surfaces: Array.isArray(value.surfaces)
-          ? value.surfaces.map((entry) => `${entry || ''}`.trim()).filter((entry) => entry.length > 0)
-          : [],
-        has_explicit_surfaces: !!value.has_explicit_surfaces,
-        input_kinds: Array.isArray(value.input_kinds)
-          ? value.input_kinds.map((entry) => `${entry || ''}`.trim()).filter((entry) => entry.length > 0)
-          : [],
-        manifest_path: manifestPath,
-      });
-    }
-    return out;
-  }
-
-  function normalizeCatalogErrors(input) {
-    const source = Array.isArray(input) ? input : [];
-    const out = [];
-    for (const item of source) {
-      const value = `${item || ''}`.trim();
-      if (!value) {
-        continue;
-      }
-      out.push(value);
-    }
-    return out;
-  }
-
-  function supportsIndicatorKinds(inputKinds, surfaces, hasExplicitSurfaces) {
-    const normalizedSurfaces = Array.isArray(surfaces)
-      ? surfaces.map((entry) => `${entry || ''}`.trim()).filter((entry) => entry.length > 0)
-      : [];
-    if (hasExplicitSurfaces) {
-      return normalizedSurfaces.includes('indicator');
-    }
-    const kinds = Array.isArray(inputKinds)
-      ? inputKinds.map((entry) => `${entry || ''}`.trim()).filter((entry) => entry.length > 0)
-      : [];
-    if (kinds.length === 0) {
-      return true;
-    }
-    return kinds.some((entry) => entry.startsWith('indicator_'));
-  }
-
-  function normalizeManifestPathForCompare(path) {
-    const value = `${path || ''}`.trim();
-    if (!value) {
-      return '';
-    }
-    return value.replace(/\\/g, '/').replace(/\/+/g, '/').toLowerCase();
-  }
-
-  function findCatalogItemByManifestPath(items, manifestPath) {
-    const expected = normalizeManifestPathForCompare(manifestPath);
-    if (!expected) {
-      return null;
-    }
-    for (const item of items || []) {
-      if (normalizeManifestPathForCompare(item.manifest_path) === expected) {
-        return item;
-      }
-    }
-    return null;
-  }
-
-  function pluginLabel(plugin) {
-    const title = plugin?.name || plugin?.id || text('wasm_text_unknown_plugin', 'Unknown plugin');
-    if (!plugin?.version) {
-      return title;
-    }
-    return `${title} (${plugin.version})`;
+  function pluginLabelWithText(plugin) {
+    return pluginLabel(plugin, text);
   }
 
   async function runAction(action, payload) {
@@ -148,6 +79,14 @@
       selectedManifestPath = configuredMatch.manifest_path;
       return;
     }
+    const activePluginMatch = findCatalogItemByPluginId(
+      items,
+      wasmState?.indicator_active_plugin_id || wasmState?.active_plugin_id,
+    );
+    if (activePluginMatch) {
+      selectedManifestPath = activePluginMatch.manifest_path;
+      return;
+    }
     if (!findCatalogItemByManifestPath(items, selectedManifestPath)) {
       selectedManifestPath = items.length > 0 ? items[0].manifest_path : '';
     }
@@ -170,29 +109,6 @@
     }
   }
 
-  async function loadSelectedPlugin() {
-    if (!selectedManifestPath) {
-      statusTone = 'error';
-      statusMessage = text('wasm_manifest_required', 'Please select a plugin manifest first.');
-      return;
-    }
-    const response = await runAction('loadManifest', {
-      manifest_path: selectedManifestPath,
-      surface: 'indicator',
-    });
-    if (!response || response.ok === false) {
-      return;
-    }
-    dispatch('change', {
-      manifestPath: selectedManifestPath,
-    });
-    statusTone = 'success';
-    statusMessage = text(
-      'status_input_indicator_plugin_loaded',
-      'Indicator plugin loaded. Enable WASM override to replace the native indicator.',
-    );
-  }
-
   async function enableRuntime() {
     const response = await runAction('enable', {});
     if (!response || response.ok === false) {
@@ -202,10 +118,47 @@
     statusMessage = text('status_input_indicator_plugin_runtime_ready', 'WASM runtime enabled.');
   }
 
-  function handlePluginToggle(event) {
+  async function handlePluginToggle(event) {
+    const nextEnabled = !!event.currentTarget.checked;
     dispatch('change', {
-      pluginEnabled: !!event.currentTarget.checked,
+      pluginEnabled: nextEnabled,
     });
+    if (!nextEnabled) {
+      statusTone = 'info';
+      statusMessage = text(
+        'text_input_indicator_plugin_summary_off',
+        'Native indicator remains active.',
+      );
+      return;
+    }
+    const candidateManifestPath = `${selectedManifestPath || manifestPath || ''}`.trim();
+    if (!candidateManifestPath) {
+      dispatch('change', {
+        pluginEnabled: false,
+      });
+      statusTone = 'error';
+      statusMessage = text(
+        'wasm_manifest_required',
+        'Please select a plugin manifest first.',
+      );
+      return;
+    }
+    const response = await runAction('loadManifest', {
+      manifest_path: candidateManifestPath,
+      surface: 'indicator',
+    });
+    if (!response || response.ok === false) {
+      dispatch('change', {
+        pluginEnabled: false,
+      });
+      return;
+    }
+    const confirmedManifestPath = `${response.configured_indicator_manifest_path || candidateManifestPath}`.trim();
+    if (confirmedManifestPath && confirmedManifestPath !== candidateManifestPath) {
+      dispatch('change', {
+        manifestPath: confirmedManifestPath,
+      });
+    }
   }
 
   function handleFallbackToggle(event) {
@@ -214,57 +167,38 @@
     });
   }
 
-  function handleManifestSelection() {
+  async function handleManifestSelection() {
+    if (!selectedManifestPath) {
+      return;
+    }
+    const previousManifestPath = `${manifestPath || ''}`.trim();
+    const nextManifestPath = selectedManifestPath;
     dispatch('change', {
-      manifestPath: selectedManifestPath,
+      manifestPath: nextManifestPath,
     });
-  }
-
-  function normalizeRouteStatus(input) {
-    const value = input && typeof input === 'object' ? input : {};
-    return {
-      route_attempted: !!value.route_attempted,
-      event_kind: `${value.event_kind || ''}`.trim(),
-      reason: `${value.reason || ''}`.trim(),
-      rendered_by_wasm: !!value.rendered_by_wasm,
-      native_fallback_applied: !!value.native_fallback_applied,
-      event_supported: !!value.event_supported,
-      wasm_fallback_enabled: !!value.wasm_fallback_enabled,
-    };
-  }
-
-  function routeEventText(kind) {
-    switch (kind) {
-      case 'click':
-        return text('text_input_indicator_route_event_click', 'Click');
-      case 'scroll':
-        return text('text_input_indicator_route_event_scroll', 'Scroll');
-      case 'key':
-        return text('text_input_indicator_route_event_key', 'Key');
-      default:
-        return text('text_input_indicator_route_event_unknown', 'Unknown');
+    const response = await runAction('loadManifest', {
+      manifest_path: nextManifestPath,
+      surface: 'indicator',
+    });
+    if (!response || response.ok === false) {
+      if (previousManifestPath && previousManifestPath !== nextManifestPath) {
+        dispatch('change', {
+          manifestPath: previousManifestPath,
+        });
+      }
+      return;
     }
-  }
-
-  function routeReasonText(reason) {
-    switch (reason) {
-      case 'wasm_rendered':
-        return text('text_input_indicator_route_reason_wasm_rendered', 'WASM rendered output');
-      case 'fallback_disabled':
-        return text('text_input_indicator_route_reason_fallback_disabled', 'Fallback disabled');
-      case 'event_not_supported':
-        return text('text_input_indicator_route_reason_event_not_supported', 'Plugin does not support this event');
-      case 'plugin_unloaded':
-        return text('text_input_indicator_route_reason_plugin_unloaded', 'Runtime or plugin not ready');
-      case 'anchor_unavailable':
-        return text('text_input_indicator_route_reason_anchor_unavailable', 'Indicator anchor unavailable');
-      case 'invoke_failed_no_output':
-        return text('text_input_indicator_route_reason_invoke_failed_no_output', 'Plugin invoked but no output');
-      case 'invoke_no_output':
-        return text('text_input_indicator_route_reason_invoke_no_output', 'Plugin invoked with no visible output');
-      default:
-        return text('text_input_indicator_route_reason_unknown', 'Unknown');
+    const confirmedManifestPath = `${response.configured_indicator_manifest_path || nextManifestPath}`.trim();
+    if (confirmedManifestPath && confirmedManifestPath !== nextManifestPath) {
+      dispatch('change', {
+        manifestPath: confirmedManifestPath,
+      });
     }
+    statusTone = 'success';
+    statusMessage = text(
+      'status_input_indicator_plugin_loaded',
+      'Indicator plugin loaded.',
+    );
   }
 
   let catalog = [];
@@ -291,12 +225,16 @@
 
   $: runtimeEnabled = !!(wasmState?.indicator_enabled ?? wasmState?.enabled);
   $: pluginLoaded = !!(wasmState?.indicator_plugin_loaded ?? wasmState?.plugin_loaded);
-  $: configuredPluginTitle = pluginLabel(
+  $: configuredPluginTitle = pluginLabelWithText(
     findCatalogItemByManifestPath(catalog, manifestPath)
     || findCatalogItemByManifestPath(catalog, selectedManifestPath)
     || findCatalogItemByManifestPath(
       catalog,
       wasmState?.configured_indicator_manifest_path || wasmState?.configured_manifest_path,
+    )
+    || findCatalogItemByPluginId(
+      catalog,
+      wasmState?.indicator_active_plugin_id || wasmState?.active_plugin_id,
     ),
   );
   $: activePluginTitle = wasmState?.indicator_active_plugin_name
@@ -309,8 +247,8 @@
   $: routeStatusClass = routeStatus.native_fallback_applied
     ? 'is-warn'
     : (routeStatus.rendered_by_wasm ? 'is-ok' : 'is-idle');
-  $: routeEventLabel = routeEventText(routeStatus.event_kind);
-  $: routeReasonLabel = routeReasonText(routeStatus.reason);
+  $: routeEventLabel = routeEventText(routeStatus.event_kind, text);
+  $: routeReasonLabel = routeReasonText(routeStatus.reason, text);
   $: summaryText = pluginEnabled
     ? text('text_input_indicator_plugin_summary_on', 'WASM override is active.')
     : text('text_input_indicator_plugin_summary_off', 'Native indicator remains active.');
@@ -330,14 +268,24 @@
   </div>
 
   <div class="indicator-plugin-menu__body">
-    <label class="indicator-plugin-menu__toggle">
+    <label class="indicator-plugin-menu__toggle indicator-plugin-menu__toggle--primary">
       <span class="indicator-plugin-menu__toggle-copy">
         <span data-i18n="label_input_indicator_plugin_override">Use plugin to override native indicator</span>
         <small data-i18n="hint_input_indicator_plugin_override">
           When enabled, the input indicator switches to the active WASM plugin; the native renderer is no longer used unless fallback is triggered.
         </small>
       </span>
-      <input type="checkbox" checked={pluginEnabled} on:change={handlePluginToggle} />
+      <span class="indicator-plugin-menu__switch-wrap">
+        <input
+          type="checkbox"
+          class="indicator-plugin-menu__switch-input"
+          checked={pluginEnabled}
+          on:change={handlePluginToggle}
+        />
+        <span class="indicator-plugin-menu__switch" aria-hidden="true">
+          <span class="indicator-plugin-menu__switch-thumb"></span>
+        </span>
+      </span>
     </label>
 
     <div class="indicator-plugin-menu__status-grid indicator-plugin-menu__status-grid--primary">
@@ -404,15 +352,6 @@
           >
             {texts.btn_wasm_refresh_catalog || 'Refresh Plugin List'}
           </button>
-          <button
-            type="button"
-            disabled={busy || !selectedManifestPath}
-            on:click={loadSelectedPlugin}
-            data-i18n="btn_wasm_load_selected"
-            title={text('tip_input_indicator_plugin_load', 'Load the selected indicator-compatible plugin into the shared WASM runtime.')}
-          >
-            {texts.btn_wasm_load_selected || 'Load Selected'}
-          </button>
         </div>
       </div>
 
@@ -426,7 +365,7 @@
           <option value="">{text('text_input_indicator_plugin_catalog_empty', 'No compatible indicator plugins discovered.')}</option>
         {:else}
           {#each catalog as plugin}
-            <option value={plugin.manifest_path}>{pluginLabel(plugin)}</option>
+            <option value={plugin.manifest_path}>{pluginLabelWithText(plugin)}</option>
           {/each}
         {/if}
       </select>
@@ -525,9 +464,76 @@
     gap: 12px;
   }
 
+  .indicator-plugin-menu__toggle--primary {
+    align-items: center;
+  }
+
   .indicator-plugin-menu__toggle-copy {
     display: grid;
     gap: 4px;
+  }
+
+  .indicator-plugin-menu__switch-wrap {
+    position: relative;
+    flex: none;
+    width: 52px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .indicator-plugin-menu__switch-input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .indicator-plugin-menu__switch {
+    width: 52px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(147, 162, 188, 0.38);
+    border: 1px solid rgba(168, 184, 210, 0.78);
+    transition: background-color 160ms ease, border-color 160ms ease;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px;
+    box-sizing: border-box;
+  }
+
+  .indicator-plugin-menu__switch-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateX(0);
+    transition: transform 160ms ease;
+  }
+
+  .indicator-plugin-menu__switch-input:checked + .indicator-plugin-menu__switch {
+    background: rgba(18, 168, 117, 0.24);
+    border-color: rgba(18, 168, 117, 0.5);
+  }
+
+  .indicator-plugin-menu__switch-input:checked + .indicator-plugin-menu__switch .indicator-plugin-menu__switch-thumb {
+    transform: translateX(22px);
+  }
+
+  .indicator-plugin-menu__switch-input:focus-visible + .indicator-plugin-menu__switch {
+    box-shadow: 0 0 0 3px rgba(68, 138, 227, 0.28);
+  }
+
+  .indicator-plugin-menu__switch-input:disabled {
+    cursor: not-allowed;
+  }
+
+  .indicator-plugin-menu__switch-input:disabled + .indicator-plugin-menu__switch {
+    opacity: 0.55;
   }
 
   .indicator-plugin-menu__toggle-copy small {

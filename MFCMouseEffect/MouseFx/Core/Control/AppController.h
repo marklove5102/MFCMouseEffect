@@ -243,6 +243,7 @@ private:
     void ShutdownWasmHost();
     void ApplyWasmConfigToHost(bool tryLoadManifest);
     bool EnsureInputIndicatorWasmBudgetFloor();
+    void SyncInputIndicatorWasmHostToConfig();
 
 
     void NotifyGpuFallbackIfNeeded(const std::string& reason);
