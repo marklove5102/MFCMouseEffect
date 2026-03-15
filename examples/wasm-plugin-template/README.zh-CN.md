@@ -49,7 +49,6 @@ examples/wasm-plugin-template/
         hover-spark-ring.ts
       indicator/
         input-indicator-basic.ts
-        input-indicator-keyviz.ts
     index.ts                  # 默认入口（当前导出 text-rise）
   scripts/
     build-lib.mjs             # 构建公共能力
@@ -137,7 +136,6 @@ pnpm run sync:runtime-samples
 | `mixed-emoji-celebrate` | 混合 | 2 文本 + 2 图片庆祝效果 | 是 |
 | `button-adaptive` | 混合 | 根据鼠标键位选择文本/图片资源 | 是 |
 | `indicator-basic` | 指示器 | 键盘通道使用专门的 key-cap panel，鼠标/滚轮通道使用专门的 pointer shell + button zone + wheel slot helper，并消费 `indicator_*` 尾部中的 streak / modifier 上下文（不再额外发 `pulse/ripple` 命令；滚轮事件不会激活点击按键高亮） | 否 |
-| `indicator-keyviz-style` | 指示器 | keyviz 风格指示器：键盘通道使用分层 keycap 卡片，鼠标/滚轮通道使用深色 pointer 卡片与着色强调区域，同时复用共享 `indicator_*` 尾部语义（不再额外发 `pulse/ripple` 命令） | 否 |
 | `click-pulse-dual` | 脉冲 | 仅使用 `spawn_pulse` 组合 ripple + star 双层脉冲 | 否 |
 | `click-polyline-zigzag` | 折线 | 仅使用 `spawn_polyline` 组合 3 条延迟锯齿闪电线 | 否 |
 | `click-path-stroke-ribbon` | path stroke | 使用 `spawn_path_stroke` + 可选共享渲染尾部组合 2 条延迟曲线丝带描边 | 否 |

@@ -49,7 +49,6 @@ examples/wasm-plugin-template/
         hover-spark-ring.ts
       indicator/
         input-indicator-basic.ts
-        input-indicator-keyviz.ts
     index.ts                  # default entry (currently exports text-rise)
   scripts/
     build-lib.mjs             # shared build helper
@@ -137,7 +136,6 @@ Managed cleanup scope:
 | `mixed-emoji-celebrate` | mixed | 2 texts + 2 images celebration | yes |
 | `button-adaptive` | mixed | text/image ids adapt by mouse button | yes |
 | `indicator-basic` | indicator | input-indicator style sample: keyboard uses a dedicated key-cap panel, pointer lanes use a dedicated pointer shell + button zone + wheel slot helper, and all lanes consume `indicator_*` tails for streak/modifier-aware styling (no extra pulse/ripple command; scroll lane keeps click-zone inactive) | no |
-| `indicator-keyviz-style` | indicator | keyviz-inspired indicator style: keyboard lane uses layered keycap cards and pointer/scroll lanes use dark pointer cards with tinted accent zones, while preserving shared `indicator_*` tail semantics (no extra pulse/ripple command) | no |
 | `click-pulse-dual` | pulse | layered ripple + star pulse stack using `spawn_pulse` only | no |
 | `click-polyline-zigzag` | polyline | 3 delayed zigzag bolt strokes using `spawn_polyline` only | no |
 | `click-path-stroke-ribbon` | path-stroke | 2 delayed curved ribbon strokes using `spawn_path_stroke` plus the optional shared render-semantics tail | no |

@@ -43,14 +43,18 @@ Deep implementation details are intentionally moved to P2 docs to reduce context
 - WebUI settings bootstrap is now split into `app-core.js` + `app-actions.js` + `app-gesture-debug.js` (with `app.js` as bootstrap) to lower coupling and shrink the largest runtime file; webui asset discovery prefers directories that contain these files.
 - Input-indicator settings logic is now extracted to `settings-form-input-indicator.js` to keep `settings-form.js` focused and reduce coupling between settings sections.
 - Input-indicator plugin menu now delegates catalog/route helper logic to `input-indicator-plugin-menu-model.js` to keep the Svelte view focused on UI structure.
+- Input-indicator basic settings apply regression fixed: `form` state is now two-way bound across `InputIndicatorFields -> InputIndicatorSectionTabs -> InputIndicatorBasicFields`, so edits in the basic tab (`position_mode`, offsets, size/duration, etc.) always flow back to the save payload instead of snapping back to previous backend state after `Apply`.
+- Input-indicator basic settings layout fix: the per-monitor overrides header/container now span both grid columns, so when overrides are hidden the following labels no longer shift into the right column (prevents label/input misalignment).
 - Input-indicator plugin menu fixed a selection lock issue: the selector no longer overwrites user-selected manifest with stale prop value before `loadManifest` executes, so switching between indicator plugins can take effect.
 - WebUI wasm action refresh now keeps UI edits while always trusting backend `wasm_manifest_path`, preventing indicator plugin selection from reverting after refresh.
+- Official runtime indicator sample set is now reduced to `demo.indicator.basic.v2` only; non-basic indicator demos and synced runtime artifacts are removed to prevent stale plugin selection drift.
+- `SetInputIndicatorConfig` now auto-recovers stale indicator wasm manifest paths: when `render_mode=wasm` but configured manifest no longer exists, controller degrades indicator render mode to `native` and clears `wasm_manifest_path`, preventing repeated "manifest file does not exist" apply failures.
 - Automation mapping UI now extracts selection/summary/helper logic into `mapping-panel-helpers.js` to shrink `MappingPanel.svelte` and reduce coupling.
 - Automation mapping scope UI now lives in `MappingScopePanel.svelte`, keeping `MappingPanel.svelte` focused on orchestration while preserving existing behavior.
 - Automation mapping shortcut editor UI is now extracted to `MappingShortcutPanel.svelte` to keep `MappingPanel.svelte` thinner and reduce coupling.
 - `/api/wasm/load-manifest` now infers `surface` from the manifest when the caller omits it, preventing indicator-only plugins from being loaded into effects hosts (and vice versa).
 - `/api/wasm/load-manifest` now also promotes indicator render mode to `wasm` after successful indicator manifest switch, so plugin selection takes effect immediately and survives refresh.
-- Core wasm HTTP contract checks now include indicator plugin cycle assertions (`basic -> keyviz -> basic`) and verify configured/active manifest plus `input_indicator.render_mode` stay consistent after each switch.
+- Core wasm HTTP contract checks assert `indicator-basic` load consistency (configured/active manifest and `input_indicator.render_mode`) after indicator manifest apply.
 - Core/scaffold webui path resolvers now both prefer source-tree/working-dir assets before executable-side bundle in dev runs, and prioritize candidates with complete indicator UI assets (`input-indicator-settings.svelte.js`) to reduce stale frontend bundle pickup.
 - Manual macOS core websettings runner now defaults to rebuilding `WebUIWorkspace` before starting host, and pins both `MFX_WEBUI_DIR` + `MFX_SCAFFOLD_WEBUI_DIR` to repo `WebUI`, reducing stale bundle drift between `/tmp` host binaries and source-tree frontend assets.
 

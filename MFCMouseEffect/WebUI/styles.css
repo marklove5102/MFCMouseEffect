@@ -525,6 +525,7 @@ textarea {
   margin-top: 4px;
   font-weight: 700;
   color: #425f83;
+  grid-column: 1 / -1;
 }
 
 .monitor-overrides {
@@ -533,6 +534,7 @@ textarea {
   border-radius: var(--radius-sm);
   background: #f6fbff;
   padding: 8px;
+  grid-column: 1 / -1;
 }
 
 .pm-empty {

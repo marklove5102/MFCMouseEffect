@@ -17,8 +17,40 @@
 #endif
 
 #include <cmath>
+#include <filesystem>
 
 namespace mousefx {
+namespace {
+
+bool IsRegularFileUtf8(const std::string& pathUtf8) {
+    const std::string path = TrimAscii(pathUtf8);
+    if (path.empty()) {
+        return false;
+    }
+    const std::filesystem::path filePath(Utf8ToWString(path));
+    std::error_code ec;
+    return std::filesystem::exists(filePath, ec) &&
+           !ec &&
+           std::filesystem::is_regular_file(filePath, ec) &&
+           !ec;
+}
+
+InputIndicatorConfig ResolveInputIndicatorManifestFallback(InputIndicatorConfig cfg) {
+    cfg = config_internal::SanitizeInputIndicatorConfig(std::move(cfg));
+    if (cfg.renderMode != "wasm") {
+        return cfg;
+    }
+    if (cfg.wasmManifestPath.empty() || IsRegularFileUtf8(cfg.wasmManifestPath)) {
+        return cfg;
+    }
+
+    // Configured wasm manifest is stale/missing; degrade to native indicator immediately.
+    cfg.wasmManifestPath.clear();
+    cfg.renderMode = "native";
+    return config_internal::SanitizeInputIndicatorConfig(std::move(cfg));
+}
+
+} // namespace
 
 void AppController::ApplyOverlayTargetFpsToPlatform() {
 #if MFX_PLATFORM_MACOS
@@ -59,7 +91,7 @@ void AppController::SetTextEffectFontSize(float sizePt) {
 }
 
 void AppController::SetInputIndicatorConfig(const InputIndicatorConfig& cfg) {
-    config_.inputIndicator = config_internal::SanitizeInputIndicatorConfig(cfg);
+    config_.inputIndicator = ResolveInputIndicatorManifestFallback(cfg);
     if (config_.inputIndicator.renderMode == "wasm") {
         EnsureInputIndicatorWasmBudgetFloor();
     }

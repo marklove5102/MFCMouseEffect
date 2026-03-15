@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-14T15:53:59.889Z",
+  "generated_at": "2026-03-15T03:35:18.189Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "This file is the compact P1 runtime truth for daily execution.",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 115,
-      "size_bytes": 8759,
-      "estimated_tokens": 2190,
+      "line_count": 119,
+      "size_bytes": 9812,
+      "estimated_tokens": 2453,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "32882e71d26640ac6bea5b31afa5f3e7d6bbc356",
-      "updated_at": "2026-03-14T15:46:22.857Z"
+      "hash_sha1": "37e6397e5a1d60f1848f9b14801897281835c16f",
+      "updated_at": "2026-03-15T03:35:03.198Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",

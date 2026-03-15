@@ -19,16 +19,6 @@ export const SAMPLE_PRESETS = [
     enableFrameTick: false,
   },
   {
-    key: "indicator-keyviz-style",
-    source: "assembly/samples/indicator/input-indicator-keyviz.ts",
-    id: "demo.indicator.keyviz.v2",
-    name: "Demo Indicator Keyviz Style",
-    version: "0.1.0",
-    surfaces: ["indicator"],
-    inputKinds: ["indicator_click", "indicator_scroll", "indicator_key"],
-    enableFrameTick: false,
-  },
-  {
     key: "text-burst",
     source: "assembly/samples/effects/text-burst.ts",
     id: "demo.click.text-burst.v2",
@@ -435,7 +425,7 @@ export const SAMPLE_PRESETS = [
     name: "Demo Event Scroll Particle Burst",
     version: "0.1.0",
     inputKinds: ["scroll"],
-    enableFrameTick: true,
+    enableFrameTick: false,
     imageAssets: [
       "assets/smile.png",
       "assets/confetti.png",
@@ -450,7 +440,7 @@ export const SAMPLE_PRESETS = [
     name: "Demo Event Scroll Neon Burst",
     version: "0.1.0",
     inputKinds: ["scroll"],
-    enableFrameTick: true,
+    enableFrameTick: false,
     imageAssets: [
       "assets/particle-glow.png",
     ],
@@ -462,7 +452,7 @@ export const SAMPLE_PRESETS = [
     name: "Demo Event Hold Orbit Pulse",
     version: "0.1.0",
     inputKinds: ["hold_start", "hold_update", "hold_end"],
-    enableFrameTick: true,
+    enableFrameTick: false,
   },
   {
     key: "hover-spark-ring",
@@ -471,7 +461,7 @@ export const SAMPLE_PRESETS = [
     name: "Demo Event Hover Spark Ring",
     version: "0.1.0",
     inputKinds: ["hover_start", "hover_end"],
-    enableFrameTick: true,
+    enableFrameTick: false,
   },
 ];
 

@@ -70,12 +70,8 @@ _mfx_core_http_wasm_contract_dispatch_checks() {
     if [[ -n "$repo_root" ]]; then
         local latest_state_snapshot_file="$tmp_dir/state-after-wasm-dispatch.out"
         local indicator_manifest_path="$repo_root/examples/wasm-plugin-template/dist/samples/indicator-basic/plugin.json"
-        local indicator_keyviz_manifest_path="$repo_root/examples/wasm-plugin-template/dist/samples/indicator-keyviz-style/plugin.json"
         if [[ ! -f "$indicator_manifest_path" ]] && command -v npm >/dev/null 2>&1; then
             npm --prefix "$repo_root/examples/wasm-plugin-template" run build:sample -- --sample indicator-basic >/dev/null
-        fi
-        if [[ ! -f "$indicator_keyviz_manifest_path" ]] && command -v npm >/dev/null 2>&1; then
-            npm --prefix "$repo_root/examples/wasm-plugin-template" run build:sample -- --sample indicator-keyviz-style >/dev/null
         fi
         if [[ -f "$indicator_manifest_path" ]]; then
             local indicator_manifest_path_escaped
@@ -92,67 +88,72 @@ _mfx_core_http_wasm_contract_dispatch_checks() {
                 "$(_mfx_core_http_wasm_parse_string_field "$tmp_dir/wasm-load-manifest-indicator-sample.out" "indicator_active_manifest_path")" \
                 "$indicator_manifest_path" \
                 "core wasm load-manifest indicator sample active manifest path"
-            if [[ -f "$indicator_keyviz_manifest_path" ]]; then
-                local indicator_keyviz_manifest_path_escaped
-                indicator_keyviz_manifest_path_escaped="$(_mfx_core_http_wasm_json_escape "$indicator_keyviz_manifest_path")"
-                local code_load_indicator_keyviz_manifest
-                code_load_indicator_keyviz_manifest="$(_mfx_core_http_wasm_load_manifest_payload_http_code \
-                    "$tmp_dir/wasm-load-manifest-indicator-keyviz.out" \
-                    "$base_url" \
-                    "$token" \
-                    "{\"manifest_path\":\"$indicator_keyviz_manifest_path_escaped\",\"surface\":\"indicator\"}")"
-                mfx_assert_eq "$code_load_indicator_keyviz_manifest" "200" "core wasm load-manifest indicator keyviz status"
-                mfx_assert_file_contains "$tmp_dir/wasm-load-manifest-indicator-keyviz.out" "\"ok\":true" "core wasm load-manifest indicator keyviz ok"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_wasm_parse_string_field "$tmp_dir/wasm-load-manifest-indicator-keyviz.out" "indicator_active_manifest_path")" \
-                    "$indicator_keyviz_manifest_path" \
-                    "core wasm load-manifest indicator keyviz active manifest path"
+            local code_state_after_indicator_basic_load
+            code_state_after_indicator_basic_load="$(mfx_http_code "$tmp_dir/state-after-indicator-basic-load.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
+            mfx_assert_eq "$code_state_after_indicator_basic_load" "200" "core wasm state after indicator basic load status"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-basic-load.out" "input_indicator.wasm_manifest_path")" \
+                "$indicator_manifest_path" \
+                "core wasm indicator basic load configured manifest path in state"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-basic-load.out" "input_indicator.render_mode")" \
+                "wasm" \
+                "core wasm indicator basic load keeps wasm render mode"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-basic-load.out" "wasm.indicator_active_manifest_path")" \
+                "$indicator_manifest_path" \
+                "core wasm indicator basic load active manifest path in state"
 
-                local code_state_after_indicator_keyviz_switch
-                code_state_after_indicator_keyviz_switch="$(mfx_http_code "$tmp_dir/state-after-indicator-keyviz-switch.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
-                mfx_assert_eq "$code_state_after_indicator_keyviz_switch" "200" "core wasm state after indicator keyviz switch status"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-keyviz-switch.out" "input_indicator.wasm_manifest_path")" \
-                    "$indicator_keyviz_manifest_path" \
-                    "core wasm indicator keyviz switch configured manifest path in state"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-keyviz-switch.out" "input_indicator.render_mode")" \
-                    "wasm" \
-                    "core wasm indicator keyviz switch keeps wasm render mode"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-keyviz-switch.out" "wasm.indicator_active_manifest_path")" \
-                    "$indicator_keyviz_manifest_path" \
-                    "core wasm indicator keyviz switch active manifest path in state"
+            local indicator_stale_manifest_path="${indicator_manifest_path}.missing"
+            local indicator_stale_manifest_payload_file="$tmp_dir/state-apply-indicator-stale-manifest.json"
+            cat >"$indicator_stale_manifest_payload_file" <<EOF
+{
+  "input_indicator": {
+    "render_mode": "wasm",
+    "wasm_manifest_path": "$indicator_stale_manifest_path"
+  }
+}
+EOF
+            local code_apply_indicator_stale_manifest
+            code_apply_indicator_stale_manifest="$(mfx_http_code "$tmp_dir/state-apply-indicator-stale-manifest.out" "$base_url/api/state" \
+                -X POST \
+                -H "x-mfcmouseeffect-token: $token" \
+                -H "Content-Type: application/json" \
+                --data-binary "@$indicator_stale_manifest_payload_file")"
+            mfx_assert_eq "$code_apply_indicator_stale_manifest" "200" "core state apply indicator stale manifest status"
+            mfx_assert_file_contains "$tmp_dir/state-apply-indicator-stale-manifest.out" "\"ok\":true" "core state apply indicator stale manifest ok"
 
-                local code_load_indicator_manifest_cycle_restore
-                code_load_indicator_manifest_cycle_restore="$(_mfx_core_http_wasm_load_manifest_payload_http_code \
-                    "$tmp_dir/wasm-load-manifest-indicator-basic-cycle-restore.out" \
-                    "$base_url" \
-                    "$token" \
-                    "{\"manifest_path\":\"$indicator_manifest_path_escaped\",\"surface\":\"indicator\"}")"
-                mfx_assert_eq "$code_load_indicator_manifest_cycle_restore" "200" "core wasm load-manifest indicator basic cycle restore status"
-                mfx_assert_file_contains "$tmp_dir/wasm-load-manifest-indicator-basic-cycle-restore.out" "\"ok\":true" "core wasm load-manifest indicator basic cycle restore ok"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_wasm_parse_string_field "$tmp_dir/wasm-load-manifest-indicator-basic-cycle-restore.out" "indicator_active_manifest_path")" \
-                    "$indicator_manifest_path" \
-                    "core wasm load-manifest indicator basic cycle restore active manifest path"
+            local code_state_after_indicator_stale_manifest_apply
+            code_state_after_indicator_stale_manifest_apply="$(mfx_http_code "$tmp_dir/state-after-indicator-stale-manifest-apply.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
+            mfx_assert_eq "$code_state_after_indicator_stale_manifest_apply" "200" "core wasm state after indicator stale manifest apply status"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-stale-manifest-apply.out" "input_indicator.render_mode")" \
+                "native" \
+                "core stale indicator manifest degrades render mode to native"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-stale-manifest-apply.out" "input_indicator.wasm_manifest_path")" \
+                "" \
+                "core stale indicator manifest clears configured wasm manifest path"
 
-                local code_state_after_indicator_basic_cycle_restore
-                code_state_after_indicator_basic_cycle_restore="$(mfx_http_code "$tmp_dir/state-after-indicator-basic-cycle-restore.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
-                mfx_assert_eq "$code_state_after_indicator_basic_cycle_restore" "200" "core wasm state after indicator basic cycle restore status"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-basic-cycle-restore.out" "input_indicator.wasm_manifest_path")" \
-                    "$indicator_manifest_path" \
-                    "core wasm indicator basic cycle restore configured manifest path in state"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-basic-cycle-restore.out" "input_indicator.render_mode")" \
-                    "wasm" \
-                    "core wasm indicator basic cycle restore keeps wasm render mode"
-                mfx_assert_eq \
-                    "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-basic-cycle-restore.out" "wasm.indicator_active_manifest_path")" \
-                    "$indicator_manifest_path" \
-                    "core wasm indicator basic cycle restore active manifest path in state"
-            fi
+            local code_load_indicator_manifest_after_stale_recover
+            code_load_indicator_manifest_after_stale_recover="$(_mfx_core_http_wasm_load_manifest_payload_http_code \
+                "$tmp_dir/wasm-load-manifest-indicator-basic-after-stale-recover.out" \
+                "$base_url" \
+                "$token" \
+                "{\"manifest_path\":\"$indicator_manifest_path_escaped\",\"surface\":\"indicator\"}")"
+            mfx_assert_eq "$code_load_indicator_manifest_after_stale_recover" "200" "core wasm load-manifest indicator basic after stale recover status"
+            mfx_assert_file_contains "$tmp_dir/wasm-load-manifest-indicator-basic-after-stale-recover.out" "\"ok\":true" "core wasm load-manifest indicator basic after stale recover ok"
+            local code_state_after_indicator_stale_manifest_recover
+            code_state_after_indicator_stale_manifest_recover="$(mfx_http_code "$tmp_dir/state-after-indicator-stale-manifest-recover.out" "$base_url/api/state" -H "x-mfcmouseeffect-token: $token")"
+            mfx_assert_eq "$code_state_after_indicator_stale_manifest_recover" "200" "core wasm state after indicator stale manifest recover status"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-stale-manifest-recover.out" "input_indicator.render_mode")" \
+                "wasm" \
+                "core stale indicator manifest recover keeps wasm render mode"
+            mfx_assert_eq \
+                "$(_mfx_core_http_read_json_string "$tmp_dir/state-after-indicator-stale-manifest-recover.out" "input_indicator.wasm_manifest_path")" \
+                "$indicator_manifest_path" \
+                "core stale indicator manifest recover restores configured wasm manifest path"
 
             local code_indicator_dispatch
             code_indicator_dispatch="$(_mfx_core_http_wasm_test_dispatch_indicator_key_http_code "$tmp_dir/wasm-test-dispatch-indicator-key.out" "$base_url" "$token")"

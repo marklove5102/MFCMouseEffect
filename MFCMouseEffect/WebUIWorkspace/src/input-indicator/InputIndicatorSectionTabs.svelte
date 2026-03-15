@@ -82,7 +82,7 @@
       monitors={monitors}
       monitorOverrides={monitorOverrides}
       bind:monitorRows={monitorRows}
-      form={form}
+      bind:form={form}
       texts={texts}
     />
   </div>

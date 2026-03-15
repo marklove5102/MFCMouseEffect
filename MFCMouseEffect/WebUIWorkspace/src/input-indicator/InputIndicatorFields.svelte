@@ -137,7 +137,7 @@
     keyLabelLayoutModes={keyLabelLayoutModes}
     monitors={monitors}
     monitorOverrides={monitorOverrides}
-    form={form}
+    bind:form={form}
     wasmState={wasmState}
     bind:monitorRows={monitorRows}
     onWasmAction={onWasmAction}
