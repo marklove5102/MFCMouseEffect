@@ -45,6 +45,7 @@ nlohmann::json BuildRootFromConfig(const EffectConfig& config) {
         {keys::mouse_companion::kModelPath, companion.modelPath},
         {keys::mouse_companion::kActionLibraryPath, companion.actionLibraryPath},
         {keys::mouse_companion::kAppearanceProfilePath, companion.appearanceProfilePath},
+        {keys::mouse_companion::kEdgeClampMode, companion.edgeClampMode},
         {keys::mouse_companion::kSizePx, companion.sizePx},
         {keys::mouse_companion::kOffsetX, companion.offsetX},
         {keys::mouse_companion::kOffsetY, companion.offsetY},

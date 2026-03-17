@@ -95,6 +95,7 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
         {"model_path", EnsureUtf8(companion.modelPath)},
         {"action_library_path", EnsureUtf8(companion.actionLibraryPath)},
         {"appearance_profile_path", EnsureUtf8(companion.appearanceProfilePath)},
+        {"edge_clamp_mode", EnsureUtf8(companion.edgeClampMode)},
         {"size_px", companion.sizePx},
         {"offset_x", companion.offsetX},
         {"offset_y", companion.offsetY},

@@ -53,6 +53,11 @@ void AppendSettingsSchemaOptionsSections(const EffectConfig& config, json* out) 
         {"model_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb"},
         {"action_library_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json"},
         {"appearance_profile_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json"},
+        {"edge_clamp_modes", json::array({
+            MakeOpt("soft", L"\u8f6f\u8fb9\u754c\uff08\u63a8\u8350\uff09", L"Soft Edge (Recommended)", lang),
+            MakeOpt("free", L"\u65e0\u8fb9\u754c\u9650\u5236", L"Free (No Clamp)", lang),
+            MakeOpt("strict", L"\u4e25\u683c\u5c4f\u5e55\u5185", L"Strict (In Screen)", lang),
+        })},
         {"size_px_range", {{"min", 48}, {"max", 360}, {"step", 1}}},
         {"offset_range", {{"min", -1200}, {"max", 1200}, {"step", 1}}},
         {"press_lift_px_range", {{"min", 0}, {"max", 240}, {"step", 1}}},

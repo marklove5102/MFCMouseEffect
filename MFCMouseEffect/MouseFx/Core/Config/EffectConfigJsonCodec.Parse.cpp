@@ -87,6 +87,10 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
             companion,
             keys::mouse_companion::kAppearanceProfilePath,
             config.mouseCompanion.appearanceProfilePath);
+        config.mouseCompanion.edgeClampMode = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kEdgeClampMode,
+            config.mouseCompanion.edgeClampMode);
         config.mouseCompanion.sizePx = parse_internal::GetOr<int>(
             companion,
             keys::mouse_companion::kSizePx,

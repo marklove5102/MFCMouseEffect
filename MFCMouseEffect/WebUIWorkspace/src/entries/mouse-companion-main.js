@@ -1,4 +1,9 @@
 const DEFAULT_SCHEMA = {
+  edge_clamp_modes: [
+    { value: 'soft', label: 'Soft Edge (Recommended)' },
+    { value: 'free', label: 'Free (No Clamp)' },
+    { value: 'strict', label: 'Strict (In Screen)' },
+  ],
   size_px_range: { min: 48, max: 360, step: 1 },
   offset_range: { min: -1200, max: 1200, step: 1 },
   press_lift_px_range: { min: 0, max: 240, step: 1 },
@@ -14,6 +19,7 @@ const DEFAULT_STATE = {
   model_path: 'MFCMouseEffect/Assets/Pet3D/source/pet-main.glb',
   action_library_path: 'MFCMouseEffect/Assets/Pet3D/source/pet-actions.json',
   appearance_profile_path: 'MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json',
+  edge_clamp_mode: 'soft',
   size_px: 112,
   offset_x: 18,
   offset_y: 26,
@@ -85,7 +91,31 @@ function normalizeRange(value, fallback) {
 
 function normalizeSchema(value) {
   const source = value && typeof value === 'object' ? value : {};
+  const normalizeModeOptions = (input) => {
+    if (!Array.isArray(input)) {
+      return [...DEFAULT_SCHEMA.edge_clamp_modes];
+    }
+    const normalized = input
+      .map((item) => {
+        const sourceItem = item && typeof item === 'object' ? item : {};
+        const value = `${sourceItem.value ?? ''}`.trim().toLowerCase();
+        const label = `${sourceItem.label ?? ''}`.trim();
+        if (!value) {
+          return null;
+        }
+        return {
+          value,
+          label: label || value,
+        };
+      })
+      .filter((item) => !!item);
+    if (normalized.length <= 0) {
+      return [...DEFAULT_SCHEMA.edge_clamp_modes];
+    }
+    return normalized;
+  };
   return {
+    edge_clamp_modes: normalizeModeOptions(source.edge_clamp_modes),
     size_px_range: normalizeRange(source.size_px_range, DEFAULT_SCHEMA.size_px_range),
     offset_range: normalizeRange(source.offset_range, DEFAULT_SCHEMA.offset_range),
     press_lift_px_range: normalizeRange(source.press_lift_px_range, DEFAULT_SCHEMA.press_lift_px_range),
@@ -102,11 +132,16 @@ function normalizeState(value) {
   const modelPath = `${source.model_path || ''}`.trim();
   const actionLibraryPath = `${source.action_library_path || ''}`.trim();
   const appearanceProfilePath = `${source.appearance_profile_path || ''}`.trim();
+  const edgeClampMode = `${source.edge_clamp_mode ?? ''}`.trim().toLowerCase();
   return {
     enabled: !!source.enabled,
     model_path: modelPath || DEFAULT_STATE.model_path,
     action_library_path: actionLibraryPath || DEFAULT_STATE.action_library_path,
     appearance_profile_path: appearanceProfilePath || DEFAULT_STATE.appearance_profile_path,
+    edge_clamp_mode:
+      edgeClampMode === 'strict' || edgeClampMode === 'free' || edgeClampMode === 'soft'
+        ? edgeClampMode
+        : DEFAULT_STATE.edge_clamp_mode,
     size_px: clampInt(source.size_px, 48, 360, DEFAULT_STATE.size_px),
     offset_x: clampInt(source.offset_x, -1200, 1200, DEFAULT_STATE.offset_x),
     offset_y: clampInt(source.offset_y, -1200, 1200, DEFAULT_STATE.offset_y),
@@ -219,6 +254,29 @@ function applyRange(inputId, range) {
   node.min = `${range.min}`;
   node.max = `${range.max}`;
   node.step = `${range.step}`;
+}
+
+function applySelectOptions(selectId, options, selected) {
+  const node = byId(selectId);
+  if (!node) {
+    return;
+  }
+  const normalized = Array.isArray(options) && options.length > 0
+    ? options
+    : DEFAULT_SCHEMA.edge_clamp_modes;
+  const selectedValue = `${selected ?? ''}`.trim().toLowerCase();
+  node.innerHTML = '';
+  for (const option of normalized) {
+    const value = `${option?.value ?? ''}`.trim().toLowerCase();
+    if (!value) {
+      continue;
+    }
+    const item = document.createElement('option');
+    item.value = value;
+    item.textContent = `${option?.label ?? value}`;
+    node.appendChild(item);
+  }
+  node.value = selectedValue || DEFAULT_STATE.edge_clamp_mode;
 }
 
 function syncTestFieldState() {
@@ -412,6 +470,9 @@ function mountIfNeeded() {
       <label for="mc_appearance_profile_path" class="label-with-tip"><span data-i18n="label_mouse_companion_appearance_profile_path">Appearance Profile Path (JSON)</span></label>
       <input id="mc_appearance_profile_path" type="text" data-i18n-placeholder="placeholder_mouse_companion_appearance_profile_path" placeholder="MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json" />
 
+      <label for="mc_edge_clamp_mode" data-i18n="label_mouse_companion_edge_clamp_mode">Edge Clamp Mode</label>
+      <select id="mc_edge_clamp_mode"></select>
+
       <label for="mc_size_px" data-i18n="label_mouse_companion_size_px">Companion Size (px)</label>
       <input id="mc_size_px" type="number" />
 
@@ -568,6 +629,7 @@ function readFromDom() {
     model_path: (byId('mc_model_path')?.value || '').trim(),
     action_library_path: (byId('mc_action_library_path')?.value || '').trim(),
     appearance_profile_path: (byId('mc_appearance_profile_path')?.value || '').trim(),
+    edge_clamp_mode: (byId('mc_edge_clamp_mode')?.value || '').trim(),
     size_px: readNumber('mc_size_px', DEFAULT_STATE.size_px),
     offset_x: readNumber('mc_offset_x', DEFAULT_STATE.offset_x),
     offset_y: readNumber('mc_offset_y', DEFAULT_STATE.offset_y),
@@ -599,6 +661,7 @@ function writeToDom(state, schema) {
     appearanceProfilePath.value =
       state.appearance_profile_path || DEFAULT_STATE.appearance_profile_path;
   }
+  applySelectOptions('mc_edge_clamp_mode', schema.edge_clamp_modes, state.edge_clamp_mode);
 
   const size = byId('mc_size_px');
   if (size) {

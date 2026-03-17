@@ -24,7 +24,8 @@ void mfx_macos_mouse_companion_configure_follow_profile_v1(
     void* handle,
     int offsetX,
     int offsetY,
-    int pressLiftPx);
+    int pressLiftPx,
+    int edgeClampModeCode);
 void mfx_macos_mouse_companion_update_state_v1(
     void* handle,
     int cursorX,

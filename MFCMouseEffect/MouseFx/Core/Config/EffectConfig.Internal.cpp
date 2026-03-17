@@ -150,6 +150,12 @@ MouseCompanionConfig SanitizeMouseCompanionConfig(MouseCompanionConfig config) {
     if (config.appearanceProfilePath.empty()) {
         config.appearanceProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json";
     }
+    config.edgeClampMode = ToLowerAscii(TrimAscii(config.edgeClampMode));
+    if (config.edgeClampMode != "strict" &&
+        config.edgeClampMode != "soft" &&
+        config.edgeClampMode != "free") {
+        config.edgeClampMode = "soft";
+    }
     config.sizePx = ClampInt(config.sizePx, 48, 360);
     config.offsetX = ClampInt(config.offsetX, -1200, 1200);
     config.offsetY = ClampInt(config.offsetY, -1200, 1200);

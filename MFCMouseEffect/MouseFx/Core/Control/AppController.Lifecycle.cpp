@@ -165,6 +165,17 @@ void ResetActionCoverageStatusFields(AppController::MouseCompanionRuntimeStatus*
     status->actionCoverageActions.clear();
 }
 
+int ResolveMouseCompanionEdgeClampModeCode(const std::string& mode) {
+    const std::string normalized = ToLowerAscii(TrimAscii(mode));
+    if (normalized == "strict") {
+        return 0;
+    }
+    if (normalized == "free") {
+        return 2;
+    }
+    return 1; // soft
+}
+
 } // namespace
 
 bool AppController::Start() {
@@ -570,11 +581,13 @@ void AppController::ApplyPetVisualFollowProfile() {
     }
     const MouseCompanionConfig& cfg = config_.mouseCompanion;
     const int pressLiftPx = cfg.useTestProfile ? cfg.testPressLiftPx : cfg.pressLiftPx;
+    const int edgeClampModeCode = ResolveMouseCompanionEdgeClampModeCode(cfg.edgeClampMode);
     mfx_macos_mouse_companion_configure_follow_profile_v1(
         petVisualHostHandle_,
         cfg.offsetX,
         cfg.offsetY,
-        pressLiftPx);
+        pressLiftPx,
+        edgeClampModeCode);
 #endif
 }
 

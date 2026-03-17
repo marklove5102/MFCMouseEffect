@@ -42,6 +42,7 @@ inline constexpr const char kEnabled[] = "enabled";
 inline constexpr const char kModelPath[] = "model_path";
 inline constexpr const char kActionLibraryPath[] = "action_library_path";
 inline constexpr const char kAppearanceProfilePath[] = "appearance_profile_path";
+inline constexpr const char kEdgeClampMode[] = "edge_clamp_mode";
 inline constexpr const char kSizePx[] = "size_px";
 inline constexpr const char kOffsetX[] = "offset_x";
 inline constexpr const char kOffsetY[] = "offset_y";

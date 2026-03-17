@@ -258,6 +258,9 @@ void ApplyMouseCompanionSettings(const json& payload, AppController* controller)
     if (source.contains("appearance_profile_path") && source["appearance_profile_path"].is_string()) {
         companion.appearanceProfilePath = source["appearance_profile_path"].get<std::string>();
     }
+    if (source.contains("edge_clamp_mode") && source["edge_clamp_mode"].is_string()) {
+        companion.edgeClampMode = source["edge_clamp_mode"].get<std::string>();
+    }
     applyInt("size_px", &companion.sizePx);
     applyInt("offset_x", &companion.offsetX);
     applyInt("offset_y", &companion.offsetY);

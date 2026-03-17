@@ -182,11 +182,16 @@
     const modelPath = `${source.model_path || ''}`.trim();
     const actionLibraryPath = `${source.action_library_path || ''}`.trim();
     const appearanceProfilePath = `${source.appearance_profile_path || ''}`.trim();
+    const edgeClampMode = `${source.edge_clamp_mode || ''}`.trim().toLowerCase();
     return {
       enabled: !!source.enabled,
       model_path: modelPath || 'MFCMouseEffect/Assets/Pet3D/source/pet-main.glb',
       action_library_path: actionLibraryPath || 'MFCMouseEffect/Assets/Pet3D/source/pet-actions.json',
       appearance_profile_path: appearanceProfilePath || 'MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json',
+      edge_clamp_mode:
+        edgeClampMode === 'strict' || edgeClampMode === 'soft' || edgeClampMode === 'free'
+          ? edgeClampMode
+          : 'soft',
       size_px: clamp(source.size_px, 48, 360, 112),
       offset_x: clamp(source.offset_x, -1200, 1200, 18),
       offset_y: clamp(source.offset_y, -1200, 1200, 26),
@@ -456,6 +461,7 @@
         model_path: getText('mc_model_path'),
         action_library_path: getText('mc_action_library_path'),
         appearance_profile_path: getText('mc_appearance_profile_path'),
+        edge_clamp_mode: getText('mc_edge_clamp_mode') || 'soft',
         size_px: getNum('mc_size_px'),
         offset_x: getNum('mc_offset_x'),
         offset_y: getNum('mc_offset_y'),

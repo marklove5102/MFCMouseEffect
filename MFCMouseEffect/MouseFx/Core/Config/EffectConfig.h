@@ -129,6 +129,8 @@ struct MouseCompanionConfig {
     std::string modelPath = "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb";
     std::string actionLibraryPath = "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json";
     std::string appearanceProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json";
+    // strict | soft | free
+    std::string edgeClampMode = "soft";
     int sizePx = 112;
     int offsetX = 18;
     int offsetY = 26;

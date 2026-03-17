@@ -183,12 +183,15 @@
   - 当 `use_test_profile=true` 时，`test_smoothing_percent` 与 `test_press_lift_px` 覆盖生产值生效。
 - macOS 可视桥参数已接通：
   - 新增 `mfx_macos_mouse_companion_configure_follow_profile_v1(...)`；
-  - `offset_x / offset_y / press_lift_px` 会进入窗口跟随位姿更新，不再只是配置落库字段。
+  - `offset_x / offset_y / press_lift_px / edge_clamp_mode` 会进入窗口跟随位姿更新，不再只是配置落库字段。
 
 ## P9 增量（已完成首版：资产路径可配置 + 定向热重载）
 - 配置契约扩展（`mouse_companion`）：
   - 新增 `action_library_path`（动作库 JSON 路径）；
   - 新增 `appearance_profile_path`（外观配置 JSON 路径）。
+- 配置契约扩展（`mouse_companion`）：
+  - 新增 `edge_clamp_mode`（`strict | soft | free`，默认 `soft`）；
+  - WebSettings 与运行时均支持实时切换边界策略，不需要重启 host。
 - 端到端链路已打通：
   - `EffectConfig` + JSON parse/serialize + settings state/schema + `apply_settings` 均已支持新字段；
   - WebSettings `Mouse Companion` 分区已可编辑两条路径并随 `Apply` 持久化。

@@ -206,6 +206,10 @@ Deep implementation details are intentionally moved to P2 docs to reduce context
 - Mouse Companion edge saturation is further reduced (macOS Swift bridge):
   - soft-edge overflow budget is widened to `>= max(1.25*window_size, 0.90*window_size + |offset|)`,
   - this avoids early clamp saturation when cursor keeps moving outward near desktop boundaries.
+- Mouse Companion edge policy is now an explicit runtime contract (`mouse_companion.edge_clamp_mode`):
+  - config/schema/state/apply all support `strict | soft | free` (default `soft`),
+  - macOS follow profile now propagates the mode to Swift bridge immediately without restart,
+  - `free` disables desktop clamping entirely, `soft` keeps wide-overflow soft edge, `strict` clamps to in-screen bounds.
 - Click effect regression guard is tightened:
   - `DispatchRouter::OnClick` no longer suppresses click rendering via hold-policy gate,
   - click lane now always attempts normal wasm/native rendering when effects are not blacklisted, preventing stale hold state from globally swallowing click effects.

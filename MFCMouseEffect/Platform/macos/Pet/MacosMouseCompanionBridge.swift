@@ -4,6 +4,12 @@
 @preconcurrency import SceneKit
 import simd
 
+private enum MfxEdgeClampMode: Int32 {
+    case strict = 0
+    case soft = 1
+    case free = 2
+}
+
 @MainActor
 private final class MfxMouseCompanionHost {
     private let window: NSWindow
@@ -26,6 +32,7 @@ private final class MfxMouseCompanionHost {
     private var followOffsetX: CGFloat = 18.0
     private var followOffsetY: CGFloat = 26.0
     private var pressLiftPx: CGFloat = 24.0
+    private var edgeClampMode: MfxEdgeClampMode = .soft
 
     init(sizePx: Int) {
         // Keep generous canvas padding so different model proportions are not clipped.
@@ -172,13 +179,22 @@ private final class MfxMouseCompanionHost {
         modelNode.position.z = modelBasePosition.z
     }
 
-    func configureFollowProfile(offsetX: Int32, offsetY: Int32, pressLiftPx: Int32) {
+    func configureFollowProfile(
+        offsetX: Int32,
+        offsetY: Int32,
+        pressLiftPx: Int32,
+        edgeClampModeCode: Int32
+    ) {
         followOffsetX = CGFloat(offsetX)
         followOffsetY = CGFloat(offsetY)
         self.pressLiftPx = CGFloat(max(0, pressLiftPx))
+        edgeClampMode = MfxEdgeClampMode(rawValue: edgeClampModeCode) ?? .soft
     }
 
     private func clampToVisibleDesktop(_ desiredOrigin: NSPoint) -> NSPoint {
+        if edgeClampMode == .free {
+            return desiredOrigin
+        }
         let screens = NSScreen.screens
         guard !screens.isEmpty else {
             return desiredOrigin
@@ -194,6 +210,18 @@ private final class MfxMouseCompanionHost {
 
         let width = window.frame.width
         let height = window.frame.height
+        if edgeClampMode == .strict {
+            let minX = desktopBounds.minX
+            let minY = desktopBounds.minY
+            let maxX = desktopBounds.maxX - width
+            let maxY = desktopBounds.maxY - height
+            let upperX = max(maxX, minX)
+            let upperY = max(maxY, minY)
+            let clampedX = min(max(desiredOrigin.x, minX), upperX)
+            let clampedY = min(max(desiredOrigin.y, minY), upperY)
+            return NSPoint(x: clampedX, y: clampedY)
+        }
+
         // Wide soft-edge policy:
         // allow most of the companion window to move outside screen bounds so
         // edge-follow does not saturate early when cursor keeps moving outward.
@@ -797,7 +825,8 @@ public func mfx_macos_mouse_companion_configure_follow_profile_v1(
     _ handle: UnsafeMutableRawPointer?,
     _ offsetX: Int32,
     _ offsetY: Int32,
-    _ pressLiftPx: Int32
+    _ pressLiftPx: Int32,
+    _ edgeClampModeCode: Int32
 ) {
     guard let handle else {
         return
@@ -812,7 +841,8 @@ public func mfx_macos_mouse_companion_configure_follow_profile_v1(
             Unmanaged<MfxMouseCompanionHost>.fromOpaque(raw).takeUnretainedValue().configureFollowProfile(
                 offsetX: offsetX,
                 offsetY: offsetY,
-                pressLiftPx: pressLiftPx)
+                pressLiftPx: pressLiftPx,
+                edgeClampModeCode: edgeClampModeCode)
         }
         return
     }
@@ -825,7 +855,8 @@ public func mfx_macos_mouse_companion_configure_follow_profile_v1(
             Unmanaged<MfxMouseCompanionHost>.fromOpaque(raw).takeUnretainedValue().configureFollowProfile(
                 offsetX: offsetX,
                 offsetY: offsetY,
-                pressLiftPx: pressLiftPx)
+                pressLiftPx: pressLiftPx,
+                edgeClampModeCode: edgeClampModeCode)
         }
     }
 }

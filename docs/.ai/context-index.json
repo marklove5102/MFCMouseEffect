@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-17T11:49:39.517Z",
+  "generated_at": "2026-03-17T12:08:36.829Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "This file is the compact P1 runtime truth for daily execution.",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 288,
-      "size_bytes": 32740,
-      "estimated_tokens": 8185,
+      "line_count": 292,
+      "size_bytes": 33142,
+      "estimated_tokens": 8286,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": true,
-      "hash_sha1": "b4158500fa5e34e9fbd42dc5078b903513af56de",
-      "updated_at": "2026-03-17T11:44:12.288Z"
+      "hash_sha1": "fcce4a043233b66e5b8086fb457a0e6cf33b9c22",
+      "updated_at": "2026-03-17T12:07:37.383Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -246,14 +246,14 @@
       ],
       "summary": "1. 资产层（Import）",
       "when_to_read": "Read only when task keywords match this capability area.",
-      "line_count": 214,
-      "size_bytes": 12413,
-      "estimated_tokens": 3104,
+      "line_count": 217,
+      "size_bytes": 12642,
+      "estimated_tokens": 3161,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "76ad610946890886b68a4df1996acbaf49d6f2d1",
-      "updated_at": "2026-03-17T08:10:54.786Z"
+      "hash_sha1": "a2be3086499960728c4ddda35133aa61057b8de0",
+      "updated_at": "2026-03-17T12:07:52.644Z"
     },
     {
       "id": "docs/architecture/mouse-companion-action-clip-contract.zh-CN.md",

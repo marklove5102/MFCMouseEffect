@@ -122,6 +122,7 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
         current.modelPath == normalized.modelPath &&
         current.actionLibraryPath == normalized.actionLibraryPath &&
         current.appearanceProfilePath == normalized.appearanceProfilePath &&
+        current.edgeClampMode == normalized.edgeClampMode &&
         current.sizePx == normalized.sizePx &&
         current.offsetX == normalized.offsetX &&
         current.offsetY == normalized.offsetY &&
