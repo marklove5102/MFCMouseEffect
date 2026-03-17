@@ -49,6 +49,19 @@ void AppendSettingsSchemaOptionsSections(const EffectConfig& config, json* out) 
         {"step", 1},
         {"default", 0},
     };
+    (*out)["mouse_companion"] = {
+        {"model_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb"},
+        {"action_library_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json"},
+        {"appearance_profile_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json"},
+        {"size_px_range", {{"min", 48}, {"max", 360}, {"step", 1}}},
+        {"offset_range", {{"min", -1200}, {"max", 1200}, {"step", 1}}},
+        {"press_lift_px_range", {{"min", 0}, {"max", 240}, {"step", 1}}},
+        {"smoothing_percent_range", {{"min", 0}, {"max", 95}, {"step", 1}}},
+        {"follow_threshold_px_range", {{"min", 0}, {"max", 32}, {"step", 1}}},
+        {"release_hold_ms_range", {{"min", 0}, {"max", 800}, {"step", 10}}},
+        {"test_press_lift_px_range", {{"min", 0}, {"max", 320}, {"step", 1}}},
+        {"test_smoothing_percent_range", {{"min", 0}, {"max", 95}, {"step", 1}}},
+    };
     (*out)["effect_conflict_policy_options"] = {
         {"hold_move_policy", json::array({
             MakeOpt("hold_only", L"\u4ec5\u957f\u6309\u7279\u6548\uff08\u63a8\u8350\uff09", L"Hold Effect Only (Recommended)", lang),

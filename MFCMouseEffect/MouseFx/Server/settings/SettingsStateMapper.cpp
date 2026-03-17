@@ -38,6 +38,10 @@ std::string BuildSettingsStateJson(const EffectConfig& cfg, const AppController*
     if (inputAutomationGestureRouteStatus.is_object() && !inputAutomationGestureRouteStatus.empty()) {
         out["input_automation_gesture_route_status"] = inputAutomationGestureRouteStatus;
     }
+    const json mouseCompanionRuntimeState = BuildMouseCompanionRuntimeState(controller);
+    if (mouseCompanionRuntimeState.is_object() && !mouseCompanionRuntimeState.empty()) {
+        out["mouse_companion_runtime"] = mouseCompanionRuntimeState;
+    }
 
     const json wasmState = BuildWasmState(cfg, controller);
     if (wasmState.is_object() && !wasmState.empty()) {

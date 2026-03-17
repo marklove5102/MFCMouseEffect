@@ -24,6 +24,7 @@ void CommandHandler::HandleApplySettings(const std::string& jsonCmd) {
     }
 
     command_handler_apply_settings::ApplyTextSettings(payload, controller_);
+    command_handler_apply_settings::ApplyMouseCompanionSettings(payload, controller_);
     command_handler_apply_settings::ApplyInputIndicatorSettings(payload, controller_);
     command_handler_apply_settings::ApplyAutomationSettings(payload, controller_);
     command_handler_apply_settings::ApplyWasmSettings(payload, controller_);

@@ -118,6 +118,7 @@ intptr_t DispatchRouter::OnMove(const DispatchMessage& message) {
     ctrl_->RememberLastPointerPoint(pt);
 #endif
 
+    petFeature_.OnMouseMove(*ctrl_, pt);
     automationFeature_.OnMouseMove(*ctrl_, pt);
     const bool effectsBlockedByAppBlacklist = ctrl_->IsEffectsBlockedByAppBlacklist();
 
@@ -204,6 +205,7 @@ intptr_t DispatchRouter::OnButtonDown(const DispatchMessage& message) {
     ctrl_->RememberLastPointerPoint(pt);
 #endif
 
+    petFeature_.OnButtonDown(*ctrl_, pt, button);
     const bool effectsBlockedByAppBlacklist = ctrl_->IsEffectsBlockedByAppBlacklist();
     ctrl_->BeginHoldTracking(pt, button);
     automationFeature_.OnButtonDown(*ctrl_, pt, button);
@@ -234,6 +236,7 @@ intptr_t DispatchRouter::OnButtonUp(const DispatchMessage& message) {
 #else
     ctrl_->RememberLastPointerPoint(pt);
 #endif
+    petFeature_.OnButtonUp(*ctrl_, pt, static_cast<int>(message.button));
     automationFeature_.OnButtonUp(*ctrl_, pt, static_cast<int>(message.button));
     const bool effectsBlockedByAppBlacklist = ctrl_->IsEffectsBlockedByAppBlacklist();
     if (!effectsBlockedByAppBlacklist) {

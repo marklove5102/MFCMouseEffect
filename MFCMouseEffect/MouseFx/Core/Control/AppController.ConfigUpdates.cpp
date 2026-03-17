@@ -114,6 +114,98 @@ void AppController::SetTextEffectFontSize(float sizePt) {
     }
 }
 
+void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
+    const MouseCompanionConfig normalized = config_internal::SanitizeMouseCompanionConfig(cfg);
+    const MouseCompanionConfig current = config_.mouseCompanion;
+    const bool unchanged =
+        current.enabled == normalized.enabled &&
+        current.modelPath == normalized.modelPath &&
+        current.actionLibraryPath == normalized.actionLibraryPath &&
+        current.appearanceProfilePath == normalized.appearanceProfilePath &&
+        current.sizePx == normalized.sizePx &&
+        current.offsetX == normalized.offsetX &&
+        current.offsetY == normalized.offsetY &&
+        current.pressLiftPx == normalized.pressLiftPx &&
+        current.smoothingPercent == normalized.smoothingPercent &&
+        current.followThresholdPx == normalized.followThresholdPx &&
+        current.releaseHoldMs == normalized.releaseHoldMs &&
+        current.useTestProfile == normalized.useTestProfile &&
+        current.testPressLiftPx == normalized.testPressLiftPx &&
+        current.testSmoothingPercent == normalized.testSmoothingPercent;
+    if (unchanged) {
+        return;
+    }
+
+    const bool enabledChanged = (current.enabled != normalized.enabled);
+    const bool sizeChanged = (current.sizePx != normalized.sizePx);
+    const bool modelPathChanged = (current.modelPath != normalized.modelPath);
+    const bool actionLibraryPathChanged = (current.actionLibraryPath != normalized.actionLibraryPath);
+    const bool appearanceProfilePathChanged = (current.appearanceProfilePath != normalized.appearanceProfilePath);
+    config_.mouseCompanion = normalized;
+    {
+        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+        mouseCompanionRuntimeStatus_.configEnabled = normalized.enabled;
+        mouseCompanionRuntimeStatus_.configuredModelPath = normalized.modelPath;
+        mouseCompanionRuntimeStatus_.configuredActionLibraryPath = normalized.actionLibraryPath;
+        mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = normalized.appearanceProfilePath;
+    }
+    PersistConfig();
+
+    if (!normalized.enabled) {
+        ResetPetDispatchRuntimeState();
+        ShutdownPetVisualHost();
+        {
+            std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+            mouseCompanionRuntimeStatus_.modelLoaded = false;
+            mouseCompanionRuntimeStatus_.actionLibraryLoaded = false;
+            mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
+            mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
+            mouseCompanionRuntimeStatus_.visualModelLoaded = false;
+            mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
+            mouseCompanionRuntimeStatus_.visualModelPath.clear();
+            mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+            mouseCompanionRuntimeStatus_.loadedActionLibraryPath.clear();
+            mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath.clear();
+            mouseCompanionRuntimeStatus_.visualModelLoadError.clear();
+            mouseCompanionRuntimeStatus_.actionCoverageReady = false;
+            mouseCompanionRuntimeStatus_.actionCoverageExpectedActionCount = 0;
+            mouseCompanionRuntimeStatus_.actionCoverageCoveredActionCount = 0;
+            mouseCompanionRuntimeStatus_.actionCoverageMissingActionCount = 0;
+            mouseCompanionRuntimeStatus_.actionCoverageSkeletonBoneCount = 0;
+            mouseCompanionRuntimeStatus_.actionCoverageTotalTrackCount = 0;
+            mouseCompanionRuntimeStatus_.actionCoverageMappedTrackCount = 0;
+            mouseCompanionRuntimeStatus_.actionCoverageOverallRatio = 0.0f;
+            mouseCompanionRuntimeStatus_.actionCoverageError.clear();
+            mouseCompanionRuntimeStatus_.actionCoverageMissingActions.clear();
+            mouseCompanionRuntimeStatus_.actionCoverageMissingBoneNames.clear();
+            mouseCompanionRuntimeStatus_.actionCoverageActions.clear();
+        }
+        return;
+    }
+
+    if (sizeChanged && petVisualHostHandle_ != nullptr) {
+        ShutdownPetVisualHost();
+    }
+    EnsurePetVisualHost();
+    ApplyPetVisualFollowProfile();
+
+    const bool shouldReloadModel =
+        enabledChanged ||
+        sizeChanged ||
+        modelPathChanged ||
+        loadedPetModelPath_.empty();
+    if (shouldReloadModel) {
+        TryLoadDefaultPetModel();
+    } else {
+        if (actionLibraryPathChanged || loadedPetActionLibraryPath_.empty()) {
+            TryLoadDefaultPetActionLibrary();
+        }
+        if (appearanceProfilePathChanged || loadedPetAppearanceProfilePath_.empty()) {
+            TryLoadDefaultPetAppearanceProfile();
+        }
+    }
+}
+
 void AppController::SetInputIndicatorConfig(const InputIndicatorConfig& cfg) {
     config_.inputIndicator = ResolveInputIndicatorManifestFallback(cfg);
     if (config_.inputIndicator.renderMode == "wasm") {

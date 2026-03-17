@@ -3,6 +3,7 @@
 
 #include "MouseFx/Server/routes/automation/WebSettingsServer.TestAutomationApiRoutes.h"
 #include "MouseFx/Server/routes/testing/WebSettingsServer.TestEffectsApiRoutes.h"
+#include "MouseFx/Server/routes/testing/WebSettingsServer.TestMouseCompanionApiRoutes.h"
 #include "MouseFx/Server/routes/testing/WebSettingsServer.TestWasmInputApiRoutes.h"
 
 namespace mousefx {
@@ -17,6 +18,10 @@ bool HandleWebSettingsTestApiRoute(
     }
 
     if (HandleWebSettingsTestEffectsApiRoute(req, path, controller, resp)) {
+        return true;
+    }
+
+    if (HandleWebSettingsTestMouseCompanionApiRoute(req, path, controller, resp)) {
         return true;
     }
 

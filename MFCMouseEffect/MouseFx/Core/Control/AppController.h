@@ -34,6 +34,9 @@ class GdiPlusSession;
 namespace wasm {
 class WasmEffectHost;
 }
+namespace pet {
+class PetCompanionRuntime;
+}
 
 // Owns the subsystem lifecycle: message-only dispatcher, GDI+ init, hook, and effects.
 class AppController final : public IDispatchMessageHandler {
@@ -87,6 +90,54 @@ public:
         bool nativeFallbackApplied{false};
     };
 
+    struct MouseCompanionRuntimeStatus {
+        struct ActionCoverageActionStatus {
+            std::string actionName;
+            bool clipPresent{false};
+            int trackCount{0};
+            int mappedTrackCount{0};
+            float coverageRatio{0.0f};
+            std::vector<std::string> missingBoneTracks;
+        };
+
+        bool configEnabled{false};
+        bool runtimePresent{false};
+        bool visualHostActive{false};
+        bool visualModelLoaded{false};
+        bool modelLoaded{false};
+        bool actionLibraryLoaded{false};
+        bool appearanceProfileLoaded{false};
+        bool poseBindingConfigured{false};
+        int skeletonBoneCount{0};
+        std::string configuredModelPath;
+        std::string configuredActionLibraryPath;
+        std::string configuredAppearanceProfilePath;
+        std::string visualModelPath;
+        std::string loadedModelPath;
+        std::string loadedActionLibraryPath;
+        std::string loadedAppearanceProfilePath;
+        std::string visualModelLoadError;
+        std::string modelLoadError;
+        std::string actionLibraryLoadError;
+        std::string appearanceProfileLoadError;
+        int lastActionCode{0};
+        float lastActionIntensity{0.0f};
+        uint64_t lastActionTickMs{0};
+        std::string lastActionName{"idle"};
+        bool actionCoverageReady{false};
+        int actionCoverageExpectedActionCount{0};
+        int actionCoverageCoveredActionCount{0};
+        int actionCoverageMissingActionCount{0};
+        int actionCoverageSkeletonBoneCount{0};
+        int actionCoverageTotalTrackCount{0};
+        int actionCoverageMappedTrackCount{0};
+        float actionCoverageOverallRatio{0.0f};
+        std::string actionCoverageError;
+        std::vector<std::string> actionCoverageMissingActions;
+        std::vector<std::string> actionCoverageMissingBoneNames;
+        std::vector<ActionCoverageActionStatus> actionCoverageActions;
+    };
+
     bool Start();
     void Stop();
     
@@ -109,6 +160,7 @@ public:
     void SetTextEffectContent(const std::vector<std::wstring>& texts);
     // Set text click font size in point units.
     void SetTextEffectFontSize(float sizePt);
+    void SetMouseCompanionConfig(const MouseCompanionConfig& cfg);
     void SetInputIndicatorConfig(const InputIndicatorConfig& cfg);
     void SetInputAutomationConfig(const InputAutomationConfig& cfg);
     void SetRuntimeDiagnosticsEnabled(bool enabled);
@@ -175,6 +227,7 @@ public:
     void DispatchInputIndicatorScroll(const ScrollEvent& ev);
     void DispatchInputIndicatorKey(const KeyEvent& ev);
     InputIndicatorWasmRouteStatus ReadInputIndicatorWasmRouteStatus() const;
+    MouseCompanionRuntimeStatus ReadMouseCompanionRuntimeStatus() const;
     IInputIndicatorOverlay& IndicatorOverlay() { return *inputIndicatorOverlay_; }
     InputAutomationEngine& InputAutomation() { return inputAutomationEngine_; }
     const InputAutomationEngine& InputAutomation() const { return inputAutomationEngine_; }
@@ -200,6 +253,10 @@ public:
     bool QueryCursorScreenPoint(ScreenPoint* outPt) const;
     void RememberLastPointerPoint(const ScreenPoint& pt);
     bool TryGetLastPointerPoint(ScreenPoint* outPt) const;
+    void DispatchPetMove(const ScreenPoint& pt);
+    void DispatchPetClick(const ClickEvent& ev);
+    void DispatchPetButtonDown(const ScreenPoint& pt, int button);
+    void DispatchPetButtonUp(const ScreenPoint& pt, int button);
     void KillDispatchTimer(uintptr_t timerId);
     std::string CurrentForegroundProcessBaseName();
     bool IsEffectsBlockedByAppBlacklist();
@@ -255,6 +312,19 @@ private:
     void WriteGpuRouteStatusSnapshot(EffectCategory category, const std::string& requestedType, const std::string& effectiveType, const std::string& reason) const;
     void NotifyInputCaptureStatusChanged();
     void RefreshInputCaptureRuntimeState();
+    void TryLoadDefaultPetModel();
+    void TryLoadDefaultPetActionLibrary();
+    void TryLoadDefaultPetAppearanceProfile();
+    void RecomputePetActionCoverageStatus();
+    void EnsurePetVisualHost();
+    void ShutdownPetVisualHost();
+    bool TryLoadPetModelIntoVisualHost(const std::string& modelPath);
+    void ApplyPetVisualFollowProfile();
+    void TryApplyPetAppearanceToVisualHost();
+    bool EnsurePetVisualPoseBinding();
+    void UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity);
+    ScreenPoint ResolvePetRuntimeCursorPoint(const ScreenPoint& rawPt, double dtSeconds, int smoothingPercent);
+    void ResetPetDispatchRuntimeState();
     void EnterInputCaptureDegradedMode(uint32_t error);
     void UpdateVmSuppressionState();
     void ApplyVmSuppression(bool suppressed);
@@ -327,7 +397,25 @@ private:
     InputIndicatorWasmDispatchFeature inputIndicatorWasmDispatch_{};
     mutable std::mutex inputIndicatorWasmRouteStatusMutex_{};
     InputIndicatorWasmRouteStatus inputIndicatorWasmRouteStatus_{};
+    mutable std::mutex mouseCompanionRuntimeStatusMutex_{};
+    MouseCompanionRuntimeStatus mouseCompanionRuntimeStatus_{};
     InputAutomationEngine inputAutomationEngine_{};
+    std::unique_ptr<pet::PetCompanionRuntime> petCompanion_{};
+    void* petVisualHostHandle_{nullptr};
+    std::string loadedPetModelPath_{};
+    std::string loadedPetActionLibraryPath_{};
+    std::string loadedPetAppearanceProfilePath_{};
+    std::vector<std::string> petVisualSkeletonNames_{};
+    std::vector<const char*> petVisualSkeletonNamePtrs_{};
+    bool petVisualPoseBindingConfigured_{false};
+    bool petDragging_ = false;
+    uint64_t petLastTickMs_ = 0;
+    bool petHasSmoothedCursor_ = false;
+    double petSmoothedCursorX_ = 0.0;
+    double petSmoothedCursorY_ = 0.0;
+    ScreenPoint petLastDispatchPoint_{};
+    bool petHasLastDispatchPoint_ = false;
+    uint64_t petReleaseHoldUntilTickMs_ = 0;
     bool runtimeDiagnosticsEnabled_ = false;
     mutable ShortcutCaptureSession shortcutCaptureSession_{};
     static constexpr size_t kWasmEffectsHostCount = 5;

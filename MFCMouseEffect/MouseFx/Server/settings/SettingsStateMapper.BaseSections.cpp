@@ -89,6 +89,24 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
         {"idle_fade_end_ms", cfg.trailParams.idleFade.endMs},
     };
 
+    const MouseCompanionConfig companion = config_internal::SanitizeMouseCompanionConfig(cfg.mouseCompanion);
+    (*out)["mouse_companion"] = {
+        {"enabled", companion.enabled},
+        {"model_path", EnsureUtf8(companion.modelPath)},
+        {"action_library_path", EnsureUtf8(companion.actionLibraryPath)},
+        {"appearance_profile_path", EnsureUtf8(companion.appearanceProfilePath)},
+        {"size_px", companion.sizePx},
+        {"offset_x", companion.offsetX},
+        {"offset_y", companion.offsetY},
+        {"press_lift_px", companion.pressLiftPx},
+        {"smoothing_percent", companion.smoothingPercent},
+        {"follow_threshold_px", companion.followThresholdPx},
+        {"release_hold_ms", companion.releaseHoldMs},
+        {"use_test_profile", companion.useTestProfile},
+        {"test_press_lift_px", companion.testPressLiftPx},
+        {"test_smoothing_percent", companion.testSmoothingPercent},
+    };
+
     (*out)["input_indicator"] = {
         {"enabled", cfg.inputIndicator.enabled},
         {"keyboard_enabled", cfg.inputIndicator.keyboardEnabled},

@@ -223,6 +223,57 @@ void ApplyTextSettings(const json& payload, AppController* controller) {
     }
 }
 
+void ApplyMouseCompanionSettings(const json& payload, AppController* controller) {
+    if (!controller) {
+        return;
+    }
+    if (!payload.contains("mouse_companion") || !payload["mouse_companion"].is_object()) {
+        return;
+    }
+
+    MouseCompanionConfig companion = controller->Config().mouseCompanion;
+    const json& source = payload["mouse_companion"];
+    auto applyInt = [&](const char* key, int* dst) {
+        if (!key || !dst || !source.contains(key)) {
+            return;
+        }
+        if (source[key].is_number_integer()) {
+            *dst = source[key].get<int>();
+            return;
+        }
+        if (source[key].is_number()) {
+            *dst = static_cast<int>(source[key].get<double>());
+        }
+    };
+
+    if (source.contains("enabled") && source["enabled"].is_boolean()) {
+        companion.enabled = source["enabled"].get<bool>();
+    }
+    if (source.contains("model_path") && source["model_path"].is_string()) {
+        companion.modelPath = source["model_path"].get<std::string>();
+    }
+    if (source.contains("action_library_path") && source["action_library_path"].is_string()) {
+        companion.actionLibraryPath = source["action_library_path"].get<std::string>();
+    }
+    if (source.contains("appearance_profile_path") && source["appearance_profile_path"].is_string()) {
+        companion.appearanceProfilePath = source["appearance_profile_path"].get<std::string>();
+    }
+    applyInt("size_px", &companion.sizePx);
+    applyInt("offset_x", &companion.offsetX);
+    applyInt("offset_y", &companion.offsetY);
+    applyInt("press_lift_px", &companion.pressLiftPx);
+    applyInt("smoothing_percent", &companion.smoothingPercent);
+    applyInt("follow_threshold_px", &companion.followThresholdPx);
+    applyInt("release_hold_ms", &companion.releaseHoldMs);
+    if (source.contains("use_test_profile") && source["use_test_profile"].is_boolean()) {
+        companion.useTestProfile = source["use_test_profile"].get<bool>();
+    }
+    applyInt("test_press_lift_px", &companion.testPressLiftPx);
+    applyInt("test_smoothing_percent", &companion.testSmoothingPercent);
+
+    controller->SetMouseCompanionConfig(config_internal::SanitizeMouseCompanionConfig(companion));
+}
+
 void ApplyInputIndicatorSettings(const json& payload, AppController* controller) {
     if (!controller) {
         return;

@@ -13,6 +13,7 @@ inline constexpr const char kHoldPresenterBackend[] = "hold_presenter_backend";
 inline constexpr const char kEffectsBlacklistApps[] = "effects_blacklist_apps";
 inline constexpr const char kTrailStyle[] = "trail_style";
 inline constexpr const char kActiveEffects[] = "active_effects";
+inline constexpr const char kMouseCompanion[] = "mouse_companion";
 inline constexpr const char kInputIndicator[] = "input_indicator";
 inline constexpr const char kMouseIndicator[] = "mouse_indicator";
 inline constexpr const char kAutomation[] = "automation";
@@ -35,5 +36,22 @@ inline constexpr const char kScroll[] = "scroll";
 inline constexpr const char kHold[] = "hold";
 inline constexpr const char kHover[] = "hover";
 } // namespace effect_size_scale
+
+namespace mouse_companion {
+inline constexpr const char kEnabled[] = "enabled";
+inline constexpr const char kModelPath[] = "model_path";
+inline constexpr const char kActionLibraryPath[] = "action_library_path";
+inline constexpr const char kAppearanceProfilePath[] = "appearance_profile_path";
+inline constexpr const char kSizePx[] = "size_px";
+inline constexpr const char kOffsetX[] = "offset_x";
+inline constexpr const char kOffsetY[] = "offset_y";
+inline constexpr const char kPressLiftPx[] = "press_lift_px";
+inline constexpr const char kSmoothingPercent[] = "smoothing_percent";
+inline constexpr const char kFollowThresholdPx[] = "follow_threshold_px";
+inline constexpr const char kReleaseHoldMs[] = "release_hold_ms";
+inline constexpr const char kUseTestProfile[] = "use_test_profile";
+inline constexpr const char kTestPressLiftPx[] = "test_press_lift_px";
+inline constexpr const char kTestSmoothingPercent[] = "test_smoothing_percent";
+} // namespace mouse_companion
 
 } // namespace mousefx::config_json::keys

@@ -195,4 +195,64 @@ json BuildInputAutomationGestureRouteStatusState(const AppController* controller
     return out;
 }
 
+json BuildMouseCompanionRuntimeState(const AppController* controller) {
+    if (!controller) {
+        return {};
+    }
+
+    const AppController::MouseCompanionRuntimeStatus status =
+        controller->ReadMouseCompanionRuntimeStatus();
+    json out = json::object();
+    out["config_enabled"] = status.configEnabled;
+    out["runtime_present"] = status.runtimePresent;
+    out["visual_host_active"] = status.visualHostActive;
+    out["visual_model_loaded"] = status.visualModelLoaded;
+    out["model_loaded"] = status.modelLoaded;
+    out["action_library_loaded"] = status.actionLibraryLoaded;
+    out["appearance_profile_loaded"] = status.appearanceProfileLoaded;
+    out["pose_binding_configured"] = status.poseBindingConfigured;
+    out["skeleton_bone_count"] = status.skeletonBoneCount;
+    out["configured_model_path"] = status.configuredModelPath;
+    out["configured_action_library_path"] = status.configuredActionLibraryPath;
+    out["configured_appearance_profile_path"] = status.configuredAppearanceProfilePath;
+    out["visual_model_path"] = status.visualModelPath;
+    out["loaded_model_path"] = status.loadedModelPath;
+    out["loaded_action_library_path"] = status.loadedActionLibraryPath;
+    out["loaded_appearance_profile_path"] = status.loadedAppearanceProfilePath;
+    out["visual_model_load_error"] = status.visualModelLoadError;
+    out["model_load_error"] = status.modelLoadError;
+    out["action_library_load_error"] = status.actionLibraryLoadError;
+    out["appearance_profile_load_error"] = status.appearanceProfileLoadError;
+    out["last_action_code"] = status.lastActionCode;
+    out["last_action_name"] = status.lastActionName;
+    out["last_action_intensity"] = status.lastActionIntensity;
+    out["last_action_tick_ms"] = status.lastActionTickMs;
+    out["action_coverage"] = {
+        {"ready", status.actionCoverageReady},
+        {"expected_action_count", status.actionCoverageExpectedActionCount},
+        {"covered_action_count", status.actionCoverageCoveredActionCount},
+        {"missing_action_count", status.actionCoverageMissingActionCount},
+        {"skeleton_bone_count", status.actionCoverageSkeletonBoneCount},
+        {"total_track_count", status.actionCoverageTotalTrackCount},
+        {"mapped_track_count", status.actionCoverageMappedTrackCount},
+        {"overall_coverage_ratio", status.actionCoverageOverallRatio},
+        {"error", status.actionCoverageError},
+        {"missing_actions", status.actionCoverageMissingActions},
+        {"missing_bone_names", status.actionCoverageMissingBoneNames},
+    };
+    json actionEntries = json::array();
+    for (const auto& action : status.actionCoverageActions) {
+        actionEntries.push_back({
+            {"action_name", action.actionName},
+            {"clip_present", action.clipPresent},
+            {"track_count", action.trackCount},
+            {"mapped_track_count", action.mappedTrackCount},
+            {"coverage_ratio", action.coverageRatio},
+            {"missing_bone_tracks", action.missingBoneTracks},
+        });
+    }
+    out["action_coverage"]["actions"] = std::move(actionEntries);
+    return out;
+}
+
 } // namespace mousefx

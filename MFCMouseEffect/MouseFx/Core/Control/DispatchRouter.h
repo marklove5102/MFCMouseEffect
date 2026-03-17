@@ -5,6 +5,7 @@
 #include "MouseFx/Core/Control/AutomationDispatchFeature.h"
 #include "MouseFx/Core/Control/DispatchMessage.h"
 #include "MouseFx/Core/Control/InputIndicatorDispatchFeature.h"
+#include "MouseFx/Core/Control/PetDispatchFeature.h"
 #include "MouseFx/Core/Control/WasmDispatchFeature.h"
 
 namespace mousefx {
@@ -33,6 +34,7 @@ private:
     WasmDispatchFeature wasmFeature_{};
     AutomationDispatchFeature automationFeature_{};
     InputIndicatorDispatchFeature indicatorFeature_{};
+    PetDispatchFeature petFeature_{};
 };
 
 } // namespace mousefx

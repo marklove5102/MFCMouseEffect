@@ -9,20 +9,6 @@
 #include "MouseFx/Interfaces/IMouseEffect.h"
 
 namespace mousefx {
-namespace {
-
-bool IsHoldInteractionActive(AppController* controller) {
-    if (!controller) {
-        return false;
-    }
-    return controller->CurrentHoldDurationMs() >= AppController::HoldDelayMs();
-}
-
-bool ShouldSuppressClickEffectForHoldPolicy(AppController* controller) {
-    return IsHoldInteractionActive(controller);
-}
-
-} // namespace
 
 DispatchRouter::DispatchRouter(AppController* controller)
     : ctrl_(controller) {}
@@ -96,11 +82,11 @@ intptr_t DispatchRouter::OnClick(const DispatchMessage& message) {
 
     if (ev) {
         ctrl_->RememberLastPointerPoint(ev->pt);
+        petFeature_.OnClick(*ctrl_, *ev);
         const bool effectsBlockedByAppBlacklist = ctrl_->IsEffectsBlockedByAppBlacklist();
-        const bool suppressClickEffectByPolicy = ShouldSuppressClickEffectForHoldPolicy(ctrl_);
         bool renderedByWasm = false;
         bool wasmRouteActive = false;
-        if (!effectsBlockedByAppBlacklist && !suppressClickEffectByPolicy) {
+        if (!effectsBlockedByAppBlacklist) {
             wasmRouteActive = wasmFeature_.RouteClick(*ctrl_, *ev, &renderedByWasm);
         }
         automationFeature_.OnClick(*ctrl_, *ev);
@@ -109,7 +95,6 @@ intptr_t DispatchRouter::OnClick(const DispatchMessage& message) {
         const bool shouldFallbackToBuiltin =
             ((!wasmRouteActive) || ctrl_->ShouldFallbackToBuiltinClickWhenWasmActive());
         if (!effectsBlockedByAppBlacklist &&
-            !suppressClickEffectByPolicy &&
             shouldFallbackToBuiltin &&
             !renderedByWasm) {
             if (auto* effect = ctrl_->GetEffect(EffectCategory::Click)) {

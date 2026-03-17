@@ -137,6 +137,31 @@ TrailRendererParamsConfig SanitizeTrailParams(TrailRendererParamsConfig params) 
     return params;
 }
 
+MouseCompanionConfig SanitizeMouseCompanionConfig(MouseCompanionConfig config) {
+    config.modelPath = TrimAscii(config.modelPath);
+    if (config.modelPath.empty()) {
+        config.modelPath = "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb";
+    }
+    config.actionLibraryPath = TrimAscii(config.actionLibraryPath);
+    if (config.actionLibraryPath.empty()) {
+        config.actionLibraryPath = "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json";
+    }
+    config.appearanceProfilePath = TrimAscii(config.appearanceProfilePath);
+    if (config.appearanceProfilePath.empty()) {
+        config.appearanceProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json";
+    }
+    config.sizePx = ClampInt(config.sizePx, 48, 360);
+    config.offsetX = ClampInt(config.offsetX, -1200, 1200);
+    config.offsetY = ClampInt(config.offsetY, -1200, 1200);
+    config.pressLiftPx = ClampInt(config.pressLiftPx, 0, 240);
+    config.smoothingPercent = ClampInt(config.smoothingPercent, 0, 95);
+    config.followThresholdPx = ClampInt(config.followThresholdPx, 0, 32);
+    config.releaseHoldMs = ClampInt(config.releaseHoldMs, 0, 800);
+    config.testPressLiftPx = ClampInt(config.testPressLiftPx, 0, 320);
+    config.testSmoothingPercent = ClampInt(config.testSmoothingPercent, 0, 95);
+    return config;
+}
+
 InputIndicatorConfig SanitizeInputIndicatorConfig(InputIndicatorConfig config) {
     config.positionMode = (config.positionMode == "absolute") ? "absolute" : "relative";
     config.renderMode = ToLowerAscii(TrimAscii(config.renderMode));

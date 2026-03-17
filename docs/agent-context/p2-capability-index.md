@@ -33,6 +33,16 @@ Use it when P1 (`current.md`) is not enough and you need targeted deep context.
 - Server layer map and include boundaries:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/server-structure.md`
 
+## Mouse Companion 3D
+- 3D companion runtime blueprint and phased architecture (canonical `glb`, non-builtin animation pipeline):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md`
+- Action clip asset contract and JSON schema (external skeleton action reuse):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-action-clip-contract.zh-CN.md`
+- Appearance customization contract (profile JSON + accessory/material override):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-appearance-contract.zh-CN.md`
+- Model import pipeline contract (converter abstraction + sidecar/default pipeline):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-model-import-pipeline-contract.zh-CN.md`
+
 ## Regression / Workflow
 - Unified regression workflow:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-regression-suite-workflow.md`

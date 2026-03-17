@@ -69,6 +69,67 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
     }
     config.effectConflictPolicy = config_internal::SanitizeEffectConflictPolicyConfig(config.effectConflictPolicy);
 
+    if (root.contains(keys::kMouseCompanion) && root[keys::kMouseCompanion].is_object()) {
+        const auto& companion = root[keys::kMouseCompanion];
+        config.mouseCompanion.enabled = parse_internal::GetOr<bool>(
+            companion,
+            keys::mouse_companion::kEnabled,
+            config.mouseCompanion.enabled);
+        config.mouseCompanion.modelPath = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kModelPath,
+            config.mouseCompanion.modelPath);
+        config.mouseCompanion.actionLibraryPath = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kActionLibraryPath,
+            config.mouseCompanion.actionLibraryPath);
+        config.mouseCompanion.appearanceProfilePath = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kAppearanceProfilePath,
+            config.mouseCompanion.appearanceProfilePath);
+        config.mouseCompanion.sizePx = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kSizePx,
+            config.mouseCompanion.sizePx);
+        config.mouseCompanion.offsetX = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kOffsetX,
+            config.mouseCompanion.offsetX);
+        config.mouseCompanion.offsetY = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kOffsetY,
+            config.mouseCompanion.offsetY);
+        config.mouseCompanion.pressLiftPx = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kPressLiftPx,
+            config.mouseCompanion.pressLiftPx);
+        config.mouseCompanion.smoothingPercent = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kSmoothingPercent,
+            config.mouseCompanion.smoothingPercent);
+        config.mouseCompanion.followThresholdPx = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kFollowThresholdPx,
+            config.mouseCompanion.followThresholdPx);
+        config.mouseCompanion.releaseHoldMs = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kReleaseHoldMs,
+            config.mouseCompanion.releaseHoldMs);
+        config.mouseCompanion.useTestProfile = parse_internal::GetOr<bool>(
+            companion,
+            keys::mouse_companion::kUseTestProfile,
+            config.mouseCompanion.useTestProfile);
+        config.mouseCompanion.testPressLiftPx = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kTestPressLiftPx,
+            config.mouseCompanion.testPressLiftPx);
+        config.mouseCompanion.testSmoothingPercent = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kTestSmoothingPercent,
+            config.mouseCompanion.testSmoothingPercent);
+    }
+    config.mouseCompanion = config_internal::SanitizeMouseCompanionConfig(config.mouseCompanion);
+
     parse_internal::ParseInputIndicator(root, config);
     parse_internal::ParseAutomation(root, config);
     parse_internal::ParseWasm(root, config);

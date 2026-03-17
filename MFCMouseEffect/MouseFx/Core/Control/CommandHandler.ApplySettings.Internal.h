@@ -16,6 +16,7 @@ bool TryParsePayloadObject(const std::string& jsonCmd, json* outPayload);
 
 void ApplyActiveSettings(const json& payload, AppController* controller);
 void ApplyTextSettings(const json& payload, AppController* controller);
+void ApplyMouseCompanionSettings(const json& payload, AppController* controller);
 void ApplyInputIndicatorSettings(const json& payload, AppController* controller);
 void ApplyAutomationSettings(const json& payload, AppController* controller);
 void ApplyWasmSettings(const json& payload, AppController* controller);

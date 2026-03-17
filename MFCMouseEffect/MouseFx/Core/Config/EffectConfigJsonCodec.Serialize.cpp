@@ -38,6 +38,24 @@ nlohmann::json BuildRootFromConfig(const EffectConfig& config) {
     root[keys::kEffectConflictPolicy] = {
         {keys::effect_conflict_policy::kHoldMovePolicy, policy.holdMovePolicy},
     };
+    const MouseCompanionConfig companion =
+        config_internal::SanitizeMouseCompanionConfig(config.mouseCompanion);
+    root[keys::kMouseCompanion] = {
+        {keys::mouse_companion::kEnabled, companion.enabled},
+        {keys::mouse_companion::kModelPath, companion.modelPath},
+        {keys::mouse_companion::kActionLibraryPath, companion.actionLibraryPath},
+        {keys::mouse_companion::kAppearanceProfilePath, companion.appearanceProfilePath},
+        {keys::mouse_companion::kSizePx, companion.sizePx},
+        {keys::mouse_companion::kOffsetX, companion.offsetX},
+        {keys::mouse_companion::kOffsetY, companion.offsetY},
+        {keys::mouse_companion::kPressLiftPx, companion.pressLiftPx},
+        {keys::mouse_companion::kSmoothingPercent, companion.smoothingPercent},
+        {keys::mouse_companion::kFollowThresholdPx, companion.followThresholdPx},
+        {keys::mouse_companion::kReleaseHoldMs, companion.releaseHoldMs},
+        {keys::mouse_companion::kUseTestProfile, companion.useTestProfile},
+        {keys::mouse_companion::kTestPressLiftPx, companion.testPressLiftPx},
+        {keys::mouse_companion::kTestSmoothingPercent, companion.testSmoothingPercent},
+    };
     root[keys::kEffects] = serialize_internal::BuildEffectsJson(config);
     return root;
 }

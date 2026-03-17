@@ -123,6 +123,24 @@ struct PerMonitorPosOverride {
     int absoluteY = 40;
 };
 
+// Configuration for cursor-centric mouse companion runtime.
+struct MouseCompanionConfig {
+    bool enabled = false;
+    std::string modelPath = "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb";
+    std::string actionLibraryPath = "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json";
+    std::string appearanceProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json";
+    int sizePx = 112;
+    int offsetX = 18;
+    int offsetY = 26;
+    int pressLiftPx = 24;
+    int smoothingPercent = 68;
+    int followThresholdPx = 2;
+    int releaseHoldMs = 120;
+    bool useTestProfile = false;
+    int testPressLiftPx = 48;
+    int testSmoothingPercent = 32;
+};
+
 // Configuration for input action indicator (mouse/keyboard overlay).
 struct InputIndicatorConfig {
     bool enabled = true;
@@ -297,6 +315,7 @@ struct EffectConfig {
     TextConfig textClick;
     EffectSizeScaleConfig effectSizeScales;
     EffectConflictPolicyConfig effectConflictPolicy;
+    MouseCompanionConfig mouseCompanion;
     InputIndicatorConfig inputIndicator;
     InputAutomationConfig automation;
     WasmConfig wasm;
