@@ -42,8 +42,11 @@ const ScrollEffectDirectionColorProfile& ResolveDirectionColor(
 } // namespace
 
 std::string NormalizeScrollEffectType(const std::string& effectType) {
-    const std::string lowered = ToLowerAscii(effectType);
-    if (lowered.empty() || lowered == "none") {
+    const std::string lowered = ToLowerAscii(TrimAscii(effectType));
+    if (lowered == "none") {
+        return "none";
+    }
+    if (lowered.empty()) {
         return "arrow";
     }
     if (ContainsToken(lowered, "helix")) return "helix";

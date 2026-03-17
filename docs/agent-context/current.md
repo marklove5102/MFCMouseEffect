@@ -82,7 +82,12 @@ Deep implementation details are intentionally moved to P2 docs to reduce context
 - Core wasm HTTP contract checks assert `indicator-basic` load consistency (configured/active manifest and `input_indicator.render_mode`) after indicator manifest apply.
 - Core/scaffold webui path resolvers now both prefer source-tree/working-dir assets before executable-side bundle in dev runs, and prioritize candidates with complete indicator UI assets (`input-indicator-settings.svelte.js`) to reduce stale frontend bundle pickup.
 - Manual macOS core websettings runner now defaults to rebuilding `WebUIWorkspace` before starting host, and pins both `MFX_WEBUI_DIR` + `MFX_SCAFFOLD_WEBUI_DIR` to repo `WebUI`, reducing stale bundle drift between `/tmp` host binaries and source-tree frontend assets.
-- Workspace sidebar section order is now: `General -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`; effects section title is renamed from `Visual Effects` to `Cursor Effects` (`光标特效`).
+- Workspace sidebar section order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`; effects section title remains `Cursor Effects` (`光标特效`).
+- New cursor-centric 3D companion capability is now exposed as `Mouse Companion` (`鼠标伴宠`) instead of `3D萌宠`:
+  - config/state key: `mouse_companion`
+  - macOS runtime: Swift-first SceneKit bridge (`Platform/macos/Pet/MacosMouseCompanionBridge.swift`)
+  - test profile switch is built in (`use_test_profile`) with dedicated test parameters for fast verification.
+- Effects `none` behavior regression is fixed for all five categories (`click/trail/scroll/hold/hover`): selecting `none` and pressing `Apply` now persists and keeps runtime disabled, instead of being normalized back to default effects on refresh.
 - Cursor effects now include a secondary tab `Effect Blacklist` (`effects_blacklist_apps`): when foreground process matches the blacklist, click/trail/scroll/hold/hover rendering is skipped (native + WASM), while automation and input-indicator lanes remain active.
 - `Effect Blacklist` app selection now reuses automation scope catalog UI (`MappingScopePanel` + `/api/automation/app-catalog`): supports search, refresh, and pick-from-file; free-text manual add is disabled to keep scope entries consistent with catalog/file sources.
 - `Effect Blacklist` UI now uses the same two-column scope layout as automation mapping, and blacklist chip state updates immediately after selecting catalog items (no manual page refresh needed).

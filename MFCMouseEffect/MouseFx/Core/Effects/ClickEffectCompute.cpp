@@ -37,7 +37,10 @@ const char* ResolveTextLabel(MouseButton button) {
 
 std::string NormalizeClickEffectType(const std::string& effectType) {
     const std::string lowered = ToLowerAscii(TrimAscii(effectType));
-    if (lowered.empty() || lowered == "none") {
+    if (lowered == "none") {
+        return "none";
+    }
+    if (lowered.empty()) {
         return "ripple";
     }
     if (lowered == "star" || lowered == "icon" || lowered == "icon_star") {

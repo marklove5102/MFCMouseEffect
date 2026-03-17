@@ -15,8 +15,11 @@ bool ContainsToken(const std::string& value, const char* token) {
 } // namespace
 
 std::string NormalizeHoverEffectType(const std::string& effectType) {
-    const std::string lowered = ToLowerAscii(effectType);
-    if (lowered.empty() || lowered == "none") {
+    const std::string lowered = ToLowerAscii(TrimAscii(effectType));
+    if (lowered == "none") {
+        return "none";
+    }
+    if (lowered.empty()) {
         return "glow";
     }
     if (ContainsToken(lowered, "tube") ||
