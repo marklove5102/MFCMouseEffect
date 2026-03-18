@@ -547,8 +547,99 @@ input[type="checkbox"] {
   box-shadow: 0 0 0 3px rgba(71, 157, 255, 0.28);
 }
 
-.mouse-companion-runtime {
+.mouse-companion-tabs {
   grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mouse-companion-tab {
+  border-color: rgba(173, 193, 216, 0.86);
+  background: rgba(247, 250, 255, 0.9);
+  color: #3f5f84;
+  padding: 8px 12px;
+  min-width: 88px;
+}
+
+.mouse-companion-tab:hover {
+  border-color: rgba(138, 171, 206, 0.95);
+}
+
+.mouse-companion-tab.is-active {
+  border-color: #8bbde8;
+  color: #0f5289;
+  background: linear-gradient(180deg, #eaf4ff, #deefff);
+  box-shadow: 0 7px 14px rgba(23, 93, 152, 0.14);
+}
+
+.mouse-companion-panel {
+  grid-column: 1 / -1;
+}
+
+.mouse-companion-probe {
+  border: 1px solid rgba(156, 178, 205, 0.55);
+  border-radius: 12px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(246, 250, 255, 0.88), rgba(239, 246, 253, 0.88));
+}
+
+.mouse-companion-probe__title {
+  font-size: 12px;
+  font-weight: 760;
+  color: #3c5f87;
+  margin-bottom: 4px;
+}
+
+.mouse-companion-probe__hint {
+  font-size: 11px;
+  color: #5c779a;
+  margin-bottom: 10px;
+}
+
+.mouse-companion-probe__grid {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.mouse-companion-probe__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mouse-companion-probe__result-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.mouse-companion-probe__result-label {
+  font-size: 11px;
+  color: #587598;
+}
+
+.mouse-companion-probe__result {
+  font-size: 12px;
+  font-weight: 680;
+  color: #21486f;
+}
+
+.mouse-companion-probe__result.is-ok {
+  color: #0f766e;
+}
+
+.mouse-companion-probe__result.is-warn {
+  color: #a33120;
+}
+
+.mouse-companion-runtime {
   border: 1px solid rgba(156, 178, 205, 0.55);
   border-radius: 12px;
   padding: 12px;
@@ -2418,7 +2509,21 @@ textarea {
     gap: 8px;
   }
 
+  .mouse-companion-tabs {
+    gap: 6px;
+  }
+
+  .mouse-companion-tab {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    min-width: 0;
+  }
+
   .mouse-companion-runtime__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mouse-companion-probe__grid {
     grid-template-columns: 1fr;
   }
 

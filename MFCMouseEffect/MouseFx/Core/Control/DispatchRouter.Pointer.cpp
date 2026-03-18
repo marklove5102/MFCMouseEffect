@@ -18,7 +18,7 @@ bool IsHoldInteractionActive(AppController* controller) {
     if (!controller) {
         return false;
     }
-    return controller->CurrentHoldDurationMs() >= AppController::HoldDelayMs();
+    return controller->CurrentHoldDurationMs() >= controller->ActiveHoldDelayMs();
 }
 
 std::string HoldMovePolicy(AppController* controller) {
@@ -170,6 +170,7 @@ intptr_t DispatchRouter::OnScroll(const DispatchMessage& message) {
     ev.delta = delta;
     ev.horizontal = false;
 
+    petFeature_.OnScroll(*ctrl_, pt, static_cast<int>(delta));
     automationFeature_.OnScroll(*ctrl_, delta);
     indicatorFeature_.OnScroll(*ctrl_, ev);
     const bool effectsBlockedByAppBlacklist = ctrl_->IsEffectsBlockedByAppBlacklist();
@@ -237,6 +238,7 @@ intptr_t DispatchRouter::OnButtonUp(const DispatchMessage& message) {
     ctrl_->RememberLastPointerPoint(pt);
 #endif
     petFeature_.OnButtonUp(*ctrl_, pt, static_cast<int>(message.button));
+    petFeature_.OnHoldEnd(*ctrl_, pt);
     automationFeature_.OnButtonUp(*ctrl_, pt, static_cast<int>(message.button));
     const bool effectsBlockedByAppBlacklist = ctrl_->IsEffectsBlockedByAppBlacklist();
     if (!effectsBlockedByAppBlacklist) {
@@ -277,6 +279,7 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
             pt = dispatch_router_detail::MessagePoint(message);
         }
         if (ctrl_->TryEnterHover(&pt)) {
+            petFeature_.OnHoverStart(*ctrl_, pt);
             bool hoverRenderedByWasm = false;
             const bool hoverRouteActive = wasmFeature_.RouteHoverStart(*ctrl_, pt, &hoverRenderedByWasm);
             if (!hoverRouteActive || !hoverRenderedByWasm) {
@@ -321,6 +324,11 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
             // For hold-enabled policies, start hold lane after delay.
             // move_only policy is handled above and does not enter hold lane.
             bool holdRenderedByWasm = false;
+            petFeature_.OnHoldStart(
+                *ctrl_,
+                holdStartPt,
+                button,
+                static_cast<uint32_t>(ctrl_->CurrentHoldDurationMs()));
             const bool holdRouteActive = wasmFeature_.RouteHoldStart(
                 *ctrl_,
                 holdStartPt,
@@ -395,6 +403,11 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
                         ? ctrl_->HoldTrackingButton()
                         : static_cast<int>(MouseButton::Left);
                 bool holdRenderedByWasm = false;
+                petFeature_.OnHoldStart(
+                    *ctrl_,
+                    pt,
+                    trackedButton,
+                    static_cast<uint32_t>(ctrl_->CurrentHoldDurationMs()));
                 const bool holdRouteActive = wasmFeature_.RouteHoldStart(
                     *ctrl_,
                     pt,
@@ -406,6 +419,7 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
                 }
             }
         }
+        petFeature_.OnHoldUpdate(*ctrl_, pt, static_cast<uint32_t>(ctrl_->CurrentHoldDurationMs()));
         wasmFeature_.RouteHoldUpdateIfActive(
             *ctrl_, pt, static_cast<uint32_t>(ctrl_->CurrentHoldDurationMs()));
         if (effect) {

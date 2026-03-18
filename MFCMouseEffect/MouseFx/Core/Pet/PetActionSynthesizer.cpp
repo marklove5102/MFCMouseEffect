@@ -191,6 +191,14 @@ public:
         RebuildClipBindings();
     }
 
+    void SetEffectProfile(std::shared_ptr<const ProceduralEffectProfile> effectProfile) override {
+        if (effectProfile) {
+            effectProfile_ = std::move(effectProfile);
+            return;
+        }
+        effectProfile_ = CreateDefaultProceduralEffectProfile();
+    }
+
     void RequestAction(PetAction action, double blendDurationSeconds) override {
         nextAction_ = action;
         blendDurationSeconds_ = std::max(0.0, blendDurationSeconds);
@@ -241,9 +249,22 @@ public:
             blendAlpha);
         outPose->locomotionTurn = ResolveTurn(input);
 
-        if (!EmitClipPose(styleAction, outPose)) {
-            EmitRigPose(styleAction, input, outPose);
+        const bool clipApplied = EmitClipPose(styleAction, outPose);
+        if (!clipApplied) {
+            EmitProceduralPose(styleAction, input, outPose);
+            return;
         }
+
+        const ProceduralActionSpec& spec = ResolveActionSpec(styleAction);
+        const float clipBlendWeight = ClampRange(spec.clipBlendWeight, 0.0f, 1.0f);
+        const float proceduralBlendWeight = 1.0f - clipBlendWeight;
+        if (proceduralBlendWeight <= 0.001f) {
+            return;
+        }
+
+        SkeletonPose proceduralPose{};
+        EmitProceduralPose(styleAction, input, &proceduralPose);
+        BlendPoseWithProcedural(proceduralBlendWeight, proceduralPose, outPose);
     }
 
 private:
@@ -392,59 +413,98 @@ private:
         return track.keyframes.back().local;
     }
 
-    void EmitRigPose(PetAction styleAction, const PetFrameInput& input, SkeletonPose* outPose) const {
+    void EmitProceduralPose(PetAction styleAction, const PetFrameInput& input, SkeletonPose* outPose) const {
         if (!outPose || !skeleton_ || skeleton_->bones.empty()) {
             return;
         }
 
         std::vector<uint8_t> assigned(skeleton_->bones.size(), 0);
-        const float actionIntensity = ClampRange(outPose->actionIntensity, 0.0f, 1.0f);
+        const ProceduralActionSpec& spec = ResolveActionSpec(styleAction);
+        const float actionIntensity = ClampRange(spec.actionIntensity, 0.0f, 1.0f);
         const float turn = ClampRange(outPose->locomotionTurn, -1.0f, 1.0f);
-        const float breathe = std::sin(static_cast<float>(timeSeconds_) * 2.4f) * 0.04f;
-        const float clickPulse = (styleAction == PetAction::ClickReact)
-            ? std::exp(-static_cast<float>(styleElapsedSeconds_) * 8.5f)
+        const float breathe =
+            std::sin(static_cast<float>(timeSeconds_) * std::max(0.1f, spec.breatheHz)) * spec.breatheAmplitude;
+        const float pulse = (spec.pulseGain > 0.001f)
+            ? std::exp(-static_cast<float>(styleElapsedSeconds_) * std::max(0.1f, spec.pulseDecayHz)) *
+                  spec.pulseGain
             : 0.0f;
-        const float dragWeight = (styleAction == PetAction::Drag) ? 1.0f : 0.0f;
-        const float followWeight = (styleAction == PetAction::Follow) ? 1.0f : 0.0f;
 
         Transform hips{};
-        hips.position.y = breathe * 0.08f;
+        hips.position.y = breathe * 0.08f + spec.hipsYOffset;
         hips.rotation = QuatFromEulerXYZ(
-            -0.07f * dragWeight + 0.05f * clickPulse,
-            turn * (0.08f + actionIntensity * 0.06f),
+            spec.hipsPitch + 0.05f * pulse,
+            turn * (0.08f + actionIntensity * 0.06f) + spec.hipsYaw,
             0.0f);
-        const float squash = 1.0f + clickPulse * 0.08f;
-        hips.scale = {squash, std::max(0.86f, 1.0f - clickPulse * 0.11f), squash};
+        const float pulseScale = pulse * 0.08f;
+        hips.scale = {
+            std::max(0.70f, spec.hipsScaleX + pulseScale),
+            std::max(0.70f, spec.hipsScaleY - pulse * 0.10f),
+            std::max(0.70f, spec.hipsScaleZ + pulseScale)};
         PushBonePose(rig_.hips, hips, &assigned, outPose);
 
         Transform spine{};
         spine.rotation = QuatFromEulerXYZ(
-            -0.04f * followWeight - 0.14f * dragWeight + breathe * 0.30f,
-            turn * (0.12f + actionIntensity * 0.08f),
+            spec.spinePitch + breathe * 0.30f,
+            turn * (0.12f + actionIntensity * 0.08f) + spec.spineYaw,
             0.0f);
         PushBonePose(rig_.spine, spine, &assigned, outPose);
 
         Transform chest{};
         chest.rotation = QuatFromEulerXYZ(
-            -0.02f * followWeight - 0.10f * dragWeight + breathe * 0.45f,
-            turn * (0.20f + actionIntensity * 0.12f),
+            spec.chestPitch + breathe * 0.45f,
+            turn * (0.20f + actionIntensity * 0.12f) + spec.chestYaw,
             0.0f);
         PushBonePose(rig_.chest, chest, &assigned, outPose);
 
         Transform neck{};
         neck.rotation = QuatFromEulerXYZ(
-            -0.06f * clickPulse + breathe * 0.40f,
-            turn * 0.28f,
+            spec.neckPitch + breathe * 0.40f,
+            turn * 0.28f + spec.neckYaw,
             0.0f);
         PushBonePose(rig_.neck, neck, &assigned, outPose);
 
         const float cursorPitch = ClampRange(-input.cursorPosition.y * 0.0012f, -0.30f, 0.28f);
         Transform head{};
         head.rotation = QuatFromEulerXYZ(
-            cursorPitch * (0.35f + followWeight * 0.25f) - 0.12f * dragWeight,
-            turn * (0.42f + actionIntensity * 0.24f),
+            cursorPitch * spec.headCursorPitchGain + spec.headPitchBias + breathe * 0.20f,
+            turn * spec.headYawGain + spec.headYawBias,
             0.0f);
         PushBonePose(rig_.head, head, &assigned, outPose);
+    }
+
+    void BlendPoseWithProcedural(
+        float proceduralWeight,
+        const SkeletonPose& proceduralPose,
+        SkeletonPose* inOutPose) const {
+        if (!inOutPose) {
+            return;
+        }
+        const float weight = ClampRange(proceduralWeight, 0.0f, 1.0f);
+        if (weight <= 0.001f || proceduralPose.bones.empty()) {
+            return;
+        }
+
+        for (const BonePose& source : proceduralPose.bones) {
+            if (source.boneIndex < 0) {
+                continue;
+            }
+
+            BonePose* target = nullptr;
+            for (auto& existing : inOutPose->bones) {
+                if (existing.boneIndex == source.boneIndex) {
+                    target = &existing;
+                    break;
+                }
+            }
+            if (target) {
+                target->local = LerpTransform(target->local, source.local, weight);
+                continue;
+            }
+
+            BonePose injected = source;
+            injected.local = LerpTransform(Transform{}, source.local, weight);
+            inOutPose->bones.push_back(std::move(injected));
+        }
     }
 
     void PushBonePose(int32_t boneIndex,
@@ -481,19 +541,8 @@ private:
         return Lerp(currentValue, targetValue, blendAlpha);
     }
 
-    static float ResolveActionIntensity(PetAction action) {
-        switch (action) {
-        case PetAction::Idle:
-            return 0.2f;
-        case PetAction::Follow:
-            return 0.6f;
-        case PetAction::ClickReact:
-            return 0.95f;
-        case PetAction::Drag:
-            return 0.8f;
-        default:
-            return 0.0f;
-        }
+    float ResolveActionIntensity(PetAction action) const {
+        return ResolveActionSpec(action).actionIntensity;
     }
 
     static float ResolveForward(PetAction action, const PetFrameInput& input) {
@@ -502,6 +551,12 @@ private:
             return input.cursorVisible ? 1.0f : 0.0f;
         case PetAction::Drag:
             return input.dragging ? 0.35f : 0.0f;
+        case PetAction::HoverReact:
+            return input.cursorVisible ? 0.45f : 0.0f;
+        case PetAction::HoldReact:
+            return input.primaryPressed ? 0.25f : 0.0f;
+        case PetAction::ScrollReact:
+            return input.cursorVisible ? 0.65f : 0.0f;
         default:
             return 0.0f;
         }
@@ -512,10 +567,21 @@ private:
         return Clamp01(0.5 + (input.cursorPosition.x * kTurnScale)) * 2.0f - 1.0f;
     }
 
+    const ProceduralActionSpec& ResolveActionSpec(PetAction action) const {
+        if (effectProfile_) {
+            if (const auto* spec = effectProfile_->Find(action)) {
+                return *spec;
+            }
+        }
+        static const ProceduralActionSpec kFallback{};
+        return kFallback;
+    }
+
     const SkeletonDesc* skeleton_{nullptr};
     std::unordered_map<std::string, int32_t> boneIndexByName_{};
     RigSlots rig_{};
     std::shared_ptr<const ActionLibrary> actionLibrary_{};
+    std::shared_ptr<const ProceduralEffectProfile> effectProfile_{CreateDefaultProceduralEffectProfile()};
     std::unordered_map<int, ClipBinding> clipBindings_{};
     PetAction currentAction_{PetAction::Idle};
     PetAction nextAction_{PetAction::Idle};

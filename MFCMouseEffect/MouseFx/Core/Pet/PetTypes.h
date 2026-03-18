@@ -54,6 +54,9 @@ enum class PetAction : uint8_t {
     Follow = 1,
     ClickReact = 2,
     Drag = 3,
+    HoverReact = 4,
+    HoldReact = 5,
+    ScrollReact = 6,
 };
 
 struct PetFrameInput final {

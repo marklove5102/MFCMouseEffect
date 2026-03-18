@@ -133,9 +133,15 @@ state_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-state.XXXXXX)"
 proof_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-result.XXXXXX)"
 dispatch_status_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-status.XXXXXX)"
 dispatch_move_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-move.XXXXXX)"
+dispatch_scroll_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-scroll.XXXXXX)"
 dispatch_down_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-down.XXXXXX)"
 dispatch_up_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-up.XXXXXX)"
 dispatch_click_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-click.XXXXXX)"
+dispatch_hover_start_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-hover-start.XXXXXX)"
+dispatch_hover_end_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-hover-end.XXXXXX)"
+dispatch_hold_start_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-hold-start.XXXXXX)"
+dispatch_hold_update_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-hold-update.XXXXXX)"
+dispatch_hold_end_tmp="$(mktemp /tmp/mfx-mouse-companion-proof-dispatch-hold-end.XXXXXX)"
 rm -f "$probe_file" "${probe_file}.diagnostics" "$stdin_pipe" "$log_file"
 mkfifo "$stdin_pipe"
 
@@ -212,10 +218,18 @@ dispatch_mouse_companion_test_event() {
     local x="$2"
     local y="$3"
     local button="$4"
-    local out_file="$5"
+    local delta="$5"
+    local hold_ms="$6"
+    local out_file="$7"
     local body
-    body="$(jq -n --arg event "$event" --argjson x "$x" --argjson y "$y" --argjson button "$button" \
-        '{event:$event,x:$x,y:$y,button:$button}')"
+    body="$(jq -n \
+        --arg event "$event" \
+        --argjson x "$x" \
+        --argjson y "$y" \
+        --argjson button "$button" \
+        --argjson delta "$delta" \
+        --argjson hold_ms "$hold_ms" \
+        '{event:$event,x:$x,y:$y,button:$button,delta:$delta,hold_ms:$hold_ms}')"
     curl -sS -X POST \
         -H "x-mfcmouseeffect-token: $token" \
         -H "content-type: application/json" \
@@ -223,11 +237,17 @@ dispatch_mouse_companion_test_event() {
         "$base_url/api/mouse-companion/test-dispatch" >"$out_file"
 }
 
-dispatch_mouse_companion_test_event "status" 640 360 1 "$dispatch_status_tmp"
-dispatch_mouse_companion_test_event "move" 640 360 1 "$dispatch_move_tmp"
-dispatch_mouse_companion_test_event "button_down" 640 360 1 "$dispatch_down_tmp"
-dispatch_mouse_companion_test_event "button_up" 640 360 1 "$dispatch_up_tmp"
-dispatch_mouse_companion_test_event "click" 640 360 1 "$dispatch_click_tmp"
+dispatch_mouse_companion_test_event "status" 640 360 1 120 420 "$dispatch_status_tmp"
+dispatch_mouse_companion_test_event "move" 640 360 1 120 420 "$dispatch_move_tmp"
+dispatch_mouse_companion_test_event "scroll" 640 360 1 120 420 "$dispatch_scroll_tmp"
+dispatch_mouse_companion_test_event "button_down" 640 360 1 120 420 "$dispatch_down_tmp"
+dispatch_mouse_companion_test_event "button_up" 640 360 1 120 420 "$dispatch_up_tmp"
+dispatch_mouse_companion_test_event "click" 640 360 1 120 420 "$dispatch_click_tmp"
+dispatch_mouse_companion_test_event "hover_start" 640 360 1 120 420 "$dispatch_hover_start_tmp"
+dispatch_mouse_companion_test_event "hover_end" 640 360 1 120 420 "$dispatch_hover_end_tmp"
+dispatch_mouse_companion_test_event "hold_start" 640 360 1 120 420 "$dispatch_hold_start_tmp"
+dispatch_mouse_companion_test_event "hold_update" 640 360 1 120 640 "$dispatch_hold_update_tmp"
+dispatch_mouse_companion_test_event "hold_end" 640 360 1 120 640 "$dispatch_hold_end_tmp"
 
 curl -sS \
     -H "x-mfcmouseeffect-token: $token" \
@@ -250,6 +270,7 @@ jq -n \
         model_loaded: ($rt.model_loaded // false),
         visual_model_loaded: ($rt.visual_model_loaded // false),
         action_library_loaded: ($rt.action_library_loaded // false),
+        effect_profile_loaded: ($rt.effect_profile_loaded // false),
         appearance_profile_loaded: ($rt.appearance_profile_loaded // false),
         pose_binding_configured: ($rt.pose_binding_configured // false),
         skeleton_bone_count: ($rt.skeleton_bone_count // 0),
@@ -258,8 +279,10 @@ jq -n \
         last_action_intensity: ($rt.last_action_intensity // 0),
         last_action_tick_ms: ($rt.last_action_tick_ms // 0),
         loaded_model_path: ($rt.loaded_model_path // ""),
+        loaded_effect_profile_path: ($rt.loaded_effect_profile_path // ""),
         visual_model_path: ($rt.visual_model_path // ""),
         model_load_error: ($rt.model_load_error // ""),
+        effect_profile_load_error: ($rt.effect_profile_load_error // ""),
         visual_model_load_error: ($rt.visual_model_load_error // "")
       },
       action_coverage: (($rt.action_coverage // {}) | {
@@ -280,15 +303,27 @@ jq -n \
 
 jq --slurpfile status "$dispatch_status_tmp" \
    --slurpfile move "$dispatch_move_tmp" \
+   --slurpfile scroll "$dispatch_scroll_tmp" \
    --slurpfile down "$dispatch_down_tmp" \
    --slurpfile up "$dispatch_up_tmp" \
    --slurpfile click "$dispatch_click_tmp" \
+   --slurpfile hover_start "$dispatch_hover_start_tmp" \
+   --slurpfile hover_end "$dispatch_hover_end_tmp" \
+   --slurpfile hold_start "$dispatch_hold_start_tmp" \
+   --slurpfile hold_update "$dispatch_hold_update_tmp" \
+   --slurpfile hold_end "$dispatch_hold_end_tmp" \
    '.action_sequence = {
       idle: ($status[0].runtime.last_action_name // ""),
       follow: ($move[0].runtime.last_action_name // ""),
+      scroll: ($scroll[0].runtime.last_action_name // ""),
       press: ($down[0].runtime.last_action_name // ""),
       release: ($up[0].runtime.last_action_name // ""),
-      click: ($click[0].runtime.last_action_name // "")
+      click: ($click[0].runtime.last_action_name // ""),
+      hover_start: ($hover_start[0].runtime.last_action_name // ""),
+      hover_end: ($hover_end[0].runtime.last_action_name // ""),
+      hold_start: ($hold_start[0].runtime.last_action_name // ""),
+      hold_update: ($hold_update[0].runtime.last_action_name // ""),
+      hold_end: ($hold_end[0].runtime.last_action_name // "")
     }' "$proof_tmp" >"${proof_tmp}.tmp"
 mv "${proof_tmp}.tmp" "$proof_tmp"
 
@@ -296,24 +331,30 @@ if ! jq -e '
     .runtime.model_loaded == true and
     .runtime.visual_model_loaded == true and
     .runtime.action_library_loaded == true and
+    .runtime.effect_profile_loaded == true and
     .runtime.appearance_profile_loaded == true and
     .runtime.pose_binding_configured == true and
     (.runtime.skeleton_bone_count | tonumber) > 0 and
-    .runtime.last_action_name == "click_react" and
     (.runtime.last_action_tick_ms | tonumber) > 0 and
     .action_coverage.ready == true and
-    (.action_coverage.expected_action_count | tonumber) == 4 and
-    (.action_coverage.covered_action_count | tonumber) >= 4 and
+    (.action_coverage.expected_action_count | tonumber) == 7 and
+    (.action_coverage.covered_action_count | tonumber) >= 7 and
     (.action_coverage.missing_action_count | tonumber) == 0 and
     (.action_coverage.total_track_count | tonumber) > 0 and
     (.action_coverage.mapped_track_count | tonumber) > 0 and
     (.action_coverage.overall_coverage_ratio | tonumber) >= 1.0 and
     (.action_coverage.missing_bone_names | length) == 0 and
-    (.action_sequence.idle == "idle" or .action_sequence.idle == "follow") and
+    (.action_sequence.idle == "idle" or .action_sequence.idle == "follow" or .action_sequence.idle == "hover_react") and
     .action_sequence.follow == "follow" and
+    .action_sequence.scroll == "scroll_react" and
     .action_sequence.press == "drag" and
     .action_sequence.release == "follow" and
-    .action_sequence.click == "click_react"
+    .action_sequence.click == "click_react" and
+    .action_sequence.hover_start == "hover_react" and
+    .action_sequence.hover_end == "follow" and
+    .action_sequence.hold_start == "hold_react" and
+    .action_sequence.hold_update == "hold_react" and
+    .action_sequence.hold_end == "follow"
 ' "$proof_tmp" >/dev/null; then
     mfx_info "proof failed; runtime snapshot:"
     cat "$proof_tmp" >&2

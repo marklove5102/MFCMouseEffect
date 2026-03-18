@@ -187,19 +187,20 @@ void AppController::OnDispatchActivity(DispatchMessageKind kind, uint32_t timerI
 
     bool hoverEndRenderedByWasm = false;
     bool hoverWasmRouteActive = false;
+    ScreenPoint hoverPt{};
+    if (QueryCursorScreenPoint(&hoverPt)) {
+        RememberLastPointerPoint(hoverPt);
+    } else if (!TryGetLastPointerPoint(&hoverPt)) {
+        hoverPt = ScreenPoint{};
+    }
     if (auto* hoverHost = WasmEffectsHostForChannel("hover");
         hoverHost && hoverHost->Enabled() && hoverHost->IsPluginLoaded()) {
-        ScreenPoint pt{};
-        if (QueryCursorScreenPoint(&pt)) {
-            RememberLastPointerPoint(pt);
-        } else if (!TryGetLastPointerPoint(&pt)) {
-            pt = ScreenPoint{};
-        }
         WasmDispatchFeature wasmDispatch{};
-        hoverWasmRouteActive = wasmDispatch.RouteHoverEnd(*this, pt, &hoverEndRenderedByWasm);
+        hoverWasmRouteActive = wasmDispatch.RouteHoverEnd(*this, hoverPt, &hoverEndRenderedByWasm);
     }
 
     hovering_ = false;
+    DispatchPetHoverEnd(hoverPt);
     if (!hoverWasmRouteActive || !hoverEndRenderedByWasm) {
         if (auto* effect = GetEffect(EffectCategory::Hover)) {
             effect->OnHoverEnd();

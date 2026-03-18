@@ -6,7 +6,12 @@ namespace mousefx::pet {
 PetCompanionRuntime::PetCompanionRuntime(std::unique_ptr<IPetModelRuntime> modelRuntime,
                                          std::unique_ptr<IActionSynthesizer> actionSynthesizer)
     : modelRuntime_(std::move(modelRuntime)),
-      actionSynthesizer_(std::move(actionSynthesizer)) {}
+      actionSynthesizer_(std::move(actionSynthesizer)),
+      effectProfile_(CreateDefaultProceduralEffectProfile()) {
+    if (actionSynthesizer_) {
+        actionSynthesizer_->SetEffectProfile(effectProfile_);
+    }
+}
 
 bool PetCompanionRuntime::LoadCanonicalModel(const CanonicalModelAsset& asset) {
     if (!modelRuntime_) {
@@ -18,6 +23,7 @@ bool PetCompanionRuntime::LoadCanonicalModel(const CanonicalModelAsset& asset) {
     }
     if (actionSynthesizer_) {
         actionSynthesizer_->SetActionLibrary(actionLibrary_);
+        actionSynthesizer_->SetEffectProfile(effectProfile_);
         actionSynthesizer_->BindSkeleton(modelRuntime_->CurrentSkeleton());
     }
     return true;
@@ -34,9 +40,24 @@ bool PetCompanionRuntime::LoadActionLibraryFromJson(const std::string& jsonPath)
     actionLibrary_ = std::make_shared<ActionLibrary>(std::move(library));
     if (actionSynthesizer_) {
         actionSynthesizer_->SetActionLibrary(actionLibrary_);
+        actionSynthesizer_->SetEffectProfile(effectProfile_);
         if (modelRuntime_) {
             actionSynthesizer_->BindSkeleton(modelRuntime_->CurrentSkeleton());
         }
+    }
+    return true;
+}
+
+bool PetCompanionRuntime::LoadEffectProfileFromJson(const std::string& jsonPath) {
+    ProceduralEffectProfile profile{};
+    std::string error;
+    if (!LoadProceduralEffectProfileFromJsonFile(jsonPath, &profile, &error)) {
+        (void)error;
+        return false;
+    }
+    effectProfile_ = std::make_shared<ProceduralEffectProfile>(std::move(profile));
+    if (actionSynthesizer_) {
+        actionSynthesizer_->SetEffectProfile(effectProfile_);
     }
     return true;
 }

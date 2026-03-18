@@ -171,6 +171,49 @@ Deep implementation details are intentionally moved to P2 docs to reduce context
   - runtime caches coverage report at action-library load time and resets cache on model/action disable/failure paths to avoid stale diagnostics,
   - Web `Mouse Companion` diagnostics panel now renders action-level coverage detail lines directly from `/api/state` (no test route dependency),
   - proof script now consumes coverage gate from `/api/state.mouse_companion_runtime.action_coverage` (action sequence assertions remain on test route).
+- Mouse Companion P9 seventh slice (模型导入可观测性 + 状态一致性) is now wired:
+  - `/api/state.mouse_companion_runtime` 新增 `loaded_model_source_format`、`model_converted_to_canonical`、`model_import_diagnostics[]`，用于多格式导入排障，
+  - `TryLoadDefaultPetModel` 在导入失败/运行时加载失败路径会同步清理 `loaded_model_path` 并更新导入诊断，避免旧成功路径残留，
+  - `SkeletonModelRuntime::LoadCanonicalModel` 在每次加载前先复位 `loaded_` 与缓存 pose 状态，避免模型重载失败后仍暴露旧 skeleton 的状态泄漏，
+  - runtime proof 脚本去掉了对最终 `/api/state.last_action_name` 的强时序断言，改为以 test-dispatch 动作序列断言为主，降低异步输入竞争导致的假失败。
+- Mouse Companion P10 first slice (五类鼠标输入动作驱动) is now wired:
+  - 宠物动作枚举扩展：`hover_react / hold_react / scroll_react`（保持 `idle/follow/click_react/drag` 兼容），
+  - `DispatchRouter` 已将 `scroll/hover_start/hover_end/hold_start/hold_update/hold_end` 事件接入 `PetDispatchFeature`，
+  - `AppController` 新增对应 `DispatchPet*` 路由并将这些输入映射到动作请求（含强度/平滑参数），
+  - test route `/api/mouse-companion/test-dispatch` 已支持上述扩展事件，proof 脚本门禁同步覆盖五类输入动作序列，
+  - 默认样例动作库 `pet-actions.json` 已补充 `hoverReact/holdReact/scrollReact` clip，提升动作可感知度。
+- Mouse Companion P10 second slice (覆盖率门禁升级到 7 动作) is now wired:
+  - `ActionCoverageAnalyzer` 预期动作集已从 4 升级到 7（`idle/follow/click_react/drag/hover_react/hold_react/scroll_react`），
+  - `/api/state.mouse_companion_runtime.action_coverage` 的 `expected_action_count / covered_action_count / actions[]` 与新动作集对齐，
+  - proof 脚本覆盖率门禁同步升级为 `expected_action_count=7`，避免“输入已接入但覆盖率仍按旧四动作”造成的伪通过。
+- Mouse Companion P10 third slice (动作可见性与触发门槛调优) is now wired:
+  - 触发门槛改为双档：生产档 `hover=1500ms`、`hold=260ms`；测试档 `hover=320ms`、`hold=120ms`（`use_test_profile=true` 时生效），
+  - `hoverReact/holdReact/scrollReact` 默认样例 clip 已提升动作幅度，降低“动作已切换但视觉几乎不可区分”的误判，
+  - runtime proof 脚本的首帧动作判定放宽为 `idle/follow/hover_react`，与新 hover 门槛保持一致并减少定时器竞争伪失败。
+- Mouse Companion P11 first slice (从“模型特化动作”切换到“语义参数驱动”) is now wired:
+  - 新增 `ProceduralEffectProfile`（`PetEffectProfile.{h,cpp}`）与默认资产 `Assets/Pet3D/source/pet-effects.json`，动作语义与模型骨架解耦，
+  - `IActionSynthesizer` 新增 `SetEffectProfile(...)`，`PetCompanionRuntime` 启动默认注入 profile，并支持从 JSON 热加载，
+  - `PetActionSynthesizer::EmitRigPose` 已改为按动作语义参数求解（不再依赖单模型硬编码姿态常量），
+  - `/api/state.mouse_companion_runtime` 新增 `effect_profile_loaded/configured_effect_profile_path/loaded_effect_profile_path/effect_profile_load_error`，
+  - proof 脚本门禁新增 `runtime.effect_profile_loaded == true`，确保语义层真正接入运行时。
+- Mouse Companion P11 second slice (clip 与程序化语义融合) is now wired:
+  - 合成器更新为“clip+程序化”融合模式：clip 命中时仍会叠加程序化骨架语义，不再被 clip 完全覆盖，
+  - `pet-effects.json` 新增 `clip_blend_weight`，可按动作控制 clip/procedural 占比（`1.0=clip only`, `0.0=procedural only`），
+  - 当前默认参数已调成“乌萨奇可见优先”，确保在现有模型上能直接看见 hover/hold/scroll 等语义效果。
+- Mouse Companion WebSettings action-probe panel is now wired:
+  - section UI adds deterministic probe controls (`status/move/scroll/hover_start/hover_end/hold_start/hold_update/hold_end/button_down/button_up/click/run-sequence`) and inline probe result feedback,
+  - probe input now includes `delta` (scroll intensity) and `hold_ms` (hold-phase duration) so five input domains can be replayed from WebUI without shell command edits,
+  - probe uses test-only route `/api/mouse-companion/test-dispatch` through existing web API client and refreshes runtime/coverage diagnostics on success,
+  - when test route is disabled, panel now surfaces explicit enable hint (`MFX_ENABLE_MOUSE_COMPANION_TEST_API=1`) instead of silent no-op.
+- Mouse Companion WebSettings section now uses secondary tabs (`Basic/Follow/Probe/Runtime`):
+  - runtime contracts and field IDs stay unchanged (`read/write/apply` behavior remains backward compatible),
+  - tab state is stable across render refresh, with click + keyboard (`ArrowLeft/ArrowRight`) switching.
+  - tab active state is now persisted in local UI state storage (`mouse-companion.v1`), matching effects/input-indicator section behavior.
+  - section form read/write/range binding is now driven by a dedicated contract module (`WebUIWorkspace/src/mouse-companion/form-contract.js`), reducing repeated DOM field wiring and lowering future field-extension regression risk.
+  - runtime diagnostics normalization/render logic is now extracted to `WebUIWorkspace/src/mouse-companion/runtime-diagnostics.js`, so entry file keeps orchestration only while preserving existing diagnostics output contract.
+  - probe dispatch/input/result state machine is now extracted to `WebUIWorkspace/src/mouse-companion/probe-controller.js`, and entry file only wires callbacks (`runtime snapshot update + render`) to keep probe behavior stable with lower coupling.
+  - section markup template (`Basic/Follow/Probe/Runtime` panels) is now extracted to `WebUIWorkspace/src/mouse-companion/section-template.js`, reducing long inline HTML in entry layer and making future UI evolution isolated from runtime wiring logic.
+  - tab active-state normalization, keyboard navigation (`ArrowLeft/ArrowRight`), and DOM sync are now extracted to `WebUIWorkspace/src/mouse-companion/tab-controller.js`; entry layer persists only storage callback wiring (`mouse-companion.v1`).
 - Mouse Companion visual follow coordinate regression fix is applied:
   - macOS pet visual host update now converts runtime cursor point from Quartz to Cocoa before calling Swift window-position update,
   - pet window origin is clamped to visible desktop bounds on every follow tick, and `show()` now starts from main-screen visible center as a safe anchor,

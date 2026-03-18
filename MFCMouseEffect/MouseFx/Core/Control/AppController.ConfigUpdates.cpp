@@ -155,19 +155,29 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
     if (!normalized.enabled) {
         ResetPetDispatchRuntimeState();
         ShutdownPetVisualHost();
+        loadedPetModelPath_.clear();
+        loadedPetActionLibraryPath_.clear();
+        loadedPetEffectProfilePath_.clear();
+        loadedPetAppearanceProfilePath_.clear();
         {
             std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
             mouseCompanionRuntimeStatus_.modelLoaded = false;
             mouseCompanionRuntimeStatus_.actionLibraryLoaded = false;
+            mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
             mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
             mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
             mouseCompanionRuntimeStatus_.visualModelLoaded = false;
             mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
             mouseCompanionRuntimeStatus_.visualModelPath.clear();
             mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+            mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "unknown";
             mouseCompanionRuntimeStatus_.loadedActionLibraryPath.clear();
+            mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
             mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath.clear();
+            mouseCompanionRuntimeStatus_.modelConvertedToCanonical = false;
+            mouseCompanionRuntimeStatus_.modelImportDiagnostics.clear();
             mouseCompanionRuntimeStatus_.visualModelLoadError.clear();
+            mouseCompanionRuntimeStatus_.effectProfileLoadError.clear();
             mouseCompanionRuntimeStatus_.actionCoverageReady = false;
             mouseCompanionRuntimeStatus_.actionCoverageExpectedActionCount = 0;
             mouseCompanionRuntimeStatus_.actionCoverageCoveredActionCount = 0;
@@ -200,6 +210,9 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
     } else {
         if (actionLibraryPathChanged || loadedPetActionLibraryPath_.empty()) {
             TryLoadDefaultPetActionLibrary();
+        }
+        if (loadedPetEffectProfilePath_.empty()) {
+            TryLoadDefaultPetEffectProfile();
         }
         if (appearanceProfilePathChanged || loadedPetAppearanceProfilePath_.empty()) {
             TryLoadDefaultPetAppearanceProfile();

@@ -106,19 +106,26 @@ public:
         bool visualModelLoaded{false};
         bool modelLoaded{false};
         bool actionLibraryLoaded{false};
+        bool effectProfileLoaded{false};
         bool appearanceProfileLoaded{false};
         bool poseBindingConfigured{false};
         int skeletonBoneCount{0};
         std::string configuredModelPath;
         std::string configuredActionLibraryPath;
+        std::string configuredEffectProfilePath;
         std::string configuredAppearanceProfilePath;
         std::string visualModelPath;
         std::string loadedModelPath;
+        std::string loadedModelSourceFormat{"unknown"};
         std::string loadedActionLibraryPath;
+        std::string loadedEffectProfilePath;
         std::string loadedAppearanceProfilePath;
+        bool modelConvertedToCanonical{false};
+        std::vector<std::string> modelImportDiagnostics;
         std::string visualModelLoadError;
         std::string modelLoadError;
         std::string actionLibraryLoadError;
+        std::string effectProfileLoadError;
         std::string appearanceProfileLoadError;
         int lastActionCode{0};
         float lastActionIntensity{0.0f};
@@ -254,9 +261,15 @@ public:
     void RememberLastPointerPoint(const ScreenPoint& pt);
     bool TryGetLastPointerPoint(ScreenPoint* outPt) const;
     void DispatchPetMove(const ScreenPoint& pt);
+    void DispatchPetScroll(const ScreenPoint& pt, int delta);
     void DispatchPetClick(const ClickEvent& ev);
     void DispatchPetButtonDown(const ScreenPoint& pt, int button);
     void DispatchPetButtonUp(const ScreenPoint& pt, int button);
+    void DispatchPetHoverStart(const ScreenPoint& pt);
+    void DispatchPetHoverEnd(const ScreenPoint& pt);
+    void DispatchPetHoldStart(const ScreenPoint& pt, int button, uint32_t holdMs);
+    void DispatchPetHoldUpdate(const ScreenPoint& pt, uint32_t holdMs);
+    void DispatchPetHoldEnd(const ScreenPoint& pt);
     void KillDispatchTimer(uintptr_t timerId);
     std::string CurrentForegroundProcessBaseName();
     bool IsEffectsBlockedByAppBlacklist();
@@ -272,7 +285,8 @@ public:
     static constexpr uintptr_t HoldTimerId() { return kHoldTimerId; }
     static constexpr uintptr_t HoldUpdateTimerId() { return kHoldUpdateTimerId; }
     static constexpr uintptr_t WasmFrameTimerId() { return kWasmFrameTimerId; }
-    static constexpr uint32_t HoldDelayMs() { return kHoldDelayMs; }
+    uint32_t ActiveHoverThresholdMs() const;
+    uint32_t ActiveHoldDelayMs() const;
 #ifdef _DEBUG
     void LogDebugClick(const ClickEvent& ev);
 #else
@@ -314,6 +328,7 @@ private:
     void RefreshInputCaptureRuntimeState();
     void TryLoadDefaultPetModel();
     void TryLoadDefaultPetActionLibrary();
+    void TryLoadDefaultPetEffectProfile();
     void TryLoadDefaultPetAppearanceProfile();
     void RecomputePetActionCoverageStatus();
     void EnsurePetVisualHost();
@@ -366,13 +381,15 @@ private:
     bool hasLastPointerPoint_ = false;
     bool hovering_ = false;
     static constexpr uintptr_t kHoverTimerId = 2;
-    static constexpr uint32_t kHoverThresholdMs = 2000;
+    static constexpr uint32_t kHoverThresholdMs = 1500;
+    static constexpr uint32_t kHoverThresholdTestMs = 320;
     static constexpr uintptr_t kInputCaptureHealthTimerId = 6;
     static constexpr uintptr_t kWasmFrameTimerId = 10;
 
     // Hold delay logic
     static constexpr uintptr_t kHoldTimerId = 5;
-    static constexpr uint32_t kHoldDelayMs = 350; // Increased to 350ms to distinguish from click
+    static constexpr uint32_t kHoldDelayMs = 260;
+    static constexpr uint32_t kHoldDelayTestMs = 120;
     static constexpr uintptr_t kHoldUpdateTimerId = 9;
     static constexpr uint32_t kHoldUpdateIntervalMs = 16; // ~60fps periodic hold overlay update
     struct PendingHold {
@@ -404,6 +421,7 @@ private:
     void* petVisualHostHandle_{nullptr};
     std::string loadedPetModelPath_{};
     std::string loadedPetActionLibraryPath_{};
+    std::string loadedPetEffectProfilePath_{};
     std::string loadedPetAppearanceProfilePath_{};
     std::vector<std::string> petVisualSkeletonNames_{};
     std::vector<const char*> petVisualSkeletonNamePtrs_{};

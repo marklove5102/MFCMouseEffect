@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "actions": [
+    {
+      "action": "idle",
+      "action_intensity": 0.22,
+      "clip_blend_weight": 0.55,
+      "breathe_hz": 2.2,
+      "breathe_amplitude": 0.036,
+      "spine_pitch": -0.01,
+      "chest_pitch": -0.01,
+      "head_cursor_pitch_gain": 0.28,
+      "head_yaw_gain": 0.34
+    },
+    {
+      "action": "follow",
+      "action_intensity": 0.62,
+      "clip_blend_weight": 0.45,
+      "spine_pitch": -0.04,
+      "spine_yaw": 0.14,
+      "chest_pitch": -0.03,
+      "chest_yaw": 0.22,
+      "head_cursor_pitch_gain": 0.52,
+      "head_yaw_gain": 0.58
+    },
+    {
+      "action": "click_react",
+      "action_intensity": 0.92,
+      "clip_blend_weight": 0.30,
+      "pulse_gain": 1.0,
+      "pulse_decay_hz": 9.0,
+      "hips_pitch": 0.08,
+      "hips_scale_x": 1.07,
+      "hips_scale_y": 0.88,
+      "hips_scale_z": 1.07,
+      "neck_pitch": 0.08,
+      "head_pitch_bias": -0.06
+    },
+    {
+      "action": "drag",
+      "action_intensity": 0.82,
+      "clip_blend_weight": 0.28,
+      "hips_pitch": -0.09,
+      "hips_yaw": 0.10,
+      "spine_pitch": -0.16,
+      "spine_yaw": 0.18,
+      "chest_pitch": -0.13,
+      "chest_yaw": 0.26,
+      "head_pitch_bias": -0.14,
+      "head_yaw_gain": 0.48
+    },
+    {
+      "action": "hover_react",
+      "action_intensity": 0.70,
+      "clip_blend_weight": 0.24,
+      "breathe_hz": 2.8,
+      "hips_y_offset": 0.012,
+      "hips_yaw": 0.16,
+      "spine_yaw": 0.28,
+      "chest_yaw": 0.34,
+      "neck_pitch": 0.08,
+      "neck_yaw": 0.22,
+      "head_pitch_bias": 0.08,
+      "head_yaw_bias": 0.20,
+      "head_yaw_gain": 0.66
+    },
+    {
+      "action": "hold_react",
+      "action_intensity": 0.86,
+      "clip_blend_weight": 0.22,
+      "hips_y_offset": -0.018,
+      "hips_pitch": -0.10,
+      "hips_scale_x": 1.10,
+      "hips_scale_y": 0.80,
+      "hips_scale_z": 1.10,
+      "spine_pitch": -0.18,
+      "chest_pitch": -0.20,
+      "neck_pitch": -0.05,
+      "head_pitch_bias": -0.18,
+      "head_yaw_gain": 0.42
+    },
+    {
+      "action": "scroll_react",
+      "action_intensity": 0.78,
+      "clip_blend_weight": 0.18,
+      "breathe_hz": 3.3,
+      "hips_yaw": 0.26,
+      "spine_yaw": 0.38,
+      "chest_yaw": 0.46,
+      "neck_yaw": 0.36,
+      "head_yaw_bias": 0.28,
+      "head_yaw_gain": 0.84
+    }
+  ]
+}

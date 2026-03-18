@@ -1,15 +1,18 @@
 #include "pch.h"
 #include "MouseFx/Core/Pet/PetInterfaces.h"
 
+#include <cctype>
 #include <cstdlib>
 #include <filesystem>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
 #if !defined(_WIN32)
 #include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 namespace mousefx::pet {
@@ -98,14 +101,134 @@ bool IsCanonicalCacheUsable(const std::filesystem::path& canonicalPath, const st
     return targetTime >= sourceTime;
 }
 
+std::string Trim(std::string value) {
+    size_t start = 0;
+    while (start < value.size() &&
+           std::isspace(static_cast<unsigned char>(value[start])) != 0) {
+        ++start;
+    }
+    if (start >= value.size()) {
+        return {};
+    }
+
+    size_t end = value.size();
+    while (end > start &&
+           std::isspace(static_cast<unsigned char>(value[end - 1])) != 0) {
+        --end;
+    }
+    return value.substr(start, end - start);
+}
+
+void AppendCommandPart(const std::string& part, std::vector<std::string>* out) {
+    if (!out) {
+        return;
+    }
+    const std::string trimmed = Trim(part);
+    if (!trimmed.empty()) {
+        out->push_back(trimmed);
+    }
+}
+
+std::vector<std::string> ParseCommandTemplateList(const std::string& value) {
+    std::vector<std::string> commands{};
+    std::string normalized = value;
+    for (char& ch : normalized) {
+        if (ch == '\r') {
+            ch = '\n';
+        }
+    }
+
+    std::istringstream lines(normalized);
+    std::string line;
+    while (std::getline(lines, line)) {
+        size_t cursor = 0;
+        while (true) {
+            const size_t sep = line.find("||", cursor);
+            if (sep == std::string::npos) {
+                AppendCommandPart(line.substr(cursor), &commands);
+                break;
+            }
+            AppendCommandPart(line.substr(cursor, sep - cursor), &commands);
+            cursor = sep + 2;
+        }
+    }
+    return commands;
+}
+
 std::vector<std::string> ResolveCommandTemplates(const char* envVarName,
                                                  const std::vector<std::string>& defaults) {
     if (envVarName && envVarName[0] != '\0') {
         if (const char* value = std::getenv(envVarName); value && value[0] != '\0') {
-            return {std::string(value)};
+            const std::vector<std::string> fromEnv = ParseCommandTemplateList(value);
+            if (!fromEnv.empty()) {
+                return fromEnv;
+            }
+            return {};
         }
     }
     return defaults;
+}
+
+std::string ExtractExecutableToken(const std::string& commandTemplate) {
+    const std::string command = Trim(commandTemplate);
+    if (command.empty()) {
+        return {};
+    }
+
+    size_t cursor = 0;
+    const char first = command[cursor];
+    if (first == '"' || first == '\'') {
+        const char quote = first;
+        const size_t end = command.find(quote, cursor + 1);
+        if (end == std::string::npos) {
+            return {};
+        }
+        return command.substr(cursor + 1, end - (cursor + 1));
+    }
+
+    while (cursor < command.size() &&
+           std::isspace(static_cast<unsigned char>(command[cursor])) == 0) {
+        ++cursor;
+    }
+    return command.substr(0, cursor);
+}
+
+bool IsCommandAvailable(const std::string& executableToken) {
+    if (executableToken.empty()) {
+        return false;
+    }
+
+    const std::filesystem::path executablePath(executableToken);
+    const bool explicitPath =
+        executableToken.find('/') != std::string::npos ||
+        executableToken.find('\\') != std::string::npos;
+
+#if defined(_WIN32)
+    std::error_code ec;
+    if (explicitPath) {
+        return std::filesystem::exists(executablePath, ec) && !ec;
+    }
+    return true;
+#else
+    if (explicitPath) {
+        return ::access(executablePath.string().c_str(), X_OK) == 0;
+    }
+
+    const char* pathEnv = std::getenv("PATH");
+    if (!pathEnv || pathEnv[0] == '\0') {
+        return false;
+    }
+    std::istringstream stream(pathEnv);
+    std::string dir;
+    while (std::getline(stream, dir, ':')) {
+        const std::filesystem::path base = dir.empty() ? std::filesystem::path(".") : std::filesystem::path(dir);
+        const std::filesystem::path candidate = base / executablePath;
+        if (::access(candidate.string().c_str(), X_OK) == 0) {
+            return true;
+        }
+    }
+    return false;
+#endif
 }
 
 class ToolBackedCanonicalFormatConverter final : public IModelFormatConverter {
@@ -170,11 +293,26 @@ public:
             return false;
         }
 
+        bool hadAvailableBackend = false;
         for (size_t i = 0; i < commands.size(); ++i) {
+            const std::string executable = ExtractExecutableToken(commands[i]);
+            if (executable.empty()) {
+                outResult->warnings.push_back(
+                    diagnosticPrefix_ + ".command_template_invalid[" + std::to_string(i) + "]");
+                continue;
+            }
+            if (!IsCommandAvailable(executable)) {
+                outResult->warnings.push_back(
+                    diagnosticPrefix_ + ".backend_unavailable[" + std::to_string(i) + "]: " + executable);
+                continue;
+            }
+
+            hadAvailableBackend = true;
             const std::string command = BuildCommand(commands[i], source, canonicalPath);
             const std::optional<int> exitCode = ExecuteCommand(command);
             if (!exitCode.has_value()) {
-                outResult->warnings.push_back(diagnosticPrefix_ + ".command_exec_failed");
+                outResult->warnings.push_back(
+                    diagnosticPrefix_ + ".command_exec_failed[" + std::to_string(i) + "]");
                 continue;
             }
             if (exitCode.value() != 0) {
@@ -194,6 +332,9 @@ public:
             return true;
         }
 
+        if (!hadAvailableBackend) {
+            outResult->warnings.push_back(diagnosticPrefix_ + ".backend_unavailable");
+        }
         return false;
     }
 
@@ -210,6 +351,7 @@ std::unique_ptr<IModelFormatConverter> CreateToolBackedUsdzCanonicalFormatConver
     std::vector<std::string> defaults{};
 #if defined(__APPLE__)
     defaults.emplace_back("xcrun usdz_converter {src} {dst}");
+    defaults.emplace_back("usdz_converter {src} {dst}");
 #endif
     return std::make_unique<ToolBackedCanonicalFormatConverter>(
         ModelFormat::Usdz,
@@ -221,6 +363,7 @@ std::unique_ptr<IModelFormatConverter> CreateToolBackedUsdzCanonicalFormatConver
 std::unique_ptr<IModelFormatConverter> CreateToolBackedFbxCanonicalFormatConverter() {
     std::vector<std::string> defaults{};
     defaults.emplace_back("FBX2glTF --binary --input {src} --output {dst}");
+    defaults.emplace_back("fbx2gltf --binary --input {src} --output {dst}");
     return std::make_unique<ToolBackedCanonicalFormatConverter>(
         ModelFormat::Fbx,
         "converter.fbx",

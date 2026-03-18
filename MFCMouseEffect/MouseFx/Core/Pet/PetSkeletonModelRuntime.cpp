@@ -15,9 +15,14 @@ namespace {
 class SkeletonModelRuntime final : public IPetModelRuntime {
 public:
     bool LoadCanonicalModel(const CanonicalModelAsset& asset) override {
+        loaded_ = false;
         loadedAsset_ = asset;
         skeleton_ = {};
         poseByBone_.clear();
+        lastPose_ = {};
+        filteredPose_.clear();
+        resolvedLocalPose_.clear();
+        resolvedPoseValid_.clear();
 
         if (asset.canonicalGlbPath.empty()) {
             return false;
@@ -34,7 +39,6 @@ public:
         }
         resolvedLocalPose_.assign(skeleton_.bones.size(), Transform{});
         resolvedPoseValid_.assign(skeleton_.bones.size(), false);
-        filteredPose_.clear();
         loaded_ = true;
         return true;
     }

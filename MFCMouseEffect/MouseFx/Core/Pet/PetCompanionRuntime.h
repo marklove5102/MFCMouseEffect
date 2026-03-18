@@ -15,6 +15,7 @@ public:
     void Tick(const PetFrameInput& input) override;
     bool LoadCanonicalModel(const CanonicalModelAsset& asset);
     bool LoadActionLibraryFromJson(const std::string& jsonPath);
+    bool LoadEffectProfileFromJson(const std::string& jsonPath);
 
     void RequestAction(PetAction action, double blendDurationSeconds);
     void ApplyAppearance(const AppearanceOverrides& appearance);
@@ -26,6 +27,7 @@ private:
     std::unique_ptr<IPetModelRuntime> modelRuntime_{};
     std::unique_ptr<IActionSynthesizer> actionSynthesizer_{};
     std::shared_ptr<const ActionLibrary> actionLibrary_{};
+    std::shared_ptr<const ProceduralEffectProfile> effectProfile_{};
     AppearanceOverrides currentAppearance_{};
     SkeletonPose workingPose_{};
 };

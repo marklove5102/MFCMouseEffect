@@ -119,6 +119,12 @@ const char* PetActionName(PetAction action) {
         return "click_react";
     case PetAction::Drag:
         return "drag";
+    case PetAction::HoverReact:
+        return "hover_react";
+    case PetAction::HoldReact:
+        return "hold_react";
+    case PetAction::ScrollReact:
+        return "scroll_react";
     default:
         return "unknown";
     }
@@ -130,11 +136,14 @@ ActionCoverageReport BuildActionCoverageReport(
     ActionCoverageReport report{};
     report.skeletonBoneCount = static_cast<int>(skeleton.bones.size());
 
-    const std::array<PetAction, 4> expectedActions = {
+    const std::array<PetAction, 7> expectedActions = {
         PetAction::Idle,
         PetAction::Follow,
         PetAction::ClickReact,
         PetAction::Drag,
+        PetAction::HoverReact,
+        PetAction::HoldReact,
+        PetAction::ScrollReact,
     };
 
     report.expectedActionCount = static_cast<int>(expectedActions.size());

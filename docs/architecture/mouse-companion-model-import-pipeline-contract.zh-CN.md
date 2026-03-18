@@ -48,8 +48,12 @@
   - 模板占位符：
     - `{src}`：源模型路径（自动 shell quote）
     - `{dst}`：目标 canonical `.glb` 路径（自动 shell quote）
+  - 多后端模板输入：
+    - 环境变量支持单条或多条命令模板；
+    - 多条模板可用换行或 `||` 分隔，按顺序尝试（第一个成功即返回）。
   - 运行策略：
     - 若 `canonical/<stem>.glb` 缓存未过期则复用；
+    - 先做命令后端可用性预检（可执行文件 token）；
     - 若命令后端不可用/执行失败则返回失败，并由后续 sidecar 兜底链路接管。
 
 ## Importer 行为
@@ -65,8 +69,18 @@
   - `converter.vrm.*`：VRM 转换阶段诊断（source 缺失、header 非法、copy 失败、缓存复用等）。
   - `converter.gltf.*`：GLTF 转换阶段诊断（解析失败、资源缺失、不安全 URI、写入失败、缓存复用等）。
   - `converter.usdz.*` / `converter.fbx.*`：
-    - `backend_unavailable`、`command_exec_failed`、`command_failed[n]`、
+    - `backend_unavailable`、`backend_unavailable[n]`、`command_template_invalid[n]`、
+    - `command_exec_failed[n]`、`command_failed[n]`、
     - `output_missing`、`reuse_cached_canonical`、`exported_canonical` 等。
+
+## 运行时可观测性（新增）
+- 来源：`/api/state.mouse_companion_runtime`
+- 模型导入链路新增字段：
+  - `loaded_model_source_format`：当前成功导入模型的源格式（`glb/gltf/usdz/vrm/fbx/unknown`）。
+  - `model_converted_to_canonical`：是否发生了“源格式 -> canonical `.glb`”转换。
+  - `model_import_diagnostics`：导入/转换阶段诊断数组（直接透传 converter/importer warning）。
+- 设计目标：
+  - 多格式接入时，失败定位优先依赖结构化 runtime state，而不是人工翻 host 日志。
 
 ## 扩展方式（后续接真实后端）
 1. 新增一个 `IModelFormatConverter` 实现（例如 `VrmToGlbConverter`）。

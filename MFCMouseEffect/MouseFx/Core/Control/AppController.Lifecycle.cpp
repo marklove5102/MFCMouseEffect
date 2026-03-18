@@ -109,6 +109,25 @@ std::filesystem::path ResolveExistingDefaultPetAppearanceProfilePath(const std::
     return ResolveExistingDefaultPetAppearanceProfilePath();
 }
 
+std::string ResolveConfiguredPetEffectProfilePath() {
+    static constexpr const char* kDefaultPath = "MFCMouseEffect/Assets/Pet3D/source/pet-effects.json";
+    return kDefaultPath;
+}
+
+std::filesystem::path ResolveExistingDefaultPetEffectProfilePath() {
+    static constexpr const char* kCandidates[] = {
+        "Assets/Pet3D/source/pet-effects.json",
+        "MFCMouseEffect/Assets/Pet3D/source/pet-effects.json",
+    };
+    for (const char* candidate : kCandidates) {
+        const std::filesystem::path path(candidate);
+        if (std::filesystem::exists(path)) {
+            return path;
+        }
+    }
+    return {};
+}
+
 void AppendUniqueExistingPath(
     const std::filesystem::path& candidate,
     std::vector<std::filesystem::path>* outPaths) {
@@ -196,6 +215,7 @@ bool AppController::Start() {
         mouseCompanionRuntimeStatus_.configEnabled = companion.enabled;
         mouseCompanionRuntimeStatus_.configuredModelPath = companion.modelPath;
         mouseCompanionRuntimeStatus_.configuredActionLibraryPath = companion.actionLibraryPath;
+        mouseCompanionRuntimeStatus_.configuredEffectProfilePath = ResolveConfiguredPetEffectProfilePath();
         mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = companion.appearanceProfilePath;
         mouseCompanionRuntimeStatus_.runtimePresent = (petCompanion_ != nullptr);
     }
@@ -346,34 +366,71 @@ void AppController::TryLoadDefaultPetModel() {
         mouseCompanionRuntimeStatus_.configuredModelPath = companionCfg.modelPath;
     }
     if (modelPath.empty()) {
+        loadedPetModelPath_.clear();
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.modelLoaded = false;
         mouseCompanionRuntimeStatus_.modelLoadError = "model_path_not_found";
+        mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "unknown";
+        mouseCompanionRuntimeStatus_.modelConvertedToCanonical = false;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics.clear();
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_unavailable";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
         ResetActionCoverageStatusFields(&mouseCompanionRuntimeStatus_, "model_unavailable");
         return;
     }
 
     auto importer = pet::CreateDefaultModelAssetImporter();
     if (!importer) {
+        loadedPetModelPath_.clear();
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.modelLoaded = false;
         mouseCompanionRuntimeStatus_.modelLoadError = "model_importer_unavailable";
+        mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "unknown";
+        mouseCompanionRuntimeStatus_.modelConvertedToCanonical = false;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics = {"model_importer_unavailable"};
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_unavailable";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
         ResetActionCoverageStatusFields(&mouseCompanionRuntimeStatus_, "model_importer_unavailable");
         return;
     }
 
     pet::CanonicalModelAsset canonical{};
     if (!importer->ImportToCanonicalGlb(modelPath.string(), &canonical)) {
+        loadedPetModelPath_.clear();
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.modelLoaded = false;
         mouseCompanionRuntimeStatus_.modelLoadError = "model_import_to_canonical_failed";
+        mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = pet::ToString(canonical.sourceFormat);
+        mouseCompanionRuntimeStatus_.modelConvertedToCanonical = canonical.converted;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics = canonical.warnings;
+        if (mouseCompanionRuntimeStatus_.modelImportDiagnostics.empty()) {
+            mouseCompanionRuntimeStatus_.modelImportDiagnostics.push_back(
+                "model_import_to_canonical_failed_without_diagnostics");
+        }
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_unavailable";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
         ResetActionCoverageStatusFields(&mouseCompanionRuntimeStatus_, "model_import_failed");
         return;
     }
     if (!petCompanion_->LoadCanonicalModel(canonical)) {
+        loadedPetModelPath_.clear();
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.modelLoaded = false;
         mouseCompanionRuntimeStatus_.modelLoadError = "model_runtime_load_failed";
+        mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = pet::ToString(canonical.sourceFormat);
+        mouseCompanionRuntimeStatus_.modelConvertedToCanonical = canonical.converted;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics = canonical.warnings;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics.push_back("model_runtime_load_failed");
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_unavailable";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
         ResetActionCoverageStatusFields(&mouseCompanionRuntimeStatus_, "model_runtime_load_failed");
         return;
     }
@@ -383,6 +440,12 @@ void AppController::TryLoadDefaultPetModel() {
         mouseCompanionRuntimeStatus_.modelLoaded = true;
         mouseCompanionRuntimeStatus_.modelLoadError.clear();
         mouseCompanionRuntimeStatus_.loadedModelPath = loadedPetModelPath_;
+        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = pet::ToString(canonical.sourceFormat);
+        mouseCompanionRuntimeStatus_.modelConvertedToCanonical = canonical.converted;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics = canonical.warnings;
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_not_loaded_yet";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
         const pet::SkeletonDesc* skeleton = petCompanion_ ? petCompanion_->CurrentSkeleton() : nullptr;
         mouseCompanionRuntimeStatus_.skeletonBoneCount =
             skeleton ? static_cast<int>(skeleton->bones.size()) : 0;
@@ -404,6 +467,7 @@ void AppController::TryLoadDefaultPetModel() {
         }
     }
     TryLoadDefaultPetActionLibrary();
+    TryLoadDefaultPetEffectProfile();
     TryLoadDefaultPetAppearanceProfile();
 }
 
@@ -483,6 +547,40 @@ void AppController::TryLoadDefaultPetAppearanceProfile() {
         mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath = loadedPetAppearanceProfilePath_;
     }
     TryApplyPetAppearanceToVisualHost();
+}
+
+void AppController::TryLoadDefaultPetEffectProfile() {
+    if (!petCompanion_) {
+        return;
+    }
+    const std::string configuredPath = ResolveConfiguredPetEffectProfilePath();
+    const std::filesystem::path profilePath = ResolveExistingDefaultPetEffectProfilePath();
+    {
+        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+        mouseCompanionRuntimeStatus_.configuredEffectProfilePath = configuredPath;
+    }
+    if (profilePath.empty()) {
+        loadedPetEffectProfilePath_.clear();
+        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_path_not_found";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
+        return;
+    }
+    if (!petCompanion_->LoadEffectProfileFromJson(profilePath.string())) {
+        loadedPetEffectProfilePath_.clear();
+        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "effect_profile_parse_or_bind_failed";
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
+        return;
+    }
+
+    loadedPetEffectProfilePath_ = profilePath.string();
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.effectProfileLoaded = true;
+    mouseCompanionRuntimeStatus_.effectProfileLoadError.clear();
+    mouseCompanionRuntimeStatus_.loadedEffectProfilePath = loadedPetEffectProfilePath_;
 }
 
 void AppController::RecomputePetActionCoverageStatus() {

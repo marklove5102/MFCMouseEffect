@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "MouseFx/Core/Pet/PetActionLibrary.h"
+#include "MouseFx/Core/Pet/PetEffectProfile.h"
 #include "MouseFx/Core/Pet/PetAssetFormat.h"
 #include "MouseFx/Core/Pet/PetTypes.h"
 
@@ -53,6 +54,7 @@ public:
     virtual ~IActionSynthesizer() = default;
     virtual void BindSkeleton(const SkeletonDesc* skeleton) = 0;
     virtual void SetActionLibrary(std::shared_ptr<const ActionLibrary> actionLibrary) = 0;
+    virtual void SetEffectProfile(std::shared_ptr<const ProceduralEffectProfile> effectProfile) = 0;
     virtual void RequestAction(PetAction action, double blendDurationSeconds) = 0;
     virtual void Update(const PetFrameInput& input, SkeletonPose* outPose) = 0;
 };

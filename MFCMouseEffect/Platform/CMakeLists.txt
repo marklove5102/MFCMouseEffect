@@ -262,6 +262,7 @@ if(MFX_ENABLE_ENTRY_RUNTIME_TARGETS)
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetAssetFormat.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetCanonicalModelValidator.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetCompanionRuntime.cpp"
+            "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetEffectProfile.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetGlbSkeletonLoader.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetGltfJsonCanonicalConverter.cpp"
             "${MFX_PROJECT_ROOT}/MouseFx/Core/Pet/PetModelFormatConverter.cpp"

@@ -50,19 +50,26 @@ json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRun
         {"visual_model_loaded", status.visualModelLoaded},
         {"model_loaded", status.modelLoaded},
         {"action_library_loaded", status.actionLibraryLoaded},
+        {"effect_profile_loaded", status.effectProfileLoaded},
         {"appearance_profile_loaded", status.appearanceProfileLoaded},
         {"pose_binding_configured", status.poseBindingConfigured},
         {"skeleton_bone_count", status.skeletonBoneCount},
         {"configured_model_path", status.configuredModelPath},
         {"configured_action_library_path", status.configuredActionLibraryPath},
+        {"configured_effect_profile_path", status.configuredEffectProfilePath},
         {"configured_appearance_profile_path", status.configuredAppearanceProfilePath},
         {"visual_model_path", status.visualModelPath},
         {"loaded_model_path", status.loadedModelPath},
+        {"loaded_model_source_format", status.loadedModelSourceFormat},
         {"loaded_action_library_path", status.loadedActionLibraryPath},
+        {"loaded_effect_profile_path", status.loadedEffectProfilePath},
         {"loaded_appearance_profile_path", status.loadedAppearanceProfilePath},
+        {"model_converted_to_canonical", status.modelConvertedToCanonical},
+        {"model_import_diagnostics", status.modelImportDiagnostics},
         {"visual_model_load_error", status.visualModelLoadError},
         {"model_load_error", status.modelLoadError},
         {"action_library_load_error", status.actionLibraryLoadError},
+        {"effect_profile_load_error", status.effectProfileLoadError},
         {"appearance_profile_load_error", status.appearanceProfileLoadError},
         {"last_action_code", status.lastActionCode},
         {"last_action_name", status.lastActionName},
@@ -164,6 +171,8 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
     const std::string event = ToLowerAscii(TrimAscii(payload.value("event", std::string("status"))));
     const int32_t x = ParseInt32OrDefault(payload, "x", 640);
     const int32_t y = ParseInt32OrDefault(payload, "y", 360);
+    const int32_t delta = ParseInt32OrDefault(payload, "delta", 120);
+    const uint32_t holdMs = static_cast<uint32_t>(std::max(0, ParseInt32OrDefault(payload, "hold_ms", 420)));
     const uint8_t rawButton = ParseButtonOrDefault(payload, "button", 1);
     const int button = std::max(0, static_cast<int>(rawButton));
 
@@ -175,6 +184,8 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
         // No-op: return current runtime snapshot only.
     } else if (event == "move") {
         controller->DispatchPetMove(pt);
+    } else if (event == "scroll") {
+        controller->DispatchPetScroll(pt, delta);
     } else if (event == "button_down") {
         controller->DispatchPetButtonDown(pt, button);
     } else if (event == "button_up") {
@@ -184,12 +195,33 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
         ev.pt = pt;
         ev.button = ResolveMouseButton(rawButton);
         controller->DispatchPetClick(ev);
+    } else if (event == "hover_start") {
+        controller->DispatchPetHoverStart(pt);
+    } else if (event == "hover_end") {
+        controller->DispatchPetHoverEnd(pt);
+    } else if (event == "hold_start") {
+        controller->DispatchPetHoldStart(pt, button, holdMs);
+    } else if (event == "hold_update") {
+        controller->DispatchPetHoldUpdate(pt, holdMs);
+    } else if (event == "hold_end") {
+        controller->DispatchPetHoldEnd(pt);
     } else {
         SetJsonResponse(resp, json({
             {"ok", false},
             {"error", "unsupported_event"},
             {"event", event},
-            {"supported_events", json::array({"status", "move", "button_down", "button_up", "click"})},
+            {"supported_events", json::array({
+                "status",
+                "move",
+                "scroll",
+                "button_down",
+                "button_up",
+                "click",
+                "hover_start",
+                "hover_end",
+                "hold_start",
+                "hold_update",
+                "hold_end"})},
         }).dump());
         return true;
     }
@@ -203,6 +235,8 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
             {"x", pt.x},
             {"y", pt.y},
         }},
+        {"delta", delta},
+        {"hold_ms", holdMs},
         {"button", button},
         {"runtime", BuildMouseCompanionRuntimeStatusJson(status)},
         {"action_coverage", BuildActionCoverageJson(status)},

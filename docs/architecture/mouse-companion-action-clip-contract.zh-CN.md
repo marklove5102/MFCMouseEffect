@@ -3,6 +3,8 @@
 ## 目标
 - 为“复用已有骨架动作”提供稳定契约，不依赖模型内置帧动画。
 - 让动作资产和模型资产解耦：模型走 `glb`，动作走独立 JSON Clip 库。
+- 与语义参数驱动层（`pet-effects.json`）配合时，Clip 负责“可复用动作片段”，语义层负责“事件级动作风格与强度”。
+  - 参考：`/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-procedural-effect-profile-contract.zh-CN.md`
 
 ## 运行时链路
 1. `AppController` 启动时尝试加载默认动作库：
@@ -26,7 +28,10 @@
 ```
 
 `clips[]` 元素字段：
-- `action`：`idle | follow | clickReact | drag`（大小写不敏感，`click` 也可映射到 `clickReact`）
+- `action`：
+  - 基础：`idle | follow | clickReact | drag`
+  - 扩展：`hoverReact | holdReact | scrollReact`
+  - 大小写不敏感，且支持下划线别名（例如 `click_react/hover_react/hold_react/scroll_react`）
 - `duration`：秒，`<=0` 时自动取该 Clip 最大关键帧时间
 - `loop`：是否循环
 - `tracks`：骨骼轨道数组
@@ -67,7 +72,9 @@
 ## 当前样例
 - 仓库已提供样例动作库：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/MFCMouseEffect/Assets/Pet3D/source/pet-actions.json`
-- 该样例覆盖 `idle/follow/clickReact/drag` 四类基础动作，并包含 `bone_remap`（`Chest -> Spine`）示例，可直接验证重映射链路。
+- 该样例覆盖 `idle/follow/clickReact/drag/hoverReact/holdReact/scrollReact`，并包含 `bone_remap`（`Chest -> Spine`）示例，可直接验证重映射链路。
+- 2026-03-17 可见性调优：
+  - `hoverReact/holdReact/scrollReact` 关键帧幅度已增强（更明显的头/躯干旋转与 hold 压缩），用于避免“运行时已切动作但体感像只有两种姿态”。
 
 ## 回归检查
 - 编译：`cmake --build build-macos --target mfx_entry_runtime_common -j 6`
@@ -82,7 +89,7 @@
 
 1. 开启测试路由环境变量：`MFX_ENABLE_MOUSE_COMPANION_TEST_API=1`
 2. 调用：`POST /api/mouse-companion/test-dispatch`
-   - 支持事件：`status | move | button_down | button_up | click`
+   - 支持事件：`status | move | scroll | button_down | button_up | click | hover_start | hover_end | hold_start | hold_update | hold_end`
    - 返回新增字段：`action_coverage`
 3. `action_coverage` 关键字段：
    - `ready` / `error`
@@ -93,7 +100,7 @@
    - `actions[]`（每个 action 的轨道映射细节）
 
 说明：
-- `missing_action_count=0` 仅表示四类基础动作都有 Clip，不代表所有轨道都能映射。
+- `missing_action_count=0` 仅表示当前门禁动作集（现为 7 类：`idle/follow/click_react/drag/hover_react/hold_react/scroll_react`）都有 Clip，不代表所有轨道都能映射。
 - `missing_bone_names` 用于定位具体骨骼命名偏差（建议优先通过 `bone_remap` 修正）。
 - 该校验是“契约可行性门禁”，不影响运行时兜底策略（未映射轨道会被跳过，系统继续运行）。
 
@@ -115,5 +122,8 @@
 
 当前脚本门禁同时覆盖：
 - 资产加载就绪：`model/visual/action/appearance/pose_binding`
-- 动作切换序列：`idle -> follow -> drag -> follow -> click_react`
-- 动作契约覆盖：`expected_action_count=4 && missing_action_count=0 && missing_bone_names=[] && overall_coverage_ratio=1.0`
+- 动作切换序列：`idle -> follow -> scroll_react -> drag -> follow -> click_react -> hover_react -> follow -> hold_react -> hold_react -> follow`
+- 动作契约覆盖：`expected_action_count=7 && missing_action_count=0 && missing_bone_names=[] && overall_coverage_ratio=1.0`
+
+说明（2026-03-17）：
+- 由于 hover 触发阈值已从旧值下调（生产档 `1500ms`，测试档 `320ms`），proof 对首帧 `idle` 判定允许 `idle/follow/hover_react` 三种结果，避免定时器竞争导致伪失败。

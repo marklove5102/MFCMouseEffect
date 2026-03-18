@@ -203,6 +203,38 @@
   - 动作库/外观解析默认优先使用配置路径；
   - 配置路径不存在时，回退到内置候选路径（保持可用性）。
 
+## P10 增量（已完成首版：Web 动作探针）
+- `Mouse Companion` 分区新增动作探针面板（Action Probe）：
+  - 可直接触发 `status/move/button_down/button_up/click` 以及一键 `run sequence`；
+  - 探针参数支持 `x/y/button` 输入，便于做确定性动作切换验证。
+- 探针面板与运行时诊断联动：
+  - 每次探针调用成功后，会刷新伴宠运行时快照与 `action_coverage` 显示，
+  - 可在不手动移动鼠标的情况下确认 `idle -> follow -> drag -> follow -> click_react` 链路是否可达。
+- 安全边界：
+  - 面板调用的是测试路由 `/api/mouse-companion/test-dispatch`，
+  - 仅在显式开启 `MFX_ENABLE_MOUSE_COMPANION_TEST_API=1` 时可用；未开启时 UI 会给出明确提示。
+
+## P11 增量（已完成首版：Web 二级 Tab 结构）
+- `Mouse Companion` 分区已从“单长表单”升级为二级 Tab：
+  - `Basic`：启用、模型/动作库/外观路径、尺寸；
+  - `Follow`：边界策略、偏移、抬升、平滑/阈值/释放保持、测试档；
+  - `Probe`：动作探针与结果反馈；
+  - `Runtime`：运行时诊断与覆盖率细节。
+- 兼容性约束：
+  - 仍复用原字段 ID（例如 `mc_model_path`、`mc_probe_*`、`mc_runtime_*`），`read/write/apply` 契约不变；
+  - tab 状态在 `render` 刷新后保持，不会因状态轮询跳回默认页。
+- 可用性增强：
+  - 支持鼠标点击切换；
+  - 支持键盘 `ArrowLeft/ArrowRight` 在二级 tab 间快速切换。
+  - 激活 tab 会持久化到本地 UI 状态存储（`mouse-companion.v1`），刷新后保持上次停留页签。
+- 可维护性增强：
+  - 二级 tab 的分区模板（`Basic/Follow/Probe/Runtime`）已抽取到 `WebUIWorkspace/src/mouse-companion/section-template.js`；
+  - 二级 tab 的状态归一化、键盘切换与面板显隐同步已抽取到 `WebUIWorkspace/src/mouse-companion/tab-controller.js`；
+  - 表单字段读写与 range 绑定已抽取到契约模块 `WebUIWorkspace/src/mouse-companion/form-contract.js`；
+  - 运行态诊断的 normalize + DOM 渲染逻辑已抽取到 `WebUIWorkspace/src/mouse-companion/runtime-diagnostics.js`；
+  - 动作探针的输入读取、dispatch、结果反馈状态机已抽取到 `WebUIWorkspace/src/mouse-companion/probe-controller.js`；
+  - 后续新增配置字段时，优先在契约模块增量扩展，避免在入口文件散落式修改。
+
 ## 后续阶段（P7+）
 1. P7-next（真实转换后端扩展）
 - 在默认管线继续增强 `usdz/fbx` 命令后端适配（多命令候选、后端检测与错误语义分层）。

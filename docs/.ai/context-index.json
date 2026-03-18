@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-17T12:11:04.103Z",
+  "generated_at": "2026-03-17T15:15:33.156Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "This file is the compact P1 runtime truth for daily execution.",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 292,
-      "size_bytes": 33142,
-      "estimated_tokens": 8286,
+      "line_count": 335,
+      "size_bytes": 39420,
+      "estimated_tokens": 9855,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": true,
-      "hash_sha1": "fcce4a043233b66e5b8086fb457a0e6cf33b9c22",
-      "updated_at": "2026-03-17T12:07:37.383Z"
+      "hash_sha1": "ecbf3b51408bcfc02fe8287e76f28c47740e62a0",
+      "updated_at": "2026-03-17T15:14:27.695Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -246,14 +246,14 @@
       ],
       "summary": "1. 资产层（Import）",
       "when_to_read": "Read only when task keywords match this capability area.",
-      "line_count": 217,
-      "size_bytes": 12642,
-      "estimated_tokens": 3161,
+      "line_count": 249,
+      "size_bytes": 15072,
+      "estimated_tokens": 3768,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "a2be3086499960728c4ddda35133aa61057b8de0",
-      "updated_at": "2026-03-17T12:07:52.644Z"
+      "hash_sha1": "71869327b6d4bbff8162e7ceed69a4693b029bec",
+      "updated_at": "2026-03-17T13:05:46.583Z"
     },
     {
       "id": "docs/architecture/mouse-companion-action-clip-contract.zh-CN.md",
@@ -261,7 +261,7 @@
       "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-action-clip-contract.zh-CN.md",
       "priority": "P2",
       "role": "architecture",
-      "topic": "general",
+      "topic": "effects",
       "first_read_rank": 0,
       "tags": [
         "mouse",
@@ -271,18 +271,19 @@
         "contract",
         "zh",
         "cn",
+        "effects",
         "macos"
       ],
       "summary": "1. `AppController` 启动时尝试加载默认动作库：",
       "when_to_read": "Read only when task keywords match this capability area.",
-      "line_count": 120,
-      "size_bytes": 5405,
-      "estimated_tokens": 1352,
+      "line_count": 130,
+      "size_bytes": 6536,
+      "estimated_tokens": 1634,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "749989d6a85c11733575d091d5f2fea4b004bf54",
-      "updated_at": "2026-03-17T09:55:24.536Z"
+      "hash_sha1": "d90d062a387f3135fee2fa71f2caaf854352ede1",
+      "updated_at": "2026-03-17T15:10:16.667Z"
     },
     {
       "id": "docs/architecture/mouse-companion-appearance-contract.zh-CN.md",
@@ -333,14 +334,45 @@
       ],
       "summary": "1. `GlbPassthroughFormatConverter`",
       "when_to_read": "Read only when task keywords match this capability area.",
-      "line_count": 85,
-      "size_bytes": 4197,
-      "estimated_tokens": 1050,
+      "line_count": 99,
+      "size_bytes": 5088,
+      "estimated_tokens": 1272,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "d1c1595b9d063cfee8b7639126f0c2df3e5c3368",
-      "updated_at": "2026-03-17T07:21:03.059Z"
+      "hash_sha1": "3cc3bf1e242c1018f4afed6da2258bf473026f37",
+      "updated_at": "2026-03-17T13:23:45.049Z"
+    },
+    {
+      "id": "docs/architecture/mouse-companion-procedural-effect-profile-contract.zh-CN.md",
+      "relative_path": "docs/architecture/mouse-companion-procedural-effect-profile-contract.zh-CN.md",
+      "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-procedural-effect-profile-contract.zh-CN.md",
+      "priority": "P2",
+      "role": "architecture",
+      "topic": "effects",
+      "first_read_rank": 0,
+      "tags": [
+        "mouse",
+        "companion",
+        "procedural",
+        "effect",
+        "profile",
+        "contract",
+        "zh",
+        "cn",
+        "effects",
+        "macos"
+      ],
+      "summary": "\"version\": 1,",
+      "when_to_read": "Read only when task keywords match this capability area.",
+      "line_count": 82,
+      "size_bytes": 3211,
+      "estimated_tokens": 803,
+      "max_read_tokens": 750,
+      "line_limit": 0,
+      "line_limit_exceeded": false,
+      "hash_sha1": "2e62860134dccfe041fdf93add6886f4b6f7ad4a",
+      "updated_at": "2026-03-17T15:14:10.266Z"
     },
     {
       "id": "docs/architecture/posix-core-automation-contract-workflow.md",

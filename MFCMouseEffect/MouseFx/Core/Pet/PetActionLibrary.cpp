@@ -56,6 +56,18 @@ bool ParseActionName(const std::string& raw, PetAction* outAction) {
         *outAction = PetAction::Drag;
         return true;
     }
+    if (normalized == "hoverreact" || normalized == "hover_react" || normalized == "hover") {
+        *outAction = PetAction::HoverReact;
+        return true;
+    }
+    if (normalized == "holdreact" || normalized == "hold_react" || normalized == "hold") {
+        *outAction = PetAction::HoldReact;
+        return true;
+    }
+    if (normalized == "scrollreact" || normalized == "scroll_react" || normalized == "scroll") {
+        *outAction = PetAction::ScrollReact;
+        return true;
+    }
     return false;
 }
 

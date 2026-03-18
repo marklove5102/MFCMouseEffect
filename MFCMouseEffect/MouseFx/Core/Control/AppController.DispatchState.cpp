@@ -113,6 +113,12 @@ const char* ResolveMouseCompanionActionName(int actionCode) {
         return "click_react";
     case pet::PetAction::Drag:
         return "drag";
+    case pet::PetAction::HoverReact:
+        return "hover_react";
+    case pet::PetAction::HoldReact:
+        return "hold_react";
+    case pet::PetAction::ScrollReact:
+        return "scroll_react";
     default:
         return "unknown";
     }
@@ -364,6 +370,16 @@ uint32_t AppController::CurrentHoldDurationMs() const {
     return static_cast<uint32_t>(std::min<uint64_t>(delta, 0xFFFFFFFFu));
 }
 
+uint32_t AppController::ActiveHoverThresholdMs() const {
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    return activeConfig.useTestProfile ? kHoverThresholdTestMs : kHoverThresholdMs;
+}
+
+uint32_t AppController::ActiveHoldDelayMs() const {
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    return activeConfig.useTestProfile ? kHoldDelayTestMs : kHoldDelayMs;
+}
+
 void AppController::BeginHoldTracking(const ScreenPoint& pt, int button) {
     holdButtonDown_ = true;
     holdTrackingButton_ = button;
@@ -382,7 +398,7 @@ void AppController::EndHoldTracking() {
 
 void AppController::ArmHoldTimer() {
     if (dispatchMessageHost_ && dispatchMessageHost_->IsCreated()) {
-        dispatchMessageHost_->SetTimer(kHoldTimerId, kHoldDelayMs);
+        dispatchMessageHost_->SetTimer(kHoldTimerId, ActiveHoldDelayMs());
     }
 }
 
@@ -456,7 +472,7 @@ bool AppController::TryEnterHover(ScreenPoint* outPt) {
     }
 
     const uint64_t elapsed = CurrentTickMs() - lastInputTime_;
-    if (elapsed < kHoverThresholdMs) {
+    if (elapsed < ActiveHoverThresholdMs()) {
         return false;
     }
 
@@ -514,6 +530,22 @@ void AppController::DispatchPetMove(const ScreenPoint& pt) {
         effectiveDragging ? 0.8f : 0.6f);
 }
 
+void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
+    if (!config_.mouseCompanion.enabled || !petCompanion_) {
+        return;
+    }
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    petLastDispatchPoint_ = pt;
+    petHasLastDispatchPoint_ = true;
+    const uint64_t nowTickMs = CurrentTickMs();
+    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
+    petCompanion_->RequestAction(pet::PetAction::ScrollReact, 0.05);
+    petCompanion_->Tick(BuildPetFrameInput(runtimePt, holdButtonDown_, petDragging_, dt));
+    const float intensity = std::clamp(static_cast<float>(std::abs(delta)) / 120.0f, 0.45f, 1.0f);
+    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::ScrollReact), intensity);
+}
+
 void AppController::DispatchPetClick(const ClickEvent& ev) {
     if (!config_.mouseCompanion.enabled || !petCompanion_) {
         return;
@@ -529,6 +561,36 @@ void AppController::DispatchPetClick(const ClickEvent& ev) {
     petCompanion_->RequestAction(pet::PetAction::ClickReact, 0.04);
     petCompanion_->Tick(BuildPetFrameInput(runtimePt, primary, petDragging_, dt));
     UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::ClickReact), 0.95f);
+}
+
+void AppController::DispatchPetHoverStart(const ScreenPoint& pt) {
+    if (!config_.mouseCompanion.enabled || !petCompanion_) {
+        return;
+    }
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    petLastDispatchPoint_ = pt;
+    petHasLastDispatchPoint_ = true;
+    const uint64_t nowTickMs = CurrentTickMs();
+    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
+    petCompanion_->RequestAction(pet::PetAction::HoverReact, 0.10);
+    petCompanion_->Tick(BuildPetFrameInput(runtimePt, false, false, dt));
+    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::HoverReact), 0.58f);
+}
+
+void AppController::DispatchPetHoverEnd(const ScreenPoint& pt) {
+    if (!config_.mouseCompanion.enabled || !petCompanion_) {
+        return;
+    }
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    petLastDispatchPoint_ = pt;
+    petHasLastDispatchPoint_ = true;
+    const uint64_t nowTickMs = CurrentTickMs();
+    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
+    petCompanion_->RequestAction(pet::PetAction::Follow, 0.08);
+    petCompanion_->Tick(BuildPetFrameInput(runtimePt, holdButtonDown_, petDragging_, dt));
+    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::Follow), 0.60f);
 }
 
 void AppController::DispatchPetButtonDown(const ScreenPoint& pt, int button) {
@@ -552,6 +614,41 @@ void AppController::DispatchPetButtonDown(const ScreenPoint& pt, int button) {
         runtimePt,
         petDragging_ ? static_cast<int>(pet::PetAction::Drag) : static_cast<int>(pet::PetAction::Follow),
         petDragging_ ? 0.8f : 0.6f);
+}
+
+void AppController::DispatchPetHoldStart(const ScreenPoint& pt, int button, uint32_t holdMs) {
+    if (!config_.mouseCompanion.enabled || !petCompanion_) {
+        return;
+    }
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    petLastDispatchPoint_ = pt;
+    petHasLastDispatchPoint_ = true;
+    const bool primary = (button == static_cast<int>(MouseButton::Left));
+    const uint64_t nowTickMs = CurrentTickMs();
+    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
+    petCompanion_->RequestAction(pet::PetAction::HoldReact, 0.08);
+    petCompanion_->Tick(BuildPetFrameInput(runtimePt, primary, petDragging_, dt));
+    const float holdPhase = std::clamp(static_cast<float>(holdMs) / 900.0f, 0.0f, 1.0f);
+    const float intensity = 0.62f + holdPhase * 0.28f;
+    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::HoldReact), intensity);
+}
+
+void AppController::DispatchPetHoldUpdate(const ScreenPoint& pt, uint32_t holdMs) {
+    if (!config_.mouseCompanion.enabled || !petCompanion_) {
+        return;
+    }
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    petLastDispatchPoint_ = pt;
+    petHasLastDispatchPoint_ = true;
+    const uint64_t nowTickMs = CurrentTickMs();
+    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
+    petCompanion_->RequestAction(pet::PetAction::HoldReact, 0.06);
+    petCompanion_->Tick(BuildPetFrameInput(runtimePt, true, petDragging_, dt));
+    const float holdPhase = std::clamp(static_cast<float>(holdMs) / 1200.0f, 0.0f, 1.0f);
+    const float intensity = 0.66f + holdPhase * 0.26f;
+    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::HoldReact), intensity);
 }
 
 void AppController::DispatchPetButtonUp(const ScreenPoint& pt, int button) {
@@ -584,6 +681,21 @@ void AppController::DispatchPetButtonUp(const ScreenPoint& pt, int button) {
         runtimePt,
         releaseHoldActive ? static_cast<int>(pet::PetAction::Drag) : static_cast<int>(pet::PetAction::Follow),
         releaseHoldActive ? 0.72f : 0.6f);
+}
+
+void AppController::DispatchPetHoldEnd(const ScreenPoint& pt) {
+    if (!config_.mouseCompanion.enabled || !petCompanion_) {
+        return;
+    }
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    petLastDispatchPoint_ = pt;
+    petHasLastDispatchPoint_ = true;
+    const uint64_t nowTickMs = CurrentTickMs();
+    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
+    petCompanion_->RequestAction(pet::PetAction::Follow, 0.09);
+    petCompanion_->Tick(BuildPetFrameInput(runtimePt, false, petDragging_, dt));
+    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::Follow), 0.60f);
 }
 
 ScreenPoint AppController::ResolvePetRuntimeCursorPoint(
