@@ -22,6 +22,7 @@
 #include "MouseFx/Core/Overlay/IInputIndicatorOverlay.h"
 #include "MouseFx/Core/Control/InputIndicatorWasmDispatchFeature.h"
 #include "MouseFx/Core/Control/MouseCompanionPluginHostPhase0.h"
+#include "MouseFx/Core/Control/MouseCompanionPluginHostV1.h"
 #include "MouseFx/Core/Automation/InputAutomationEngine.h"
 #include "MouseFx/Core/Automation/ShortcutCaptureSession.h"
 #include "MouseFx/Interfaces/IMouseEffect.h"
@@ -362,8 +363,12 @@ private:
     void UpdatePetPointerMotion(const ScreenPoint& pt, uint64_t nowTickMs);
     void DecayPetPointerMotion(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig);
     void ResolvePetContinuousAction(const MouseCompanionConfig& activeConfig, int* outActionCode, float* outActionIntensity) const;
+    MouseCompanionPetRuntimeConfig BuildMouseCompanionPluginRuntimeConfig(const MouseCompanionConfig& cfg) const;
     void SyncMouseCompanionPluginPhase0Status();
+    void ResetMouseCompanionPluginHosts(const MouseCompanionConfig& cfg, uint64_t nowTickMs);
+    void OnMouseCompanionPluginConfigChanged(const MouseCompanionConfig& cfg, uint64_t nowTickMs);
     void RecordMouseCompanionPluginPhase0Input(const char* eventName);
+    void RecordMouseCompanionPluginInput(const char* eventName, const MouseCompanionPetInputEvent& event);
     void EnterInputCaptureDegradedMode(uint32_t error);
     void UpdateVmSuppressionState();
     void ApplyVmSuppression(bool suppressed);
@@ -493,6 +498,7 @@ private:
     bool runtimeDiagnosticsEnabled_ = false;
     mutable ShortcutCaptureSession shortcutCaptureSession_{};
     MouseCompanionPluginHostPhase0 petPluginHostPhase0_{};
+    MouseCompanionPluginHostV1 petPluginHostV1_{};
     static constexpr size_t kWasmEffectsHostCount = 5;
     std::array<std::unique_ptr<wasm::WasmEffectHost>, kWasmEffectsHostCount> wasmEffectHosts_{};
     std::unique_ptr<wasm::WasmEffectHost> wasmIndicatorHost_{};

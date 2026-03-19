@@ -636,6 +636,45 @@ bool AppController::QueryCursorScreenPoint(ScreenPoint* outPt) const {
     return cursorPositionService_->TryGetCursorScreenPoint(outPt);
 }
 
+MouseCompanionPetRuntimeConfig AppController::BuildMouseCompanionPluginRuntimeConfig(
+    const MouseCompanionConfig& cfg) const {
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(cfg);
+    MouseCompanionPetRuntimeConfig out{};
+    out.enabled = cfg.enabled;
+    out.useTestProfile = cfg.useTestProfile;
+    out.facePointerEnabled = cfg.facePointerEnabled;
+    out.sizePx = cfg.sizePx;
+    out.offsetX = cfg.offsetX;
+    out.offsetY = cfg.offsetY;
+    out.pressLiftPx = activeConfig.pressLiftPx;
+    out.smoothingPercent = activeConfig.smoothingPercent;
+    out.followThresholdPx = activeConfig.followThresholdPx;
+    out.releaseHoldMs = activeConfig.releaseHoldMs;
+    out.clickStreakBreakMs = activeConfig.clickStreakBreakMs;
+    out.headTintPerClick = activeConfig.headTintPerClick;
+    out.headTintMax = activeConfig.headTintMax;
+    out.headTintDecayPerSecond = activeConfig.headTintDecayPerSecond;
+    out.positionMode = cfg.positionMode;
+    out.edgeClampMode = cfg.edgeClampMode;
+    return out;
+}
+
+void AppController::ResetMouseCompanionPluginHosts(
+    const MouseCompanionConfig& cfg,
+    uint64_t nowTickMs) {
+    petPluginHostPhase0_.Reset(cfg.enabled, nowTickMs);
+    petPluginHostV1_.Reset(BuildMouseCompanionPluginRuntimeConfig(cfg), nowTickMs);
+    SyncMouseCompanionPluginPhase0Status();
+}
+
+void AppController::OnMouseCompanionPluginConfigChanged(
+    const MouseCompanionConfig& cfg,
+    uint64_t nowTickMs) {
+    petPluginHostPhase0_.OnConfigChanged(cfg.enabled, nowTickMs);
+    petPluginHostV1_.OnConfigChanged(BuildMouseCompanionPluginRuntimeConfig(cfg), nowTickMs);
+    SyncMouseCompanionPluginPhase0Status();
+}
+
 void AppController::SyncMouseCompanionPluginPhase0Status() {
     const MouseCompanionPluginPhase0Snapshot snapshot = petPluginHostPhase0_.Snapshot();
     std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
@@ -654,6 +693,13 @@ void AppController::SyncMouseCompanionPluginPhase0Status() {
 void AppController::RecordMouseCompanionPluginPhase0Input(const char* eventName) {
     petPluginHostPhase0_.OnInputEvent(eventName, CurrentTickMs());
     SyncMouseCompanionPluginPhase0Status();
+}
+
+void AppController::RecordMouseCompanionPluginInput(
+    const char* eventName,
+    const MouseCompanionPetInputEvent& event) {
+    RecordMouseCompanionPluginPhase0Input(eventName);
+    petPluginHostV1_.OnInput(event);
 }
 
 void AppController::DispatchPetMove(const ScreenPoint& pt) {
@@ -680,7 +726,15 @@ void AppController::DispatchPetMove(const ScreenPoint& pt) {
     }
 
     UpdatePetVisualState(runtimePt, actionCode, intensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("move");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::Move;
+    event.actionHint = (actionCode == kPetActionFollow || actionCode == kPetActionDrag)
+        ? MouseCompanionPetActionHint::Follow
+        : MouseCompanionPetActionHint::Idle;
+    event.pt = runtimePt;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = intensity;
+    RecordMouseCompanionPluginInput("move", event);
 }
 
 void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
@@ -690,7 +744,15 @@ void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
     UpdatePetClickStreakDecay(nowTickMs, activeConfig);
     const float intensity = ClampUnit(static_cast<float>(std::abs(delta)) / 120.0f);
     UpdatePetVisualState(pt, kPetActionScrollReact, intensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("scroll");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::Scroll;
+    event.actionHint = MouseCompanionPetActionHint::Scroll;
+    event.pt = pt;
+    event.delta = delta;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = intensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("scroll", event);
 }
 
 void AppController::DispatchPetClick(const ClickEvent& ev) {
@@ -720,7 +782,15 @@ void AppController::DispatchPetClick(const ClickEvent& ev) {
         UpdatePetVisualState(ev.pt, fallbackAction, fallbackIntensity, petClickStreak_.tintAmount);
     }
     petPrimaryPress_.releaseReady = false;
-    RecordMouseCompanionPluginPhase0Input(eligible ? "click_accept" : "click_reject");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::Click;
+    event.actionHint = eligible ? MouseCompanionPetActionHint::Click : MouseCompanionPetActionHint::Idle;
+    event.pt = ev.pt;
+    event.button = static_cast<int>(ev.button);
+    event.tickMs = nowTickMs;
+    event.actionIntensity = eligible ? petClickStreak_.tintAmount : 0.0f;
+    event.accepted = eligible;
+    RecordMouseCompanionPluginInput(eligible ? "click_accept" : "click_reject", event);
 }
 
 void AppController::DispatchPetHoverStart(const ScreenPoint& pt) {
@@ -730,7 +800,14 @@ void AppController::DispatchPetHoverStart(const ScreenPoint& pt) {
     float actionIntensity = 0.0f;
     ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("hover_start");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::HoverStart;
+    event.actionHint = MouseCompanionPetActionHint::Idle;
+    event.pt = pt;
+    event.tickMs = CurrentTickMs();
+    event.actionIntensity = actionIntensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("hover_start", event);
 }
 
 void AppController::DispatchPetHoverEnd(const ScreenPoint& pt) {
@@ -740,7 +817,14 @@ void AppController::DispatchPetHoverEnd(const ScreenPoint& pt) {
     float actionIntensity = 0.0f;
     ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("hover_end");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::HoverEnd;
+    event.actionHint = MouseCompanionPetActionHint::Idle;
+    event.pt = pt;
+    event.tickMs = CurrentTickMs();
+    event.actionIntensity = actionIntensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("hover_end", event);
 }
 
 void AppController::DispatchPetButtonDown(const ScreenPoint& pt, int button) {
@@ -759,7 +843,15 @@ void AppController::DispatchPetButtonDown(const ScreenPoint& pt, int button) {
         ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
     }
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("button_down");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::ButtonDown;
+    event.actionHint = MouseCompanionPetActionHint::Idle;
+    event.pt = pt;
+    event.button = button;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = actionIntensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("button_down", event);
 }
 
 void AppController::DispatchPetHoldStart(const ScreenPoint& pt, int button, uint32_t holdMs) {
@@ -767,18 +859,37 @@ void AppController::DispatchPetHoldStart(const ScreenPoint& pt, int button, uint
         petPrimaryPress_.holdTriggered = true;
     }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const uint64_t nowTickMs = CurrentTickMs();
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
     const float intensity = ClampUnit(static_cast<float>(holdMs) / 300.0f);
     UpdatePetVisualState(pt, kPetActionHoldReact, intensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("hold_start");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::HoldStart;
+    event.actionHint = MouseCompanionPetActionHint::Hold;
+    event.pt = pt;
+    event.button = button;
+    event.holdMs = holdMs;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = intensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("hold_start", event);
 }
 
 void AppController::DispatchPetHoldUpdate(const ScreenPoint& pt, uint32_t holdMs) {
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const uint64_t nowTickMs = CurrentTickMs();
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
     const float intensity = ClampUnit(static_cast<float>(holdMs) / 600.0f);
     UpdatePetVisualState(pt, kPetActionHoldReact, intensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("hold_update");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::HoldUpdate;
+    event.actionHint = MouseCompanionPetActionHint::Hold;
+    event.pt = pt;
+    event.holdMs = holdMs;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = intensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("hold_update", event);
 }
 
 void AppController::DispatchPetButtonUp(const ScreenPoint& pt, int button) {
@@ -799,17 +910,33 @@ void AppController::DispatchPetButtonUp(const ScreenPoint& pt, int button) {
     float actionIntensity = 0.0f;
     ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("button_up");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::ButtonUp;
+    event.actionHint = MouseCompanionPetActionHint::Idle;
+    event.pt = pt;
+    event.button = button;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = actionIntensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("button_up", event);
 }
 
 void AppController::DispatchPetHoldEnd(const ScreenPoint& pt) {
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const uint64_t nowTickMs = CurrentTickMs();
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
     int actionCode = kPetActionIdle;
     float actionIntensity = 0.0f;
     ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
-    RecordMouseCompanionPluginPhase0Input("hold_end");
+    MouseCompanionPetInputEvent event{};
+    event.kind = MouseCompanionPetInputKind::HoldEnd;
+    event.actionHint = MouseCompanionPetActionHint::Idle;
+    event.pt = pt;
+    event.tickMs = nowTickMs;
+    event.actionIntensity = actionIntensity;
+    event.accepted = true;
+    RecordMouseCompanionPluginInput("hold_end", event);
 }
 
 void AppController::TickPetVisualFrame() {
@@ -875,7 +1002,8 @@ ScreenPoint AppController::ResolvePetRuntimeCursorPoint(
 }
 
 void AppController::ResetPetDispatchRuntimeState() {
-    petPluginHostPhase0_.Reset(config_.mouseCompanion.enabled, CurrentTickMs());
+    const uint64_t nowTickMs = CurrentTickMs();
+    ResetMouseCompanionPluginHosts(config_.mouseCompanion, nowTickMs);
     petDragging_ = false;
     petLastTickMs_ = 0;
     petReleaseHoldUntilTickMs_ = 0;
@@ -896,12 +1024,11 @@ void AppController::ResetPetDispatchRuntimeState() {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.lastActionCode = 0;
         mouseCompanionRuntimeStatus_.lastActionIntensity = 0.0f;
-        mouseCompanionRuntimeStatus_.lastActionTickMs = CurrentTickMs();
+        mouseCompanionRuntimeStatus_.lastActionTickMs = nowTickMs;
         mouseCompanionRuntimeStatus_.lastActionName = "idle";
         mouseCompanionRuntimeStatus_.clickStreak = 0;
         mouseCompanionRuntimeStatus_.clickStreakTintAmount = 0.0f;
     }
-    SyncMouseCompanionPluginPhase0Status();
 }
 
 void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity, float headTintAmount) {
@@ -916,6 +1043,10 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
         mouseCompanionRuntimeStatus_.lastActionName = ResolvePetActionName(actionCode);
         mouseCompanionRuntimeStatus_.clickStreakTintAmount = clampedTint;
     }
+
+    petPluginHostV1_.Tick(nowTickMs, 0.0f);
+    MouseCompanionPetPoseFrame pluginPoseFrame{};
+    petPluginHostV1_.SamplePose(&pluginPoseFrame);
 
 #if MFX_PLATFORM_MACOS
     if (petVisualHostHandle_ && config_.mouseCompanion.enabled) {

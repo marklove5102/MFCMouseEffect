@@ -149,6 +149,11 @@
   - `MouseFx/Core/Control/MouseCompanionPluginHostPhase0.{h,cpp}` 已接入 `AppController`，
   - `DispatchPet*` 事件已接入 Phase0 插件宿主计数与事件轨迹，
   - 运行时诊断新增插件化字段：`plugin_host_ready`、`active_plugin_id`、`compatibility_status`、`plugin_event_count`。
+- 已补充 `Phase 0.5` 契约收敛骨架：
+  - 新增 `MouseCompanionPluginV1Types.h` 与 `MouseCompanionPluginHostV1.h`，
+  - `PetInputEvent / PetRuntimeConfig / PetPoseFrame` 已有强类型定义，
+  - `Initialize / OnInput / Tick / SamplePose / OnConfigChanged / Shutdown` 已有空宿主骨架，
+  - 当前仅并行接收 `DispatchPet*` 与 frame tick，不改变现有 click/idle 可见行为，后续 `hold -> scroll` 直接在这层接口上接入。
 - 已落地 `Phase 1` 第一批 click-first 状态机语义（后端）：
   - click 门槛：`press<=220ms && travel<=10px`，并接入 `scroll` 后短窗口抑制，
   - `position_mode=fixed_bottom_left` 下 move 路径保持 `idle`（不进入 follow），

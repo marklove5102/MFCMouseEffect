@@ -154,7 +154,7 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
         activeCompanionCfg.headTintMax = activeCompanionCfg.testHeadTintMax;
         activeCompanionCfg.headTintDecayPerSecond = activeCompanionCfg.testHeadTintDecayPerSecond;
     }
-    petPluginHostPhase0_.OnConfigChanged(normalized.enabled, CurrentTickMs());
+    OnMouseCompanionPluginConfigChanged(normalized, CurrentTickMs());
     {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.configEnabled = normalized.enabled;
@@ -206,7 +206,6 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
         mouseCompanionRuntimeStatus_.actionCoverageMissingBoneNames.clear();
         mouseCompanionRuntimeStatus_.actionCoverageActions.clear();
     }
-    SyncMouseCompanionPluginPhase0Status();
     PersistConfig();
     if (normalized.enabled) {
         TryLoadDefaultPetModel();

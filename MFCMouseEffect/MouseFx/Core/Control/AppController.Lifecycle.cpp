@@ -212,7 +212,7 @@ bool AppController::Start() {
     // Load config from the best available directory (AppData preferred)
     configDir_ = ResolveConfigDirectory();
     config_ = EffectConfig::Load(configDir_);
-    petPluginHostPhase0_.Reset(config_.mouseCompanion.enabled, CurrentTickMs());
+    ResetMouseCompanionPluginHosts(config_.mouseCompanion, CurrentTickMs());
     {
         const MouseCompanionConfig companion = config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
@@ -224,7 +224,6 @@ bool AppController::Start() {
         mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = companion.appearanceProfilePath;
         mouseCompanionRuntimeStatus_.runtimePresent = false;
     }
-    SyncMouseCompanionPluginPhase0Status();
     SyncLaunchAtStartupRegistration();
     ReloadThemeCatalogFromRootPath(config_.themeCatalogRootPath);
     const bool themeNormalized = NormalizeConfiguredThemeName();
@@ -303,7 +302,7 @@ void AppController::Stop() {
     inputCaptureActive_.store(false, std::memory_order_release);
     inputCaptureError_.store(0, std::memory_order_release);
     effectsSuspendedByInputCapture_.store(false, std::memory_order_release);
-    petPluginHostPhase0_.Reset(config_.mouseCompanion.enabled, CurrentTickMs());
+    ResetMouseCompanionPluginHosts(config_.mouseCompanion, CurrentTickMs());
     if (dispatchMessageHost_ && dispatchMessageHost_->IsCreated()) {
         dispatchMessageHost_->KillTimer(kHoverTimerId);
         dispatchMessageHost_->KillTimer(kHoldTimerId);
@@ -324,7 +323,6 @@ void AppController::Stop() {
         mouseCompanionRuntimeStatus_.visualHostActive = false;
         mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
     }
-    SyncMouseCompanionPluginPhase0Status();
     for (auto& effect : effects_) {
         if (effect) {
             effect->Shutdown();

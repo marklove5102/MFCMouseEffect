@@ -84,12 +84,11 @@ AppController::AppController()
     if (!inputIndicatorOverlay_) {
         inputIndicatorOverlay_ = std::make_unique<NullInputIndicatorOverlay>();
     }
-    petPluginHostPhase0_.Reset(false, CurrentTickMs());
+    ResetMouseCompanionPluginHosts(config_.mouseCompanion, CurrentTickMs());
     {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.runtimePresent = false;
     }
-    SyncMouseCompanionPluginPhase0Status();
 }
 
 AppController::~AppController() {
