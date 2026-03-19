@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-19T10:04:41.469Z",
+  "generated_at": "2026-03-19T10:09:05.658Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -84,13 +84,13 @@
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
       "line_count": 155,
-      "size_bytes": 17221,
-      "estimated_tokens": 4306,
+      "size_bytes": 17280,
+      "estimated_tokens": 4320,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "2ef99e257ac59dd6ac359a6241d09fc46158268e",
-      "updated_at": "2026-03-19T10:03:54.321Z"
+      "hash_sha1": "46da043dd54b44484e4527910fd5622c1a8501b1",
+      "updated_at": "2026-03-19T10:08:37.426Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",

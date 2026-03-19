@@ -876,7 +876,10 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         let semanticBinding = isSemanticPoseBindingKey(key)
         if let exact = boneNodesByName[key], !exact.isEmpty {
             let sortedExact = sortPoseBindingMatches(exact, key: key, containsPatterns: [key])
-            return semanticBinding ? Array(sortedExact.prefix(1)) : sortedExact
+            if semanticBinding {
+                return resolvedSemanticPoseBindingNodes(key: key, root: sortedExact[0])
+            }
+            return sortedExact
         }
 
         let containsPatterns: [String]
@@ -915,7 +918,52 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             return []
         }
         let sortedMatches = sortPoseBindingMatches(matches, key: key, containsPatterns: containsPatterns)
-        return semanticBinding ? Array(sortedMatches.prefix(1)) : sortedMatches
+        if semanticBinding {
+            return resolvedSemanticPoseBindingNodes(key: key, root: sortedMatches[0])
+        }
+        return sortedMatches
+    }
+
+    private func resolvedSemanticPoseBindingNodes(key: String, root: SCNNode) -> [SCNNode] {
+        switch key {
+        case "left_ear", "right_ear":
+            return collectPoseBindingChain(from: root, maxDepth: 3)
+        default:
+            return [root]
+        }
+    }
+
+    private func collectPoseBindingChain(from root: SCNNode, maxDepth: Int) -> [SCNNode] {
+        let depth = max(1, maxDepth)
+        var chain: [SCNNode] = [root]
+        var seen: Set<ObjectIdentifier> = [ObjectIdentifier(root)]
+        var cursor = root
+        for _ in 1..<depth {
+            let candidates = cursor.childNodes.filter { child in
+                let childId = ObjectIdentifier(child)
+                guard !seen.contains(childId) else {
+                    return false
+                }
+                return Self.normalizedBoneName(child.name) != nil &&
+                    restLocalTransformByNode[childId] != nil
+            }
+            guard let next = candidates.sorted(by: { lhs, rhs in
+                let lhsY = lhs.worldPosition.y
+                let rhsY = rhs.worldPosition.y
+                if lhsY != rhsY {
+                    return lhsY > rhsY
+                }
+                let lhsName = Self.normalizedBoneName(lhs.name) ?? ""
+                let rhsName = Self.normalizedBoneName(rhs.name) ?? ""
+                return lhsName < rhsName
+            }).first else {
+                break
+            }
+            chain.append(next)
+            seen.insert(ObjectIdentifier(next))
+            cursor = next
+        }
+        return chain
     }
 
     private func isSemanticPoseBindingKey(_ key: String) -> Bool {
