@@ -104,6 +104,7 @@ private final class MfxMouseCompanionPanelView: NSView {
     private var clickPulse: CGFloat = 0.0
     private var holdPulse: CGFloat = 0.0
     private var scrollPulse: CGFloat = 0.0
+    private var scrollAmplitude: CGFloat = 0.35
     private var poseBindingConfigured = false
     private var poseEarSpread: CGFloat = 0.0
     private var poseEarLift: CGFloat = 0.0
@@ -148,7 +149,8 @@ private final class MfxMouseCompanionPanelView: NSView {
             holdPulse = max(holdPulse, max(0.35, resolvedIntensity))
         }
         if resolvedAction == .scrollReact {
-            scrollPulse = max(scrollPulse, max(0.30, resolvedIntensity))
+            scrollPulse = 1.0
+            scrollAmplitude = max(0.35, resolvedIntensity)
         }
 
         self.actionCode = resolvedAction
@@ -255,7 +257,7 @@ private final class MfxMouseCompanionPanelView: NSView {
         bobTime += dt
         clickPulse = max(0.0, clickPulse - dt * 3.6)
         holdPulse = max(0.0, holdPulse - dt * 1.2)
-        scrollPulse = max(0.0, scrollPulse - dt * 1.8)
+        scrollPulse = max(0.0, scrollPulse - dt / 0.72)
 
         needsDisplay = true
     }
@@ -272,7 +274,10 @@ private final class MfxMouseCompanionPanelView: NSView {
         let clickT = mfxClamp(1.0 - clickPulse, min: 0.0, max: 1.0)
         let clickProfileBase = mfxImpulseProfile(clickT, inRatio: 0.42, holdRatio: 0.16)
         let holdProfileBase = mfxClamp(max(holdPulse, (actionCode == .holdReact ? actionIntensity : 0.0)), min: 0.0, max: 1.0)
-        let scrollProfileBase = mfxClamp(scrollPulse, min: 0.0, max: 1.0)
+        let scrollT = mfxClamp(1.0 - scrollPulse, min: 0.0, max: 1.0)
+        let scrollAmpNorm = mfxClamp((scrollAmplitude - 0.35) / 0.65, min: 0.0, max: 1.0)
+        let scrollProfileBase = mfxImpulseProfile(scrollT, inRatio: 0.42, holdRatio: 0.16) * mfxClamp(0.82 + scrollAmpNorm * 0.18, min: 0.0, max: 1.0)
+        let scrollFlap = CGFloat(sin(Double(scrollT) * Double.pi * 2.0 * 1.8)) * scrollProfileBase * (0.2 + scrollAmpNorm * 0.1)
         let idleProfile = (actionCode == .idle) ? actionIntensity : 0.0
         let clickProfile = max(clickProfileBase, poseHandSpread, poseLegSpread, poseEarSpread * 0.9)
         let holdProfile = max(holdProfileBase, poseHandLift * 0.7)
@@ -294,9 +299,9 @@ private final class MfxMouseCompanionPanelView: NSView {
         transform.concat()
 
         drawShadow(side: side, clickProfile: clickProfile)
-        drawLimbs(side: side, clickProfile: clickProfile, holdProfile: holdProfile, scrollProfile: scrollProfile, idleProfile: idleProfile)
+        drawLimbs(side: side, clickProfile: clickProfile, holdProfile: holdProfile, scrollProfile: scrollProfile, scrollFlap: scrollFlap, idleProfile: idleProfile)
         drawBody(side: side, clickProfile: clickProfile, holdProfile: holdProfile)
-        drawHead(side: side, clickProfile: clickProfile, holdProfile: holdProfile, scrollProfile: scrollProfile, idleProfile: idleProfile)
+        drawHead(side: side, clickProfile: clickProfile, holdProfile: holdProfile, scrollProfile: scrollProfile, scrollFlap: scrollFlap, idleProfile: idleProfile)
         drawFace(side: side, clickProfile: clickProfile, scrollProfile: scrollProfile, holdProfile: holdProfile)
         drawActionAura(side: side, clickProfile: clickProfile, holdProfile: holdProfile, scrollProfile: scrollProfile)
 
@@ -310,20 +315,20 @@ private final class MfxMouseCompanionPanelView: NSView {
         NSBezierPath(ovalIn: shadowRect).fill()
     }
 
-    private func drawLimbs(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, idleProfile: CGFloat) {
+    private func drawLimbs(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, scrollFlap: CGFloat, idleProfile: CGFloat) {
         let idleHandWave = sin(Double(bobTime * 3.1 + 0.8)) * Double(side * idleProfile * 0.03)
         let handSpread = side * (0.17 + clickProfile * 0.03 + scrollProfile * 0.02 + holdProfile * 0.02 + poseHandSpread * 0.03)
         let handBaseY = side * (0.01 - holdProfile * 0.01)
-        let handLift = side * (clickProfile * 0.10 + scrollProfile * 0.06 + holdProfile * 0.02 + poseHandLift * 0.05) + CGFloat(idleHandWave)
-        let handTwist = 34.0 * clickProfile + 18.0 * scrollProfile + 26.0 * holdProfile + 24.0 * poseHandSpread + idleProfile * 6.0
+        let handLift = side * (clickProfile * 0.10 + scrollProfile * 0.10 + holdProfile * 0.02 + poseHandLift * 0.05 + abs(scrollFlap) * 0.04) + CGFloat(idleHandWave)
+        let handTwist = 34.0 * clickProfile + 26.0 * scrollProfile + scrollFlap * 18.0 + 26.0 * holdProfile + 24.0 * poseHandSpread + idleProfile * 6.0
         let handRect = NSRect(x: -side * 0.06, y: -side * 0.05, width: side * 0.12, height: side * 0.14)
 
         drawLimbOval(centerX: -handSpread, centerY: handBaseY + handLift, degrees: handTwist, rect: handRect)
         drawLimbOval(centerX: handSpread, centerY: handBaseY + handLift, degrees: -handTwist, rect: handRect)
 
-        let legSpread = side * (0.10 + clickProfile * 0.03 + scrollProfile * 0.02 + poseLegSpread * 0.03)
+        let legSpread = side * (0.10 + clickProfile * 0.03 + scrollProfile * 0.04 + poseLegSpread * 0.03)
         let legY = -side * (0.20 + holdProfile * 0.01)
-        let legKick = 16.0 * clickProfile + 8.0 * scrollProfile + 16.0 * holdProfile + 14.0 * poseLegKick
+        let legKick = 16.0 * clickProfile + 12.0 * scrollProfile + abs(scrollFlap) * 6.0 + 16.0 * holdProfile + 14.0 * poseLegKick
         let legRect = NSRect(x: -side * 0.055, y: -side * 0.025, width: side * 0.11, height: side * 0.09)
         drawLimbOval(centerX: -legSpread, centerY: legY, degrees: -legKick, rect: legRect)
         drawLimbOval(centerX: legSpread, centerY: legY, degrees: legKick, rect: legRect)
@@ -364,10 +369,10 @@ private final class MfxMouseCompanionPanelView: NSView {
         bodyPath.stroke()
     }
 
-    private func drawHead(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, idleProfile: CGFloat) {
+    private func drawHead(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, scrollFlap: CGFloat, idleProfile: CGFloat) {
         let idleEarWave = CGFloat(sin(Double(bobTime * 3.4))) * side * idleProfile * 0.022
         let earLift = (clickProfile * 0.04 + scrollProfile * 0.03 - holdProfile * 0.04 + poseEarLift * 0.05) * side + idleEarWave
-        let earSpread = (clickProfile * 0.03 + scrollProfile * 0.05 + poseEarSpread * 0.06) * side + abs(idleEarWave) * 0.4
+        let earSpread = (clickProfile * 0.03 + scrollProfile * 0.06 + abs(scrollFlap) * 0.04 + poseEarSpread * 0.06) * side + abs(idleEarWave) * 0.4
         let leftEarRect = NSRect(x: -side * 0.17 - earSpread, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
         let rightEarRect = NSRect(x: side * 0.05 + earSpread, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
         let headWidth = side * (0.48 + holdProfile * 0.06)

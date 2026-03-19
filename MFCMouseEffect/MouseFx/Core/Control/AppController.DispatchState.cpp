@@ -129,6 +129,8 @@ constexpr double kPetPointerSpeedDecayTestPerSecond = 6.0;
 constexpr double kPetPointerSpeedZeroFloorPxPerSec = 0.5;
 constexpr float kPetHoverIdleIntensity = 0.42f;
 constexpr float kPetHoverIdleIntensityTest = 0.58f;
+constexpr float kPetScrollAmplitudeMin = 0.35f;
+constexpr float kPetScrollAmplitudeMax = 2.4f;
 
 double ResolvePetFollowSpeedThresholdPxPerSec(bool useTestProfile) {
     return useTestProfile ? kPetFollowSpeedThresholdTestPxPerSec : kPetFollowSpeedThresholdPxPerSec;
@@ -144,6 +146,22 @@ float ResolvePetHoverIdleIntensity(bool useTestProfile) {
 
 float ClampUnit(float value) {
     return std::clamp(value, 0.0f, 1.0f);
+}
+
+float ImpulseProfile(float t, float inRatio, float holdRatio) {
+    const float clampedT = ClampUnit(t);
+    const float inPart = std::clamp(inRatio, 0.05f, 0.9f);
+    const float holdPart = std::clamp(holdRatio, 0.0f, 0.7f);
+    const float outStart = std::clamp(inPart + holdPart, inPart, 0.98f);
+    if (clampedT < inPart) {
+        const float p = clampedT / inPart;
+        return 1.0f - std::pow(1.0f - p, 3.0f);
+    }
+    if (clampedT < outStart) {
+        return 1.0f;
+    }
+    const float p = (clampedT - outStart) / std::max(0.001f, 1.0f - outStart);
+    return 1.0f - p * p * (3.0f - 2.0f * p);
 }
 
 void WriteQuaternionFromEuler(float rx, float ry, float rz, float* out) {
@@ -814,6 +832,11 @@ void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
     petLastScrollTickMs_ = nowTickMs;
     petReleaseHoldUntilTickMs_ = 0;
     UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+    petVisualPoseRuntime_.scrollPulse = 1.0f;
+    petVisualPoseRuntime_.scrollAmplitude = std::clamp(
+        static_cast<float>(std::abs(delta)) / 120.0f,
+        kPetScrollAmplitudeMin,
+        kPetScrollAmplitudeMax);
     const float intensity = ClampUnit(static_cast<float>(std::abs(delta)) / 120.0f);
     UpdatePetVisualState(pt, kPetActionScrollReact, intensity, petClickStreak_.tintAmount);
     MouseCompanionPetInputEvent event{};
@@ -1171,8 +1194,10 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
                 const float dt = static_cast<float>(std::clamp<uint64_t>(deltaMs, 0, 120)) / 1000.0f;
                 petVisualPoseRuntime_.holdPulse =
                     std::max(0.0f, petVisualPoseRuntime_.holdPulse - dt * visualProfile.holdDecayPerSecond);
+                const float scrollDurationSeconds = static_cast<float>(
+                    activeConfig.useTestProfile ? kPetScrollImpulseDurationTestMs : kPetScrollImpulseDurationMs) / 1000.0f;
                 petVisualPoseRuntime_.scrollPulse =
-                    std::max(0.0f, petVisualPoseRuntime_.scrollPulse - dt * visualProfile.scrollDecayPerSecond);
+                    std::max(0.0f, petVisualPoseRuntime_.scrollPulse - dt / std::max(0.001f, scrollDurationSeconds));
             }
 
             if (actionCode == kPetActionHoldReact) {
@@ -1180,28 +1205,39 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
                     std::max(petVisualPoseRuntime_.holdPulse, std::max(visualProfile.holdPulseFloor, clampedIntensity));
             }
             if (actionCode == kPetActionScrollReact) {
-                petVisualPoseRuntime_.scrollPulse =
-                    std::max(petVisualPoseRuntime_.scrollPulse, std::max(visualProfile.scrollPulseFloor, clampedIntensity));
+                petVisualPoseRuntime_.scrollPulse = 1.0f;
+                petVisualPoseRuntime_.scrollAmplitude = std::max(
+                    petVisualPoseRuntime_.scrollAmplitude,
+                    std::clamp(clampedIntensity, kPetScrollAmplitudeMin, 1.0f));
             }
 
             const float holdProfile = std::max(
                 ClampUnit(petVisualPoseRuntime_.holdPulse),
                 (actionCode == kPetActionHoldReact) ? clampedIntensity : 0.0f);
-            const float scrollProfile = ClampUnit(petVisualPoseRuntime_.scrollPulse);
+            const float scrollT = ClampUnit(1.0f - petVisualPoseRuntime_.scrollPulse);
+            const float scrollAmpNorm = ClampUnit(
+                (petVisualPoseRuntime_.scrollAmplitude - kPetScrollAmplitudeMin) /
+                (kPetScrollAmplitudeMax - kPetScrollAmplitudeMin));
+            const float scrollProfile = ClampUnit(
+                ImpulseProfile(scrollT, 0.42f, 0.16f) * (0.82f + scrollAmpNorm * 0.18f));
+            const float scrollFlap = std::sin(scrollT * 6.2831853f * 1.8f) *
+                                     scrollProfile *
+                                     (0.2f + scrollAmpNorm * 0.1f);
             const float holdTerm = ClampUnit(holdProfile * visualProfile.holdPoseGain);
             const float scrollTerm = ClampUnit(scrollProfile * visualProfile.scrollPoseGain);
             const float earSpread = ClampUnit(
-                scrollTerm * 0.70f);
+                scrollTerm * 0.76f + std::abs(scrollFlap) * 0.12f);
             const float earLift = ClampUnit(
                 scrollTerm * 0.42f);
             const float handLift = ClampUnit(
                 holdTerm * 0.14f +
-                scrollTerm * 0.30f);
+                scrollTerm * 0.68f +
+                std::abs(scrollFlap) * 0.10f);
             const float handSpread = ClampUnit(
                 holdTerm * 0.42f +
-                scrollTerm * 0.18f);
+                scrollTerm * 0.24f);
             const float legSpread = ClampUnit(
-                scrollTerm * 0.50f);
+                scrollTerm * 0.70f);
             const float legCurl = ClampUnit(
                 holdTerm * 0.96f +
                 scrollTerm * 0.40f);
@@ -1238,7 +1274,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             WriteQuaternionFromEuler(
                 -1.02f * holdTerm,
                 0.0f,
-                -(0.09f * holdTerm + 0.12f * scrollProfile + 0.42f * earSpread),
+                -(0.09f * holdTerm + 0.12f * scrollProfile + 0.18f * scrollFlap + 0.42f * earSpread),
                 q);
             rotations[0] = q[0];
             rotations[1] = q[1];
@@ -1247,7 +1283,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             WriteQuaternionFromEuler(
                 -1.02f * holdTerm,
                 0.0f,
-                (0.09f * holdTerm + 0.12f * scrollProfile + 0.42f * earSpread),
+                (0.09f * holdTerm + 0.12f * scrollProfile - 0.18f * scrollFlap + 0.42f * earSpread),
                 q);
             rotations[4] = q[0];
             rotations[5] = q[1];
@@ -1256,7 +1292,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             WriteQuaternionFromEuler(
                 -0.34f * holdTerm,
                 0.42f * holdTerm,
-                0.42f * holdTerm + 0.20f * scrollProfile + 0.40f * handSpread,
+                0.42f * holdTerm + 0.20f * scrollProfile + 0.26f * scrollFlap + 0.40f * handSpread,
                 q);
             rotations[8] = q[0];
             rotations[9] = q[1];
@@ -1265,7 +1301,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             WriteQuaternionFromEuler(
                 -0.34f * holdTerm,
                 -0.42f * holdTerm,
-                -(0.42f * holdTerm + 0.20f * scrollProfile + 0.40f * handSpread),
+                -(0.42f * holdTerm + 0.20f * scrollProfile - 0.26f * scrollFlap + 0.40f * handSpread),
                 q);
             rotations[12] = q[0];
             rotations[13] = q[1];

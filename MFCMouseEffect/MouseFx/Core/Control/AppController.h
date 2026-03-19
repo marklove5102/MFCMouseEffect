@@ -467,6 +467,8 @@ private:
     static constexpr double kPetClickMaxTravelPx = 10.0;
     static constexpr double kPetDragStartTravelPx = 1.0;
     static constexpr uint32_t kPetClickSuppressAfterScrollMs = 140;
+    static constexpr uint32_t kPetScrollImpulseDurationMs = 720;
+    static constexpr uint32_t kPetScrollImpulseDurationTestMs = 560;
     static constexpr uint32_t kPetVisualHoldEnterMs = 130;
     static constexpr uint32_t kPetVisualHoldEnterTestMs = 90;
     static constexpr double kPetVisualHoldStableSpeedThresholdPxPerSec = 24.0;
@@ -506,6 +508,7 @@ private:
     struct PetVisualPoseRuntimeState {
         float holdPulse = 0.0f;
         float scrollPulse = 0.0f;
+        float scrollAmplitude = 0.35f;
         uint64_t lastTickMs = 0;
     } petVisualPoseRuntime_{};
     bool runtimeDiagnosticsEnabled_ = false;
