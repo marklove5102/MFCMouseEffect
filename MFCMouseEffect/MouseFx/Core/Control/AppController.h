@@ -282,6 +282,7 @@ public:
     void DispatchPetHoldStart(const ScreenPoint& pt, int button, uint32_t holdMs);
     void DispatchPetHoldUpdate(const ScreenPoint& pt, uint32_t holdMs);
     void DispatchPetHoldEnd(const ScreenPoint& pt);
+    void TickPetVisualFrame();
     void KillDispatchTimer(uintptr_t timerId);
     std::string CurrentForegroundProcessBaseName();
     bool IsEffectsBlockedByAppBlacklist();

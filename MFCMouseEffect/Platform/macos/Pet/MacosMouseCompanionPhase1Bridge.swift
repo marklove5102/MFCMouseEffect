@@ -466,6 +466,9 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
     private let sceneView: SCNView
     private let sceneRootNode = SCNNode()
     private let sceneCameraNode = SCNNode()
+    private let targetPetSizePx: CGFloat
+    private var panelCanvasSize: CGSize
+    private let baseCameraPosition = SCNVector3(x: 0.0, y: 0.24, z: 3.2)
     private var positionMode: MfxMouseCompanionPositionMode = .fixedBottomLeft
     private var offsetX: CGFloat
     private var offsetY: CGFloat
@@ -479,6 +482,10 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
     private var clickActionClip: MfxActionClip?
     private var actionBoneRemapLower: [String: [String]] = [:]
     private var actionTrackNodeCache: [String: [SCNNode]] = [:]
+    private var headTintTargetNodes: [SCNNode] = []
+    private var headTintBaseMultiplyByMaterial: [ObjectIdentifier: NSColor] = [:]
+    private var appliedHeadTintAmount: CGFloat = -1.0
+    private let headTintColor = NSColor(calibratedRed: 1.0, green: 0.30, blue: 0.30, alpha: 1.0)
     private var modelBaseScale: CGFloat = 1.0
     private var modelBasePosition = SCNVector3Zero
     private let modelFacingYaw: CGFloat = .pi
@@ -488,6 +495,7 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
     private var clickOneShotActive = false
     private var clickOneShotElapsed: CGFloat = 0.0
     private var clickOneShotDuration: CGFloat = 0.30
+    private var pendingInitialPanelFit = false
     private var modelFrameTimer: Timer?
     private var currentActionCode: Int32 = MfxMouseCompanionActionCode.idle.rawValue
     private var currentActionIntensity: Float = 0.0
@@ -495,6 +503,8 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
 
     init(sizePx: Int, offsetX: Int, offsetY: Int) {
         let side = CGFloat(max(96, sizePx))
+        targetPetSizePx = side
+        panelCanvasSize = CGSize(width: side, height: side)
         panel = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: side, height: side),
             styleMask: .borderless,
@@ -511,6 +521,13 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         contentView = NSView(frame: NSRect(x: 0, y: 0, width: side, height: side))
         contentView.wantsLayer = true
         contentView.layer?.backgroundColor = NSColor.clear.cgColor
+        contentView.layer?.borderWidth = 2.0
+        contentView.layer?.borderColor = NSColor(
+            calibratedRed: 0.12,
+            green: 0.68,
+            blue: 1.0,
+            alpha: 0.92).cgColor
+        contentView.layer?.cornerRadius = 6.0
 
         companionView = MfxMouseCompanionPanelView(frame: NSRect(x: 0, y: 0, width: side, height: side))
         companionView.wantsLayer = true
@@ -533,8 +550,9 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         sceneCameraNode.camera?.zNear = 0.01
         sceneCameraNode.camera?.zFar = 1000.0
         sceneCameraNode.camera?.fieldOfView = 64.0
-        sceneCameraNode.position = SCNVector3(x: 0.0, y: 0.24, z: 3.2)
+        sceneCameraNode.position = baseCameraPosition
         scene.rootNode.addChildNode(sceneCameraNode)
+        sceneView.pointOfView = sceneCameraNode
 
         let keyLight = SCNNode()
         keyLight.light = SCNLight()
@@ -595,6 +613,10 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         currentActionIntensity = actionIntensity
         currentHeadTintAmount = headTintAmount
 
+        if actionCode == MfxMouseCompanionActionCode.clickReact.rawValue {
+            beginClickOneShot()
+        }
+
         if modelLoaded, let modelNode {
             updateLoadedModel(
                 node: modelNode,
@@ -636,16 +658,18 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         modelNode = container
         rebuildBoneNodeIndex(root: container)
         resolveSemanticCoreBones()
+        rebuildHeadTintTargets(root: container)
         actionTrackNodeCache.removeAll(keepingCapacity: true)
         poseBindingNodesByIndex.removeAll(keepingCapacity: true)
+        sceneView.isHidden = false
+        companionView.isHidden = true
         normalizeModelTransform()
+        pendingInitialPanelFit = true
         modelLoaded = true
         modelLastTick = CACurrentMediaTime()
         lastModelActionCode = -1
         clickOneShotActive = false
         clickOneShotElapsed = 0.0
-        sceneView.isHidden = false
-        companionView.isHidden = true
         updateLoadedModel(
             node: container,
             actionCode: currentActionCode,
@@ -881,12 +905,50 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             y: min(max(origin.y, minY), maxY))
     }
 
+    private func resizePanelCanvasIfNeeded(_ newSize: CGSize) {
+        let snapped = CGSize(
+            width: ceil(max(targetPetSizePx, newSize.width)),
+            height: ceil(max(targetPetSizePx, newSize.height)))
+        if abs(snapped.width - panelCanvasSize.width) < 0.5,
+           abs(snapped.height - panelCanvasSize.height) < 0.5 {
+            return
+        }
+
+        let oldFrame = panel.frame
+        let newOrigin: NSPoint
+        if positionMode == .fixedBottomLeft {
+            newOrigin = oldFrame.origin
+        } else {
+            newOrigin = NSPoint(
+                x: oldFrame.midX - snapped.width * 0.5,
+                y: oldFrame.midY - snapped.height * 0.5)
+        }
+
+        panelCanvasSize = snapped
+        updateCameraForCurrentCanvas()
+        let bounds = NSRect(origin: .zero, size: snapped)
+        panel.setFrame(NSRect(origin: clampToDesktop(newOrigin), size: snapped), display: true)
+        contentView.frame = bounds
+        sceneView.frame = bounds
+        companionView.frame = bounds
+    }
+
+    private func updateCameraForCurrentCanvas() {
+        let widthRatio = panelCanvasSize.width / max(1.0, targetPetSizePx)
+        let heightRatio = panelCanvasSize.height / max(1.0, targetPetSizePx)
+        let ratio = max(1.0, max(widthRatio, heightRatio))
+        sceneCameraNode.position = SCNVector3(
+            x: baseCameraPosition.x,
+            y: baseCameraPosition.y,
+            z: baseCameraPosition.z * ratio)
+    }
+
     private func startModelFrameLoop() {
         if modelFrameTimer != nil {
             return
         }
         let timer = Timer(
-            timeInterval: 1.0 / 60.0,
+            timeInterval: 1.0 / 120.0,
             target: self,
             selector: #selector(onModelFrame(_:)),
             userInfo: nil,
@@ -911,6 +973,10 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             actionCode: currentActionCode,
             actionIntensity: currentActionIntensity,
             headTintAmount: currentHeadTintAmount)
+        if pendingInitialPanelFit {
+            fitCanvasToModel()
+            pendingInitialPanelFit = false
+        }
     }
 
     private func loadScene(url: URL) -> SCNScene? {
@@ -1373,7 +1439,7 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             modelNode.scale = SCNVector3(x: modelBaseScale, y: modelBaseScale, z: modelBaseScale)
             modelNode.position = SCNVector3Zero
             modelBasePosition = modelNode.position
-            modelNode.eulerAngles = SCNVector3(x: -0.08, y: modelFacingYaw, z: 0.0)
+            modelNode.eulerAngles = SCNVector3(x: 0.0, y: modelFacingYaw, z: 0.0)
             return
         }
 
@@ -1388,7 +1454,162 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             y: -(cy * modelBaseScale) + verticalLift,
             z: -(cz * modelBaseScale))
         modelBasePosition = modelNode.position
-        modelNode.eulerAngles = SCNVector3(x: -0.08, y: modelFacingYaw, z: 0.0)
+        modelNode.eulerAngles = SCNVector3(x: 0.0, y: modelFacingYaw, z: 0.0)
+    }
+
+    private func fitCanvasToModel() {
+        guard let modelNode,
+              let measured = measuredRenderableBounds(for: modelNode) else {
+            return
+        }
+        resizePanelCanvasIfNeeded(
+            CGSize(
+                width: measured.width * 1.5,
+                height: measured.height * 3.0))
+        recenterModelInCanvas(modelNode)
+    }
+
+    private func recenterModelInCanvas(_ node: SCNNode) {
+        guard let projected = measuredRenderableBounds(for: node) else {
+            return
+        }
+        let deltaX = panelCanvasSize.width * 0.5 - projected.midX
+        let deltaY = panelCanvasSize.height * 0.5 - projected.midY
+        if abs(deltaX) < 0.5, abs(deltaY) < 0.5 {
+            return
+        }
+
+        let anchor = sceneView.projectPoint(node.presentation.position)
+        let shifted = SCNVector3(
+            x: anchor.x + deltaX,
+            y: anchor.y - deltaY,
+            z: anchor.z)
+        let worldAnchor = sceneView.unprojectPoint(anchor)
+        let worldShifted = sceneView.unprojectPoint(shifted)
+        node.position.x += worldShifted.x - worldAnchor.x
+        node.position.y += worldShifted.y - worldAnchor.y
+        node.position.z += worldShifted.z - worldAnchor.z
+        modelBasePosition = node.position
+    }
+
+    private func measuredRenderableBounds(for root: SCNNode) -> CGRect? {
+        if let snapshot = snapshotVisibleBounds() {
+            return snapshot
+        }
+        return projectedRenderableBounds(for: root)
+    }
+
+    private func projectedRenderableBounds(for root: SCNNode) -> CGRect? {
+        sceneView.layoutSubtreeIfNeeded()
+        var minX = CGFloat.greatestFiniteMagnitude
+        var minY = CGFloat.greatestFiniteMagnitude
+        var maxX = -CGFloat.greatestFiniteMagnitude
+        var maxY = -CGFloat.greatestFiniteMagnitude
+        var found = false
+
+        root.enumerateChildNodes { node, _ in
+            guard let geometry = node.geometry, !geometry.sources(for: .vertex).isEmpty else {
+                return
+            }
+            let (localMin, localMax) = geometry.boundingBox
+            let corners = [
+                SCNVector3(localMin.x, localMin.y, localMin.z),
+                SCNVector3(localMin.x, localMin.y, localMax.z),
+                SCNVector3(localMin.x, localMax.y, localMin.z),
+                SCNVector3(localMin.x, localMax.y, localMax.z),
+                SCNVector3(localMax.x, localMin.y, localMin.z),
+                SCNVector3(localMax.x, localMin.y, localMax.z),
+                SCNVector3(localMax.x, localMax.y, localMin.z),
+                SCNVector3(localMax.x, localMax.y, localMax.z),
+            ]
+            for corner in corners {
+                let world = node.presentation.convertPosition(corner, to: nil)
+                let projected = sceneView.projectPoint(world)
+                minX = min(minX, projected.x)
+                minY = min(minY, projected.y)
+                maxX = max(maxX, projected.x)
+                maxY = max(maxY, projected.y)
+            }
+            found = true
+        }
+
+        guard found,
+              minX.isFinite, minY.isFinite, maxX.isFinite, maxY.isFinite,
+              maxX > minX, maxY > minY else {
+            return nil
+        }
+        return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+    }
+
+    private func snapshotVisibleBounds() -> CGRect? {
+        sceneView.layoutSubtreeIfNeeded()
+        let originalBackground = sceneView.backgroundColor
+        let chroma = NSColor(
+            calibratedRed: 1.0,
+            green: 0.0,
+            blue: 1.0,
+            alpha: 1.0)
+        sceneView.backgroundColor = chroma
+        let image = sceneView.snapshot()
+        sceneView.backgroundColor = originalBackground
+
+        guard let tiffData = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData) else {
+            return nil
+        }
+
+        let width = bitmap.pixelsWide
+        let height = bitmap.pixelsHigh
+        guard width > 0, height > 0 else {
+            return nil
+        }
+
+        var minX = width
+        var minY = height
+        var maxX = -1
+        var maxY = -1
+
+        for y in 0..<height {
+            for x in 0..<width {
+                guard let rawColor = bitmap.colorAt(x: x, y: y),
+                      let color = rawColor.usingColorSpace(.deviceRGB) else {
+                    continue
+                }
+                if color.alphaComponent < 0.05 {
+                    continue
+                }
+                let distance =
+                    abs(color.redComponent - 1.0) +
+                    abs(color.greenComponent - 0.0) +
+                    abs(color.blueComponent - 1.0)
+                if distance < 0.15 {
+                    continue
+                }
+                if x < minX { minX = x }
+                if y < minY { minY = y }
+                if x > maxX { maxX = x }
+                if y > maxY { maxY = y }
+            }
+        }
+
+        guard maxX >= minX, maxY >= minY else {
+            return nil
+        }
+
+        let scaleX = max(0.0001, image.size.width / CGFloat(width))
+        let scaleY = max(0.0001, image.size.height / CGFloat(height))
+        let bounds = CGRect(
+            x: CGFloat(minX) * scaleX,
+            y: CGFloat(minY) * scaleY,
+            width: CGFloat(maxX - minX + 1) * scaleX,
+            height: CGFloat(maxY - minY + 1) * scaleY)
+
+        let widthCoverage = bounds.width / max(1.0, panelCanvasSize.width)
+        let heightCoverage = bounds.height / max(1.0, panelCanvasSize.height)
+        if widthCoverage > 0.97, heightCoverage > 0.97 {
+            return nil
+        }
+        return bounds
     }
 
     private func updateLoadedModel(
@@ -1398,18 +1619,11 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         headTintAmount: Float
     ) {
         let now = CACurrentMediaTime()
-        let dt = CGFloat(max(0.0, min(0.08, now - modelLastTick)))
+        let dt = CGFloat(max(0.0, min(0.05, now - modelLastTick)))
         modelLastTick = now
         modelBobTime += dt
 
         let resolvedIntensity = CGFloat(mfxClamp(CGFloat(actionIntensity), min: 0.0, max: 1.0))
-        let isClickReact = (actionCode == MfxMouseCompanionActionCode.clickReact.rawValue)
-        if isClickReact && lastModelActionCode != MfxMouseCompanionActionCode.clickReact.rawValue {
-            clickOneShotActive = true
-            clickOneShotElapsed = 0.0
-            clickOneShotDuration = mfxClamp(clickActionClip?.duration ?? 0.30, min: 0.05, max: 5.0)
-            restoreAllPoseBindingNodesToRest()
-        }
         let oneShotDuration = mfxClamp(clickOneShotDuration, min: 0.05, max: 5.0)
         if clickOneShotActive {
             clickOneShotElapsed += dt
@@ -1419,7 +1633,7 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             }
         }
         let clickTime = mfxClamp(clickOneShotElapsed, min: 0.0, max: oneShotDuration)
-        let clickPeakTime: CGFloat = 0.08
+        let clickPeakTime: CGFloat = 0.055
         let effectiveActionCode = clickOneShotActive
             ? MfxMouseCompanionActionCode.clickReact.rawValue
             : actionCode
@@ -1430,14 +1644,14 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         }
 
         if clickOneShotActive {
-            node.eulerAngles.x = -0.08
+            node.eulerAngles.x = 0.0
             node.eulerAngles.y = modelFacingYaw
             node.position = modelBasePosition
         } else {
             let dragLean = (effectiveActionCode == MfxMouseCompanionActionCode.drag.rawValue) ? (resolvedIntensity * 0.05) : 0.0
             let followLean = (effectiveActionCode == MfxMouseCompanionActionCode.follow.rawValue) ? (resolvedIntensity * 0.02) : 0.0
             let dragYaw = (effectiveActionCode == MfxMouseCompanionActionCode.drag.rawValue) ? (-0.20 * resolvedIntensity) : 0.0
-            node.eulerAngles.x = -0.08 - dragLean - followLean
+            node.eulerAngles.x = -dragLean - followLean
             node.eulerAngles.y = modelFacingYaw + dragYaw
 
             let bobStrength = (0.010 + resolvedIntensity * 0.012)
@@ -1460,14 +1674,16 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             var chestScaleZ: CGFloat = 1.0
             if clickTime <= clickPeakTime {
                 let a = mfxClamp(clickTime / clickPeakTime, min: 0.0, max: 1.0)
-                chestScaleX = 1.0 + 0.06 * a * clickStrength
-                chestScaleY = 1.0 - 0.08 * a * clickStrength
-                chestScaleZ = 1.0 + 0.06 * a * clickStrength
+                let eased = a * a * (3.0 - 2.0 * a)
+                chestScaleX = 1.0 + 0.06 * eased * clickStrength
+                chestScaleY = 1.0 - 0.08 * eased * clickStrength
+                chestScaleZ = 1.0 + 0.06 * eased * clickStrength
             } else {
                 let b = mfxClamp((clickTime - clickPeakTime) / max(0.001, oneShotDuration - clickPeakTime), min: 0.0, max: 1.0)
-                chestScaleX = (1.06 - 0.06 * b) * clickStrength + (1.0 - clickStrength)
-                chestScaleY = (0.92 + 0.08 * b) * clickStrength + (1.0 - clickStrength)
-                chestScaleZ = (1.06 - 0.06 * b) * clickStrength + (1.0 - clickStrength)
+                let eased = b * b * (3.0 - 2.0 * b)
+                chestScaleX = (1.06 - 0.06 * eased) * clickStrength + (1.0 - clickStrength)
+                chestScaleY = (0.92 + 0.08 * eased) * clickStrength + (1.0 - clickStrength)
+                chestScaleZ = (1.06 - 0.06 * eased) * clickStrength + (1.0 - clickStrength)
             }
             for chest in semanticChestNodes {
                 chest.scale.x *= chestScaleX
@@ -1476,9 +1692,15 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
             }
         }
 
-        // Keep a gentle global tint response for click streak parity.
         let tint = mfxClamp(CGFloat(headTintAmount), min: 0.0, max: 1.0)
-        applyGlobalTint(node: node, tintAmount: tint)
+        applyHeadTint(tintAmount: tint)
+    }
+
+    private func beginClickOneShot() {
+        clickOneShotActive = true
+        clickOneShotDuration = mfxClamp(clickActionClip?.duration ?? 0.30, min: 0.05, max: 5.0)
+        clickOneShotElapsed = 0.0
+        restoreAllPoseBindingNodesToRest()
     }
 
     private func runActionPulse(node: SCNNode, actionCode: Int32, intensity: Float) {
@@ -1495,20 +1717,109 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         node.runAction(SCNAction.sequence([up, down]), forKey: "mfx_action_pulse")
     }
 
-    private func applyGlobalTint(node: SCNNode, tintAmount: CGFloat) {
-        let tint = mfxClamp(tintAmount, min: 0.0, max: 1.0)
-        node.enumerateChildNodes { child, _ in
-            guard let geometry = child.geometry else {
+    private func rebuildHeadTintTargets(root: SCNNode) {
+        headTintTargetNodes.removeAll(keepingCapacity: true)
+        headTintBaseMultiplyByMaterial.removeAll(keepingCapacity: true)
+        appliedHeadTintAmount = -1.0
+
+        var tintableNodes: [SCNNode] = []
+        root.enumerateChildNodes { node, _ in
+            guard let geometry = node.geometry, !geometry.materials.isEmpty else {
                 return
             }
-            for material in geometry.materials {
-                material.multiply.contents = NSColor(
-                    calibratedRed: 1.0,
-                    green: 1.0 - tint * 0.18,
-                    blue: 1.0 - tint * 0.28,
-                    alpha: 1.0)
+            tintableNodes.append(node)
+        }
+        guard !tintableNodes.isEmpty else {
+            return
+        }
+
+        var selected = tintableNodes.filter { node in
+            guard let name = node.name?.lowercased() else {
+                return false
+            }
+            return name.contains("head") ||
+                name.contains("face") ||
+                name.contains("kao") ||
+                name.contains("頭") ||
+                name.contains("顔")
+        }
+
+        if selected.isEmpty {
+            let ys = tintableNodes.map(meshWorldCenterY)
+            if let minY = ys.min(), let maxY = ys.max() {
+                let thresholdY = minY + (maxY - minY) * 0.5
+                selected = tintableNodes.filter { meshWorldCenterY($0) >= thresholdY }
             }
         }
+
+        if selected.isEmpty, let topmost = tintableNodes.max(by: { meshWorldCenterY($0) < meshWorldCenterY($1) }) {
+            selected = [topmost]
+        }
+
+        headTintTargetNodes = selected
+        for node in headTintTargetNodes {
+            guard let geometry = node.geometry else {
+                continue
+            }
+            for material in geometry.materials {
+                let materialId = ObjectIdentifier(material)
+                if headTintBaseMultiplyByMaterial[materialId] == nil {
+                    headTintBaseMultiplyByMaterial[materialId] = resolvedMaterialMultiplyColor(material) ?? NSColor.white
+                }
+            }
+        }
+    }
+
+    private func applyHeadTint(tintAmount: CGFloat) {
+        let tint = mfxClamp(tintAmount, min: 0.0, max: 1.0)
+        if abs(tint - appliedHeadTintAmount) < 0.0001 {
+            return
+        }
+        for child in headTintTargetNodes {
+            guard let geometry = child.geometry else {
+                continue
+            }
+            for material in geometry.materials {
+                let materialId = ObjectIdentifier(material)
+                let baseColor = headTintBaseMultiplyByMaterial[materialId] ?? NSColor.white
+                material.multiply.contents = blendedColor(
+                    from: baseColor,
+                    to: headTintColor,
+                    amount: tint)
+            }
+        }
+        appliedHeadTintAmount = tint
+    }
+
+    private func meshWorldCenterY(_ node: SCNNode) -> CGFloat {
+        guard let geometry = node.geometry else {
+            return CGFloat(node.presentation.worldPosition.y)
+        }
+        let (localMin, localMax) = geometry.boundingBox
+        let center = SCNVector3(
+            (localMin.x + localMax.x) * 0.5,
+            (localMin.y + localMax.y) * 0.5,
+            (localMin.z + localMax.z) * 0.5)
+        let world = node.presentation.convertPosition(center, to: nil)
+        return CGFloat(world.y)
+    }
+
+    private func resolvedMaterialMultiplyColor(_ material: SCNMaterial) -> NSColor? {
+        if let color = material.multiply.contents as? NSColor {
+            return color.usingColorSpace(.deviceRGB) ?? color
+        }
+        return nil
+    }
+
+    private func blendedColor(from: NSColor, to: NSColor, amount: CGFloat) -> NSColor {
+        let alpha = mfxClamp(amount, min: 0.0, max: 1.0)
+        let lhs = from.usingColorSpace(.deviceRGB) ?? from
+        let rhs = to.usingColorSpace(.deviceRGB) ?? to
+        return NSColor(
+            calibratedRed: lhs.redComponent + (rhs.redComponent - lhs.redComponent) * alpha,
+            green: lhs.greenComponent + (rhs.greenComponent - lhs.greenComponent) * alpha,
+            blue: lhs.blueComponent + (rhs.blueComponent - lhs.blueComponent) * alpha,
+            alpha: lhs.alphaComponent + (rhs.alphaComponent - lhs.alphaComponent) * alpha)
     }
 
     private static func normalizedBoneName(_ value: String?) -> String? {

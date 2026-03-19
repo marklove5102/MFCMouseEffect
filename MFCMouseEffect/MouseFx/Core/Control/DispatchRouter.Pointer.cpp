@@ -259,6 +259,7 @@ intptr_t DispatchRouter::OnTimer(const DispatchMessage& message) {
         if (ctrl_->IsEffectsBlockedByAppBlacklist()) {
             return 0;
         }
+        ctrl_->TickPetVisualFrame();
         bool renderedByWasm = false;
         wasmFeature_.RouteFrameTick(*ctrl_, &renderedByWasm);
         return 0;

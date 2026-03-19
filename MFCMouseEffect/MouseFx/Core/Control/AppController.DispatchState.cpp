@@ -408,19 +408,22 @@ void AppController::UpdatePetClickStreakDecay(uint64_t nowTickMs, const MouseCom
             : 0;
     petClickStreak_.lastUpdateTickMs = nowTickMs;
 
-    if (deltaMs > 0) {
-        const float dtSeconds = static_cast<float>(deltaMs) / 1000.0f;
-        const float decay = static_cast<float>(activeConfig.headTintDecayPerSecond) * dtSeconds;
-        petClickStreak_.tintAmount = std::max(0.0f, petClickStreak_.tintAmount - decay);
-    }
-
-    if (petClickStreak_.lastClickTickMs > 0 && nowTickMs >= petClickStreak_.lastClickTickMs) {
+    if (petClickStreak_.streak > 0 &&
+        petClickStreak_.lastClickTickMs > 0 &&
+        nowTickMs >= petClickStreak_.lastClickTickMs) {
         const uint64_t sinceClickMs = nowTickMs - petClickStreak_.lastClickTickMs;
         if (sinceClickMs > static_cast<uint64_t>(std::max(0, activeConfig.clickStreakBreakMs))) {
             petClickStreak_.streak = 0;
-            if (petClickStreak_.tintAmount < 0.0001f) {
-                petClickStreak_.tintAmount = 0.0f;
-            }
+            petClickStreak_.lastClickTickMs = 0;
+        }
+    }
+
+    if (petClickStreak_.streak == 0 && petClickStreak_.tintAmount > 0.0f && deltaMs > 0) {
+        const float dtSeconds = static_cast<float>(deltaMs) / 1000.0f;
+        const float decay = static_cast<float>(activeConfig.headTintDecayPerSecond) * dtSeconds;
+        petClickStreak_.tintAmount = std::max(0.0f, petClickStreak_.tintAmount - decay);
+        if (petClickStreak_.tintAmount < 0.0001f) {
+            petClickStreak_.tintAmount = 0.0f;
         }
     }
 
@@ -432,7 +435,6 @@ void AppController::RegisterPetClickStreakClick(uint64_t nowTickMs, const MouseC
         const uint64_t sinceClickMs = nowTickMs - petClickStreak_.lastClickTickMs;
         if (sinceClickMs > static_cast<uint64_t>(std::max(0, activeConfig.clickStreakBreakMs))) {
             petClickStreak_.streak = 0;
-            petClickStreak_.tintAmount = 0.0f;
         }
     } else if (petClickStreak_.lastClickTickMs == 0) {
         petClickStreak_.streak = 0;
@@ -736,6 +738,37 @@ void AppController::DispatchPetHoldEnd(const ScreenPoint& pt) {
     const int actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
     UpdatePetVisualState(pt, actionCode, 0.0f, petClickStreak_.tintAmount);
     RecordMouseCompanionPluginPhase0Input("hold_end");
+}
+
+void AppController::TickPetVisualFrame() {
+#if MFX_PLATFORM_MACOS
+    if (!petVisualHostHandle_ || !config_.mouseCompanion.enabled) {
+        return;
+    }
+
+    const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+    const uint64_t nowTickMs = CurrentTickMs();
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+
+    ScreenPoint pt{};
+    if (!QueryCursorScreenPoint(&pt) && !TryGetLastPointerPoint(&pt)) {
+        pt.x = 0;
+        pt.y = 0;
+    } else {
+        RememberLastPointerPoint(pt);
+    }
+
+    int actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+    float actionIntensity = 0.0f;
+    if (holdButtonDown_ && petPrimaryPress_.active) {
+        actionCode = kPetActionDrag;
+        actionIntensity = ClampUnit(static_cast<float>(petPrimaryPress_.maxTravelPx / 32.0));
+    }
+
+    UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
+#else
+    (void)this;
+#endif
 }
 
 ScreenPoint AppController::ResolvePetRuntimeCursorPoint(
