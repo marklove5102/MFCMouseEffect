@@ -379,10 +379,11 @@ private final class MfxMouseCompanionPanelView: NSView {
 
     private func drawHead(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, scrollFlap: CGFloat, idleProfile: CGFloat) {
         let idleEarWave = CGFloat(sin(Double(bobTime * 3.4))) * side * idleProfile * 0.022
-        let earLift = (clickProfile * 0.04 + scrollProfile * 0.03 - holdProfile * 0.04 + poseEarLift * 0.05) * side + idleEarWave
-        let earSpread = (clickProfile * 0.03 + scrollProfile * 0.06 + abs(scrollFlap) * 0.04 + poseEarSpread * 0.06) * side + abs(idleEarWave) * 0.4
-        let leftEarRect = NSRect(x: -side * 0.17 - earSpread, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
-        let rightEarRect = NSRect(x: side * 0.05 + earSpread, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
+        let earLift = (clickProfile * 0.04 + scrollProfile * 0.02 - holdProfile * 0.04 + poseEarLift * 0.05) * side + idleEarWave
+        let earInset = (scrollProfile * 0.05 + abs(scrollFlap) * 0.02 + poseEarSpread * 0.04) * side
+        let clickEarSpread = (clickProfile * 0.03) * side + abs(idleEarWave) * 0.4
+        let leftEarRect = NSRect(x: -side * 0.17 - clickEarSpread + earInset, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
+        let rightEarRect = NSRect(x: side * 0.05 + clickEarSpread - earInset, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
         let headWidth = side * (0.48 + holdProfile * 0.06)
         let headHeight = side * (0.40 - holdProfile * 0.06)
         let headRect = NSRect(

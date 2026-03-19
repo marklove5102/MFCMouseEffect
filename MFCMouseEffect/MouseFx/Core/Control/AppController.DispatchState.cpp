@@ -1232,10 +1232,10 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
                                      (0.2f + scrollAmpNorm * 0.1f);
             const float holdTerm = ClampUnit(holdProfile * visualProfile.holdPoseGain);
             const float scrollTerm = ClampUnit(scrollProfile * visualProfile.scrollPoseGain);
-            const float earSpread = ClampUnit(
-                scrollTerm * 0.76f + std::abs(scrollFlap) * 0.12f);
+            const float earClamp = ClampUnit(
+                scrollTerm * 0.52f + std::abs(scrollFlap) * 0.04f);
             const float earLift = ClampUnit(
-                scrollTerm * 0.42f);
+                scrollTerm * 0.24f);
             const float handLift = ClampUnit(
                 holdTerm * 0.14f +
                 scrollTerm * 0.68f +
@@ -1266,9 +1266,9 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
                 scales[static_cast<size_t>(i) * 3 + 2] = 1.0f;
             }
 
-            positions[0] = -earSpread * 0.21f;
+            positions[0] = earClamp * 0.12f;
             positions[1] = earLift * 0.14f;
-            positions[3] = earSpread * 0.21f;
+            positions[3] = -earClamp * 0.12f;
             positions[4] = earLift * 0.14f;
             positions[6] = -handSpread * 0.26f;
             positions[7] = handLift * 0.08f;
@@ -1281,7 +1281,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             WriteQuaternionFromEuler(
                 -1.02f * holdTerm,
                 0.0f,
-                -(0.09f * holdTerm + 0.12f * scrollProfile + 0.18f * scrollFlap + 0.42f * earSpread),
+                (0.09f * holdTerm + 0.08f * scrollProfile + 0.08f * scrollFlap + 0.34f * earClamp),
                 q);
             rotations[0] = q[0];
             rotations[1] = q[1];
@@ -1290,7 +1290,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             WriteQuaternionFromEuler(
                 -1.02f * holdTerm,
                 0.0f,
-                (0.09f * holdTerm + 0.12f * scrollProfile - 0.18f * scrollFlap + 0.42f * earSpread),
+                -(0.09f * holdTerm + 0.08f * scrollProfile - 0.08f * scrollFlap + 0.34f * earClamp),
                 q);
             rotations[4] = q[0];
             rotations[5] = q[1];
