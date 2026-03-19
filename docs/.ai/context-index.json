@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-19T10:23:57.516Z",
+  "generated_at": "2026-03-19T10:40:59.361Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -41,18 +41,19 @@
         "linux",
         "contract",
         "abi",
+        "routing",
         "debug"
       ],
       "summary": "Repository-level collaboration and engineering rules for AI agents and developers.",
       "when_to_read": "Always read first.",
-      "line_count": 141,
-      "size_bytes": 7672,
-      "estimated_tokens": 1918,
+      "line_count": 143,
+      "size_bytes": 8072,
+      "estimated_tokens": 2018,
       "max_read_tokens": 1500,
       "line_limit": 260,
       "line_limit_exceeded": false,
-      "hash_sha1": "aa356c5ecdf7a64db99e1916a91543f6c54d0b9e",
-      "updated_at": "2026-03-12T14:04:20.468Z"
+      "hash_sha1": "4b046c59e1b335bfaf0e5f0005e82ee062559e11",
+      "updated_at": "2026-03-19T10:40:53.387Z"
     },
     {
       "id": "docs/agent-context/current.md",
@@ -84,13 +85,13 @@
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
       "line_count": 155,
-      "size_bytes": 17379,
-      "estimated_tokens": 4345,
+      "size_bytes": 17347,
+      "estimated_tokens": 4337,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "a2a062525b847075a46fb8676eee204d3124af93",
-      "updated_at": "2026-03-19T10:23:14.167Z"
+      "hash_sha1": "a0774dde611e29098507c69c92e2c5be609afdea",
+      "updated_at": "2026-03-19T10:26:47.804Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
