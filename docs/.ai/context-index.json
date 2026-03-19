@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-19T09:19:26.357Z",
+  "generated_at": "2026-03-19T09:22:21.813Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 154,
-      "size_bytes": 16654,
-      "estimated_tokens": 4164,
+      "line_count": 155,
+      "size_bytes": 17091,
+      "estimated_tokens": 4273,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "3dfa583210642bb417fca83507948de86ea3776c",
-      "updated_at": "2026-03-19T09:19:21.612Z"
+      "hash_sha1": "2dad92f1ae9100c229d0bcedf6cc2df0e7194192",
+      "updated_at": "2026-03-19T09:22:13.433Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -431,14 +431,14 @@
       ],
       "summary": "1. 先完成 `Phase 0`：冻结 v1 契约与最小 Host 骨架。",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 176,
-      "size_bytes": 9666,
-      "estimated_tokens": 2417,
+      "line_count": 180,
+      "size_bytes": 10063,
+      "estimated_tokens": 2516,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "27045489009133200d076c141db7368c9c79b3f6",
-      "updated_at": "2026-03-19T09:19:21.613Z"
+      "hash_sha1": "e3f965346b6910aa63f2ed21b480412551c39f7f",
+      "updated_at": "2026-03-19T09:22:13.434Z"
     },
     {
       "id": "docs/architecture/mouse-companion-pointer-facing-click-streak-contract.zh-CN.md",

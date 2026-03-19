@@ -163,6 +163,10 @@
   - `scrollReact` 不再只靠线性 `scrollPulse` 衰减，现已切到 tauri 风格的 impulse 包络：prod `0.72s` / test `0.56s`，`inRatio=0.42`、`holdRatio=0.16`，
   - native semantic pose 与 placeholder fallback 都补了基于幅度的耳朵展开、手部 lift/twist、腿部外开与轻微 flap 调制，
   - 当前仍未做“基于方向的额外滚动姿态偏置”；这一点若后续需要，再单独加在统一插件动作机上。
+- 已进入 `Phase 2` 的第三步（follow 对齐首刀）：
+  - macOS 视觉宿主已开始记录 follow 模式下的指针归一化 X，并把 real-model yaw 对齐到 tauri 的 `baseYaw - normalizedX * 0.28`，
+  - fallback 视图同步复用该指针归一化量做轻量横向 follow tilt，
+  - native follow 的额外前倾已明显收轻，避免视觉上更像 drag 而不是 follow。
 - 已落地 `Phase 1` 第一批 click-first 状态机语义（后端）：
   - click 门槛：`press<=220ms && travel<=10px`，并接入 `scroll` 后短窗口抑制，
   - `position_mode=fixed_bottom_left` 下 move 路径保持 `idle`（不进入 follow），

@@ -101,6 +101,7 @@ private final class MfxMouseCompanionPanelView: NSView {
     private var actionCode: MfxMouseCompanionActionCode = .idle
     private var actionIntensity: CGFloat = 0.0
     private var headTintAmount: CGFloat = 0.0
+    private var pointerNormalizedX: CGFloat = 0.0
     private var clickPulse: CGFloat = 0.0
     private var holdPulse: CGFloat = 0.0
     private var scrollPulse: CGFloat = 0.0
@@ -156,6 +157,11 @@ private final class MfxMouseCompanionPanelView: NSView {
         self.actionCode = resolvedAction
         self.actionIntensity = resolvedIntensity
         self.headTintAmount = resolvedTint
+        needsDisplay = true
+    }
+
+    func updatePointerNormalizedX(_ value: CGFloat) {
+        pointerNormalizedX = mfxClamp(value, min: -1.0, max: 1.0)
         needsDisplay = true
     }
 
@@ -284,7 +290,9 @@ private final class MfxMouseCompanionPanelView: NSView {
         let scrollProfile = max(scrollProfileBase, poseEarSpread * 0.8, poseLegKick * 0.7)
 
         let bobOffset = sin(Double(bobTime * 2.1)) * Double(2.0 + holdProfile * 3.0 + idleProfile * 1.8)
-        let followTilt = (actionCode == .follow || actionCode == .drag) ? (actionIntensity * 8.0) : 0.0
+        let followTiltBase = pointerNormalizedX * 4.0
+        let dragTilt = (actionCode == .drag) ? (-actionIntensity * 4.0) : 0.0
+        let followTilt = (actionCode == .follow || actionCode == .drag) ? (followTiltBase + dragTilt) : 0.0
         let clickScale = 1.0 + clickProfile * 0.10
         let holdScale = 1.0 + holdProfile * 0.05
         let scrollScale = 1.0 + scrollProfile * 0.04
@@ -528,6 +536,7 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
     private var modelBaseScale: CGFloat = 1.0
     private var modelBasePosition = SCNVector3Zero
     private let modelFacingYaw: CGFloat = .pi
+    private var pointerNormalizedX: CGFloat = 0.0
     private var lastModelActionCode: Int32 = -1
     private var modelBobTime: CGFloat = 0.0
     private var modelLastTick: CFTimeInterval = CACurrentMediaTime()
@@ -1055,6 +1064,11 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         if positionMode != .follow {
             return
         }
+        let desktop = resolveDesktopBounds()
+        let width = max(1.0, desktop.width)
+        let normalizedX = ((CGFloat(cursorX) - desktop.minX) / width) * 2.0 - 1.0
+        pointerNormalizedX = mfxClamp(normalizedX, min: -1.0, max: 1.0)
+        companionView.updatePointerNormalizedX(pointerNormalizedX)
         let desired = NSPoint(
             x: CGFloat(cursorX) - panel.frame.width * 0.52 + offsetX,
             y: CGFloat(cursorY) - panel.frame.height * 0.48 + offsetY)
@@ -2016,14 +2030,15 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
 
         if clickOneShotActive {
             node.eulerAngles.x = 0.0
-            node.eulerAngles.y = modelFacingYaw
+            node.eulerAngles.y = modelFacingYaw - pointerNormalizedX * 0.28
             node.position = modelBasePosition
         } else {
             let dragLean = (effectiveActionCode == MfxMouseCompanionActionCode.drag.rawValue) ? (resolvedIntensity * 0.05) : 0.0
-            let followLean = (effectiveActionCode == MfxMouseCompanionActionCode.follow.rawValue) ? (resolvedIntensity * 0.02) : 0.0
+            let followLean = (effectiveActionCode == MfxMouseCompanionActionCode.follow.rawValue) ? (resolvedIntensity * 0.006) : 0.0
             let dragYaw = (effectiveActionCode == MfxMouseCompanionActionCode.drag.rawValue) ? (-0.20 * resolvedIntensity) : 0.0
+            let facingYaw = modelFacingYaw - pointerNormalizedX * 0.28
             node.eulerAngles.x = -dragLean - followLean
-            node.eulerAngles.y = modelFacingYaw + dragYaw
+            node.eulerAngles.y = facingYaw + dragYaw
 
             let bobStrength =
                 (effectiveActionCode == MfxMouseCompanionActionCode.idle.rawValue)
