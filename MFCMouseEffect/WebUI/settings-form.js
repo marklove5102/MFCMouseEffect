@@ -175,19 +175,34 @@
       const parsed = Number.parseInt(`${input ?? ''}`, 10);
       return Number.isFinite(parsed) ? parsed : fallback;
     };
+    const parseFloatSafe = (input, fallback) => {
+      const parsed = Number.parseFloat(`${input ?? ''}`);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
     const clamp = (input, min, max, fallback) => {
       const valueInt = parseIntSafe(input, fallback);
       return Math.min(max, Math.max(min, valueInt));
     };
+    const clampFloat = (input, min, max, fallback) => {
+      const valueFloat = parseFloatSafe(input, fallback);
+      return Math.min(max, Math.max(min, valueFloat));
+    };
     const modelPath = `${source.model_path || ''}`.trim();
     const actionLibraryPath = `${source.action_library_path || ''}`.trim();
     const appearanceProfilePath = `${source.appearance_profile_path || ''}`.trim();
+    const positionMode = `${source.position_mode || ''}`.trim().toLowerCase();
     const edgeClampMode = `${source.edge_clamp_mode || ''}`.trim().toLowerCase();
+    const headTintPerClick = clampFloat(source.head_tint_per_click, 0.01, 1.0, 0.11);
+    const testHeadTintPerClick = clampFloat(source.test_head_tint_per_click, 0.01, 1.0, 0.2);
     return {
       enabled: !!source.enabled,
       model_path: modelPath || 'MFCMouseEffect/Assets/Pet3D/source/pet-main.glb',
       action_library_path: actionLibraryPath || 'MFCMouseEffect/Assets/Pet3D/source/pet-actions.json',
       appearance_profile_path: appearanceProfilePath || 'MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json',
+      position_mode:
+        positionMode === 'follow' || positionMode === 'fixed_bottom_left'
+          ? positionMode
+          : 'fixed_bottom_left',
       edge_clamp_mode:
         edgeClampMode === 'strict' || edgeClampMode === 'soft' || edgeClampMode === 'free'
           ? edgeClampMode
@@ -199,9 +214,18 @@
       smoothing_percent: clamp(source.smoothing_percent, 0, 95, 68),
       follow_threshold_px: clamp(source.follow_threshold_px, 0, 32, 2),
       release_hold_ms: clamp(source.release_hold_ms, 0, 800, 120),
+      face_pointer_enabled: !!source.face_pointer_enabled,
+      click_streak_break_ms: clamp(source.click_streak_break_ms, 120, 3000, 650),
+      head_tint_per_click: headTintPerClick,
+      head_tint_max: clampFloat(source.head_tint_max, headTintPerClick, 1.0, 0.7),
+      head_tint_decay_per_second: clampFloat(source.head_tint_decay_per_second, 0.05, 4.0, 0.36),
       use_test_profile: !!source.use_test_profile,
       test_press_lift_px: clamp(source.test_press_lift_px, 0, 320, 48),
       test_smoothing_percent: clamp(source.test_smoothing_percent, 0, 95, 32),
+      test_click_streak_break_ms: clamp(source.test_click_streak_break_ms, 120, 3000, 1200),
+      test_head_tint_per_click: testHeadTintPerClick,
+      test_head_tint_max: clampFloat(source.test_head_tint_max, testHeadTintPerClick, 1.0, 0.8),
+      test_head_tint_decay_per_second: clampFloat(source.test_head_tint_decay_per_second, 0.05, 4.0, 0.15),
     };
   }
 
@@ -461,6 +485,7 @@
         model_path: getText('mc_model_path'),
         action_library_path: getText('mc_action_library_path'),
         appearance_profile_path: getText('mc_appearance_profile_path'),
+        position_mode: getText('mc_position_mode') || 'fixed_bottom_left',
         edge_clamp_mode: getText('mc_edge_clamp_mode') || 'soft',
         size_px: getNum('mc_size_px'),
         offset_x: getNum('mc_offset_x'),
@@ -469,9 +494,18 @@
         smoothing_percent: getNum('mc_smoothing_percent'),
         follow_threshold_px: getNum('mc_follow_threshold_px'),
         release_hold_ms: getNum('mc_release_hold_ms'),
+        face_pointer_enabled: getChecked('mc_face_pointer_enabled'),
+        click_streak_break_ms: getNum('mc_click_streak_break_ms'),
+        head_tint_per_click: getNum('mc_head_tint_per_click'),
+        head_tint_max: getNum('mc_head_tint_max'),
+        head_tint_decay_per_second: getNum('mc_head_tint_decay_per_second'),
         use_test_profile: getChecked('mc_use_test_profile'),
         test_press_lift_px: getNum('mc_test_press_lift_px'),
         test_smoothing_percent: getNum('mc_test_smoothing_percent'),
+        test_click_streak_break_ms: getNum('mc_test_click_streak_break_ms'),
+        test_head_tint_per_click: getNum('mc_test_head_tint_per_click'),
+        test_head_tint_max: getNum('mc_test_head_tint_max'),
+        test_head_tint_decay_per_second: getNum('mc_test_head_tint_decay_per_second'),
       };
 
     return {

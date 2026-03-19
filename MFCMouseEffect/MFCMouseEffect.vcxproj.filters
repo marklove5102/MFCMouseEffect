@@ -63,6 +63,9 @@
     <ClInclude Include="MouseFx\Core\Control\PetDispatchFeature.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
+    <ClInclude Include="MouseFx\Core\Control\MouseCompanionPluginHostPhase0.h">
+      <Filter>头文件\MouseFx</Filter>
+    </ClInclude>
     <ClInclude Include="MouseFx\Core\Wasm\WasmDynamicTextLabelScope.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
@@ -97,30 +100,6 @@
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
     <ClInclude Include="MouseFx\Core\Automation\ShortcutCaptureSession.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetAssetFormat.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetCompanionRuntime.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetGlbSkeletonLoader.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetInterfaces.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetTypes.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetActionLibrary.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetAppearanceProfile.h">
-      <Filter>头文件\MouseFx</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseFx\Core\Pet\PetCanonicalModelValidator.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
     <ClInclude Include="MouseFx\Compute\EffectComputeExecutor.h">
@@ -638,6 +617,9 @@
     <ClCompile Include="MouseFx\Core\Control\PetDispatchFeature.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
+    <ClCompile Include="MouseFx\Core\Control\MouseCompanionPluginHostPhase0.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
     <ClCompile Include="MouseFx\Core\Control\WasmDispatchFeature.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
@@ -666,42 +648,6 @@
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Core\System\CursorPositionProvider.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetActionSynthesizer.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetActionLibrary.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetAppearanceProfile.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetCanonicalModelValidator.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetAssetFormat.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetCompanionRuntime.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetGlbSkeletonLoader.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetGltfJsonCanonicalConverter.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetModelFormatConverter.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetNullModelRuntime.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetSkeletonModelRuntime.cpp">
-      <Filter>源文件\MouseFx</Filter>
-    </ClCompile>
-    <ClCompile Include="MouseFx\Core\Pet\PetToolBackedCanonicalConverters.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Server\HttpServer.cpp">

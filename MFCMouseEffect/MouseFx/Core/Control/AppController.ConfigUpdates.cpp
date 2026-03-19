@@ -116,107 +116,102 @@ void AppController::SetTextEffectFontSize(float sizePt) {
 
 void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
     const MouseCompanionConfig normalized = config_internal::SanitizeMouseCompanionConfig(cfg);
-    const MouseCompanionConfig current = config_.mouseCompanion;
-    const bool unchanged =
-        current.enabled == normalized.enabled &&
-        current.modelPath == normalized.modelPath &&
-        current.actionLibraryPath == normalized.actionLibraryPath &&
-        current.appearanceProfilePath == normalized.appearanceProfilePath &&
-        current.edgeClampMode == normalized.edgeClampMode &&
-        current.sizePx == normalized.sizePx &&
-        current.offsetX == normalized.offsetX &&
-        current.offsetY == normalized.offsetY &&
-        current.pressLiftPx == normalized.pressLiftPx &&
-        current.smoothingPercent == normalized.smoothingPercent &&
-        current.followThresholdPx == normalized.followThresholdPx &&
-        current.releaseHoldMs == normalized.releaseHoldMs &&
-        current.useTestProfile == normalized.useTestProfile &&
-        current.testPressLiftPx == normalized.testPressLiftPx &&
-        current.testSmoothingPercent == normalized.testSmoothingPercent;
-    if (unchanged) {
+    if (config_.mouseCompanion.enabled == normalized.enabled &&
+        config_.mouseCompanion.modelPath == normalized.modelPath &&
+        config_.mouseCompanion.actionLibraryPath == normalized.actionLibraryPath &&
+        config_.mouseCompanion.appearanceProfilePath == normalized.appearanceProfilePath &&
+        config_.mouseCompanion.positionMode == normalized.positionMode &&
+        config_.mouseCompanion.edgeClampMode == normalized.edgeClampMode &&
+        config_.mouseCompanion.sizePx == normalized.sizePx &&
+        config_.mouseCompanion.offsetX == normalized.offsetX &&
+        config_.mouseCompanion.offsetY == normalized.offsetY &&
+        config_.mouseCompanion.pressLiftPx == normalized.pressLiftPx &&
+        config_.mouseCompanion.smoothingPercent == normalized.smoothingPercent &&
+        config_.mouseCompanion.followThresholdPx == normalized.followThresholdPx &&
+        config_.mouseCompanion.releaseHoldMs == normalized.releaseHoldMs &&
+        config_.mouseCompanion.facePointerEnabled == normalized.facePointerEnabled &&
+        config_.mouseCompanion.clickStreakBreakMs == normalized.clickStreakBreakMs &&
+        std::fabs(config_.mouseCompanion.headTintPerClick - normalized.headTintPerClick) < 1e-6 &&
+        std::fabs(config_.mouseCompanion.headTintMax - normalized.headTintMax) < 1e-6 &&
+        std::fabs(config_.mouseCompanion.headTintDecayPerSecond - normalized.headTintDecayPerSecond) < 1e-6 &&
+        config_.mouseCompanion.useTestProfile == normalized.useTestProfile &&
+        config_.mouseCompanion.testPressLiftPx == normalized.testPressLiftPx &&
+        config_.mouseCompanion.testSmoothingPercent == normalized.testSmoothingPercent &&
+        config_.mouseCompanion.testClickStreakBreakMs == normalized.testClickStreakBreakMs &&
+        std::fabs(config_.mouseCompanion.testHeadTintPerClick - normalized.testHeadTintPerClick) < 1e-6 &&
+        std::fabs(config_.mouseCompanion.testHeadTintMax - normalized.testHeadTintMax) < 1e-6 &&
+        std::fabs(config_.mouseCompanion.testHeadTintDecayPerSecond - normalized.testHeadTintDecayPerSecond) < 1e-6) {
         return;
     }
 
-    const bool enabledChanged = (current.enabled != normalized.enabled);
-    const bool sizeChanged = (current.sizePx != normalized.sizePx);
-    const bool modelPathChanged = (current.modelPath != normalized.modelPath);
-    const bool actionLibraryPathChanged = (current.actionLibraryPath != normalized.actionLibraryPath);
-    const bool appearanceProfilePathChanged = (current.appearanceProfilePath != normalized.appearanceProfilePath);
     config_.mouseCompanion = normalized;
+    MouseCompanionConfig activeCompanionCfg = normalized;
+    if (activeCompanionCfg.useTestProfile) {
+        activeCompanionCfg.pressLiftPx = activeCompanionCfg.testPressLiftPx;
+        activeCompanionCfg.smoothingPercent = activeCompanionCfg.testSmoothingPercent;
+        activeCompanionCfg.clickStreakBreakMs = activeCompanionCfg.testClickStreakBreakMs;
+        activeCompanionCfg.headTintPerClick = activeCompanionCfg.testHeadTintPerClick;
+        activeCompanionCfg.headTintMax = activeCompanionCfg.testHeadTintMax;
+        activeCompanionCfg.headTintDecayPerSecond = activeCompanionCfg.testHeadTintDecayPerSecond;
+    }
+    petPluginHostPhase0_.OnConfigChanged(normalized.enabled, CurrentTickMs());
     {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.configEnabled = normalized.enabled;
+        mouseCompanionRuntimeStatus_.runtimePresent = false;
+        mouseCompanionRuntimeStatus_.visualHostActive = false;
+        mouseCompanionRuntimeStatus_.visualModelLoaded = false;
+        mouseCompanionRuntimeStatus_.modelLoaded = false;
+        mouseCompanionRuntimeStatus_.actionLibraryLoaded = false;
+        mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
+        mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
         mouseCompanionRuntimeStatus_.configuredModelPath = normalized.modelPath;
         mouseCompanionRuntimeStatus_.configuredActionLibraryPath = normalized.actionLibraryPath;
+        mouseCompanionRuntimeStatus_.configuredEffectProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-effects.json";
         mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = normalized.appearanceProfilePath;
+        mouseCompanionRuntimeStatus_.visualModelPath.clear();
+        mouseCompanionRuntimeStatus_.loadedModelPath.clear();
+        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "unknown";
+        mouseCompanionRuntimeStatus_.loadedActionLibraryPath.clear();
+        mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
+        mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath.clear();
+        mouseCompanionRuntimeStatus_.modelConvertedToCanonical = false;
+        mouseCompanionRuntimeStatus_.modelImportDiagnostics.clear();
+        mouseCompanionRuntimeStatus_.visualModelLoadError = "backend_removed_pending_rewrite";
+        mouseCompanionRuntimeStatus_.modelLoadError = "backend_removed_pending_rewrite";
+        mouseCompanionRuntimeStatus_.actionLibraryLoadError = "backend_removed_pending_rewrite";
+        mouseCompanionRuntimeStatus_.effectProfileLoadError = "backend_removed_pending_rewrite";
+        mouseCompanionRuntimeStatus_.appearanceProfileLoadError = "backend_removed_pending_rewrite";
+        mouseCompanionRuntimeStatus_.lastActionCode = 0;
+        mouseCompanionRuntimeStatus_.lastActionName = "idle";
+        mouseCompanionRuntimeStatus_.lastActionIntensity = 0.0f;
+        mouseCompanionRuntimeStatus_.lastActionTickMs = CurrentTickMs();
+        mouseCompanionRuntimeStatus_.clickStreak = 0;
+        mouseCompanionRuntimeStatus_.clickStreakTintAmount = 0.0f;
+        mouseCompanionRuntimeStatus_.clickStreakBreakMs = activeCompanionCfg.clickStreakBreakMs;
+        mouseCompanionRuntimeStatus_.clickStreakDecayPerSecond =
+            static_cast<float>(activeCompanionCfg.headTintDecayPerSecond);
+        mouseCompanionRuntimeStatus_.actionCoverageReady = false;
+        mouseCompanionRuntimeStatus_.actionCoverageExpectedActionCount = 0;
+        mouseCompanionRuntimeStatus_.actionCoverageCoveredActionCount = 0;
+        mouseCompanionRuntimeStatus_.actionCoverageMissingActionCount = 0;
+        mouseCompanionRuntimeStatus_.actionCoverageSkeletonBoneCount = 0;
+        mouseCompanionRuntimeStatus_.actionCoverageTotalTrackCount = 0;
+        mouseCompanionRuntimeStatus_.actionCoverageMappedTrackCount = 0;
+        mouseCompanionRuntimeStatus_.actionCoverageOverallRatio = 0.0f;
+        mouseCompanionRuntimeStatus_.actionCoverageError = "backend_removed_pending_rewrite";
+        mouseCompanionRuntimeStatus_.actionCoverageMissingActions.clear();
+        mouseCompanionRuntimeStatus_.actionCoverageMissingBoneNames.clear();
+        mouseCompanionRuntimeStatus_.actionCoverageActions.clear();
     }
+    SyncMouseCompanionPluginPhase0Status();
     PersistConfig();
-
-    if (!normalized.enabled) {
-        ResetPetDispatchRuntimeState();
-        ShutdownPetVisualHost();
-        loadedPetModelPath_.clear();
-        loadedPetActionLibraryPath_.clear();
-        loadedPetEffectProfilePath_.clear();
-        loadedPetAppearanceProfilePath_.clear();
-        {
-            std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-            mouseCompanionRuntimeStatus_.modelLoaded = false;
-            mouseCompanionRuntimeStatus_.actionLibraryLoaded = false;
-            mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
-            mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
-            mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
-            mouseCompanionRuntimeStatus_.visualModelLoaded = false;
-            mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
-            mouseCompanionRuntimeStatus_.visualModelPath.clear();
-            mouseCompanionRuntimeStatus_.loadedModelPath.clear();
-            mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "unknown";
-            mouseCompanionRuntimeStatus_.loadedActionLibraryPath.clear();
-            mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
-            mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath.clear();
-            mouseCompanionRuntimeStatus_.modelConvertedToCanonical = false;
-            mouseCompanionRuntimeStatus_.modelImportDiagnostics.clear();
-            mouseCompanionRuntimeStatus_.visualModelLoadError.clear();
-            mouseCompanionRuntimeStatus_.effectProfileLoadError.clear();
-            mouseCompanionRuntimeStatus_.actionCoverageReady = false;
-            mouseCompanionRuntimeStatus_.actionCoverageExpectedActionCount = 0;
-            mouseCompanionRuntimeStatus_.actionCoverageCoveredActionCount = 0;
-            mouseCompanionRuntimeStatus_.actionCoverageMissingActionCount = 0;
-            mouseCompanionRuntimeStatus_.actionCoverageSkeletonBoneCount = 0;
-            mouseCompanionRuntimeStatus_.actionCoverageTotalTrackCount = 0;
-            mouseCompanionRuntimeStatus_.actionCoverageMappedTrackCount = 0;
-            mouseCompanionRuntimeStatus_.actionCoverageOverallRatio = 0.0f;
-            mouseCompanionRuntimeStatus_.actionCoverageError.clear();
-            mouseCompanionRuntimeStatus_.actionCoverageMissingActions.clear();
-            mouseCompanionRuntimeStatus_.actionCoverageMissingBoneNames.clear();
-            mouseCompanionRuntimeStatus_.actionCoverageActions.clear();
-        }
-        return;
-    }
-
-    if (sizeChanged && petVisualHostHandle_ != nullptr) {
-        ShutdownPetVisualHost();
-    }
-    EnsurePetVisualHost();
-    ApplyPetVisualFollowProfile();
-
-    const bool shouldReloadModel =
-        enabledChanged ||
-        sizeChanged ||
-        modelPathChanged ||
-        loadedPetModelPath_.empty();
-    if (shouldReloadModel) {
+    if (normalized.enabled) {
         TryLoadDefaultPetModel();
     } else {
-        if (actionLibraryPathChanged || loadedPetActionLibraryPath_.empty()) {
-            TryLoadDefaultPetActionLibrary();
-        }
-        if (loadedPetEffectProfilePath_.empty()) {
-            TryLoadDefaultPetEffectProfile();
-        }
-        if (appearanceProfilePathChanged || loadedPetAppearanceProfilePath_.empty()) {
-            TryLoadDefaultPetAppearanceProfile();
-        }
+        ShutdownPetVisualHost();
     }
 }
 

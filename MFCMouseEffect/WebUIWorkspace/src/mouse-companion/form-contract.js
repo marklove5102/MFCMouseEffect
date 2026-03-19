@@ -4,6 +4,7 @@ export const MOUSE_COMPANION_TAB_IDS = ['basic', 'follow', 'probe', 'runtime'];
 
 export const MOUSE_COMPANION_CHECKBOX_FIELDS = [
   { key: 'enabled', id: 'mc_enabled' },
+  { key: 'face_pointer_enabled', id: 'mc_face_pointer_enabled' },
   { key: 'use_test_profile', id: 'mc_use_test_profile' },
 ];
 
@@ -11,6 +12,7 @@ export const MOUSE_COMPANION_TEXT_FIELDS = [
   { key: 'model_path', id: 'mc_model_path' },
   { key: 'action_library_path', id: 'mc_action_library_path' },
   { key: 'appearance_profile_path', id: 'mc_appearance_profile_path' },
+  { key: 'position_mode', id: 'mc_position_mode' },
 ];
 
 export const MOUSE_COMPANION_NUMBER_FIELDS = [
@@ -21,8 +23,19 @@ export const MOUSE_COMPANION_NUMBER_FIELDS = [
   { key: 'smoothing_percent', id: 'mc_smoothing_percent' },
   { key: 'follow_threshold_px', id: 'mc_follow_threshold_px' },
   { key: 'release_hold_ms', id: 'mc_release_hold_ms' },
+  { key: 'click_streak_break_ms', id: 'mc_click_streak_break_ms' },
   { key: 'test_press_lift_px', id: 'mc_test_press_lift_px' },
   { key: 'test_smoothing_percent', id: 'mc_test_smoothing_percent' },
+  { key: 'test_click_streak_break_ms', id: 'mc_test_click_streak_break_ms' },
+];
+
+export const MOUSE_COMPANION_FLOAT_FIELDS = [
+  { key: 'head_tint_per_click', id: 'mc_head_tint_per_click' },
+  { key: 'head_tint_max', id: 'mc_head_tint_max' },
+  { key: 'head_tint_decay_per_second', id: 'mc_head_tint_decay_per_second' },
+  { key: 'test_head_tint_per_click', id: 'mc_test_head_tint_per_click' },
+  { key: 'test_head_tint_max', id: 'mc_test_head_tint_max' },
+  { key: 'test_head_tint_decay_per_second', id: 'mc_test_head_tint_decay_per_second' },
 ];
 
 export const MOUSE_COMPANION_RANGE_BINDINGS = [
@@ -33,6 +46,14 @@ export const MOUSE_COMPANION_RANGE_BINDINGS = [
   { id: 'mc_smoothing_percent', schemaKey: 'smoothing_percent_range' },
   { id: 'mc_follow_threshold_px', schemaKey: 'follow_threshold_px_range' },
   { id: 'mc_release_hold_ms', schemaKey: 'release_hold_ms_range' },
+  { id: 'mc_click_streak_break_ms', schemaKey: 'click_streak_break_ms_range' },
+  { id: 'mc_head_tint_per_click', schemaKey: 'head_tint_per_click_range' },
+  { id: 'mc_head_tint_max', schemaKey: 'head_tint_max_range' },
+  { id: 'mc_head_tint_decay_per_second', schemaKey: 'head_tint_decay_per_second_range' },
   { id: 'mc_test_press_lift_px', schemaKey: 'test_press_lift_px_range' },
   { id: 'mc_test_smoothing_percent', schemaKey: 'test_smoothing_percent_range' },
+  { id: 'mc_test_click_streak_break_ms', schemaKey: 'test_click_streak_break_ms_range' },
+  { id: 'mc_test_head_tint_per_click', schemaKey: 'test_head_tint_per_click_range' },
+  { id: 'mc_test_head_tint_max', schemaKey: 'test_head_tint_max_range' },
+  { id: 'mc_test_head_tint_decay_per_second', schemaKey: 'test_head_tint_decay_per_second_range' },
 ];

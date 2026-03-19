@@ -110,7 +110,7 @@ if(APPLE)
     mfx_add_swift_bridge("Platform/macos/Effects/MacosTextEffectFallbackBridge.swift" "text-effect fallback bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosHoverPulseOverlayBridge.swift" "hover-pulse overlay bridge")
     mfx_add_swift_bridge("Platform/macos/Effects/MacosHoldPulseOverlayBridge.swift" "hold-pulse overlay bridge")
-    mfx_add_swift_bridge("Platform/macos/Pet/MacosMouseCompanionBridge.swift" "mouse companion bridge")
+    mfx_add_swift_bridge("Platform/macos/Pet/MacosMouseCompanionPhase1Bridge.swift" "mouse companion phase1 bridge")
     mfx_add_swift_bridge("Platform/macos/Shell/MacosTrayMenuLocalizationBridge.swift" "tray localization bridge")
     mfx_add_swift_bridge("Platform/macos/Shell/MacosTrayMenuBridge.swift" "tray menu bridge")
     mfx_add_swift_bridge("Platform/macos/Shell/MacosEventLoopBridge.swift" "event loop bridge")
@@ -276,6 +276,7 @@ add_library(mfx_shell_macos STATIC
 set(MFX_MACOS_PLATFORM_HEADER_DIRS
     "${MFX_PROJECT_ROOT}/Platform/macos/Effects"
     "${MFX_PROJECT_ROOT}/Platform/macos/Overlay"
+    "${MFX_PROJECT_ROOT}/Platform/macos/Pet"
     "${MFX_PROJECT_ROOT}/Platform/macos/Wasm"
     "${MFX_PROJECT_ROOT}/Platform/macos/Shell"
     "${MFX_PROJECT_ROOT}/Platform/macos/System"

@@ -200,7 +200,7 @@ payload="$(jq -n \
     --arg model "$model_path" \
     --arg action "$action_library_path" \
     --arg appearance "$appearance_profile_path" \
-    '{mouse_companion:{enabled:true,model_path:$model,action_library_path:$action,appearance_profile_path:$appearance,release_hold_ms:0,follow_threshold_px:0}}')"
+    '{mouse_companion:{enabled:true,model_path:$model,action_library_path:$action,appearance_profile_path:$appearance,position_mode:"fixed_bottom_left",release_hold_ms:0,follow_threshold_px:0,face_pointer_enabled:false,use_test_profile:false}}')"
 
 curl -sS -X POST \
     -H "x-mfcmouseeffect-token: $token" \
@@ -240,6 +240,8 @@ dispatch_mouse_companion_test_event() {
 dispatch_mouse_companion_test_event "status" 640 360 1 120 420 "$dispatch_status_tmp"
 dispatch_mouse_companion_test_event "move" 640 360 1 120 420 "$dispatch_move_tmp"
 dispatch_mouse_companion_test_event "scroll" 640 360 1 120 420 "$dispatch_scroll_tmp"
+# Align with click-gate contract: avoid immediate click after scroll suppression window.
+sleep 0.20
 dispatch_mouse_companion_test_event "button_down" 640 360 1 120 420 "$dispatch_down_tmp"
 dispatch_mouse_companion_test_event "button_up" 640 360 1 120 420 "$dispatch_up_tmp"
 dispatch_mouse_companion_test_event "click" 640 360 1 120 420 "$dispatch_click_tmp"
@@ -278,6 +280,10 @@ jq -n \
         last_action_code: ($rt.last_action_code // -1),
         last_action_intensity: ($rt.last_action_intensity // 0),
         last_action_tick_ms: ($rt.last_action_tick_ms // 0),
+        click_streak: ($rt.click_streak // 0),
+        click_streak_tint_amount: ($rt.click_streak_tint_amount // 0),
+        click_streak_break_ms: ($rt.click_streak_break_ms // 0),
+        click_streak_decay_per_second: ($rt.click_streak_decay_per_second // 0),
         loaded_model_path: ($rt.loaded_model_path // ""),
         loaded_effect_profile_path: ($rt.loaded_effect_profile_path // ""),
         visual_model_path: ($rt.visual_model_path // ""),
@@ -336,6 +342,10 @@ if ! jq -e '
     .runtime.pose_binding_configured == true and
     (.runtime.skeleton_bone_count | tonumber) > 0 and
     (.runtime.last_action_tick_ms | tonumber) > 0 and
+    (.runtime.click_streak | tonumber) >= 1 and
+    (.runtime.click_streak_tint_amount | tonumber) > 0 and
+    (.runtime.click_streak_break_ms | tonumber) == 650 and
+    (.runtime.click_streak_decay_per_second | tonumber) > 0 and
     .action_coverage.ready == true and
     (.action_coverage.expected_action_count | tonumber) == 7 and
     (.action_coverage.covered_action_count | tonumber) >= 7 and
@@ -345,16 +355,16 @@ if ! jq -e '
     (.action_coverage.overall_coverage_ratio | tonumber) >= 1.0 and
     (.action_coverage.missing_bone_names | length) == 0 and
     (.action_sequence.idle == "idle" or .action_sequence.idle == "follow" or .action_sequence.idle == "hover_react") and
-    .action_sequence.follow == "follow" and
+    .action_sequence.follow == "idle" and
     .action_sequence.scroll == "scroll_react" and
     .action_sequence.press == "drag" and
-    .action_sequence.release == "follow" and
+    .action_sequence.release == "idle" and
     .action_sequence.click == "click_react" and
     .action_sequence.hover_start == "hover_react" and
-    .action_sequence.hover_end == "follow" and
+    .action_sequence.hover_end == "idle" and
     .action_sequence.hold_start == "hold_react" and
     .action_sequence.hold_update == "hold_react" and
-    .action_sequence.hold_end == "follow"
+    .action_sequence.hold_end == "idle"
 ' "$proof_tmp" >/dev/null; then
     mfx_info "proof failed; runtime snapshot:"
     cat "$proof_tmp" >&2

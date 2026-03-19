@@ -42,6 +42,7 @@ inline constexpr const char kEnabled[] = "enabled";
 inline constexpr const char kModelPath[] = "model_path";
 inline constexpr const char kActionLibraryPath[] = "action_library_path";
 inline constexpr const char kAppearanceProfilePath[] = "appearance_profile_path";
+inline constexpr const char kPositionMode[] = "position_mode";
 inline constexpr const char kEdgeClampMode[] = "edge_clamp_mode";
 inline constexpr const char kSizePx[] = "size_px";
 inline constexpr const char kOffsetX[] = "offset_x";
@@ -50,9 +51,18 @@ inline constexpr const char kPressLiftPx[] = "press_lift_px";
 inline constexpr const char kSmoothingPercent[] = "smoothing_percent";
 inline constexpr const char kFollowThresholdPx[] = "follow_threshold_px";
 inline constexpr const char kReleaseHoldMs[] = "release_hold_ms";
+inline constexpr const char kFacePointerEnabled[] = "face_pointer_enabled";
+inline constexpr const char kClickStreakBreakMs[] = "click_streak_break_ms";
+inline constexpr const char kHeadTintPerClick[] = "head_tint_per_click";
+inline constexpr const char kHeadTintMax[] = "head_tint_max";
+inline constexpr const char kHeadTintDecayPerSecond[] = "head_tint_decay_per_second";
 inline constexpr const char kUseTestProfile[] = "use_test_profile";
 inline constexpr const char kTestPressLiftPx[] = "test_press_lift_px";
 inline constexpr const char kTestSmoothingPercent[] = "test_smoothing_percent";
+inline constexpr const char kTestClickStreakBreakMs[] = "test_click_streak_break_ms";
+inline constexpr const char kTestHeadTintPerClick[] = "test_head_tint_per_click";
+inline constexpr const char kTestHeadTintMax[] = "test_head_tint_max";
+inline constexpr const char kTestHeadTintDecayPerSecond[] = "test_head_tint_decay_per_second";
 } // namespace mouse_companion
 
 } // namespace mousefx::config_json::keys

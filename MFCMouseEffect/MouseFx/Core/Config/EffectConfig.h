@@ -129,6 +129,8 @@ struct MouseCompanionConfig {
     std::string modelPath = "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb";
     std::string actionLibraryPath = "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json";
     std::string appearanceProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json";
+    // follow | fixed_bottom_left
+    std::string positionMode = "fixed_bottom_left";
     // strict | soft | free
     std::string edgeClampMode = "soft";
     int sizePx = 112;
@@ -138,9 +140,18 @@ struct MouseCompanionConfig {
     int smoothingPercent = 68;
     int followThresholdPx = 2;
     int releaseHoldMs = 120;
+    bool facePointerEnabled = false;
+    int clickStreakBreakMs = 650;
+    double headTintPerClick = 0.11;
+    double headTintMax = 0.70;
+    double headTintDecayPerSecond = 0.36;
     bool useTestProfile = false;
     int testPressLiftPx = 48;
     int testSmoothingPercent = 32;
+    int testClickStreakBreakMs = 1200;
+    double testHeadTintPerClick = 0.20;
+    double testHeadTintMax = 0.80;
+    double testHeadTintDecayPerSecond = 0.15;
 };
 
 // Configuration for input action indicator (mouse/keyboard overlay).

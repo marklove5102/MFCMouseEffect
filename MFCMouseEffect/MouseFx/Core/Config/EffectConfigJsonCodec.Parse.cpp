@@ -87,6 +87,10 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
             companion,
             keys::mouse_companion::kAppearanceProfilePath,
             config.mouseCompanion.appearanceProfilePath);
+        config.mouseCompanion.positionMode = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kPositionMode,
+            config.mouseCompanion.positionMode);
         config.mouseCompanion.edgeClampMode = parse_internal::GetOr<std::string>(
             companion,
             keys::mouse_companion::kEdgeClampMode,
@@ -119,6 +123,26 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
             companion,
             keys::mouse_companion::kReleaseHoldMs,
             config.mouseCompanion.releaseHoldMs);
+        config.mouseCompanion.facePointerEnabled = parse_internal::GetOr<bool>(
+            companion,
+            keys::mouse_companion::kFacePointerEnabled,
+            config.mouseCompanion.facePointerEnabled);
+        config.mouseCompanion.clickStreakBreakMs = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kClickStreakBreakMs,
+            config.mouseCompanion.clickStreakBreakMs);
+        config.mouseCompanion.headTintPerClick = parse_internal::GetOr<double>(
+            companion,
+            keys::mouse_companion::kHeadTintPerClick,
+            config.mouseCompanion.headTintPerClick);
+        config.mouseCompanion.headTintMax = parse_internal::GetOr<double>(
+            companion,
+            keys::mouse_companion::kHeadTintMax,
+            config.mouseCompanion.headTintMax);
+        config.mouseCompanion.headTintDecayPerSecond = parse_internal::GetOr<double>(
+            companion,
+            keys::mouse_companion::kHeadTintDecayPerSecond,
+            config.mouseCompanion.headTintDecayPerSecond);
         config.mouseCompanion.useTestProfile = parse_internal::GetOr<bool>(
             companion,
             keys::mouse_companion::kUseTestProfile,
@@ -131,6 +155,22 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
             companion,
             keys::mouse_companion::kTestSmoothingPercent,
             config.mouseCompanion.testSmoothingPercent);
+        config.mouseCompanion.testClickStreakBreakMs = parse_internal::GetOr<int>(
+            companion,
+            keys::mouse_companion::kTestClickStreakBreakMs,
+            config.mouseCompanion.testClickStreakBreakMs);
+        config.mouseCompanion.testHeadTintPerClick = parse_internal::GetOr<double>(
+            companion,
+            keys::mouse_companion::kTestHeadTintPerClick,
+            config.mouseCompanion.testHeadTintPerClick);
+        config.mouseCompanion.testHeadTintMax = parse_internal::GetOr<double>(
+            companion,
+            keys::mouse_companion::kTestHeadTintMax,
+            config.mouseCompanion.testHeadTintMax);
+        config.mouseCompanion.testHeadTintDecayPerSecond = parse_internal::GetOr<double>(
+            companion,
+            keys::mouse_companion::kTestHeadTintDecayPerSecond,
+            config.mouseCompanion.testHeadTintDecayPerSecond);
     }
     config.mouseCompanion = config_internal::SanitizeMouseCompanionConfig(config.mouseCompanion);
 

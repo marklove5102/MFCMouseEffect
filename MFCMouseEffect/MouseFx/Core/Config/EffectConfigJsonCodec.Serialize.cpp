@@ -45,6 +45,7 @@ nlohmann::json BuildRootFromConfig(const EffectConfig& config) {
         {keys::mouse_companion::kModelPath, companion.modelPath},
         {keys::mouse_companion::kActionLibraryPath, companion.actionLibraryPath},
         {keys::mouse_companion::kAppearanceProfilePath, companion.appearanceProfilePath},
+        {keys::mouse_companion::kPositionMode, companion.positionMode},
         {keys::mouse_companion::kEdgeClampMode, companion.edgeClampMode},
         {keys::mouse_companion::kSizePx, companion.sizePx},
         {keys::mouse_companion::kOffsetX, companion.offsetX},
@@ -53,9 +54,18 @@ nlohmann::json BuildRootFromConfig(const EffectConfig& config) {
         {keys::mouse_companion::kSmoothingPercent, companion.smoothingPercent},
         {keys::mouse_companion::kFollowThresholdPx, companion.followThresholdPx},
         {keys::mouse_companion::kReleaseHoldMs, companion.releaseHoldMs},
+        {keys::mouse_companion::kFacePointerEnabled, companion.facePointerEnabled},
+        {keys::mouse_companion::kClickStreakBreakMs, companion.clickStreakBreakMs},
+        {keys::mouse_companion::kHeadTintPerClick, companion.headTintPerClick},
+        {keys::mouse_companion::kHeadTintMax, companion.headTintMax},
+        {keys::mouse_companion::kHeadTintDecayPerSecond, companion.headTintDecayPerSecond},
         {keys::mouse_companion::kUseTestProfile, companion.useTestProfile},
         {keys::mouse_companion::kTestPressLiftPx, companion.testPressLiftPx},
         {keys::mouse_companion::kTestSmoothingPercent, companion.testSmoothingPercent},
+        {keys::mouse_companion::kTestClickStreakBreakMs, companion.testClickStreakBreakMs},
+        {keys::mouse_companion::kTestHeadTintPerClick, companion.testHeadTintPerClick},
+        {keys::mouse_companion::kTestHeadTintMax, companion.testHeadTintMax},
+        {keys::mouse_companion::kTestHeadTintDecayPerSecond, companion.testHeadTintDecayPerSecond},
     };
     root[keys::kEffects] = serialize_internal::BuildEffectsJson(config);
     return root;

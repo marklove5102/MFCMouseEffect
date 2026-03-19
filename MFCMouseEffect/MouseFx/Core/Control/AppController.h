@@ -21,6 +21,7 @@
 #include "MouseFx/Core/System/IKeyboardInjector.h"
 #include "MouseFx/Core/Overlay/IInputIndicatorOverlay.h"
 #include "MouseFx/Core/Control/InputIndicatorWasmDispatchFeature.h"
+#include "MouseFx/Core/Control/MouseCompanionPluginHostPhase0.h"
 #include "MouseFx/Core/Automation/InputAutomationEngine.h"
 #include "MouseFx/Core/Automation/ShortcutCaptureSession.h"
 #include "MouseFx/Interfaces/IMouseEffect.h"
@@ -33,9 +34,6 @@ class DispatchRouter;
 class GdiPlusSession;
 namespace wasm {
 class WasmEffectHost;
-}
-namespace pet {
-class PetCompanionRuntime;
 }
 
 // Owns the subsystem lifecycle: message-only dispatcher, GDI+ init, hook, and effects.
@@ -102,6 +100,16 @@ public:
 
         bool configEnabled{false};
         bool runtimePresent{false};
+        bool pluginHostReady{false};
+        std::string pluginHostPhase{"phase0"};
+        std::string activePluginId;
+        std::string activePluginVersion;
+        std::string engineApiVersion;
+        std::string compatibilityStatus;
+        std::string fallbackReason;
+        std::string lastPluginEvent;
+        uint64_t lastPluginEventTickMs{0};
+        uint64_t pluginEventCount{0};
         bool visualHostActive{false};
         bool visualModelLoaded{false};
         bool modelLoaded{false};
@@ -131,6 +139,10 @@ public:
         float lastActionIntensity{0.0f};
         uint64_t lastActionTickMs{0};
         std::string lastActionName{"idle"};
+        int clickStreak{0};
+        float clickStreakTintAmount{0.0f};
+        int clickStreakBreakMs{650};
+        float clickStreakDecayPerSecond{0.36f};
         bool actionCoverageReady{false};
         int actionCoverageExpectedActionCount{0};
         int actionCoverageCoveredActionCount{0};
@@ -334,12 +346,20 @@ private:
     void EnsurePetVisualHost();
     void ShutdownPetVisualHost();
     bool TryLoadPetModelIntoVisualHost(const std::string& modelPath);
+    bool TryLoadPetActionLibraryIntoVisualHost(const std::string& actionLibraryPath);
     void ApplyPetVisualFollowProfile();
     void TryApplyPetAppearanceToVisualHost();
     bool EnsurePetVisualPoseBinding();
-    void UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity);
+    void UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity, float headTintAmount);
     ScreenPoint ResolvePetRuntimeCursorPoint(const ScreenPoint& rawPt, double dtSeconds, int smoothingPercent);
     void ResetPetDispatchRuntimeState();
+    void UpdatePetPrimaryPressTravel(const ScreenPoint& pt);
+    bool EvaluatePetPrimaryClickEligibility(uint64_t nowTickMs) const;
+    void SyncPetClickStreakRuntimeStatus(const MouseCompanionConfig& activeConfig);
+    void UpdatePetClickStreakDecay(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig);
+    void RegisterPetClickStreakClick(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig);
+    void SyncMouseCompanionPluginPhase0Status();
+    void RecordMouseCompanionPluginPhase0Input(const char* eventName);
     void EnterInputCaptureDegradedMode(uint32_t error);
     void UpdateVmSuppressionState();
     void ApplyVmSuppression(bool suppressed);
@@ -417,7 +437,6 @@ private:
     mutable std::mutex mouseCompanionRuntimeStatusMutex_{};
     MouseCompanionRuntimeStatus mouseCompanionRuntimeStatus_{};
     InputAutomationEngine inputAutomationEngine_{};
-    std::unique_ptr<pet::PetCompanionRuntime> petCompanion_{};
     void* petVisualHostHandle_{nullptr};
     std::string loadedPetModelPath_{};
     std::string loadedPetActionLibraryPath_{};
@@ -428,14 +447,41 @@ private:
     bool petVisualPoseBindingConfigured_{false};
     bool petDragging_ = false;
     uint64_t petLastTickMs_ = 0;
+    static constexpr uint32_t kPetClickMaxPressMs = 220;
+    static constexpr double kPetClickMaxTravelPx = 10.0;
+    static constexpr uint32_t kPetClickSuppressAfterScrollMs = 140;
     bool petHasSmoothedCursor_ = false;
     double petSmoothedCursorX_ = 0.0;
     double petSmoothedCursorY_ = 0.0;
     ScreenPoint petLastDispatchPoint_{};
     bool petHasLastDispatchPoint_ = false;
     uint64_t petReleaseHoldUntilTickMs_ = 0;
+    struct PetPrimaryPressState {
+        bool active = false;
+        ScreenPoint downPoint{};
+        uint64_t downTickMs = 0;
+        double maxTravelPx = 0.0;
+        bool holdTriggered = false;
+        bool releaseReady = false;
+        uint64_t releaseTickMs = 0;
+        uint32_t releasePressMs = 0;
+        double releaseMaxTravelPx = 0.0;
+    } petPrimaryPress_{};
+    uint64_t petLastScrollTickMs_ = 0;
+    struct PetClickStreakState {
+        int streak = 0;
+        uint64_t lastClickTickMs = 0;
+        uint64_t lastUpdateTickMs = 0;
+        float tintAmount = 0.0f;
+    } petClickStreak_{};
+    struct PetVisualPoseRuntimeState {
+        float holdPulse = 0.0f;
+        float scrollPulse = 0.0f;
+        uint64_t lastTickMs = 0;
+    } petVisualPoseRuntime_{};
     bool runtimeDiagnosticsEnabled_ = false;
     mutable ShortcutCaptureSession shortcutCaptureSession_{};
+    MouseCompanionPluginHostPhase0 petPluginHostPhase0_{};
     static constexpr size_t kWasmEffectsHostCount = 5;
     std::array<std::unique_ptr<wasm::WasmEffectHost>, kWasmEffectsHostCount> wasmEffectHosts_{};
     std::unique_ptr<wasm::WasmEffectHost> wasmIndicatorHost_{};

@@ -12,6 +12,10 @@ export const MOUSE_COMPANION_DEFAULT_RUNTIME_STATE = {
   last_action_code: -1,
   last_action_intensity: 0,
   last_action_tick_ms: 0,
+  click_streak: 0,
+  click_streak_tint_amount: 0,
+  click_streak_break_ms: 650,
+  click_streak_decay_per_second: 0.36,
   loaded_model_path: '',
   visual_model_path: '',
   model_load_error: '',
@@ -126,6 +130,14 @@ export function normalizeMouseCompanionRuntimeState(value) {
       ? Number(source.last_action_intensity)
       : 0,
     last_action_tick_ms: Math.max(0, parseIntSafe(source.last_action_tick_ms, 0)),
+    click_streak: Math.max(0, parseIntSafe(source.click_streak, 0)),
+    click_streak_tint_amount: Number.isFinite(Number(source.click_streak_tint_amount))
+      ? Number(source.click_streak_tint_amount)
+      : 0,
+    click_streak_break_ms: Math.max(0, parseIntSafe(source.click_streak_break_ms, 650)),
+    click_streak_decay_per_second: Number.isFinite(Number(source.click_streak_decay_per_second))
+      ? Number(source.click_streak_decay_per_second)
+      : 0.36,
     loaded_model_path: textOrEmpty(source.loaded_model_path),
     visual_model_path: textOrEmpty(source.visual_model_path),
     model_load_error: textOrEmpty(source.model_load_error),
@@ -180,6 +192,18 @@ export function writeMouseCompanionRuntimeStateToDom(
   setTextNode(byId, 'mc_runtime_last_action_code', runtimeState.last_action_code);
   setTextNode(byId, 'mc_runtime_last_action_intensity', runtimeState.last_action_intensity.toFixed(3));
   setTextNode(byId, 'mc_runtime_last_action_tick_ms', runtimeState.last_action_tick_ms);
+  setTextNode(byId, 'mc_runtime_click_streak', runtimeState.click_streak);
+  setTextNode(
+    byId,
+    'mc_runtime_head_tint_amount',
+    runtimeState.click_streak_tint_amount.toFixed(3),
+  );
+  setTextNode(byId, 'mc_runtime_click_streak_break_ms', runtimeState.click_streak_break_ms);
+  setTextNode(
+    byId,
+    'mc_runtime_head_tint_decay_per_second',
+    runtimeState.click_streak_decay_per_second.toFixed(3),
+  );
 
   setPathNode(byId, 'mc_runtime_loaded_model_path', runtimeState.loaded_model_path, null);
   setPathNode(byId, 'mc_runtime_visual_model_path', runtimeState.visual_model_path, null);

@@ -245,6 +245,12 @@ void ApplyMouseCompanionSettings(const json& payload, AppController* controller)
             *dst = static_cast<int>(source[key].get<double>());
         }
     };
+    auto applyDouble = [&](const char* key, double* dst) {
+        if (!key || !dst || !source.contains(key) || !source[key].is_number()) {
+            return;
+        }
+        *dst = source[key].get<double>();
+    };
 
     if (source.contains("enabled") && source["enabled"].is_boolean()) {
         companion.enabled = source["enabled"].get<bool>();
@@ -258,6 +264,9 @@ void ApplyMouseCompanionSettings(const json& payload, AppController* controller)
     if (source.contains("appearance_profile_path") && source["appearance_profile_path"].is_string()) {
         companion.appearanceProfilePath = source["appearance_profile_path"].get<std::string>();
     }
+    if (source.contains("position_mode") && source["position_mode"].is_string()) {
+        companion.positionMode = source["position_mode"].get<std::string>();
+    }
     if (source.contains("edge_clamp_mode") && source["edge_clamp_mode"].is_string()) {
         companion.edgeClampMode = source["edge_clamp_mode"].get<std::string>();
     }
@@ -268,11 +277,22 @@ void ApplyMouseCompanionSettings(const json& payload, AppController* controller)
     applyInt("smoothing_percent", &companion.smoothingPercent);
     applyInt("follow_threshold_px", &companion.followThresholdPx);
     applyInt("release_hold_ms", &companion.releaseHoldMs);
+    if (source.contains("face_pointer_enabled") && source["face_pointer_enabled"].is_boolean()) {
+        companion.facePointerEnabled = source["face_pointer_enabled"].get<bool>();
+    }
+    applyInt("click_streak_break_ms", &companion.clickStreakBreakMs);
+    applyDouble("head_tint_per_click", &companion.headTintPerClick);
+    applyDouble("head_tint_max", &companion.headTintMax);
+    applyDouble("head_tint_decay_per_second", &companion.headTintDecayPerSecond);
     if (source.contains("use_test_profile") && source["use_test_profile"].is_boolean()) {
         companion.useTestProfile = source["use_test_profile"].get<bool>();
     }
     applyInt("test_press_lift_px", &companion.testPressLiftPx);
     applyInt("test_smoothing_percent", &companion.testSmoothingPercent);
+    applyInt("test_click_streak_break_ms", &companion.testClickStreakBreakMs);
+    applyDouble("test_head_tint_per_click", &companion.testHeadTintPerClick);
+    applyDouble("test_head_tint_max", &companion.testHeadTintMax);
+    applyDouble("test_head_tint_decay_per_second", &companion.testHeadTintDecayPerSecond);
 
     controller->SetMouseCompanionConfig(config_internal::SanitizeMouseCompanionConfig(companion));
 }

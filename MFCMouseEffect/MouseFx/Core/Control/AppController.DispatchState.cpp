@@ -3,17 +3,15 @@
 #include "AppController.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <string>
-#include <vector>
 
 #include "MouseFx/Core/Overlay/InputIndicatorKeyFilter.h"
-#include "MouseFx/Core/Pet/PetCompanionRuntime.h"
 #include "Platform/PlatformTarget.h"
 #if MFX_PLATFORM_MACOS
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
-#include "Platform/macos/Overlay/MacosOverlayCoordSpaceConversion.h"
-#include "Platform/macos/Pet/MacosMouseCompanionSwiftBridge.h"
+#include "Platform/macos/Pet/MacosMouseCompanionPhase1SwiftBridge.h"
 #elif MFX_PLATFORM_WINDOWS
 #include "Platform/windows/Overlay/Win32OverlayTimerSupport.h"
 #endif
@@ -47,163 +45,129 @@ std::string ResolveInputIndicatorWasmRouteReason(
     return nativeFallbackApplied ? "invoke_failed_no_output" : "unknown";
 }
 
-double ResolvePetDeltaSeconds(uint64_t* inOutLastTickMs, uint64_t nowTickMs) {
-    if (!inOutLastTickMs) {
-        return 1.0 / 60.0;
-    }
-    if (*inOutLastTickMs == 0 || nowTickMs <= *inOutLastTickMs) {
-        *inOutLastTickMs = nowTickMs;
-        return 1.0 / 60.0;
-    }
-    const uint64_t deltaMs = nowTickMs - *inOutLastTickMs;
-    *inOutLastTickMs = nowTickMs;
-    const double dt = static_cast<double>(deltaMs) / 1000.0;
-    return std::clamp(dt, 1.0 / 240.0, 1.0 / 15.0);
-}
-
-pet::PetFrameInput BuildPetFrameInput(const ScreenPoint& pt,
-                                      bool primaryPressed,
-                                      bool dragging,
-                                      double dtSeconds) {
-    pet::PetFrameInput input{};
-    input.dtSeconds = dtSeconds;
-    input.cursorVisible = true;
-    input.cursorPosition.x = static_cast<float>(pt.x);
-    input.cursorPosition.y = static_cast<float>(pt.y);
-    input.cursorPosition.z = 0.0f;
-    input.primaryPressed = primaryPressed;
-    input.dragging = dragging;
-    return input;
-}
-
 MouseCompanionConfig ResolveActiveMouseCompanionConfig(const MouseCompanionConfig& config) {
     MouseCompanionConfig active = config;
     if (active.useTestProfile) {
         active.pressLiftPx = active.testPressLiftPx;
         active.smoothingPercent = active.testSmoothingPercent;
+        active.clickStreakBreakMs = active.testClickStreakBreakMs;
+        active.headTintPerClick = active.testHeadTintPerClick;
+        active.headTintMax = active.testHeadTintMax;
+        active.headTintDecayPerSecond = active.testHeadTintDecayPerSecond;
     }
     return active;
 }
 
-double ResolvePetSmoothingAlpha(int smoothingPercent, double dtSeconds) {
-    const int clampedSmoothing = std::clamp(smoothingPercent, 0, 95);
-    if (clampedSmoothing <= 0) {
-        return 1.0;
-    }
-    const double dt = std::max(0.0, dtSeconds);
-    const double frameScale = std::max(1.0, dt * 60.0);
-    const double keepRatio = static_cast<double>(clampedSmoothing) / 100.0;
-    const double preserved = std::pow(keepRatio, frameScale);
-    return std::clamp(1.0 - preserved, 0.01, 1.0);
-}
-
-int64_t DistanceSquared(const ScreenPoint& lhs, const ScreenPoint& rhs) {
-    const int64_t dx = static_cast<int64_t>(lhs.x) - static_cast<int64_t>(rhs.x);
-    const int64_t dy = static_cast<int64_t>(lhs.y) - static_cast<int64_t>(rhs.y);
-    return (dx * dx) + (dy * dy);
-}
-
-const char* ResolveMouseCompanionActionName(int actionCode) {
-    switch (static_cast<pet::PetAction>(actionCode)) {
-    case pet::PetAction::Idle:
-        return "idle";
-    case pet::PetAction::Follow:
-        return "follow";
-    case pet::PetAction::ClickReact:
-        return "click_react";
-    case pet::PetAction::Drag:
-        return "drag";
-    case pet::PetAction::HoverReact:
-        return "hover_react";
-    case pet::PetAction::HoldReact:
-        return "hold_react";
-    case pet::PetAction::ScrollReact:
-        return "scroll_react";
-    default:
-        return "unknown";
-    }
-}
-
-#if MFX_PLATFORM_MACOS
-struct PetVisualPosePayload final {
-    std::vector<int> boneIndices{};
-    std::vector<float> positions{};
-    std::vector<float> rotations{};
-    std::vector<float> scales{};
-
-    int Count() const {
-        return static_cast<int>(boneIndices.size());
-    }
+constexpr int kPetActionIdle = 0;
+constexpr int kPetActionFollow = 1;
+constexpr int kPetActionClickReact = 2;
+constexpr int kPetActionDrag = 3;
+constexpr int kPetActionHoldReact = 4;
+constexpr int kPetActionScrollReact = 5;
+constexpr int32_t kPetPoseBoneCount = 6;
+constexpr int32_t kPetBoneLeftEar = 0;
+constexpr int32_t kPetBoneRightEar = 1;
+constexpr int32_t kPetBoneLeftHand = 2;
+constexpr int32_t kPetBoneRightHand = 3;
+constexpr int32_t kPetBoneLeftLeg = 4;
+constexpr int32_t kPetBoneRightLeg = 5;
+constexpr std::array<const char*, kPetPoseBoneCount> kPetPoseBoneNames = {
+    "left_ear",
+    "right_ear",
+    "left_hand",
+    "right_hand",
+    "left_leg",
+    "right_leg",
 };
 
-int ResolvePoseBoneIndex(const pet::BonePose& bonePose, const pet::SkeletonDesc* skeleton) {
-    if (bonePose.boneIndex >= 0) {
-        const int direct = bonePose.boneIndex;
-        if (!skeleton) {
-            return direct;
-        }
-        const size_t index = static_cast<size_t>(direct);
-        if (index < skeleton->bones.size()) {
-            return direct;
-        }
-    }
-    if (!skeleton || bonePose.name.empty()) {
-        return -1;
-    }
-    for (size_t i = 0; i < skeleton->bones.size(); ++i) {
-        if (skeleton->bones[i].name == bonePose.name) {
-            return static_cast<int>(i);
-        }
-    }
-    return -1;
+struct PetVisualMotionProfile {
+    float clickActionPulseBase;
+    float clickActionPulseStreakStep;
+    float clickActionPulseMax;
+    float holdDecayPerSecond;
+    float scrollDecayPerSecond;
+    float holdPulseFloor;
+    float scrollPulseFloor;
+    float holdPoseGain;
+    float scrollPoseGain;
+};
+
+// Production profile: tuned for tauri-like click burst with stable daily behavior.
+constexpr PetVisualMotionProfile kPetVisualMotionProd = {
+    0.84f, // clickActionPulseBase
+    0.05f, // clickActionPulseStreakStep
+    1.0f,  // clickActionPulseMax
+    1.2f,  // holdDecayPerSecond
+    1.8f,  // scrollDecayPerSecond
+    0.35f, // holdPulseFloor
+    0.30f, // scrollPulseFloor
+    1.0f,  // holdPoseGain
+    1.0f,  // scrollPoseGain
+};
+
+// Test profile: faster and stronger feedback to reduce manual verification cycle time.
+constexpr PetVisualMotionProfile kPetVisualMotionTest = {
+    0.92f, // clickActionPulseBase
+    0.06f, // clickActionPulseStreakStep
+    1.0f,  // clickActionPulseMax
+    1.6f,  // holdDecayPerSecond
+    2.4f,  // scrollDecayPerSecond
+    0.45f, // holdPulseFloor
+    0.40f, // scrollPulseFloor
+    1.12f, // holdPoseGain
+    1.10f, // scrollPoseGain
+};
+
+const PetVisualMotionProfile& ResolvePetVisualMotionProfile(bool useTestProfile) {
+    return useTestProfile ? kPetVisualMotionTest : kPetVisualMotionProd;
 }
 
-PetVisualPosePayload BuildPetVisualPosePayload(const pet::PetCompanionRuntime* companion) {
-    PetVisualPosePayload payload{};
-    if (!companion) {
-        return payload;
-    }
-
-    const pet::SkeletonPose& pose = companion->LastPose();
-    if (pose.bones.empty()) {
-        return payload;
-    }
-
-    const pet::SkeletonDesc* skeleton = companion->CurrentSkeleton();
-    constexpr size_t kMaxPosesPerFrame = 64;
-    const size_t reserveCount = std::min(kMaxPosesPerFrame, pose.bones.size());
-    payload.boneIndices.reserve(reserveCount);
-    payload.positions.reserve(reserveCount * 3);
-    payload.rotations.reserve(reserveCount * 4);
-    payload.scales.reserve(reserveCount * 3);
-
-    for (const auto& bonePose : pose.bones) {
-        if (payload.boneIndices.size() >= kMaxPosesPerFrame) {
-            break;
-        }
-
-        const int boneIndex = ResolvePoseBoneIndex(bonePose, skeleton);
-        if (boneIndex < 0) {
-            continue;
-        }
-
-        payload.boneIndices.push_back(boneIndex);
-        payload.positions.push_back(bonePose.local.position.x);
-        payload.positions.push_back(bonePose.local.position.y);
-        payload.positions.push_back(bonePose.local.position.z);
-        payload.rotations.push_back(bonePose.local.rotation.x);
-        payload.rotations.push_back(bonePose.local.rotation.y);
-        payload.rotations.push_back(bonePose.local.rotation.z);
-        payload.rotations.push_back(bonePose.local.rotation.w);
-        payload.scales.push_back(bonePose.local.scale.x);
-        payload.scales.push_back(bonePose.local.scale.y);
-        payload.scales.push_back(bonePose.local.scale.z);
-    }
-
-    return payload;
+float ClampUnit(float value) {
+    return std::clamp(value, 0.0f, 1.0f);
 }
-#endif
 
+void WriteQuaternionFromEuler(float rx, float ry, float rz, float* out) {
+    if (!out) {
+        return;
+    }
+    const float hx = rx * 0.5f;
+    const float hy = ry * 0.5f;
+    const float hz = rz * 0.5f;
+    const float cx = std::cos(hx);
+    const float sx = std::sin(hx);
+    const float cy = std::cos(hy);
+    const float sy = std::sin(hy);
+    const float cz = std::cos(hz);
+    const float sz = std::sin(hz);
+    out[0] = sx * cy * cz - cx * sy * sz; // x
+    out[1] = cx * sy * cz + sx * cy * sz; // y
+    out[2] = cx * cy * sz - sx * sy * cz; // z
+    out[3] = cx * cy * cz + sx * sy * sz; // w
+}
+
+double Distance(const ScreenPoint& a, const ScreenPoint& b) {
+    const double dx = static_cast<double>(a.x - b.x);
+    const double dy = static_cast<double>(a.y - b.y);
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+const char* ResolvePetActionName(int actionCode) {
+    switch (actionCode) {
+    case kPetActionFollow:
+        return "follow";
+    case kPetActionClickReact:
+        return "click_react";
+    case kPetActionDrag:
+        return "drag";
+    case kPetActionHoldReact:
+        return "hold_react";
+    case kPetActionScrollReact:
+        return "scroll_react";
+    case kPetActionIdle:
+    default:
+        return "idle";
+    }
+}
 } // namespace
 
 bool AppController::ConsumeIgnoreNextClick() {
@@ -380,6 +344,109 @@ uint32_t AppController::ActiveHoldDelayMs() const {
     return activeConfig.useTestProfile ? kHoldDelayTestMs : kHoldDelayMs;
 }
 
+void AppController::UpdatePetPrimaryPressTravel(const ScreenPoint& pt) {
+    if (!petPrimaryPress_.active) {
+        return;
+    }
+    const double travel = Distance(petPrimaryPress_.downPoint, pt);
+    if (travel > petPrimaryPress_.maxTravelPx) {
+        petPrimaryPress_.maxTravelPx = travel;
+    }
+}
+
+bool AppController::EvaluatePetPrimaryClickEligibility(uint64_t nowTickMs) const {
+    if (petLastScrollTickMs_ > 0 && nowTickMs >= petLastScrollTickMs_) {
+        const uint64_t deltaMs = nowTickMs - petLastScrollTickMs_;
+        if (deltaMs <= kPetClickSuppressAfterScrollMs) {
+            return false;
+        }
+    }
+
+    // Compatibility fallback: some routes may emit click without press/release snapshot.
+    if (!petPrimaryPress_.releaseReady) {
+        return true;
+    }
+
+    const uint64_t ageMs =
+        (nowTickMs >= petPrimaryPress_.releaseTickMs)
+            ? (nowTickMs - petPrimaryPress_.releaseTickMs)
+            : 0;
+    if (ageMs > 800) {
+        return false;
+    }
+    if (petPrimaryPress_.holdTriggered) {
+        return false;
+    }
+    if (petPrimaryPress_.releasePressMs > kPetClickMaxPressMs) {
+        return false;
+    }
+    if (petPrimaryPress_.releaseMaxTravelPx > kPetClickMaxTravelPx) {
+        return false;
+    }
+    return true;
+}
+
+void AppController::SyncPetClickStreakRuntimeStatus(const MouseCompanionConfig& activeConfig) {
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.clickStreak = petClickStreak_.streak;
+    mouseCompanionRuntimeStatus_.clickStreakTintAmount = petClickStreak_.tintAmount;
+    mouseCompanionRuntimeStatus_.clickStreakBreakMs = activeConfig.clickStreakBreakMs;
+    mouseCompanionRuntimeStatus_.clickStreakDecayPerSecond =
+        static_cast<float>(activeConfig.headTintDecayPerSecond);
+}
+
+void AppController::UpdatePetClickStreakDecay(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig) {
+    if (petClickStreak_.lastUpdateTickMs == 0) {
+        petClickStreak_.lastUpdateTickMs = nowTickMs;
+        SyncPetClickStreakRuntimeStatus(activeConfig);
+        return;
+    }
+
+    const uint64_t deltaMs =
+        (nowTickMs >= petClickStreak_.lastUpdateTickMs)
+            ? (nowTickMs - petClickStreak_.lastUpdateTickMs)
+            : 0;
+    petClickStreak_.lastUpdateTickMs = nowTickMs;
+
+    if (deltaMs > 0) {
+        const float dtSeconds = static_cast<float>(deltaMs) / 1000.0f;
+        const float decay = static_cast<float>(activeConfig.headTintDecayPerSecond) * dtSeconds;
+        petClickStreak_.tintAmount = std::max(0.0f, petClickStreak_.tintAmount - decay);
+    }
+
+    if (petClickStreak_.lastClickTickMs > 0 && nowTickMs >= petClickStreak_.lastClickTickMs) {
+        const uint64_t sinceClickMs = nowTickMs - petClickStreak_.lastClickTickMs;
+        if (sinceClickMs > static_cast<uint64_t>(std::max(0, activeConfig.clickStreakBreakMs))) {
+            petClickStreak_.streak = 0;
+            if (petClickStreak_.tintAmount < 0.0001f) {
+                petClickStreak_.tintAmount = 0.0f;
+            }
+        }
+    }
+
+    SyncPetClickStreakRuntimeStatus(activeConfig);
+}
+
+void AppController::RegisterPetClickStreakClick(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig) {
+    if (petClickStreak_.lastClickTickMs > 0 && nowTickMs >= petClickStreak_.lastClickTickMs) {
+        const uint64_t sinceClickMs = nowTickMs - petClickStreak_.lastClickTickMs;
+        if (sinceClickMs > static_cast<uint64_t>(std::max(0, activeConfig.clickStreakBreakMs))) {
+            petClickStreak_.streak = 0;
+            petClickStreak_.tintAmount = 0.0f;
+        }
+    } else if (petClickStreak_.lastClickTickMs == 0) {
+        petClickStreak_.streak = 0;
+    }
+
+    petClickStreak_.streak = std::max(0, petClickStreak_.streak) + 1;
+    petClickStreak_.lastClickTickMs = nowTickMs;
+    petClickStreak_.lastUpdateTickMs = nowTickMs;
+    const float tintGain = static_cast<float>(activeConfig.headTintPerClick);
+    const float tintCap = static_cast<float>(activeConfig.headTintMax);
+    petClickStreak_.tintAmount = std::min(tintCap, petClickStreak_.tintAmount + tintGain);
+    SyncPetClickStreakRuntimeStatus(activeConfig);
+}
+
 void AppController::BeginHoldTracking(const ScreenPoint& pt, int button) {
     holdButtonDown_ = true;
     holdTrackingButton_ = button;
@@ -495,233 +562,213 @@ bool AppController::QueryCursorScreenPoint(ScreenPoint* outPt) const {
     return cursorPositionService_->TryGetCursorScreenPoint(outPt);
 }
 
+void AppController::SyncMouseCompanionPluginPhase0Status() {
+    const MouseCompanionPluginPhase0Snapshot snapshot = petPluginHostPhase0_.Snapshot();
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.pluginHostReady = snapshot.hostReady;
+    mouseCompanionRuntimeStatus_.pluginHostPhase = snapshot.hostPhase;
+    mouseCompanionRuntimeStatus_.activePluginId = snapshot.activePluginId;
+    mouseCompanionRuntimeStatus_.activePluginVersion = snapshot.activePluginVersion;
+    mouseCompanionRuntimeStatus_.engineApiVersion = snapshot.engineApiVersion;
+    mouseCompanionRuntimeStatus_.compatibilityStatus = snapshot.compatibilityStatus;
+    mouseCompanionRuntimeStatus_.fallbackReason = snapshot.fallbackReason;
+    mouseCompanionRuntimeStatus_.lastPluginEvent = snapshot.lastEventName;
+    mouseCompanionRuntimeStatus_.lastPluginEventTickMs = snapshot.lastEventTickMs;
+    mouseCompanionRuntimeStatus_.pluginEventCount = snapshot.eventCount;
+}
+
+void AppController::RecordMouseCompanionPluginPhase0Input(const char* eventName) {
+    petPluginHostPhase0_.OnInputEvent(eventName, CurrentTickMs());
+    SyncMouseCompanionPluginPhase0Status();
+}
+
 void AppController::DispatchPetMove(const ScreenPoint& pt) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
     const uint64_t nowTickMs = CurrentTickMs();
-    const bool releaseHoldActive =
-        (activeConfig.releaseHoldMs > 0) &&
-        (petReleaseHoldUntilTickMs_ > nowTickMs);
-    const bool effectiveDragging = petDragging_ || releaseHoldActive;
-    if (!effectiveDragging &&
-        activeConfig.followThresholdPx > 0 &&
-        petHasLastDispatchPoint_) {
-        const int64_t threshold = static_cast<int64_t>(activeConfig.followThresholdPx);
-        if (DistanceSquared(pt, petLastDispatchPoint_) < (threshold * threshold)) {
-            return;
-        }
+    double dtSeconds = 1.0 / 60.0;
+    if (petLastTickMs_ > 0 && nowTickMs > petLastTickMs_) {
+        dtSeconds = static_cast<double>(nowTickMs - petLastTickMs_) / 1000.0;
+        dtSeconds = std::clamp(dtSeconds, 1.0 / 240.0, 1.0 / 12.0);
     }
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
+    petLastTickMs_ = nowTickMs;
 
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    if (effectiveDragging) {
-        petCompanion_->RequestAction(pet::PetAction::Drag, 0.05);
-    } else {
-        petCompanion_->RequestAction(pet::PetAction::Follow, 0.12);
+    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dtSeconds, activeConfig.smoothingPercent);
+    UpdatePetPrimaryPressTravel(pt);
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+
+    int actionCode = kPetActionIdle;
+    float intensity = 0.0f;
+    if (activeConfig.positionMode == "follow") {
+        actionCode = kPetActionFollow;
+        intensity = 0.55f;
+        const int thresholdPx = std::max(0, activeConfig.followThresholdPx);
+        if (petHasLastDispatchPoint_ && thresholdPx > 0) {
+            const double moveDistance = Distance(runtimePt, petLastDispatchPoint_);
+            if (moveDistance < static_cast<double>(thresholdPx)) {
+                intensity = 0.0f;
+            }
+        }
+        petLastDispatchPoint_ = runtimePt;
+        petHasLastDispatchPoint_ = true;
     }
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, holdButtonDown_, effectiveDragging, dt));
-    UpdatePetVisualState(
-        runtimePt,
-        effectiveDragging ? static_cast<int>(pet::PetAction::Drag) : static_cast<int>(pet::PetAction::Follow),
-        effectiveDragging ? 0.8f : 0.6f);
+    if (holdButtonDown_ && petPrimaryPress_.active) {
+        actionCode = kPetActionDrag;
+        intensity = ClampUnit(static_cast<float>(petPrimaryPress_.maxTravelPx / 32.0));
+    }
+
+    UpdatePetVisualState(runtimePt, actionCode, intensity, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("move");
 }
 
 void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
     const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::ScrollReact, 0.05);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, holdButtonDown_, petDragging_, dt));
-    const float intensity = std::clamp(static_cast<float>(std::abs(delta)) / 120.0f, 0.45f, 1.0f);
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::ScrollReact), intensity);
+    petLastScrollTickMs_ = nowTickMs;
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+    const float intensity = ClampUnit(static_cast<float>(std::abs(delta)) / 120.0f);
+    UpdatePetVisualState(pt, kPetActionScrollReact, intensity, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("scroll");
 }
 
 void AppController::DispatchPetClick(const ClickEvent& ev) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petReleaseHoldUntilTickMs_ = 0;
-    petLastDispatchPoint_ = ev.pt;
-    petHasLastDispatchPoint_ = true;
-    const bool primary = (ev.button == MouseButton::Left);
     const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(ev.pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::ClickReact, 0.04);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, primary, petDragging_, dt));
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::ClickReact), 0.95f);
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+
+    const bool isPrimary = (ev.button == MouseButton::Left);
+    const bool eligible = isPrimary && EvaluatePetPrimaryClickEligibility(nowTickMs);
+    if (eligible) {
+        RegisterPetClickStreakClick(nowTickMs, activeConfig);
+        const PetVisualMotionProfile& visualProfile =
+            ResolvePetVisualMotionProfile(activeConfig.useTestProfile);
+        const float pulseBase = std::min(
+            visualProfile.clickActionPulseMax,
+            visualProfile.clickActionPulseBase +
+                visualProfile.clickActionPulseStreakStep * static_cast<float>(std::max(0, petClickStreak_.streak - 1)));
+        UpdatePetVisualState(
+            ev.pt,
+            kPetActionClickReact,
+            ClampUnit(pulseBase),
+            petClickStreak_.tintAmount);
+    } else {
+        const int fallbackAction = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+        UpdatePetVisualState(ev.pt, fallbackAction, 0.0f, petClickStreak_.tintAmount);
+    }
+    petPrimaryPress_.releaseReady = false;
+    RecordMouseCompanionPluginPhase0Input(eligible ? "click_accept" : "click_reject");
 }
 
 void AppController::DispatchPetHoverStart(const ScreenPoint& pt) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::HoverReact, 0.10);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, false, false, dt));
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::HoverReact), 0.58f);
+    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    UpdatePetVisualState(pt, kPetActionIdle, 0.0f, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("hover_start");
 }
 
 void AppController::DispatchPetHoverEnd(const ScreenPoint& pt) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::Follow, 0.08);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, holdButtonDown_, petDragging_, dt));
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::Follow), 0.60f);
+    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const int actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+    UpdatePetVisualState(pt, actionCode, 0.0f, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("hover_end");
 }
 
 void AppController::DispatchPetButtonDown(const ScreenPoint& pt, int button) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petReleaseHoldUntilTickMs_ = 0;
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const bool primary = (button == static_cast<int>(MouseButton::Left));
-    if (primary) {
-        petDragging_ = true;
-        petCompanion_->RequestAction(pet::PetAction::Drag, 0.03);
-    }
     const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, primary, petDragging_, dt));
-    UpdatePetVisualState(
-        runtimePt,
-        petDragging_ ? static_cast<int>(pet::PetAction::Drag) : static_cast<int>(pet::PetAction::Follow),
-        petDragging_ ? 0.8f : 0.6f);
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+    int actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+    float actionIntensity = 0.0f;
+    if (button == static_cast<int>(MouseButton::Left)) {
+        petPrimaryPress_ = PetPrimaryPressState{};
+        petPrimaryPress_.active = true;
+        petPrimaryPress_.downPoint = pt;
+        petPrimaryPress_.downTickMs = nowTickMs;
+        // Keep primary down neutral; drag should only begin after pointer travel.
+        actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+        actionIntensity = 0.0f;
+    }
+    UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("button_down");
 }
 
 void AppController::DispatchPetHoldStart(const ScreenPoint& pt, int button, uint32_t holdMs) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
+    if (button == static_cast<int>(MouseButton::Left) && petPrimaryPress_.active) {
+        petPrimaryPress_.holdTriggered = true;
     }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const bool primary = (button == static_cast<int>(MouseButton::Left));
-    const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::HoldReact, 0.08);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, primary, petDragging_, dt));
-    const float holdPhase = std::clamp(static_cast<float>(holdMs) / 900.0f, 0.0f, 1.0f);
-    const float intensity = 0.62f + holdPhase * 0.28f;
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::HoldReact), intensity);
+    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const float intensity = ClampUnit(static_cast<float>(holdMs) / 300.0f);
+    UpdatePetVisualState(pt, kPetActionHoldReact, intensity, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("hold_start");
 }
 
 void AppController::DispatchPetHoldUpdate(const ScreenPoint& pt, uint32_t holdMs) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::HoldReact, 0.06);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, true, petDragging_, dt));
-    const float holdPhase = std::clamp(static_cast<float>(holdMs) / 1200.0f, 0.0f, 1.0f);
-    const float intensity = 0.66f + holdPhase * 0.26f;
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::HoldReact), intensity);
+    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const float intensity = ClampUnit(static_cast<float>(holdMs) / 600.0f);
+    UpdatePetVisualState(pt, kPetActionHoldReact, intensity, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("hold_update");
 }
 
 void AppController::DispatchPetButtonUp(const ScreenPoint& pt, int button) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const bool primary = (button == static_cast<int>(MouseButton::Left));
     const uint64_t nowTickMs = CurrentTickMs();
-    if (primary) {
-        petDragging_ = false;
-        if (activeConfig.releaseHoldMs > 0) {
-            petReleaseHoldUntilTickMs_ = nowTickMs + static_cast<uint64_t>(activeConfig.releaseHoldMs);
-            petCompanion_->RequestAction(pet::PetAction::Drag, 0.06);
-        } else {
-            petReleaseHoldUntilTickMs_ = 0;
-            petCompanion_->RequestAction(pet::PetAction::Follow, 0.08);
-        }
+    UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+    if (button == static_cast<int>(MouseButton::Left) && petPrimaryPress_.active) {
+        petPrimaryPress_.releaseReady = true;
+        petPrimaryPress_.releaseTickMs = nowTickMs;
+        petPrimaryPress_.releasePressMs =
+            static_cast<uint32_t>((nowTickMs >= petPrimaryPress_.downTickMs)
+                                      ? (nowTickMs - petPrimaryPress_.downTickMs)
+                                      : 0);
+        petPrimaryPress_.releaseMaxTravelPx = petPrimaryPress_.maxTravelPx;
+        petPrimaryPress_.active = false;
     }
-    const bool releaseHoldActive =
-        primary &&
-        activeConfig.releaseHoldMs > 0 &&
-        (petReleaseHoldUntilTickMs_ > nowTickMs);
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, false, releaseHoldActive, dt));
-    UpdatePetVisualState(
-        runtimePt,
-        releaseHoldActive ? static_cast<int>(pet::PetAction::Drag) : static_cast<int>(pet::PetAction::Follow),
-        releaseHoldActive ? 0.72f : 0.6f);
+    const int actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+    UpdatePetVisualState(pt, actionCode, 0.0f, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("button_up");
 }
 
 void AppController::DispatchPetHoldEnd(const ScreenPoint& pt) {
-    if (!config_.mouseCompanion.enabled || !petCompanion_) {
-        return;
-    }
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
-    petLastDispatchPoint_ = pt;
-    petHasLastDispatchPoint_ = true;
-    const uint64_t nowTickMs = CurrentTickMs();
-    const double dt = ResolvePetDeltaSeconds(&petLastTickMs_, nowTickMs);
-    const ScreenPoint runtimePt = ResolvePetRuntimeCursorPoint(pt, dt, activeConfig.smoothingPercent);
-    petCompanion_->RequestAction(pet::PetAction::Follow, 0.09);
-    petCompanion_->Tick(BuildPetFrameInput(runtimePt, false, petDragging_, dt));
-    UpdatePetVisualState(runtimePt, static_cast<int>(pet::PetAction::Follow), 0.60f);
+    UpdatePetClickStreakDecay(CurrentTickMs(), activeConfig);
+    const int actionCode = (activeConfig.positionMode == "follow") ? kPetActionFollow : kPetActionIdle;
+    UpdatePetVisualState(pt, actionCode, 0.0f, petClickStreak_.tintAmount);
+    RecordMouseCompanionPluginPhase0Input("hold_end");
 }
 
 ScreenPoint AppController::ResolvePetRuntimeCursorPoint(
     const ScreenPoint& rawPt,
     double dtSeconds,
     int smoothingPercent) {
-    const double alpha = ResolvePetSmoothingAlpha(smoothingPercent, dtSeconds);
-    const double rawX = static_cast<double>(rawPt.x);
-    const double rawY = static_cast<double>(rawPt.y);
-
-    if (!petHasSmoothedCursor_) {
-        petSmoothedCursorX_ = rawX;
-        petSmoothedCursorY_ = rawY;
+    const int clampedSmoothing = std::clamp(smoothingPercent, 0, 95);
+    if (clampedSmoothing <= 0) {
         petHasSmoothedCursor_ = true;
-    } else {
-        petSmoothedCursorX_ += (rawX - petSmoothedCursorX_) * alpha;
-        petSmoothedCursorY_ += (rawY - petSmoothedCursorY_) * alpha;
+        petSmoothedCursorX_ = static_cast<double>(rawPt.x);
+        petSmoothedCursorY_ = static_cast<double>(rawPt.y);
+        return rawPt;
     }
 
-    ScreenPoint smoothed{};
-    smoothed.x = static_cast<long>(std::lround(petSmoothedCursorX_));
-    smoothed.y = static_cast<long>(std::lround(petSmoothedCursorY_));
-    return smoothed;
+    if (!petHasSmoothedCursor_) {
+        petHasSmoothedCursor_ = true;
+        petSmoothedCursorX_ = static_cast<double>(rawPt.x);
+        petSmoothedCursorY_ = static_cast<double>(rawPt.y);
+        return rawPt;
+    }
+
+    const double frameScale = std::max(0.25, dtSeconds * 60.0);
+    const double alpha = std::clamp((1.0 - static_cast<double>(clampedSmoothing) / 100.0) * frameScale, 0.03, 1.0);
+    petSmoothedCursorX_ += (static_cast<double>(rawPt.x) - petSmoothedCursorX_) * alpha;
+    petSmoothedCursorY_ += (static_cast<double>(rawPt.y) - petSmoothedCursorY_) * alpha;
+    ScreenPoint out{};
+    out.x = static_cast<int>(std::lround(petSmoothedCursorX_));
+    out.y = static_cast<int>(std::lround(petSmoothedCursorY_));
+    return out;
 }
 
 void AppController::ResetPetDispatchRuntimeState() {
+    petPluginHostPhase0_.Reset(config_.mouseCompanion.enabled, CurrentTickMs());
     petDragging_ = false;
     petLastTickMs_ = 0;
     petReleaseHoldUntilTickMs_ = 0;
@@ -730,149 +777,199 @@ void AppController::ResetPetDispatchRuntimeState() {
     petSmoothedCursorY_ = 0.0;
     petHasLastDispatchPoint_ = false;
     petLastDispatchPoint_ = ScreenPoint{};
+    petClickStreak_.streak = 0;
+    petClickStreak_.lastClickTickMs = 0;
+    petClickStreak_.lastUpdateTickMs = 0;
+    petClickStreak_.tintAmount = 0.0f;
+    petVisualPoseRuntime_ = PetVisualPoseRuntimeState{};
+    petPrimaryPress_ = PetPrimaryPressState{};
+    petLastScrollTickMs_ = 0;
     {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-        mouseCompanionRuntimeStatus_.lastActionCode = static_cast<int>(pet::PetAction::Idle);
+        mouseCompanionRuntimeStatus_.lastActionCode = 0;
         mouseCompanionRuntimeStatus_.lastActionIntensity = 0.0f;
         mouseCompanionRuntimeStatus_.lastActionTickMs = CurrentTickMs();
         mouseCompanionRuntimeStatus_.lastActionName = "idle";
+        mouseCompanionRuntimeStatus_.clickStreak = 0;
+        mouseCompanionRuntimeStatus_.clickStreakTintAmount = 0.0f;
     }
+    SyncMouseCompanionPluginPhase0Status();
 }
 
-void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity) {
+void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity, float headTintAmount) {
+    const float clampedIntensity = ClampUnit(actionIntensity);
+    const float clampedTint = ClampUnit(headTintAmount);
+    const uint64_t nowTickMs = CurrentTickMs();
     {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.lastActionCode = actionCode;
-        mouseCompanionRuntimeStatus_.lastActionIntensity = actionIntensity;
-        mouseCompanionRuntimeStatus_.lastActionTickMs = CurrentTickMs();
-        mouseCompanionRuntimeStatus_.lastActionName = ResolveMouseCompanionActionName(actionCode);
+        mouseCompanionRuntimeStatus_.lastActionIntensity = clampedIntensity;
+        mouseCompanionRuntimeStatus_.lastActionTickMs = nowTickMs;
+        mouseCompanionRuntimeStatus_.lastActionName = ResolvePetActionName(actionCode);
+        mouseCompanionRuntimeStatus_.clickStreakTintAmount = clampedTint;
     }
+
 #if MFX_PLATFORM_MACOS
-    if (!config_.mouseCompanion.enabled || petVisualHostHandle_ == nullptr) {
-        return;
-    }
-    ScreenPoint visualPt = pt;
-    ScreenPoint cocoaPt{};
-    if (macos_overlay_coord_conversion::TryConvertQuartzToCocoa(pt, &cocoaPt)) {
-        visualPt = cocoaPt;
-    }
-    int boneCount = 0;
-    if (petCompanion_) {
-        if (const auto* skeleton = petCompanion_->CurrentSkeleton()) {
-            boneCount = static_cast<int>(skeleton->bones.size());
+    if (petVisualHostHandle_ && config_.mouseCompanion.enabled) {
+        mfx_macos_mouse_companion_panel_update_v1(
+            petVisualHostHandle_,
+            actionCode,
+            clampedIntensity,
+            clampedTint);
+        const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
+        const PetVisualMotionProfile& visualProfile =
+            ResolvePetVisualMotionProfile(activeConfig.useTestProfile);
+        if (activeConfig.positionMode == "follow") {
+            mfx_macos_mouse_companion_panel_move_follow_v1(
+                petVisualHostHandle_,
+                pt.x,
+                pt.y);
+        }
+
+        if (EnsurePetVisualPoseBinding()) {
+            if (petVisualPoseRuntime_.lastTickMs == 0 || nowTickMs <= petVisualPoseRuntime_.lastTickMs) {
+                petVisualPoseRuntime_.lastTickMs = nowTickMs;
+            } else {
+                const uint64_t deltaMs = nowTickMs - petVisualPoseRuntime_.lastTickMs;
+                petVisualPoseRuntime_.lastTickMs = nowTickMs;
+                const float dt = static_cast<float>(std::clamp<uint64_t>(deltaMs, 0, 120)) / 1000.0f;
+                petVisualPoseRuntime_.holdPulse =
+                    std::max(0.0f, petVisualPoseRuntime_.holdPulse - dt * visualProfile.holdDecayPerSecond);
+                petVisualPoseRuntime_.scrollPulse =
+                    std::max(0.0f, petVisualPoseRuntime_.scrollPulse - dt * visualProfile.scrollDecayPerSecond);
+            }
+
+            if (actionCode == kPetActionHoldReact) {
+                petVisualPoseRuntime_.holdPulse =
+                    std::max(petVisualPoseRuntime_.holdPulse, std::max(visualProfile.holdPulseFloor, clampedIntensity));
+            }
+            if (actionCode == kPetActionScrollReact) {
+                petVisualPoseRuntime_.scrollPulse =
+                    std::max(petVisualPoseRuntime_.scrollPulse, std::max(visualProfile.scrollPulseFloor, clampedIntensity));
+            }
+
+            const float holdProfile = std::max(
+                ClampUnit(petVisualPoseRuntime_.holdPulse),
+                (actionCode == kPetActionHoldReact) ? clampedIntensity : 0.0f);
+            const float scrollProfile = ClampUnit(petVisualPoseRuntime_.scrollPulse);
+            const float holdTerm = ClampUnit(holdProfile * visualProfile.holdPoseGain);
+            const float scrollTerm = ClampUnit(scrollProfile * visualProfile.scrollPoseGain);
+            const float earSpread = ClampUnit(
+                scrollTerm * 0.70f);
+            const float earLift = ClampUnit(
+                scrollTerm * 0.42f);
+            const float handLift = ClampUnit(
+                holdTerm * 0.52f +
+                scrollTerm * 0.30f);
+            const float handSpread = ClampUnit(
+                holdTerm * 0.32f +
+                scrollTerm * 0.18f);
+            const float legSpread = ClampUnit(
+                scrollTerm * 0.50f);
+            const float legKick = ClampUnit(
+                scrollTerm * 0.40f);
+
+            std::array<int32_t, kPetPoseBoneCount> boneIndices = {
+                kPetBoneLeftEar,
+                kPetBoneRightEar,
+                kPetBoneLeftHand,
+                kPetBoneRightHand,
+                kPetBoneLeftLeg,
+                kPetBoneRightLeg,
+            };
+            std::array<float, kPetPoseBoneCount * 3> positions{};
+            std::array<float, kPetPoseBoneCount * 4> rotations{};
+            std::array<float, kPetPoseBoneCount * 3> scales{};
+            for (int i = 0; i < kPetPoseBoneCount; ++i) {
+                scales[static_cast<size_t>(i) * 3 + 0] = 1.0f;
+                scales[static_cast<size_t>(i) * 3 + 1] = 1.0f;
+                scales[static_cast<size_t>(i) * 3 + 2] = 1.0f;
+            }
+
+            positions[0] = -earSpread * 0.21f;
+            positions[1] = earLift * 0.14f;
+            positions[3] = earSpread * 0.21f;
+            positions[4] = earLift * 0.14f;
+            positions[6] = -handSpread * 0.26f;
+            positions[7] = handLift * 0.22f;
+            positions[9] = handSpread * 0.26f;
+            positions[10] = handLift * 0.22f;
+            positions[12] = -legSpread * 0.17f;
+            positions[15] = legSpread * 0.17f;
+
+            float q[4]{};
+            WriteQuaternionFromEuler(-0.18f * holdProfile, 0.0f, -(0.42f * earSpread + 0.12f * scrollProfile), q);
+            rotations[0] = q[0];
+            rotations[1] = q[1];
+            rotations[2] = q[2];
+            rotations[3] = q[3];
+            WriteQuaternionFromEuler(-0.18f * holdProfile, 0.0f, (0.42f * earSpread + 0.12f * scrollProfile), q);
+            rotations[4] = q[0];
+            rotations[5] = q[1];
+            rotations[6] = q[2];
+            rotations[7] = q[3];
+            WriteQuaternionFromEuler(-0.34f * holdProfile, 0.0f, 0.92f * handSpread, q);
+            rotations[8] = q[0];
+            rotations[9] = q[1];
+            rotations[10] = q[2];
+            rotations[11] = q[3];
+            WriteQuaternionFromEuler(-0.34f * holdProfile, 0.0f, -0.92f * handSpread, q);
+            rotations[12] = q[0];
+            rotations[13] = q[1];
+            rotations[14] = q[2];
+            rotations[15] = q[3];
+            WriteQuaternionFromEuler(0.0f, 0.0f, -0.70f * legKick, q);
+            rotations[16] = q[0];
+            rotations[17] = q[1];
+            rotations[18] = q[2];
+            rotations[19] = q[3];
+            WriteQuaternionFromEuler(0.0f, 0.0f, 0.70f * legKick, q);
+            rotations[20] = q[0];
+            rotations[21] = q[1];
+            rotations[22] = q[2];
+            rotations[23] = q[3];
+
+            mfx_macos_mouse_companion_panel_apply_pose_v1(
+                petVisualHostHandle_,
+                boneIndices.data(),
+                positions.data(),
+                rotations.data(),
+                scales.data(),
+                kPetPoseBoneCount);
         }
     }
-    mfx_macos_mouse_companion_update_state_v1(
-        petVisualHostHandle_,
-        visualPt.x,
-        visualPt.y,
-        actionCode,
-        actionIntensity,
-        boneCount);
-
-    if (!petCompanion_) {
-        return;
-    }
-    if (!EnsurePetVisualPoseBinding()) {
-        return;
-    }
-    PetVisualPosePayload payload = BuildPetVisualPosePayload(petCompanion_.get());
-    if (payload.Count() <= 0) {
-        return;
-    }
-    mfx_macos_mouse_companion_apply_pose_v1(
-        petVisualHostHandle_,
-        payload.boneIndices.data(),
-        payload.positions.data(),
-        payload.rotations.data(),
-        payload.scales.data(),
-        payload.Count());
 #else
     (void)pt;
-    (void)actionCode;
-    (void)actionIntensity;
 #endif
 }
 
 bool AppController::EnsurePetVisualPoseBinding() {
 #if MFX_PLATFORM_MACOS
-    if (petVisualHostHandle_ == nullptr || !petCompanion_) {
-        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-        mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
-        return false;
-    }
-    if (petVisualPoseBindingConfigured_) {
-        return true;
-    }
-    const pet::SkeletonDesc* skeleton = petCompanion_->CurrentSkeleton();
-    if (!skeleton || skeleton->bones.empty()) {
+    if (!petVisualHostHandle_) {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
         mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
         return false;
     }
-
-    petVisualSkeletonNames_.clear();
-    petVisualSkeletonNamePtrs_.clear();
-    petVisualSkeletonNames_.reserve(skeleton->bones.size());
-    petVisualSkeletonNamePtrs_.reserve(skeleton->bones.size());
-    for (size_t i = 0; i < skeleton->bones.size(); ++i) {
-        std::string name = skeleton->bones[i].name;
-        if (name.empty()) {
-            name = "joint_" + std::to_string(i);
-        }
-        petVisualSkeletonNames_.push_back(std::move(name));
-        petVisualSkeletonNamePtrs_.push_back(petVisualSkeletonNames_.back().c_str());
+    if (!petVisualPoseBindingConfigured_) {
+        petVisualPoseBindingConfigured_ = mfx_macos_mouse_companion_panel_configure_pose_binding_v1(
+            petVisualHostHandle_,
+            kPetPoseBoneNames.data(),
+            kPetPoseBoneCount);
     }
-
-    const int configured = mfx_macos_mouse_companion_configure_pose_binding_v1(
-        petVisualHostHandle_,
-        petVisualSkeletonNamePtrs_.data(),
-        static_cast<int>(petVisualSkeletonNamePtrs_.size()));
-    petVisualPoseBindingConfigured_ = (configured != 0);
-    {
-        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-        mouseCompanionRuntimeStatus_.poseBindingConfigured = petVisualPoseBindingConfigured_;
-        mouseCompanionRuntimeStatus_.skeletonBoneCount = static_cast<int>(skeleton->bones.size());
-    }
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.poseBindingConfigured = petVisualPoseBindingConfigured_;
+    mouseCompanionRuntimeStatus_.skeletonBoneCount = petVisualPoseBindingConfigured_ ? kPetPoseBoneCount : 0;
     return petVisualPoseBindingConfigured_;
 #else
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
+    mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
     return false;
 #endif
 }
 
 void AppController::TryApplyPetAppearanceToVisualHost() {
-#if MFX_PLATFORM_MACOS
-    if (petVisualHostHandle_ == nullptr || !petCompanion_) {
-        return;
-    }
-    const pet::AppearanceOverrides& appearance = petCompanion_->CurrentAppearance();
-
-    std::vector<const char*> accessoryIds;
-    accessoryIds.reserve(appearance.enabledAccessoryIds.size());
-    for (const auto& id : appearance.enabledAccessoryIds) {
-        if (!id.empty()) {
-            accessoryIds.push_back(id.c_str());
-        }
-    }
-
-    std::vector<const char*> textureOverrides;
-    textureOverrides.reserve(appearance.textureOverridePaths.size());
-    for (const auto& value : appearance.textureOverridePaths) {
-        if (!value.empty()) {
-            textureOverrides.push_back(value.c_str());
-        }
-    }
-
-    const char* skinVariant = appearance.skinVariantId.empty() ? nullptr : appearance.skinVariantId.c_str();
-    (void)mfx_macos_mouse_companion_apply_appearance_v1(
-        petVisualHostHandle_,
-        skinVariant,
-        accessoryIds.empty() ? nullptr : accessoryIds.data(),
-        static_cast<int>(accessoryIds.size()),
-        textureOverrides.empty() ? nullptr : textureOverrides.data(),
-        static_cast<int>(textureOverrides.size()));
-#endif
 }
 
 void AppController::RememberLastPointerPoint(const ScreenPoint& pt) {

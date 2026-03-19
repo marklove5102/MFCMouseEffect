@@ -205,6 +205,16 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
     json out = json::object();
     out["config_enabled"] = status.configEnabled;
     out["runtime_present"] = status.runtimePresent;
+    out["plugin_host_ready"] = status.pluginHostReady;
+    out["plugin_host_phase"] = status.pluginHostPhase;
+    out["active_plugin_id"] = status.activePluginId;
+    out["active_plugin_version"] = status.activePluginVersion;
+    out["engine_api_version"] = status.engineApiVersion;
+    out["compatibility_status"] = status.compatibilityStatus;
+    out["fallback_reason"] = status.fallbackReason;
+    out["last_plugin_event"] = status.lastPluginEvent;
+    out["last_plugin_event_tick_ms"] = status.lastPluginEventTickMs;
+    out["plugin_event_count"] = status.pluginEventCount;
     out["visual_host_active"] = status.visualHostActive;
     out["visual_model_loaded"] = status.visualModelLoaded;
     out["model_loaded"] = status.modelLoaded;
@@ -234,6 +244,10 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
     out["last_action_name"] = status.lastActionName;
     out["last_action_intensity"] = status.lastActionIntensity;
     out["last_action_tick_ms"] = status.lastActionTickMs;
+    out["click_streak"] = status.clickStreak;
+    out["click_streak_tint_amount"] = status.clickStreakTintAmount;
+    out["click_streak_break_ms"] = status.clickStreakBreakMs;
+    out["click_streak_decay_per_second"] = status.clickStreakDecayPerSecond;
     out["action_coverage"] = {
         {"ready", status.actionCoverageReady},
         {"expected_action_count", status.actionCoverageExpectedActionCount},

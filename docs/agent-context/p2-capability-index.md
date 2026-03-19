@@ -34,6 +34,10 @@ Use it when P1 (`current.md`) is not enough and you need targeted deep context.
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/server-structure.md`
 
 ## Mouse Companion 3D
+- 插件化重建主路线（当前最高优先级，按 Native Plugin 优先、WASM 可选适配执行）:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md`
+- 后端重置契约（当前最高优先级，说明已清空旧后端实现并保留前端/配置兼容面）:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-backend-reset-contract.zh-CN.md`
 - 3D companion runtime blueprint and phased architecture (canonical `glb`, non-builtin animation pipeline):
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md`
 - Action clip asset contract and JSON schema (external skeleton action reuse):
@@ -42,6 +46,12 @@ Use it when P1 (`current.md`) is not enough and you need targeted deep context.
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-appearance-contract.zh-CN.md`
 - Model import pipeline contract (converter abstraction + sidecar/default pipeline):
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-model-import-pipeline-contract.zh-CN.md`
+- Pointer-facing toggle + click-streak head-tint contract (config/runtime/webui/proof):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-pointer-facing-click-streak-contract.zh-CN.md`
+- Position mode contract (`fixed_bottom_left` / `follow`, macOS left-bottom anchor path):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-position-mode-contract.zh-CN.md`
+- Click parity contract (tauri-aligned click gate + limb procedural linkage):
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-click-parity-tauri-contract.zh-CN.md`
 
 ## Regression / Workflow
 - Unified regression workflow:

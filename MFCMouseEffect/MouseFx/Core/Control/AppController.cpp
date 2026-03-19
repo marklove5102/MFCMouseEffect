@@ -16,8 +16,6 @@
 #include "MouseFx/Core/System/GdiPlusSession.h"
 #include "MouseFx/Core/System/StdMonotonicClockService.h"
 #include "MouseFx/Core/Overlay/NullInputIndicatorOverlay.h"
-#include "MouseFx/Core/Pet/PetCompanionRuntime.h"
-#include "MouseFx/Core/Pet/PetInterfaces.h"
 #include "MouseFx/Core/Protocol/JsonLite.h"
 #include "MouseFx/Core/Effects/ClickEffectCompute.h"
 #include "MouseFx/Core/Effects/HoldEffectCompute.h"
@@ -57,10 +55,7 @@ AppController::AppController()
     , keyboardInjector_(platform::CreateKeyboardInjector())
     , inputIndicatorOverlay_(platform::CreateInputIndicatorOverlay())
     , commandHandler_(std::make_unique<CommandHandler>(this))
-    , dispatchRouter_(std::make_unique<DispatchRouter>(this))
-    , petCompanion_(std::make_unique<pet::PetCompanionRuntime>(
-          pet::CreateDefaultPetModelRuntime(),
-          pet::CreateDefaultActionSynthesizer())) {
+    , dispatchRouter_(std::make_unique<DispatchRouter>(this)) {
     if (!dispatchMessageHost_) {
         dispatchMessageHost_ = std::make_unique<NullDispatchMessageHost>();
     }
@@ -89,10 +84,12 @@ AppController::AppController()
     if (!inputIndicatorOverlay_) {
         inputIndicatorOverlay_ = std::make_unique<NullInputIndicatorOverlay>();
     }
+    petPluginHostPhase0_.Reset(false, CurrentTickMs());
     {
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-        mouseCompanionRuntimeStatus_.runtimePresent = (petCompanion_ != nullptr);
+        mouseCompanionRuntimeStatus_.runtimePresent = false;
     }
+    SyncMouseCompanionPluginPhase0Status();
 }
 
 AppController::~AppController() {

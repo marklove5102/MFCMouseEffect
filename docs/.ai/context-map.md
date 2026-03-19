@@ -1,6 +1,6 @@
 # AI Context Map
 
-Generated: 2026-03-18T00:30:20.100Z
+Generated: 2026-03-19T01:55:24.872Z
 
 ## Goal
 Load minimal docs by task keyword while keeping AGENTS + current context as mandatory baseline.
@@ -20,8 +20,8 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 ### wasm
 - `docs/architecture/custom-effects-wasm-route.md` (P2, 750 tok)
 - `docs/architecture/custom-effects-wasm-route.zh-CN.md` (P2, 750 tok)
-- `docs/architecture/wasm-plugin-abi-v3-design.md` (P2, 750 tok)
-- `docs/architecture/wasm-plugin-abi-v3-design.zh-CN.md` (P2, 750 tok)
+- `docs/architecture/mouse-companion-backend-reset-contract.zh-CN.md` (P2, 750 tok)
+- `docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md` (P2, 750 tok)
 
 ### effects
 - `docs/architecture/mouse-companion-action-clip-contract.zh-CN.md` (P2, 750 tok)
@@ -35,6 +35,7 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 ### general
 - `docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md` (P2, 750 tok)
 - `docs/architecture/mouse-companion-appearance-contract.zh-CN.md` (P2, 645 tok)
+- `docs/architecture/mouse-companion-click-parity-tauri-contract.zh-CN.md` (P2, 750 tok)
 - `docs/architecture/mouse-companion-model-import-pipeline-contract.zh-CN.md` (P2, 750 tok)
 
 ## Commands
@@ -46,7 +47,6 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 ```
 
 ## Largest Docs (Trim Candidates)
-- `docs/agent-context/current.md` -> ~9855 tok
 - `docs/architecture/custom-effects-wasm-route.zh-CN.md` -> ~6872 tok
 - `docs/architecture/custom-effects-wasm-route.md` -> ~6707 tok
 - `docs/refactoring/phase-roadmap-macos-m1-status.md` -> ~5868 tok
@@ -54,6 +54,7 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 - `docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md` -> ~3768 tok
 - `docs/architecture/wasm-plugin-abi-v3-design.md` -> ~2078 tok
 - `docs/architecture/wasm-plugin-abi-v3-design.zh-CN.md` -> ~1996 tok
+- `docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md` -> ~1954 tok
 
 ## Notes
 - Index is machine-readable: `docs/.ai/context-index.json`.

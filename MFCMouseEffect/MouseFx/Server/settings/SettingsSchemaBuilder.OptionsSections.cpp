@@ -53,6 +53,10 @@ void AppendSettingsSchemaOptionsSections(const EffectConfig& config, json* out) 
         {"model_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb"},
         {"action_library_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-actions.json"},
         {"appearance_profile_path_default", "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json"},
+        {"position_modes", json::array({
+            MakeOpt("fixed_bottom_left", L"\u56fa\u5b9a\u5de6\u4e0b\u89d2\uff08\u70b9\u51fb\u8c03\u8bd5\u63a8\u8350\uff09", L"Fixed Bottom Left (Recommended For Click Tuning)", lang),
+            MakeOpt("follow", L"\u8ddf\u968f\u5149\u6807", L"Follow Cursor", lang),
+        })},
         {"edge_clamp_modes", json::array({
             MakeOpt("soft", L"\u8f6f\u8fb9\u754c\uff08\u63a8\u8350\uff09", L"Soft Edge (Recommended)", lang),
             MakeOpt("free", L"\u65e0\u8fb9\u754c\u9650\u5236", L"Free (No Clamp)", lang),
@@ -64,8 +68,16 @@ void AppendSettingsSchemaOptionsSections(const EffectConfig& config, json* out) 
         {"smoothing_percent_range", {{"min", 0}, {"max", 95}, {"step", 1}}},
         {"follow_threshold_px_range", {{"min", 0}, {"max", 32}, {"step", 1}}},
         {"release_hold_ms_range", {{"min", 0}, {"max", 800}, {"step", 10}}},
+        {"click_streak_break_ms_range", {{"min", 120}, {"max", 3000}, {"step", 10}}},
+        {"head_tint_per_click_range", {{"min", 0.01}, {"max", 1.0}, {"step", 0.01}}},
+        {"head_tint_max_range", {{"min", 0.01}, {"max", 1.0}, {"step", 0.01}}},
+        {"head_tint_decay_per_second_range", {{"min", 0.05}, {"max", 4.0}, {"step", 0.01}}},
         {"test_press_lift_px_range", {{"min", 0}, {"max", 320}, {"step", 1}}},
         {"test_smoothing_percent_range", {{"min", 0}, {"max", 95}, {"step", 1}}},
+        {"test_click_streak_break_ms_range", {{"min", 120}, {"max", 3000}, {"step", 10}}},
+        {"test_head_tint_per_click_range", {{"min", 0.01}, {"max", 1.0}, {"step", 0.01}}},
+        {"test_head_tint_max_range", {{"min", 0.01}, {"max", 1.0}, {"step", 0.01}}},
+        {"test_head_tint_decay_per_second_range", {{"min", 0.05}, {"max", 4.0}, {"step", 0.01}}},
     };
     (*out)["effect_conflict_policy_options"] = {
         {"hold_move_policy", json::array({

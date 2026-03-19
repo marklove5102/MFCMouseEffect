@@ -95,6 +95,7 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
         {"model_path", EnsureUtf8(companion.modelPath)},
         {"action_library_path", EnsureUtf8(companion.actionLibraryPath)},
         {"appearance_profile_path", EnsureUtf8(companion.appearanceProfilePath)},
+        {"position_mode", EnsureUtf8(companion.positionMode)},
         {"edge_clamp_mode", EnsureUtf8(companion.edgeClampMode)},
         {"size_px", companion.sizePx},
         {"offset_x", companion.offsetX},
@@ -103,9 +104,18 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
         {"smoothing_percent", companion.smoothingPercent},
         {"follow_threshold_px", companion.followThresholdPx},
         {"release_hold_ms", companion.releaseHoldMs},
+        {"face_pointer_enabled", companion.facePointerEnabled},
+        {"click_streak_break_ms", companion.clickStreakBreakMs},
+        {"head_tint_per_click", companion.headTintPerClick},
+        {"head_tint_max", companion.headTintMax},
+        {"head_tint_decay_per_second", companion.headTintDecayPerSecond},
         {"use_test_profile", companion.useTestProfile},
         {"test_press_lift_px", companion.testPressLiftPx},
         {"test_smoothing_percent", companion.testSmoothingPercent},
+        {"test_click_streak_break_ms", companion.testClickStreakBreakMs},
+        {"test_head_tint_per_click", companion.testHeadTintPerClick},
+        {"test_head_tint_max", companion.testHeadTintMax},
+        {"test_head_tint_decay_per_second", companion.testHeadTintDecayPerSecond},
     };
 
     (*out)["input_indicator"] = {

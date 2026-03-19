@@ -150,6 +150,11 @@ MouseCompanionConfig SanitizeMouseCompanionConfig(MouseCompanionConfig config) {
     if (config.appearanceProfilePath.empty()) {
         config.appearanceProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-appearance.json";
     }
+    config.positionMode = ToLowerAscii(TrimAscii(config.positionMode));
+    if (config.positionMode != "follow" &&
+        config.positionMode != "fixed_bottom_left") {
+        config.positionMode = "fixed_bottom_left";
+    }
     config.edgeClampMode = ToLowerAscii(TrimAscii(config.edgeClampMode));
     if (config.edgeClampMode != "strict" &&
         config.edgeClampMode != "soft" &&
@@ -163,8 +168,16 @@ MouseCompanionConfig SanitizeMouseCompanionConfig(MouseCompanionConfig config) {
     config.smoothingPercent = ClampInt(config.smoothingPercent, 0, 95);
     config.followThresholdPx = ClampInt(config.followThresholdPx, 0, 32);
     config.releaseHoldMs = ClampInt(config.releaseHoldMs, 0, 800);
+    config.clickStreakBreakMs = ClampInt(config.clickStreakBreakMs, 120, 3000);
+    config.headTintPerClick = std::clamp(config.headTintPerClick, 0.01, 1.0);
+    config.headTintMax = std::clamp(config.headTintMax, config.headTintPerClick, 1.0);
+    config.headTintDecayPerSecond = std::clamp(config.headTintDecayPerSecond, 0.05, 4.0);
     config.testPressLiftPx = ClampInt(config.testPressLiftPx, 0, 320);
     config.testSmoothingPercent = ClampInt(config.testSmoothingPercent, 0, 95);
+    config.testClickStreakBreakMs = ClampInt(config.testClickStreakBreakMs, 120, 3000);
+    config.testHeadTintPerClick = std::clamp(config.testHeadTintPerClick, 0.01, 1.0);
+    config.testHeadTintMax = std::clamp(config.testHeadTintMax, config.testHeadTintPerClick, 1.0);
+    config.testHeadTintDecayPerSecond = std::clamp(config.testHeadTintDecayPerSecond, 0.05, 4.0);
     return config;
 }
 

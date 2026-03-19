@@ -6,9 +6,6 @@
 #include <string>
 
 #include "MouseFx/Core/Control/AppController.h"
-#include "MouseFx/Core/Pet/PetActionCoverageAnalyzer.h"
-#include "MouseFx/Core/Pet/PetActionLibrary.h"
-#include "MouseFx/Core/Pet/PetGlbSkeletonLoader.h"
 #include "MouseFx/Core/Protocol/InputTypes.h"
 #include "MouseFx/Server/http/HttpServer.h"
 #include "MouseFx/Server/routes/testing/WebSettingsServer.TestRouteCommon.h"
@@ -46,6 +43,16 @@ json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRun
     return json({
         {"config_enabled", status.configEnabled},
         {"runtime_present", status.runtimePresent},
+        {"plugin_host_ready", status.pluginHostReady},
+        {"plugin_host_phase", status.pluginHostPhase},
+        {"active_plugin_id", status.activePluginId},
+        {"active_plugin_version", status.activePluginVersion},
+        {"engine_api_version", status.engineApiVersion},
+        {"compatibility_status", status.compatibilityStatus},
+        {"fallback_reason", status.fallbackReason},
+        {"last_plugin_event", status.lastPluginEvent},
+        {"last_plugin_event_tick_ms", status.lastPluginEventTickMs},
+        {"plugin_event_count", status.pluginEventCount},
         {"visual_host_active", status.visualHostActive},
         {"visual_model_loaded", status.visualModelLoaded},
         {"model_loaded", status.modelLoaded},
@@ -75,61 +82,29 @@ json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRun
         {"last_action_name", status.lastActionName},
         {"last_action_intensity", status.lastActionIntensity},
         {"last_action_tick_ms", status.lastActionTickMs},
+        {"click_streak", status.clickStreak},
+        {"click_streak_tint_amount", status.clickStreakTintAmount},
+        {"click_streak_break_ms", status.clickStreakBreakMs},
+        {"click_streak_decay_per_second", status.clickStreakDecayPerSecond},
     });
 }
 
 json BuildActionCoverageJson(const AppController::MouseCompanionRuntimeStatus& status) {
     json out = json::object();
-    out["ready"] = false;
-    out["error"] = "";
-    out["expected_action_count"] = 0;
-    out["covered_action_count"] = 0;
-    out["missing_action_count"] = 0;
-    out["skeleton_bone_count"] = 0;
-    out["total_track_count"] = 0;
-    out["mapped_track_count"] = 0;
-    out["overall_coverage_ratio"] = 0.0;
-    out["missing_actions"] = json::array();
-    out["missing_bone_names"] = json::array();
-    out["actions"] = json::array();
-
-    if (!status.modelLoaded || status.loadedModelPath.empty()) {
-        out["error"] = "runtime_model_unavailable";
-        return out;
-    }
-    if (!status.actionLibraryLoaded || status.loadedActionLibraryPath.empty()) {
-        out["error"] = "action_library_unavailable";
-        return out;
-    }
-
-    pet::SkeletonDesc skeleton{};
-    std::string error;
-    if (!pet::LoadSkeletonFromGlb(status.loadedModelPath, &skeleton, &error)) {
-        out["error"] = error.empty() ? "load_skeleton_failed" : error;
-        return out;
-    }
-
-    pet::ActionLibrary library{};
-    if (!pet::LoadActionLibraryFromJsonFile(status.loadedActionLibraryPath, &library, &error)) {
-        out["error"] = error.empty() ? "load_action_library_failed" : error;
-        return out;
-    }
-
-    const pet::ActionCoverageReport report = pet::BuildActionCoverageReport(skeleton, library);
-    out["ready"] = true;
-    out["error"] = "";
-    out["expected_action_count"] = report.expectedActionCount;
-    out["covered_action_count"] = report.coveredActionCount;
-    out["missing_action_count"] = report.missingActionCount;
-    out["skeleton_bone_count"] = report.skeletonBoneCount;
-    out["total_track_count"] = report.totalTrackCount;
-    out["mapped_track_count"] = report.totalMappedTrackCount;
-    out["overall_coverage_ratio"] = report.overallCoverageRatio;
-    out["missing_actions"] = report.missingActions;
-    out["missing_bone_names"] = report.missingBoneNames;
+    out["ready"] = status.actionCoverageReady;
+    out["error"] = status.actionCoverageError;
+    out["expected_action_count"] = status.actionCoverageExpectedActionCount;
+    out["covered_action_count"] = status.actionCoverageCoveredActionCount;
+    out["missing_action_count"] = status.actionCoverageMissingActionCount;
+    out["skeleton_bone_count"] = status.actionCoverageSkeletonBoneCount;
+    out["total_track_count"] = status.actionCoverageTotalTrackCount;
+    out["mapped_track_count"] = status.actionCoverageMappedTrackCount;
+    out["overall_coverage_ratio"] = status.actionCoverageOverallRatio;
+    out["missing_actions"] = status.actionCoverageMissingActions;
+    out["missing_bone_names"] = status.actionCoverageMissingBoneNames;
 
     json actions = json::array();
-    for (const auto& entry : report.actions) {
+    for (const auto& entry : status.actionCoverageActions) {
         actions.push_back({
             {"action_name", entry.actionName},
             {"clip_present", entry.clipPresent},

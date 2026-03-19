@@ -30,6 +30,9 @@ export function getMouseCompanionSectionMarkup() {
     </section>
     <section id="mc_panel_follow" class="mouse-companion-panel" role="tabpanel" aria-labelledby="mc_tab_follow" hidden>
       <div class="grid">
+        <label for="mc_position_mode" data-i18n="label_mouse_companion_position_mode">Position Mode</label>
+        <select id="mc_position_mode"></select>
+
         <label for="mc_edge_clamp_mode" data-i18n="label_mouse_companion_edge_clamp_mode">Edge Clamp Mode</label>
         <select id="mc_edge_clamp_mode"></select>
 
@@ -51,6 +54,25 @@ export function getMouseCompanionSectionMarkup() {
         <label for="mc_release_hold_ms" data-i18n="label_mouse_companion_release_hold_ms">Release Hold (ms)</label>
         <input id="mc_release_hold_ms" type="number" />
 
+        <label for="mc_face_pointer_enabled" class="label-with-tip"><span data-i18n="label_mouse_companion_face_pointer_enabled">Pointer Facing Follow</span></label>
+        <label class="startup-toggle" for="mc_face_pointer_enabled">
+          <input id="mc_face_pointer_enabled" class="startup-toggle__input" type="checkbox" />
+          <span class="startup-toggle__switch" aria-hidden="true"><span class="startup-toggle__thumb"></span></span>
+          <span id="mc_face_pointer_enabled_text" class="startup-toggle__text" data-i18n="text_mouse_companion_face_pointer_off">Disabled</span>
+        </label>
+
+        <label for="mc_click_streak_break_ms" data-i18n="label_mouse_companion_click_streak_break_ms">Click Streak Break (ms)</label>
+        <input id="mc_click_streak_break_ms" type="number" />
+
+        <label for="mc_head_tint_per_click" data-i18n="label_mouse_companion_head_tint_per_click">Head Tint Per Click (0~1)</label>
+        <input id="mc_head_tint_per_click" type="number" step="0.01" min="0.01" max="1" />
+
+        <label for="mc_head_tint_max" data-i18n="label_mouse_companion_head_tint_max">Head Tint Max (0~1)</label>
+        <input id="mc_head_tint_max" type="number" step="0.01" min="0.01" max="1" />
+
+        <label for="mc_head_tint_decay_per_second" data-i18n="label_mouse_companion_head_tint_decay_per_second">Head Tint Decay (/s)</label>
+        <input id="mc_head_tint_decay_per_second" type="number" step="0.01" min="0.05" max="4" />
+
         <label for="mc_use_test_profile" class="label-with-tip"><span data-i18n="label_mouse_companion_use_test_profile">Use Test Profile</span></label>
         <label class="startup-toggle" for="mc_use_test_profile">
           <input id="mc_use_test_profile" class="startup-toggle__input" type="checkbox" />
@@ -63,6 +85,18 @@ export function getMouseCompanionSectionMarkup() {
 
         <label for="mc_test_smoothing_percent" data-i18n="label_mouse_companion_test_smoothing_percent">Test Smoothing (%)</label>
         <input id="mc_test_smoothing_percent" type="number" />
+
+        <label for="mc_test_click_streak_break_ms" data-i18n="label_mouse_companion_test_click_streak_break_ms">Test Click Break (ms)</label>
+        <input id="mc_test_click_streak_break_ms" type="number" />
+
+        <label for="mc_test_head_tint_per_click" data-i18n="label_mouse_companion_test_head_tint_per_click">Test Tint Per Click (0~1)</label>
+        <input id="mc_test_head_tint_per_click" type="number" step="0.01" min="0.01" max="1" />
+
+        <label for="mc_test_head_tint_max" data-i18n="label_mouse_companion_test_head_tint_max">Test Tint Max (0~1)</label>
+        <input id="mc_test_head_tint_max" type="number" step="0.01" min="0.01" max="1" />
+
+        <label for="mc_test_head_tint_decay_per_second" data-i18n="label_mouse_companion_test_head_tint_decay_per_second">Test Tint Decay (/s)</label>
+        <input id="mc_test_head_tint_decay_per_second" type="number" step="0.01" min="0.05" max="4" />
       </div>
     </section>
     <section id="mc_panel_probe" class="mouse-companion-panel" role="tabpanel" aria-labelledby="mc_tab_probe" hidden>
@@ -152,6 +186,22 @@ export function getMouseCompanionSectionMarkup() {
         <div class="mouse-companion-runtime__item">
           <div class="mouse-companion-runtime__label" data-i18n="label_mouse_companion_last_action_tick_ms">Last Action Tick (ms)</div>
           <div id="mc_runtime_last_action_tick_ms" class="mouse-companion-runtime__value">0</div>
+        </div>
+        <div class="mouse-companion-runtime__item">
+          <div class="mouse-companion-runtime__label" data-i18n="label_mouse_companion_runtime_click_streak">Click Streak</div>
+          <div id="mc_runtime_click_streak" class="mouse-companion-runtime__value">0</div>
+        </div>
+        <div class="mouse-companion-runtime__item">
+          <div class="mouse-companion-runtime__label" data-i18n="label_mouse_companion_runtime_head_tint_amount">Head Tint Amount</div>
+          <div id="mc_runtime_head_tint_amount" class="mouse-companion-runtime__value">0.000</div>
+        </div>
+        <div class="mouse-companion-runtime__item">
+          <div class="mouse-companion-runtime__label" data-i18n="label_mouse_companion_runtime_click_streak_break_ms">Click Break (ms)</div>
+          <div id="mc_runtime_click_streak_break_ms" class="mouse-companion-runtime__value">650</div>
+        </div>
+        <div class="mouse-companion-runtime__item">
+          <div class="mouse-companion-runtime__label" data-i18n="label_mouse_companion_runtime_head_tint_decay_per_second">Head Tint Decay (/s)</div>
+          <div id="mc_runtime_head_tint_decay_per_second" class="mouse-companion-runtime__value">0.360</div>
         </div>
         <div class="mouse-companion-runtime__item">
           <div class="mouse-companion-runtime__label" data-i18n="label_mouse_companion_action_coverage_ready">Action Coverage Ready</div>
