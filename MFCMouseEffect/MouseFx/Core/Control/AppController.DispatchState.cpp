@@ -101,7 +101,7 @@ constexpr PetVisualMotionProfile kPetVisualMotionProd = {
     1.8f,  // scrollDecayPerSecond
     0.35f, // holdPulseFloor
     0.30f, // scrollPulseFloor
-    1.0f,  // holdPoseGain
+    1.18f, // holdPoseGain
     1.0f,  // scrollPoseGain
 };
 
@@ -114,7 +114,7 @@ constexpr PetVisualMotionProfile kPetVisualMotionTest = {
     2.4f,  // scrollDecayPerSecond
     0.45f, // holdPulseFloor
     0.40f, // scrollPulseFloor
-    1.12f, // holdPoseGain
+    1.30f, // holdPoseGain
     1.10f, // scrollPoseGain
 };
 
@@ -1098,14 +1098,15 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             const float earLift = ClampUnit(
                 scrollTerm * 0.42f);
             const float handLift = ClampUnit(
-                holdTerm * 0.52f +
+                holdTerm * 0.14f +
                 scrollTerm * 0.30f);
             const float handSpread = ClampUnit(
-                holdTerm * 0.32f +
+                holdTerm * 0.42f +
                 scrollTerm * 0.18f);
             const float legSpread = ClampUnit(
                 scrollTerm * 0.50f);
-            const float legKick = ClampUnit(
+            const float legCurl = ClampUnit(
+                holdTerm * 0.96f +
                 scrollTerm * 0.40f);
 
             std::array<int32_t, kPetPoseBoneCount> boneIndices = {
@@ -1130,39 +1131,55 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             positions[3] = earSpread * 0.21f;
             positions[4] = earLift * 0.14f;
             positions[6] = -handSpread * 0.26f;
-            positions[7] = handLift * 0.22f;
+            positions[7] = handLift * 0.08f;
             positions[9] = handSpread * 0.26f;
-            positions[10] = handLift * 0.22f;
+            positions[10] = handLift * 0.08f;
             positions[12] = -legSpread * 0.17f;
             positions[15] = legSpread * 0.17f;
 
             float q[4]{};
-            WriteQuaternionFromEuler(-0.18f * holdProfile, 0.0f, -(0.42f * earSpread + 0.12f * scrollProfile), q);
+            WriteQuaternionFromEuler(
+                -1.02f * holdTerm,
+                0.0f,
+                -(0.09f * holdTerm + 0.12f * scrollProfile + 0.42f * earSpread),
+                q);
             rotations[0] = q[0];
             rotations[1] = q[1];
             rotations[2] = q[2];
             rotations[3] = q[3];
-            WriteQuaternionFromEuler(-0.18f * holdProfile, 0.0f, (0.42f * earSpread + 0.12f * scrollProfile), q);
+            WriteQuaternionFromEuler(
+                -1.02f * holdTerm,
+                0.0f,
+                (0.09f * holdTerm + 0.12f * scrollProfile + 0.42f * earSpread),
+                q);
             rotations[4] = q[0];
             rotations[5] = q[1];
             rotations[6] = q[2];
             rotations[7] = q[3];
-            WriteQuaternionFromEuler(-0.34f * holdProfile, 0.0f, 0.92f * handSpread, q);
+            WriteQuaternionFromEuler(
+                -0.34f * holdTerm,
+                0.42f * holdTerm,
+                0.42f * holdTerm + 0.20f * scrollProfile + 0.40f * handSpread,
+                q);
             rotations[8] = q[0];
             rotations[9] = q[1];
             rotations[10] = q[2];
             rotations[11] = q[3];
-            WriteQuaternionFromEuler(-0.34f * holdProfile, 0.0f, -0.92f * handSpread, q);
+            WriteQuaternionFromEuler(
+                -0.34f * holdTerm,
+                -0.42f * holdTerm,
+                -(0.42f * holdTerm + 0.20f * scrollProfile + 0.40f * handSpread),
+                q);
             rotations[12] = q[0];
             rotations[13] = q[1];
             rotations[14] = q[2];
             rotations[15] = q[3];
-            WriteQuaternionFromEuler(0.0f, 0.0f, -0.70f * legKick, q);
+            WriteQuaternionFromEuler(0.0f, 0.0f, -0.279f * legCurl, q);
             rotations[16] = q[0];
             rotations[17] = q[1];
             rotations[18] = q[2];
             rotations[19] = q[3];
-            WriteQuaternionFromEuler(0.0f, 0.0f, 0.70f * legKick, q);
+            WriteQuaternionFromEuler(0.0f, 0.0f, 0.279f * legCurl, q);
             rotations[20] = q[0];
             rotations[21] = q[1];
             rotations[22] = q[2];

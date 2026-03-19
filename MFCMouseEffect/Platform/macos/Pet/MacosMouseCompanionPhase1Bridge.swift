@@ -312,18 +312,18 @@ private final class MfxMouseCompanionPanelView: NSView {
 
     private func drawLimbs(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, idleProfile: CGFloat) {
         let idleHandWave = sin(Double(bobTime * 3.1 + 0.8)) * Double(side * idleProfile * 0.03)
-        let handSpread = side * (0.17 + clickProfile * 0.03 + poseHandSpread * 0.03)
-        let handBaseY = side * (0.01 + holdProfile * 0.01)
-        let handLift = side * (clickProfile * 0.10 + scrollProfile * 0.06 + holdProfile * 0.04 + poseHandLift * 0.08) + CGFloat(idleHandWave)
-        let handTwist = 34.0 * clickProfile + 18.0 * scrollProfile + 12.0 * holdProfile + 24.0 * poseHandSpread + idleProfile * 6.0
+        let handSpread = side * (0.17 + clickProfile * 0.03 + scrollProfile * 0.02 + holdProfile * 0.02 + poseHandSpread * 0.03)
+        let handBaseY = side * (0.01 - holdProfile * 0.01)
+        let handLift = side * (clickProfile * 0.10 + scrollProfile * 0.06 + holdProfile * 0.02 + poseHandLift * 0.05) + CGFloat(idleHandWave)
+        let handTwist = 34.0 * clickProfile + 18.0 * scrollProfile + 26.0 * holdProfile + 24.0 * poseHandSpread + idleProfile * 6.0
         let handRect = NSRect(x: -side * 0.06, y: -side * 0.05, width: side * 0.12, height: side * 0.14)
 
         drawLimbOval(centerX: -handSpread, centerY: handBaseY + handLift, degrees: handTwist, rect: handRect)
         drawLimbOval(centerX: handSpread, centerY: handBaseY + handLift, degrees: -handTwist, rect: handRect)
 
         let legSpread = side * (0.10 + clickProfile * 0.03 + scrollProfile * 0.02 + poseLegSpread * 0.03)
-        let legY = -side * 0.20
-        let legKick = 16.0 * clickProfile + 8.0 * scrollProfile + 14.0 * poseLegKick
+        let legY = -side * (0.20 + holdProfile * 0.01)
+        let legKick = 16.0 * clickProfile + 8.0 * scrollProfile + 16.0 * holdProfile + 14.0 * poseLegKick
         let legRect = NSRect(x: -side * 0.055, y: -side * 0.025, width: side * 0.11, height: side * 0.09)
         drawLimbOval(centerX: -legSpread, centerY: legY, degrees: -legKick, rect: legRect)
         drawLimbOval(centerX: legSpread, centerY: legY, degrees: legKick, rect: legRect)
@@ -345,7 +345,13 @@ private final class MfxMouseCompanionPanelView: NSView {
     }
 
     private func drawBody(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat) {
-        let bodyRect = NSRect(x: -side * 0.20, y: -side * 0.30, width: side * 0.40, height: side * 0.44)
+        let bodyWidth = side * (0.40 + holdProfile * 0.05)
+        let bodyHeight = side * (0.44 - holdProfile * 0.09)
+        let bodyRect = NSRect(
+            x: -bodyWidth * 0.5,
+            y: -side * 0.30 - holdProfile * side * 0.02,
+            width: bodyWidth,
+            height: bodyHeight)
         let bodyPath = NSBezierPath(roundedRect: bodyRect, xRadius: side * 0.20, yRadius: side * 0.20)
 
         let bodyTop = NSColor(calibratedRed: 0.98, green: 0.99 - holdProfile * 0.04, blue: 1.0, alpha: 0.95)
@@ -360,11 +366,17 @@ private final class MfxMouseCompanionPanelView: NSView {
 
     private func drawHead(side: CGFloat, clickProfile: CGFloat, holdProfile: CGFloat, scrollProfile: CGFloat, idleProfile: CGFloat) {
         let idleEarWave = CGFloat(sin(Double(bobTime * 3.4))) * side * idleProfile * 0.022
-        let earLift = (clickProfile * 0.04 + scrollProfile * 0.03 + poseEarLift * 0.05) * side + idleEarWave
+        let earLift = (clickProfile * 0.04 + scrollProfile * 0.03 - holdProfile * 0.04 + poseEarLift * 0.05) * side + idleEarWave
         let earSpread = (clickProfile * 0.03 + scrollProfile * 0.05 + poseEarSpread * 0.06) * side + abs(idleEarWave) * 0.4
         let leftEarRect = NSRect(x: -side * 0.17 - earSpread, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
         let rightEarRect = NSRect(x: side * 0.05 + earSpread, y: side * 0.13 + earLift, width: side * 0.12, height: side * 0.36)
-        let headRect = NSRect(x: -side * 0.24, y: -side * 0.02, width: side * 0.48, height: side * 0.40)
+        let headWidth = side * (0.48 + holdProfile * 0.06)
+        let headHeight = side * (0.40 - holdProfile * 0.06)
+        let headRect = NSRect(
+            x: -headWidth * 0.5,
+            y: -side * 0.02 - holdProfile * side * 0.018,
+            width: headWidth,
+            height: headHeight)
 
         drawEar(rect: leftEarRect, side: side, clickProfile: clickProfile)
         drawEar(rect: rightEarRect, side: side, clickProfile: clickProfile)
