@@ -364,6 +364,67 @@ uint32_t AppController::ActiveHoldDelayMs() const {
     return activeConfig.useTestProfile ? kHoldDelayTestMs : kHoldDelayMs;
 }
 
+uint32_t AppController::ResolvePetVisualHoldEnterMs(const MouseCompanionConfig& activeConfig) const {
+    return activeConfig.useTestProfile ? kPetVisualHoldEnterTestMs : kPetVisualHoldEnterMs;
+}
+
+double AppController::ResolvePetVisualHoldStableSpeedThresholdPxPerSec(
+    const MouseCompanionConfig& activeConfig) const {
+    return activeConfig.useTestProfile
+        ? kPetVisualHoldStableSpeedThresholdTestPxPerSec
+        : kPetVisualHoldStableSpeedThresholdPxPerSec;
+}
+
+bool AppController::IsPetVisualHoldSuppressedByScroll(
+    uint64_t nowTickMs,
+    const MouseCompanionConfig& /*activeConfig*/) const {
+    if (petLastScrollTickMs_ == 0 || nowTickMs < petLastScrollTickMs_) {
+        return false;
+    }
+    return (nowTickMs - petLastScrollTickMs_) <= kPetVisualHoldSuppressAfterScrollMs;
+}
+
+bool AppController::ResolvePetVisualHoldState(
+    const MouseCompanionConfig& activeConfig,
+    uint64_t nowTickMs,
+    float* outIntensity) const {
+    if (outIntensity) {
+        *outIntensity = 0.0f;
+    }
+    if (IsPetVisualHoldSuppressedByScroll(nowTickMs, activeConfig)) {
+        return false;
+    }
+
+    const bool inReleaseBuffer =
+        (petReleaseHoldUntilTickMs_ > 0) &&
+        (nowTickMs < petReleaseHoldUntilTickMs_);
+    bool enteredByPress = false;
+    if (holdButtonDown_ &&
+        petPrimaryPress_.active &&
+        petPrimaryPress_.downTickMs > 0 &&
+        nowTickMs >= petPrimaryPress_.downTickMs) {
+        const uint64_t heldMs = nowTickMs - petPrimaryPress_.downTickMs;
+        const bool stablePress =
+            petPointerMotion_.moveSpeedPxPerSec <=
+            ResolvePetVisualHoldStableSpeedThresholdPxPerSec(activeConfig);
+        enteredByPress = stablePress && heldMs >= ResolvePetVisualHoldEnterMs(activeConfig);
+    }
+
+    if (!enteredByPress && !inReleaseBuffer) {
+        return false;
+    }
+
+    float intensity = 1.0f;
+    if (enteredByPress) {
+        const float holdMs = static_cast<float>(CurrentHoldDurationMs());
+        intensity = std::max(0.35f, ClampUnit(holdMs / 300.0f));
+    }
+    if (outIntensity) {
+        *outIntensity = intensity;
+    }
+    return true;
+}
+
 void AppController::UpdatePetPrimaryPressTravel(const ScreenPoint& pt) {
     if (!petPrimaryPress_.active) {
         return;
@@ -719,8 +780,18 @@ void AppController::DispatchPetMove(const ScreenPoint& pt) {
 
     int actionCode = kPetActionIdle;
     float intensity = 0.0f;
-    ResolvePetContinuousAction(activeConfig, &actionCode, &intensity);
-    if (holdButtonDown_ && petPrimaryPress_.active) {
+    if (ResolvePetVisualHoldState(activeConfig, nowTickMs, &intensity)) {
+        actionCode = kPetActionHoldReact;
+        if (holdButtonDown_ && petPrimaryPress_.active) {
+            petPrimaryPress_.holdTriggered = true;
+        }
+    } else {
+        ResolvePetContinuousAction(activeConfig, &actionCode, &intensity);
+    }
+    if (actionCode != kPetActionHoldReact &&
+        holdButtonDown_ &&
+        petPrimaryPress_.active &&
+        petPrimaryPress_.maxTravelPx > kPetDragStartTravelPx) {
         actionCode = kPetActionDrag;
         intensity = ClampUnit(static_cast<float>(petPrimaryPress_.maxTravelPx / 32.0));
     }
@@ -741,6 +812,7 @@ void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
     const uint64_t nowTickMs = CurrentTickMs();
     petLastScrollTickMs_ = nowTickMs;
+    petReleaseHoldUntilTickMs_ = 0;
     UpdatePetClickStreakDecay(nowTickMs, activeConfig);
     const float intensity = ClampUnit(static_cast<float>(std::abs(delta)) / 120.0f);
     UpdatePetVisualState(pt, kPetActionScrollReact, intensity, petClickStreak_.tintAmount);
@@ -831,6 +903,7 @@ void AppController::DispatchPetButtonDown(const ScreenPoint& pt, int button) {
     const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
     const uint64_t nowTickMs = CurrentTickMs();
     UpdatePetClickStreakDecay(nowTickMs, activeConfig);
+    petReleaseHoldUntilTickMs_ = 0;
     int actionCode = kPetActionIdle;
     float actionIntensity = 0.0f;
     ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
@@ -904,11 +977,21 @@ void AppController::DispatchPetButtonUp(const ScreenPoint& pt, int button) {
                                       ? (nowTickMs - petPrimaryPress_.downTickMs)
                                       : 0);
         petPrimaryPress_.releaseMaxTravelPx = petPrimaryPress_.maxTravelPx;
+        if (petPrimaryPress_.holdTriggered) {
+            const uint64_t releaseHoldMs = static_cast<uint64_t>(std::max(0, activeConfig.releaseHoldMs));
+            petReleaseHoldUntilTickMs_ = releaseHoldMs > 0 ? (nowTickMs + releaseHoldMs) : 0;
+        } else {
+            petReleaseHoldUntilTickMs_ = 0;
+        }
         petPrimaryPress_.active = false;
     }
     int actionCode = kPetActionIdle;
     float actionIntensity = 0.0f;
-    ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
+    if (ResolvePetVisualHoldState(activeConfig, nowTickMs, &actionIntensity)) {
+        actionCode = kPetActionHoldReact;
+    } else {
+        ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
+    }
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
     MouseCompanionPetInputEvent event{};
     event.kind = MouseCompanionPetInputKind::ButtonUp;
@@ -927,7 +1010,11 @@ void AppController::DispatchPetHoldEnd(const ScreenPoint& pt) {
     UpdatePetClickStreakDecay(nowTickMs, activeConfig);
     int actionCode = kPetActionIdle;
     float actionIntensity = 0.0f;
-    ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
+    if (ResolvePetVisualHoldState(activeConfig, nowTickMs, &actionIntensity)) {
+        actionCode = kPetActionHoldReact;
+    } else {
+        ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
+    }
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
     MouseCompanionPetInputEvent event{};
     event.kind = MouseCompanionPetInputKind::HoldEnd;
@@ -960,8 +1047,18 @@ void AppController::TickPetVisualFrame() {
 
     int actionCode = kPetActionIdle;
     float actionIntensity = 0.0f;
-    ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
-    if (holdButtonDown_ && petPrimaryPress_.active) {
+    if (ResolvePetVisualHoldState(activeConfig, nowTickMs, &actionIntensity)) {
+        actionCode = kPetActionHoldReact;
+        if (holdButtonDown_ && petPrimaryPress_.active) {
+            petPrimaryPress_.holdTriggered = true;
+        }
+    } else {
+        ResolvePetContinuousAction(activeConfig, &actionCode, &actionIntensity);
+    }
+    if (actionCode != kPetActionHoldReact &&
+        holdButtonDown_ &&
+        petPrimaryPress_.active &&
+        petPrimaryPress_.maxTravelPx > kPetDragStartTravelPx) {
         actionCode = kPetActionDrag;
         actionIntensity = ClampUnit(static_cast<float>(petPrimaryPress_.maxTravelPx / 32.0));
     }

@@ -360,6 +360,13 @@ private:
     void SyncPetClickStreakRuntimeStatus(const MouseCompanionConfig& activeConfig);
     void UpdatePetClickStreakDecay(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig);
     void RegisterPetClickStreakClick(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig);
+    uint32_t ResolvePetVisualHoldEnterMs(const MouseCompanionConfig& activeConfig) const;
+    double ResolvePetVisualHoldStableSpeedThresholdPxPerSec(const MouseCompanionConfig& activeConfig) const;
+    bool IsPetVisualHoldSuppressedByScroll(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig) const;
+    bool ResolvePetVisualHoldState(
+        const MouseCompanionConfig& activeConfig,
+        uint64_t nowTickMs,
+        float* outIntensity) const;
     void UpdatePetPointerMotion(const ScreenPoint& pt, uint64_t nowTickMs);
     void DecayPetPointerMotion(uint64_t nowTickMs, const MouseCompanionConfig& activeConfig);
     void ResolvePetContinuousAction(const MouseCompanionConfig& activeConfig, int* outActionCode, float* outActionIntensity) const;
@@ -458,7 +465,13 @@ private:
     uint64_t petLastTickMs_ = 0;
     static constexpr uint32_t kPetClickMaxPressMs = 220;
     static constexpr double kPetClickMaxTravelPx = 10.0;
+    static constexpr double kPetDragStartTravelPx = 1.0;
     static constexpr uint32_t kPetClickSuppressAfterScrollMs = 140;
+    static constexpr uint32_t kPetVisualHoldEnterMs = 130;
+    static constexpr uint32_t kPetVisualHoldEnterTestMs = 90;
+    static constexpr double kPetVisualHoldStableSpeedThresholdPxPerSec = 24.0;
+    static constexpr double kPetVisualHoldStableSpeedThresholdTestPxPerSec = 30.0;
+    static constexpr uint32_t kPetVisualHoldSuppressAfterScrollMs = 720;
     bool petHasSmoothedCursor_ = false;
     double petSmoothedCursorX_ = 0.0;
     double petSmoothedCursorY_ = 0.0;

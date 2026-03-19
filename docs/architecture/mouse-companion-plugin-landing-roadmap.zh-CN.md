@@ -157,7 +157,8 @@
 - 已进入 `Phase 2` 的第一步（hold 对齐首刀）：
   - 当前先不改 Phase0/现网可见宿主切换关系，仍保持 `click/idle` 稳定链路不动，
   - `hold` 先从“姿态对齐”切入：native semantic pose 已向 tauri `applyHoldProcedural` 收敛，重点补齐耳朵前压、手部收拢、腿部弯折、身体压扁，
-  - 共享 hold timer 仍沿用现有宿主时序；若后续继续逼近 tauri 的 `130ms stable press + releaseHoldMs` 语义，需要把 pet hold 进入阈值从通用 hold effect 计时器中解耦。
+  - 当前 pet 视觉时序已先行解耦：`holdReact` 进入条件改为稳定按压（prod `130ms` / test `90ms`）且指针速度低于阈值（prod `24px/s` / test `30px/s`），松开后继续复用 `mouse_companion.release_hold_ms` 做 release buffer，并在 scroll 后 `720ms` 内抑制 hold 进入，
+  - 普通鼠标 `hold effect` 的共享 timer 仍保留原值（prod `260ms` / test `120ms`）；后续若继续推进完全一致性，需要把 pet 与 effect 的 hold 状态机彻底拆成独立契约。
 - 已落地 `Phase 1` 第一批 click-first 状态机语义（后端）：
   - click 门槛：`press<=220ms && travel<=10px`，并接入 `scroll` 后短窗口抑制，
   - `position_mode=fixed_bottom_left` 下 move 路径保持 `idle`（不进入 follow），
