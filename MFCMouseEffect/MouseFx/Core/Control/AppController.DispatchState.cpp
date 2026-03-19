@@ -1233,12 +1233,11 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
             const float holdTerm = ClampUnit(holdProfile * visualProfile.holdPoseGain);
             const float scrollTerm = ClampUnit(scrollProfile * visualProfile.scrollPoseGain);
             const float earWingOpen = ClampUnit(
-                scrollTerm * (0.56f + scrollAmpNorm * 0.10f) + std::abs(scrollFlap) * 0.08f);
+                scrollTerm * (0.72f + scrollAmpNorm * 0.12f) + std::abs(scrollFlap) * 0.10f);
             const float earLift = ClampUnit(
-                scrollTerm * 0.28f + std::abs(scrollFlap) * 0.04f);
+                scrollTerm * 0.36f + std::abs(scrollFlap) * 0.05f);
             const float earWingFlap = scrollFlap * (0.78f + scrollAmpNorm * 0.12f);
-            const float earWingDip =
-                scrollTerm * (0.42f + scrollAmpNorm * 0.10f) + std::abs(scrollFlap) * 0.10f;
+            const float earWingDip = scrollTerm * (0.20f + scrollAmpNorm * 0.06f) + std::abs(scrollFlap) * 0.04f;
             const float handLift = ClampUnit(
                 holdTerm * 0.14f +
                 scrollTerm * 0.68f +
@@ -1282,18 +1281,18 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
 
             float q[4]{};
             WriteQuaternionFromEuler(
-                -1.02f * holdTerm - 0.36f * scrollTerm - 0.54f * earWingDip + 0.02f * std::abs(earWingFlap),
-                0.03f * earWingOpen,
-                (0.09f * holdTerm + 0.11f * scrollProfile + 0.16f * earWingFlap + 0.26f * earWingOpen),
+                -1.02f * holdTerm - 0.18f * scrollTerm - 0.30f * earWingDip + 0.03f * std::abs(earWingFlap),
+                0.04f * earWingOpen,
+                (0.09f * holdTerm + 0.14f * scrollProfile + 0.20f * earWingFlap + 0.44f * earWingOpen),
                 q);
             rotations[0] = q[0];
             rotations[1] = q[1];
             rotations[2] = q[2];
             rotations[3] = q[3];
             WriteQuaternionFromEuler(
-                -1.02f * holdTerm - 0.36f * scrollTerm - 0.54f * earWingDip + 0.02f * std::abs(earWingFlap),
-                -0.03f * earWingOpen,
-                -(0.09f * holdTerm + 0.11f * scrollProfile - 0.16f * earWingFlap + 0.26f * earWingOpen),
+                -1.02f * holdTerm - 0.18f * scrollTerm - 0.30f * earWingDip + 0.03f * std::abs(earWingFlap),
+                -0.04f * earWingOpen,
+                -(0.09f * holdTerm + 0.14f * scrollProfile - 0.20f * earWingFlap + 0.44f * earWingOpen),
                 q);
             rotations[4] = q[0];
             rotations[5] = q[1];
