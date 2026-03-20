@@ -246,7 +246,7 @@ bool AppController::Start() {
         mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = companion.appearanceProfilePath;
         mouseCompanionRuntimeStatus_.runtimePresent = false;
     }
-    SyncLaunchAtStartupRegistration();
+    SyncLaunchAtStartupManifest();
     ReloadThemeCatalogFromRootPath(config_.themeCatalogRootPath);
     const bool themeNormalized = NormalizeConfiguredThemeName();
     QuantumHaloPresenterSelection::SetConfiguredBackendPreference(config_.holdPresenterBackend);

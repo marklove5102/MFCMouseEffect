@@ -49,5 +49,32 @@ bool ConfigureLaunchAtStartup(bool enabled, std::string* outError) {
 #endif
 }
 
-} // namespace mousefx::platform
+bool SyncLaunchAtStartupManifest(bool enabled, std::string* outError) {
+    if (outError) {
+        outError->clear();
+    }
 
+#if MFX_PLATFORM_MACOS
+    constexpr int32_t kErrorBufferCapacity = 2048;
+    std::array<char, kErrorBufferCapacity> errorBuffer{};
+    const int32_t outcome = mfx_macos_sync_launch_at_startup_manifest_v1(
+        enabled ? 1 : 0, errorBuffer.data(), kErrorBufferCapacity);
+    if (outcome > 0) {
+        return true;
+    }
+    if (outError) {
+        *outError = errorBuffer.data();
+        if (outError->empty()) {
+            *outError = "launch_at_startup_manifest_sync_failed";
+        }
+    }
+    return false;
+#else
+    if (outError) {
+        *outError = "launch_at_startup_not_supported";
+    }
+    return false;
+#endif
+}
+
+} // namespace mousefx::platform

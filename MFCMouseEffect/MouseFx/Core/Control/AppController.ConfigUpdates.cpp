@@ -67,6 +67,21 @@ void AppController::SyncLaunchAtStartupRegistration() {
 #endif
 }
 
+void AppController::SyncLaunchAtStartupManifest() {
+    if (!platform::IsLaunchAtStartupSupported()) {
+        return;
+    }
+    std::string error;
+    if (platform::SyncLaunchAtStartupManifest(config_.launchAtStartup, &error)) {
+        return;
+    }
+#ifdef _DEBUG
+    std::wstring errorWide = Utf8ToWString(
+        error.empty() ? "launch_at_startup_manifest_sync_failed" : error);
+    OutputDebugStringW((L"MouseFx: launch-at-startup manifest sync failed: " + errorWide + L"\n").c_str());
+#endif
+}
+
 void AppController::ApplyOverlayTargetFpsToPlatform() {
 #if MFX_PLATFORM_MACOS
     macos_overlay_support::SetOverlayTargetFps(config_.overlayTargetFps);

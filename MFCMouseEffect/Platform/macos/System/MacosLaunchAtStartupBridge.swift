@@ -45,13 +45,17 @@ private func mfxResolveLaunchAgentFileUrl() -> URL {
         .appendingPathComponent(mfxLaunchAgentFileName, isDirectory: false)
 }
 
-private func mfxWriteLaunchAgentPlist(_ plistUrl: URL, executablePath: String) throws {
-    let plist: [String: Any] = [
+private func mfxBuildLaunchAgentPlist(executablePath: String) -> [String: Any] {
+    [
         "Label": mfxLaunchAgentLabel,
-        "ProgramArguments": [executablePath, "--mode=background"],
+        "ProgramArguments": [executablePath, "--mode=tray"],
         "RunAtLoad": true,
         "KeepAlive": false,
     ]
+}
+
+private func mfxSyncLaunchAgentManifest(_ plistUrl: URL, executablePath: String) throws {
+    let plist = mfxBuildLaunchAgentPlist(executablePath: executablePath)
     let data = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
     try data.write(to: plistUrl, options: .atomic)
 }
@@ -100,12 +104,10 @@ private func mfxApplyLaunchAgentRuntime(enabled: Bool, plistPath: String) throws
     )
 }
 
-@_cdecl("mfx_macos_set_launch_at_startup_v1")
-public func mfx_macos_set_launch_at_startup_v1(
-    _ enabled: Int32,
-    _ outErrorUtf8: UnsafeMutablePointer<CChar>?,
-    _ outErrorCapacity: Int32
-) -> Int32 {
+private func mfxSetLaunchAtStartup(enabled: Bool,
+                                   applyRuntime: Bool,
+                                   outErrorUtf8: UnsafeMutablePointer<CChar>?,
+                                   outErrorCapacity: Int32) -> Int32 {
     mfxCopyCString("", outErrorUtf8, outErrorCapacity)
 
     let fileManager = FileManager.default
@@ -114,7 +116,7 @@ public func mfx_macos_set_launch_at_startup_v1(
 
     do {
         try fileManager.createDirectory(at: launchAgentsDir, withIntermediateDirectories: true, attributes: nil)
-        if enabled != 0 {
+        if enabled {
             let executablePath = mfxResolveExecutablePath()
             guard !executablePath.isEmpty else {
                 mfxCopyCString("executable_path_missing", outErrorUtf8, outErrorCapacity)
@@ -124,10 +126,14 @@ public func mfx_macos_set_launch_at_startup_v1(
                 mfxCopyCString("executable_path_not_found", outErrorUtf8, outErrorCapacity)
                 return -1
             }
-            try mfxWriteLaunchAgentPlist(plistUrl, executablePath: executablePath)
-            try mfxApplyLaunchAgentRuntime(enabled: true, plistPath: plistUrl.path)
+            try mfxSyncLaunchAgentManifest(plistUrl, executablePath: executablePath)
+            if applyRuntime {
+                try mfxApplyLaunchAgentRuntime(enabled: true, plistPath: plistUrl.path)
+            }
         } else {
-            try mfxApplyLaunchAgentRuntime(enabled: false, plistPath: plistUrl.path)
+            if applyRuntime {
+                try mfxApplyLaunchAgentRuntime(enabled: false, plistPath: plistUrl.path)
+            }
             if fileManager.fileExists(atPath: plistUrl.path) {
                 try fileManager.removeItem(at: plistUrl)
             }
@@ -137,4 +143,30 @@ public func mfx_macos_set_launch_at_startup_v1(
         mfxCopyCString(error.localizedDescription, outErrorUtf8, outErrorCapacity)
         return -1
     }
+}
+
+@_cdecl("mfx_macos_set_launch_at_startup_v1")
+public func mfx_macos_set_launch_at_startup_v1(
+    _ enabled: Int32,
+    _ outErrorUtf8: UnsafeMutablePointer<CChar>?,
+    _ outErrorCapacity: Int32
+) -> Int32 {
+    mfxSetLaunchAtStartup(
+        enabled: enabled != 0,
+        applyRuntime: true,
+        outErrorUtf8: outErrorUtf8,
+        outErrorCapacity: outErrorCapacity)
+}
+
+@_cdecl("mfx_macos_sync_launch_at_startup_manifest_v1")
+public func mfx_macos_sync_launch_at_startup_manifest_v1(
+    _ enabled: Int32,
+    _ outErrorUtf8: UnsafeMutablePointer<CChar>?,
+    _ outErrorCapacity: Int32
+) -> Int32 {
+    mfxSetLaunchAtStartup(
+        enabled: enabled != 0,
+        applyRuntime: false,
+        outErrorUtf8: outErrorUtf8,
+        outErrorCapacity: outErrorCapacity)
 }

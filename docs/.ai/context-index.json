@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-20T10:32:37.220Z",
+  "generated_at": "2026-03-20T12:56:58.699Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -85,14 +85,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 185,
-      "size_bytes": 26197,
-      "estimated_tokens": 6550,
+      "line_count": 199,
+      "size_bytes": 29131,
+      "estimated_tokens": 7283,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "a66b5d4a6897891cd882ba313cc4c715d81ab342",
-      "updated_at": "2026-03-20T10:32:24.042Z"
+      "hash_sha1": "7d2bb4e423868587c710151e72116d693b29468f",
+      "updated_at": "2026-03-20T12:55:35.592Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -984,14 +984,14 @@
       ],
       "summary": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/package/build-macos-portable.sh",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 122,
-      "size_bytes": 6685,
-      "estimated_tokens": 1672,
+      "line_count": 134,
+      "size_bytes": 8301,
+      "estimated_tokens": 2076,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "0be61647ad167cf059907e326948385de8b777cb",
-      "updated_at": "2026-03-20T10:32:01.821Z"
+      "hash_sha1": "4f32f52a6789ca2d65f4b72cfb3b9356bbcf15be",
+      "updated_at": "2026-03-20T12:08:36.568Z"
     },
     {
       "id": "docs/ops/manual-commands.md",

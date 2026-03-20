@@ -11,7 +11,11 @@ int32_t mfx_macos_set_launch_at_startup_v1(
     char* outErrorUtf8,
     int32_t outErrorCapacity);
 
+int32_t mfx_macos_sync_launch_at_startup_manifest_v1(
+    int32_t enabled,
+    char* outErrorUtf8,
+    int32_t outErrorCapacity);
+
 #ifdef __cplusplus
 }
 #endif
-

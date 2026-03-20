@@ -334,6 +334,7 @@ private:
     bool EnsureInputIndicatorWasmBudgetFloor();
     void SyncInputIndicatorWasmHostToConfig();
     void SyncLaunchAtStartupRegistration();
+    void SyncLaunchAtStartupManifest();
 
 
     void NotifyGpuFallbackIfNeeded(const std::string& reason);

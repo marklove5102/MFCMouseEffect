@@ -130,6 +130,16 @@
 - macOS tray menu simplification (active):
   - The macOS status-bar menu now intentionally exposes only three user-facing entries: `Star Project`, `Settings`, and `Exit`.
   - Theme switching, effect-type switching, and tray-side reload/config mutation entries were removed from the menu because they could freeze the tray/event loop and are better served by the Web settings UI.
+- macOS launch-at-startup contract (active):
+  - Launch-at-startup now registers the packaged executable in `tray` mode instead of `background` mode.
+  - Reason: the POSIX background path enables stdin EOF auto-exit monitoring, which is suitable for piped/manual background runs but causes LaunchAgent-started processes to exit immediately under login-session startup.
+  - Startup-time registration was further split into two paths:
+    - explicit settings toggle -> rewrite plist and apply `launchctl` runtime state immediately
+    - normal app startup -> rewrite plist only, without bootstrapping/booting out LaunchAgent
+  - Reason: reapplying `launchctl` during every normal startup could spawn or unload duplicate launch services, which made manual launch and login launch interfere with each other.
+  - Expected behavior is now:
+    - manual launch repairs stale plist paths (for example from repo binary to `/Applications/...`) without spawning a second instance
+    - login launch uses the already-written LaunchAgent and should surface the menu-bar `MFX` item while staying alive
 - macOS portable packaging (active):
   - `./mfx package` is now the preferred user entrypoint for a full build + macOS `.app` package; `./mfx package-no-build` skips both core and WebUI rebuilds, and `./mfx pack` / `./mfx pkg` stay as compatibility aliases.
   - `run/start/package` now share the same macOS core/WebUI preparation helper (`mfx_manual_prepare_core_host_binary`) instead of carrying separate build paths; this keeps full-build vs skip-build behavior consistent across local run and packaging flows.
