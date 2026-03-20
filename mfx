@@ -18,6 +18,12 @@ Commands:
       Run macOS core host without rebuilding core/WebUI.
       Default auto stop: 30 minutes.
 
+  package [--build-dir <path>] [--output-dir <path>] [--package-name <name>] [--no-zip] [--no-dmg] [--skip-build] [--skip-webui-build]
+      Build WebUI + core host and produce macOS .app package + dmg.
+
+  package-no-build [--build-dir <path>] [--output-dir <path>] [--package-name <name>] [--no-zip] [--no-dmg]
+      Produce macOS .app package + dmg without rebuilding core/WebUI.
+
   effects [--skip-build] [--strict]
       Run macOS effects type parity selfcheck.
       --strict: fail if constrained-runtime startup is skipped.
@@ -33,6 +39,8 @@ Commands:
 Compatibility aliases:
   start -> run
   fast  -> run-no-build (also skips core/WebUI rebuild)
+  pack  -> package
+  pkg   -> package
 
   help
       Show this help.
@@ -108,6 +116,48 @@ run_start() {
     fi
 
     exec "$repo_root/tools/platform/manual/run-macos-core-websettings-manual.sh" "${args[@]}"
+}
+
+run_package() {
+    local skip_build="$1"
+    local skip_webui_build="$2"
+    shift
+    shift
+    local -a args=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --build-dir|--output-dir|--package-name)
+            [[ $# -ge 2 ]] || { echo "missing value for $1" >&2; exit 2; }
+            args+=("$1" "$2")
+            shift 2
+            ;;
+        --no-zip|--no-dmg)
+            args+=("$1")
+            shift
+            ;;
+        --skip-build)
+            skip_build=1
+            shift
+            ;;
+        --skip-webui-build)
+            skip_webui_build=1
+            shift
+            ;;
+        *)
+            echo "unknown option for package/package-no-build: $1" >&2
+            exit 2
+            ;;
+        esac
+    done
+
+    if [[ "$skip_build" == "1" ]]; then
+        args+=(--skip-build)
+    fi
+    if [[ "$skip_webui_build" == "1" ]]; then
+        args+=(--skip-webui-build)
+    fi
+
+    exec "$repo_root/tools/platform/package/build-macos-portable.sh" "${args[@]}"
 }
 
 run_effects() {
@@ -203,6 +253,14 @@ run-no-build)
     shift
     run_start 1 1 "$@"
     ;;
+package)
+    shift
+    run_package 0 0 "$@"
+    ;;
+package-no-build)
+    shift
+    run_package 1 1 "$@"
+    ;;
 start)
     shift
     run_start 0 0 "$@"
@@ -210,6 +268,14 @@ start)
 fast)
     shift
     run_start 1 1 "$@"
+    ;;
+pack)
+    shift
+    run_package 0 0 "$@"
+    ;;
+pkg)
+    shift
+    run_package 0 0 "$@"
     ;;
 effects)
     run_effects "$@"

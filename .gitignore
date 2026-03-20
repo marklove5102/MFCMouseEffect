@@ -44,6 +44,7 @@ Desktop.ini
 
 # Installer outputs (Inno Setup)
 Install/Output/
+Install/macos/
 
 # Common frontend artifacts
 node_modules/

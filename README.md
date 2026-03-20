@@ -93,6 +93,15 @@
 # 30 秒自动退出（便于快速手测）
 ./mfx run-no-build --seconds 30
 
+# 完整编译后打包 macOS ARM64 .app + zip + dmg
+./mfx package
+
+# 跳过 core/WebUI 编译直接打包
+./mfx package-no-build
+
+# 等价于 package
+./mfx pkg
+
 # 特效类型等价自检
 ./mfx effects
 
@@ -105,6 +114,7 @@
 # 兼容旧命令（仍可用）
 ./mfx start
 ./mfx fast
+./mfx pack
 ```
 
 ## 回归与自检入口

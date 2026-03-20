@@ -7,7 +7,7 @@ Implemented in this stage:
 - `SettingsLauncher` (shared POSIX spawn runner + macOS `open` command)
 - `SingleInstanceGuard` (POSIX file lock in `/tmp`; cross-host scaffolding build uses process-local stub)
 - `EventLoopService` (`CFRunLoopSource` + task queue dispatch on Apple host; non-Apple cross-host scaffolding build falls back to POSIX blocking loop)
-- `TrayService` (Apple host: Swift bridge `NSStatusBar` + menu actions `Settings` / `Exit`, shortcuts `Cmd+,` and `Cmd+Q`; non-Apple cross-host scaffolding build keeps stub)
+- `TrayService` (Apple host: Swift bridge `NSStatusBar` + minimal menu actions `Star Project` / `Settings` / `Exit`, shortcuts `Cmd+,` and `Cmd+Q`; non-Apple cross-host scaffolding build keeps stub)
 - `Tray menu localization` (Swift bridge; auto-select Chinese labels when macOS preferred language is `zh*`)
 - `Event loop bridge` (Swift bridge owns `NSApplication` lifecycle operations)
 - `UserNotificationService` (Swift bridge dispatch via `osascript` + stderr fallback)

@@ -80,6 +80,12 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 # 跳过 core/WebUI 编译
 ./mfx run-no-build
 ./mfx run-no-build --seconds 30
+# 完整编译后打包 macOS ARM64 .app + zip + dmg
+./mfx package
+# 跳过 core/WebUI 编译直接打包
+./mfx package-no-build
+# 等价于 package
+./mfx pkg
 ./mfx effects
 ./mfx verify-effects
 ./mfx verify-full
@@ -87,6 +93,8 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 ./mfx start
 # 等价于 run-no-build
 ./mfx fast
+# 等价于 package
+./mfx pack
 ./tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build

@@ -126,6 +126,24 @@
   - `./tools/platform/regression/run-posix-regression-suite.sh --platform auto`
 - macOS daily shortcut contract:
   - `./mfx run-no-build` / `./mfx fast` now skip both core rebuild and WebUIWorkspace rebuild by forwarding `--skip-build --skip-webui-build` to the manual runner; use `./mfx run` / `./mfx start` when a fresh WebUI/core build is required.
+- macOS tray menu simplification (active):
+  - The macOS status-bar menu now intentionally exposes only three user-facing entries: `Star Project`, `Settings`, and `Exit`.
+  - Theme switching, effect-type switching, and tray-side reload/config mutation entries were removed from the menu because they could freeze the tray/event loop and are better served by the Web settings UI.
+- macOS portable packaging (active):
+  - `./mfx package` is now the preferred user entrypoint for a full build + macOS `.app` package; `./mfx package-no-build` skips both core and WebUI rebuilds, and `./mfx pack` / `./mfx pkg` stay as compatibility aliases.
+  - `tools/platform/package/build-macos-portable.sh` now assembles a standard `MFCMouseEffect.app` bundle that embeds `mfx_entry_posix_host`, `MFCMouseEffect/WebUI`, the minimal pet runtime asset set, and the sample wasm plugin under `Contents/MacOS/plugins/wasm`.
+  - The packaged app launcher is now a native Mach-O wrapper (`Contents/MacOS/MFCMouseEffect`) instead of a shell script, so Finder/LaunchServices can start the bundle directly.
+  - Packaged `.app` launches no longer auto-open Web settings; startup behavior now matches the normal tray app instead of the old debug-first browser flow.
+  - macOS package size trim (active): packaging now copies only the runtime-used pet payload (`pet-main.usdz` + `pet-actions.json` + `pet-appearance.json` + `pet-effects.json`) instead of the whole `Assets` tree; `pet-main.glb` remains a repo/dev asset and is excluded from packaged artifacts.
+  - wasm package trim (active): the bundled demo plugin now keeps only `plugin.json` + `effect.wasm`; development helpers (`effect.js`, `.d.ts`, `.wat`, `samples/`) are excluded from packaged artifacts.
+  - The generated app launcher (`Contents/MacOS/MFCMouseEffect`) exports `MFX_WEBUI_DIR` / `MFX_SCAFFOLD_WEBUI_DIR` and launches from `Contents/Resources` so repo-style relative pet asset paths keep working inside the app bundle.
+  - Default portable artifact naming now explicitly marks Apple Silicon scope: `MFCMouseEffect-macos-arm64-portable` folder + `.zip`.
+  - Default macOS packaging output root is now `Install/macos` (instead of `dist/package/macos`) so packaged artifacts live under the same install-family location as Windows outputs and avoid `install`/`Install` ambiguity on case-insensitive macOS volumes.
+  - `package` now also emits an unsigned `.dmg` alongside the folder and `.zip`, using the already-validated `.app` bundle as the sole source of truth and exposing an `Applications` symlink for drag-to-install flow.
+  - Package cleanup (active): the generated folder/dmg no longer includes a top-level `README.txt`; delivered artifacts now keep only install-relevant payloads (`.app` and `Applications` link inside the dmg).
+  - `Install/macos/` is now git-ignored so repeated local packaging does not pollute the worktree with generated macOS artifacts.
+  - Unsigned package constraint remains active: Finder launch may still be gated by Gatekeeper until Developer ID signing/notarization is added later.
+  - Known open issue: `.dmg` / `Applications` launch reliability is not yet equivalent to `./mfx start`; keep app-bundle startup work as a separate follow-up instead of assuming packaging is fully production-ready.
 - Mouse companion manual proof helper:
   - `tools/platform/manual/run-macos-mouse-companion-proof.sh`
 - Manual websettings runner lock handoff (active):
@@ -154,6 +172,8 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/server-structure.md`
 - Regression workflow:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-regression-suite-workflow.md`
+- macOS packaging workflow:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/ops/macos-portable-packaging.md`
 
 ## Documentation Governance
 - `current.md` is P1-only and must stay compact.

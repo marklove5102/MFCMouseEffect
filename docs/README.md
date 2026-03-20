@@ -79,6 +79,12 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 # skips core/WebUI rebuild
 ./mfx run-no-build
 ./mfx run-no-build --seconds 30
+# full build + macOS ARM64 .app/zip/dmg package
+./mfx package
+# skips core/WebUI rebuild while packaging
+./mfx package-no-build
+# same as package
+./mfx pkg
 ./mfx effects
 ./mfx verify-effects
 ./mfx verify-full
@@ -86,6 +92,8 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 ./mfx start
 # same as run-no-build
 ./mfx fast
+# same as package
+./mfx pack
 ./tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60
 ./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
