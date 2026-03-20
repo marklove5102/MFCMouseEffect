@@ -117,6 +117,8 @@ private final class MfxMouseCompanionPanelView: NSView {
     private var actionIntensity: CGFloat = 0.0
     private var headTintAmount: CGFloat = 0.0
     private var pointerNormalizedX: CGFloat = 0.0
+    private var scrollFacingSign: CGFloat = 1.0
+    private var scrollFacingHold: CGFloat = 0.0
     private var clickPulse: CGFloat = 0.0
     private var holdPulse: CGFloat = 0.0
     private var scrollFlapProgress: CGFloat = 1.0
@@ -160,7 +162,8 @@ private final class MfxMouseCompanionPanelView: NSView {
 
     func updateState(actionCode: Int32, actionIntensity: Float, headTintAmount: Float) {
         let resolvedAction = MfxMouseCompanionActionCode(rawValue: actionCode) ?? .idle
-        let resolvedIntensity = mfxClamp(CGFloat(actionIntensity), min: 0.0, max: 1.0)
+        let rawIntensity = CGFloat(actionIntensity)
+        let resolvedIntensity = mfxClamp(abs(rawIntensity), min: 0.0, max: 1.0)
         let resolvedTint = mfxClamp(CGFloat(headTintAmount), min: 0.0, max: 1.0)
 
         if resolvedAction == .clickReact {
@@ -170,6 +173,8 @@ private final class MfxMouseCompanionPanelView: NSView {
             holdPulse = max(holdPulse, max(0.35, resolvedIntensity))
         }
         if resolvedAction == .scrollReact {
+            scrollFacingSign = rawIntensity < 0.0 ? -1.0 : 1.0
+            scrollFacingHold = 0.30
             let now = CACurrentMediaTime()
             let amplitude = mfxClamp(max(0.35, resolvedIntensity), min: 0.35, max: 2.4)
             let maxDuration: CGFloat = 0.26
@@ -305,6 +310,7 @@ private final class MfxMouseCompanionPanelView: NSView {
         bobTime += dt
         clickPulse = max(0.0, clickPulse - dt * 3.6)
         holdPulse = max(0.0, holdPulse - dt * 1.2)
+        scrollFacingHold = max(0.0, scrollFacingHold - dt)
         if scrollFlapProgress < 1.0 {
             scrollFlapProgress += dt / max(0.001, scrollFlapDuration)
             while scrollFlapProgress >= 1.0, pendingScrollFlapCount > 0 {
@@ -367,10 +373,12 @@ private final class MfxMouseCompanionPanelView: NSView {
         let scrollScale = 1.0 + scrollProfile * 0.04
         let idleScale = 1.0 + sin(Double(bobTime * 1.7)) * Double(idleProfile * 0.018)
         let actionScale = clickScale * holdScale * scrollScale * CGFloat(idleScale)
+        let scrollFacingRotation = (scrollFacingHold > 0.0 && scrollFacingSign < 0.0) ? 180.0 : 0.0
 
         NSGraphicsContext.saveGraphicsState()
         let transform = NSAffineTransform()
         transform.translateX(by: bounds.midX, yBy: bounds.midY + CGFloat(bobOffset))
+        transform.rotate(byDegrees: scrollFacingRotation)
         transform.rotate(byDegrees: followTilt * (actionCode == .drag ? -1.0 : 1.0))
         transform.scale(by: actionScale)
         transform.concat()
@@ -650,6 +658,8 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
     private var currentActionCode: Int32 = MfxMouseCompanionActionCode.idle.rawValue
     private var currentActionIntensity: Float = 0.0
     private var currentHeadTintAmount: Float = 0.0
+    private var scrollFacingSign: CGFloat = 1.0
+    private var scrollFacingHold: CGFloat = 0.0
 
     init(sizePx: Int, offsetX: Int, offsetY: Int) {
         let side = CGFloat(max(96, sizePx))
@@ -782,6 +792,9 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
 
         if actionCode == MfxMouseCompanionActionCode.clickReact.rawValue {
             beginClickOneShot()
+        } else if actionCode == MfxMouseCompanionActionCode.scrollReact.rawValue {
+            scrollFacingSign = actionIntensity < 0.0 ? -1.0 : 1.0
+            scrollFacingHold = 0.30
         }
 
         if modelLoaded, let modelNode {
@@ -1440,6 +1453,11 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
     private func stopModelFrameLoop() {
         modelFrameTimer?.invalidate()
         modelFrameTimer = nil
+    }
+
+    private func applyScrollFacingPresentation() {
+        let shouldFlip = scrollFacingHold > 0.0 && scrollFacingSign < 0.0
+        sceneView.frameCenterRotation = shouldFlip ? 180.0 : 0.0
     }
 
     @objc
@@ -2318,8 +2336,10 @@ private final class MfxMouseCompanionPanelHandle: NSObject {
         let dt = CGFloat(max(0.0, min(0.05, now - modelLastTick)))
         modelLastTick = now
         modelBobTime += dt
+        scrollFacingHold = max(0.0, scrollFacingHold - dt)
+        applyScrollFacingPresentation()
 
-        let resolvedIntensity = CGFloat(mfxClamp(CGFloat(actionIntensity), min: 0.0, max: 1.0))
+        let resolvedIntensity = CGFloat(mfxClamp(abs(CGFloat(actionIntensity)), min: 0.0, max: 1.0))
         let oneShotDuration = mfxClamp(clickOneShotDuration, min: 0.05, max: 5.0)
         if clickOneShotActive {
             clickOneShotElapsed += dt

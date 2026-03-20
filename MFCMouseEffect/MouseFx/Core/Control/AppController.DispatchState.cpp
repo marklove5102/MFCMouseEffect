@@ -900,7 +900,8 @@ void AppController::DispatchPetScroll(const ScreenPoint& pt, int delta) {
             currentElapsedSec / std::max(0.001f, petVisualPoseRuntime_.scrollFlapDurationSec));
     }
     const float intensity = ClampUnit(static_cast<float>(std::abs(delta)) / 120.0f);
-    UpdatePetVisualState(pt, kPetActionScrollReact, intensity, petClickStreak_.tintAmount);
+    const float directionalIntensity = (delta < 0) ? -intensity : intensity;
+    UpdatePetVisualState(pt, kPetActionScrollReact, directionalIntensity, petClickStreak_.tintAmount);
     MouseCompanionPetInputEvent event{};
     event.kind = MouseCompanionPetInputKind::Scroll;
     event.actionHint = MouseCompanionPetActionHint::Scroll;
@@ -1215,6 +1216,8 @@ void AppController::ResetPetDispatchRuntimeState() {
 
 void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, float actionIntensity, float headTintAmount) {
     const float clampedIntensity = ClampUnit(actionIntensity);
+    const float hostActionIntensity =
+        (actionCode == kPetActionScrollReact) ? actionIntensity : clampedIntensity;
     const float clampedTint = ClampUnit(headTintAmount);
     const uint64_t nowTickMs = CurrentTickMs();
     {
@@ -1238,7 +1241,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
         mfx_macos_mouse_companion_panel_update_v1(
             petVisualHostHandle_,
             actionCode,
-            clampedIntensity,
+            hostActionIntensity,
             clampedTint);
         const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
         const PetVisualMotionProfile& visualProfile =
