@@ -182,8 +182,10 @@ Before touching GPU-specific code, the safest first step is:
   - `unavailable_renderer_backends` is reserved for registered-but-currently-unavailable backends so future real renderers can publish runtime gating reasons without faking constructor/start failures
   - the first concrete use of that lane now exists: backend name `real` is registered but reports `requirements_unmet`, so factory/diagnostics behavior can already be exercised before the renderer itself lands
   - `renderer_backend_catalog` is the structured backend inventory contract; future renderer rollout should extend it instead of adding more ad-hoc string lists
-  - the current `real` backend capability helper names the initial unmet requirements as:
-    - `asset_resource_adapter`
+  - the first real-renderer requirement seam is now active too:
+    - `Win32MouseCompanionRealRendererAssetResources`
+    - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract
+  - the current `real` backend capability helper now names the remaining unmet requirements as:
     - `scene_runtime_adapter`
     - `renderer_draw_execution`
   - both `renderer_backend_catalog[*].unmet_requirements` and top-level `real_renderer_unmet_requirements` should stay stable enough for future automation/manual validation

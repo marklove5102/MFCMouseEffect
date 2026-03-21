@@ -7,6 +7,7 @@
 
 namespace mousefx::windows {
 
+bool IsWin32MouseCompanionRealRendererAssetResourceAdapterReady();
 std::vector<std::string> ListWin32MouseCompanionRealRendererUnmetRequirements();
 Win32MouseCompanionRendererBackendRegistry::Availability
 EvaluateWin32MouseCompanionRealRendererAvailability();

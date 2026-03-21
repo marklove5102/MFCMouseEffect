@@ -2,6 +2,7 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererBackend.h"
 
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetResources.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererCapabilities.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendRegistry.h"
 
@@ -23,10 +24,13 @@ std::string Win32MouseCompanionRealRendererBackend::LastErrorReason() const {
 }
 
 void Win32MouseCompanionRealRendererBackend::Render(
-    const Win32MouseCompanionRendererInput&,
+    const Win32MouseCompanionRendererInput& input,
     Gdiplus::Graphics*,
     int,
-    int) const {}
+    int) const {
+    const auto resources = BuildWin32MouseCompanionRealRendererAssetResources(input);
+    (void)resources;
+}
 
 void RegisterWin32MouseCompanionRealRendererBackend() {
     static Win32MouseCompanionRendererBackendRegistrar<Win32MouseCompanionRealRendererBackend> registrar(

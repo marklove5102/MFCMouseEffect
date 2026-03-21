@@ -98,9 +98,10 @@
   - hidden backend preference fields now also round-trip through settings state, apply-settings payloads, and runtime/test diagnostics
   - runtime/test diagnostics now also report whether the hidden config preference is the active resolved preference via `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status`
   - renderer registry/factory diagnostics now also distinguish currently unavailable backends from simply unselected ones, so future real-backend rollout can report machine/runtime gating reasons without changing the host contract again
-  - a `real` backend is now explicitly registered as an unavailable placeholder with reason `pending_implementation`, which keeps the rollout path visible in diagnostics without changing current placeholder-first behavior
+  - a `real` backend is now explicitly registered as an unavailable placeholder with reason `requirements_unmet`, which keeps the rollout path visible in diagnostics without changing current placeholder-first behavior
   - `renderer_backend_catalog` is now the structured source of truth for backend inventory; `available/unavailable` arrays remain as lightweight compatibility views
   - the `real` backend now also publishes explicit unmet requirements through both `renderer_backend_catalog[*].unmet_requirements` and top-level `real_renderer_unmet_requirements`
+  - the first `real` renderer requirement seam is now active via `Win32MouseCompanionRealRendererAssetResources`, so the current unmet list is down to `scene_runtime_adapter` and `renderer_draw_execution`
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

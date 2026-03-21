@@ -283,6 +283,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionPresenter.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendFactory.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreference.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetResources.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceSources.h" />
@@ -607,6 +608,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionPresenter.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendFactory.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreference.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetResources.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.cpp" />

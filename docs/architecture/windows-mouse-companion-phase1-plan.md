@@ -190,8 +190,9 @@
   - runtime/test diagnostics now also expose `renderer_backend_catalog`
   - runtime/test diagnostics now also expose `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status` so config/env/default precedence can be verified directly
   - backend preference updates that arrive through runtime config now trigger an in-place window/backend reselection instead of being ignored after the first backend is created
-  - a `real` backend is now explicitly registered into the backend registry as `unavailable(pending_implementation)` so diagnostics and preference routing can exercise the future path without changing current rendering behavior
-  - the `real` backend now also declares explicit unmet requirements (`asset_resource_adapter`, `scene_runtime_adapter`, `renderer_draw_execution`) so rollout work can converge against a named checklist instead of a generic pending marker
+  - a `real` backend is now explicitly registered into the backend registry as `unavailable(requirements_unmet)` so diagnostics and preference routing can exercise the future path without changing current rendering behavior
+  - the first real-renderer requirement seam is now active through `Win32MouseCompanionRealRendererAssetResources`, which adapts shared asset lanes into a renderer-facing resource contract
+  - the current `real` backend unmet requirements are now `scene_runtime_adapter` and `renderer_draw_execution`
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract

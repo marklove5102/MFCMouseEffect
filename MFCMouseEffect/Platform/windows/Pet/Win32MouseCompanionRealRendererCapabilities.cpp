@@ -2,14 +2,22 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererCapabilities.h"
 
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetResources.h"
+
 namespace mousefx::windows {
 
+bool IsWin32MouseCompanionRealRendererAssetResourceAdapterReady() {
+    return true;
+}
+
 std::vector<std::string> ListWin32MouseCompanionRealRendererUnmetRequirements() {
-    return {
-        "asset_resource_adapter",
-        "scene_runtime_adapter",
-        "renderer_draw_execution",
-    };
+    std::vector<std::string> unmetRequirements;
+    if (!IsWin32MouseCompanionRealRendererAssetResourceAdapterReady()) {
+        unmetRequirements.push_back("asset_resource_adapter");
+    }
+    unmetRequirements.push_back("scene_runtime_adapter");
+    unmetRequirements.push_back("renderer_draw_execution");
+    return unmetRequirements;
 }
 
 Win32MouseCompanionRendererBackendRegistry::Availability

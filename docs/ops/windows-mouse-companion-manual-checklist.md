@@ -153,10 +153,10 @@ If those hidden fields change while the host is already active, the Windows visu
    - `available_renderer_backends` should still include `placeholder`
    - `renderer_backend_catalog` should contain at least `real` and `placeholder` entries in priority order
    - the `real` catalog entry should carry unmet requirements:
-     - `asset_resource_adapter`
      - `scene_runtime_adapter`
      - `renderer_draw_execution`
    - top-level `real_renderer_unmet_requirements` should mirror that same requirement list
+   - this list should no longer include `asset_resource_adapter`; if it reappears, treat it as a regression in the real-renderer readiness seam
    - default selection should continue to resolve to the placeholder path until a real backend becomes available
 
 ## Current Expected Boundary
