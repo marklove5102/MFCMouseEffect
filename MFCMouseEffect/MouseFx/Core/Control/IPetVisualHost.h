@@ -15,6 +15,14 @@ struct PetVisualHostUpdate {
     float headTintAmount{0.0f};
 };
 
+struct PetVisualHostDiagnostics {
+    std::string preferredRendererBackend;
+    std::string selectedRendererBackend;
+    std::string rendererBackendSelectionReason;
+    std::string rendererBackendFailureReason;
+    std::vector<std::string> availableRendererBackends;
+};
+
 class IPetVisualHost {
 public:
     virtual ~IPetVisualHost() = default;
@@ -32,6 +40,7 @@ public:
     virtual void Update(const PetVisualHostUpdate& update) = 0;
     virtual void ApplyPose(const MouseCompanionPetPoseFrame& poseFrame) = 0;
     virtual bool IsActive() const = 0;
+    virtual PetVisualHostDiagnostics ReadDiagnostics() const { return {}; }
 };
 
 } // namespace mousefx

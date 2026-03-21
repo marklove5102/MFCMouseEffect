@@ -74,6 +74,12 @@
   - `PetPoseFrame`
   - appearance/action-library asset lanes
   - lightweight readiness diagnostics
+- Windows pet backend selection diagnostics are now active too:
+  - `preferred_renderer_backend`
+  - `selected_renderer_backend`
+  - `renderer_backend_selection_reason`
+  - `renderer_backend_failure_reason`
+  - `available_renderer_backends`
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

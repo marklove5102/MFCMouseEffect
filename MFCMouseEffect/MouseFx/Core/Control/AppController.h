@@ -120,6 +120,11 @@ public:
         bool appearanceProfileLoaded{false};
         bool poseBindingConfigured{false};
         int skeletonBoneCount{0};
+        std::string preferredRendererBackend;
+        std::string selectedRendererBackend;
+        std::string rendererBackendSelectionReason;
+        std::string rendererBackendFailureReason;
+        std::vector<std::string> availableRendererBackends;
         std::string configuredModelPath;
         std::string configuredActionLibraryPath;
         std::string configuredEffectProfilePath;

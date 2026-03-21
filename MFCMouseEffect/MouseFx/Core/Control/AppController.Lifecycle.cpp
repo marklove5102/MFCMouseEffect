@@ -344,6 +344,11 @@ void AppController::Stop() {
         mouseCompanionRuntimeStatus_.runtimePresent = false;
         mouseCompanionRuntimeStatus_.visualHostActive = false;
         mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
+        mouseCompanionRuntimeStatus_.preferredRendererBackend.clear();
+        mouseCompanionRuntimeStatus_.selectedRendererBackend.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
+        mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
     }
     for (auto& effect : effects_) {
         if (effect) {
@@ -400,6 +405,11 @@ void AppController::TryLoadDefaultPetModel() {
             mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
             mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
             mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
+            mouseCompanionRuntimeStatus_.preferredRendererBackend.clear();
+            mouseCompanionRuntimeStatus_.selectedRendererBackend.clear();
+            mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
+            mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
+            mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
             mouseCompanionRuntimeStatus_.visualModelPath.clear();
             mouseCompanionRuntimeStatus_.loadedModelPath.clear();
             mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "phase1_placeholder";
@@ -434,6 +444,8 @@ void AppController::TryLoadDefaultPetModel() {
     ApplyPetVisualFollowProfile();
 
     const bool visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
+    const PetVisualHostDiagnostics visualHostDiagnostics =
+        petVisualHost_ ? petVisualHost_->ReadDiagnostics() : PetVisualHostDiagnostics{};
     TryApplyPetModelToVisualHost();
     TryApplyPetActionLibraryToVisualHost();
     TryApplyPetAppearanceToVisualHost();
@@ -457,6 +469,13 @@ void AppController::TryLoadDefaultPetModel() {
         mouseCompanionRuntimeStatus_.appearanceProfileLoaded = loadedAppearanceProfile;
         mouseCompanionRuntimeStatus_.poseBindingConfigured = poseBindingReady;
         mouseCompanionRuntimeStatus_.skeletonBoneCount = poseBindingReady ? 6 : 0;
+        mouseCompanionRuntimeStatus_.preferredRendererBackend = visualHostDiagnostics.preferredRendererBackend;
+        mouseCompanionRuntimeStatus_.selectedRendererBackend = visualHostDiagnostics.selectedRendererBackend;
+        mouseCompanionRuntimeStatus_.rendererBackendSelectionReason =
+            visualHostDiagnostics.rendererBackendSelectionReason;
+        mouseCompanionRuntimeStatus_.rendererBackendFailureReason =
+            visualHostDiagnostics.rendererBackendFailureReason;
+        mouseCompanionRuntimeStatus_.availableRendererBackends = visualHostDiagnostics.availableRendererBackends;
         mouseCompanionRuntimeStatus_.loadedActionLibraryPath =
             loadedActionLibrary ? loadedPetActionLibraryPath_ : "";
         mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
@@ -533,6 +552,20 @@ void AppController::EnsurePetVisualHost() {
     }
     std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
     mouseCompanionRuntimeStatus_.visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
+    if (petVisualHost_ && petVisualHost_->IsActive()) {
+        const PetVisualHostDiagnostics diagnostics = petVisualHost_->ReadDiagnostics();
+        mouseCompanionRuntimeStatus_.preferredRendererBackend = diagnostics.preferredRendererBackend;
+        mouseCompanionRuntimeStatus_.selectedRendererBackend = diagnostics.selectedRendererBackend;
+        mouseCompanionRuntimeStatus_.rendererBackendSelectionReason = diagnostics.rendererBackendSelectionReason;
+        mouseCompanionRuntimeStatus_.rendererBackendFailureReason = diagnostics.rendererBackendFailureReason;
+        mouseCompanionRuntimeStatus_.availableRendererBackends = diagnostics.availableRendererBackends;
+    } else {
+        mouseCompanionRuntimeStatus_.preferredRendererBackend.clear();
+        mouseCompanionRuntimeStatus_.selectedRendererBackend.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
+        mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
+    }
 }
 
 void AppController::ApplyPetVisualFollowProfile() {
@@ -556,6 +589,11 @@ void AppController::ShutdownPetVisualHost() {
     mouseCompanionRuntimeStatus_.visualHostActive = false;
     mouseCompanionRuntimeStatus_.visualModelLoaded = false;
     mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
+    mouseCompanionRuntimeStatus_.preferredRendererBackend.clear();
+    mouseCompanionRuntimeStatus_.selectedRendererBackend.clear();
+    mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
+    mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
+    mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
     mouseCompanionRuntimeStatus_.visualModelPath.clear();
     mouseCompanionRuntimeStatus_.visualModelLoadError = "phase1_visual_host_inactive";
 }

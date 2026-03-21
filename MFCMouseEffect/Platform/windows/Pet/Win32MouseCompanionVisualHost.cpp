@@ -118,6 +118,16 @@ bool Win32MouseCompanionVisualHost::IsActive() const {
     return state_.active;
 }
 
+PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const {
+    PetVisualHostDiagnostics diagnostics{};
+    diagnostics.preferredRendererBackend = window_.PreferredRendererBackendName();
+    diagnostics.selectedRendererBackend = window_.SelectedRendererBackendName();
+    diagnostics.rendererBackendSelectionReason = window_.RendererBackendSelectionReason();
+    diagnostics.rendererBackendFailureReason = window_.RendererBackendFailureReason();
+    diagnostics.availableRendererBackends = window_.AvailableRendererBackendNames();
+    return diagnostics;
+}
+
 void Win32MouseCompanionVisualHost::SyncWindow() {
     if (!state_.active || !state_.visible) {
         return;

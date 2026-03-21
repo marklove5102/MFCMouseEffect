@@ -150,6 +150,10 @@ public:
         return handle_ != nullptr;
     }
 
+    PetVisualHostDiagnostics ReadDiagnostics() const override {
+        return {};
+    }
+
 private:
     static int ResolveEdgeClampModeCode(const std::string& mode) {
         const std::string normalized = ToLowerAscii(TrimAscii(mode));

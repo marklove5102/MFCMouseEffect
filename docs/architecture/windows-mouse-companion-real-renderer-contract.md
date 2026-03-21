@@ -167,6 +167,13 @@ Before touching GPU-specific code, the safest first step is:
 - Runtime interpretation is now moving behind a reusable adapter too:
   - `Win32MouseCompanionRendererRuntime`
   - placeholder helper layers now consume a normalized runtime view instead of repeatedly decoding raw renderer input
+- Backend selection is now observable through runtime diagnostics:
+  - `preferred_renderer_backend`
+  - `selected_renderer_backend`
+  - `renderer_backend_selection_reason`
+  - `renderer_backend_failure_reason`
+  - `available_renderer_backends`
+  - this gives future backend bring-up a stable way to verify host/factory/registry routing before any visual parity work starts
 - Current limitation remains explicit:
   - the placeholder renderer is still the only backend implementation
   - built-in backend selection now routes through an explicit backend registry + registration step, so future Windows backends no longer need another factory/window rewrite

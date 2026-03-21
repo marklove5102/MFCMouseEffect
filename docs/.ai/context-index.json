@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-21T12:08:49.387Z",
+  "generated_at": "2026-03-21T12:21:11.623Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 202,
-      "size_bytes": 9776,
-      "estimated_tokens": 2444,
+      "line_count": 208,
+      "size_bytes": 10017,
+      "estimated_tokens": 2505,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "81d59bee33ce09248f3c9da445adff91ed1bbdbe",
-      "updated_at": "2026-03-21T12:01:56.300Z"
+      "hash_sha1": "9ddcca86af02628114c1d166caaab0a630a96d3d",
+      "updated_at": "2026-03-21T12:18:51.009Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -877,14 +877,14 @@
       ],
       "summary": "1. close Phase1.5 behavior/structure boundary",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 210,
-      "size_bytes": 14040,
-      "estimated_tokens": 3510,
+      "line_count": 215,
+      "size_bytes": 14411,
+      "estimated_tokens": 3603,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "2dfe31b94cfb3c806c0009eafe576706c69a7630",
-      "updated_at": "2026-03-21T11:56:20.505Z"
+      "hash_sha1": "ed64cd90a6d875aff67df17f7d5ed8737f8fcf94",
+      "updated_at": "2026-03-21T12:18:56.413Z"
     },
     {
       "id": "docs/architecture/windows-mouse-companion-phase15-exit-contract.md",
@@ -938,14 +938,14 @@
       ],
       "summary": "This contract does **not** choose the final Windows rendering technology yet.",
       "when_to_read": "Read when executing manual/regression workflows.",
-      "line_count": 183,
-      "size_bytes": 8029,
-      "estimated_tokens": 2008,
+      "line_count": 190,
+      "size_bytes": 8402,
+      "estimated_tokens": 2101,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "37dfe7969a383e4b1a5b32211f3f15bebaab2319",
-      "updated_at": "2026-03-21T11:56:20.505Z"
+      "hash_sha1": "7fc24da9d5c15fa4a8f37f5f9a9011de063b1234",
+      "updated_at": "2026-03-21T12:19:02.080Z"
     },
     {
       "id": "docs/archive/architecture/README.md",

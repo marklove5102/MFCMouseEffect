@@ -180,6 +180,11 @@
 - Renderer runtime interpretation is now narrowing too:
   - `Win32MouseCompanionRendererRuntime` centralizes action decoding, normalized intensities, pose-sample lookup, facing sign, and clip access
   - placeholder motion/posture/action-profile/scene helpers now consume that runtime view instead of repeatedly decoding raw renderer input on their own
+- Backend-selection observability is now active too:
+  - Windows visual host now reports `preferred_renderer_backend`
+  - Windows visual host can now report `selected_renderer_backend`
+  - runtime/test diagnostics also expose `renderer_backend_selection_reason` and `renderer_backend_failure_reason`
+  - runtime/test diagnostics also expose `available_renderer_backends`
 - Intended next-step order:
   1. close Phase1.5 behavior/structure boundary
   2. keep the current placeholder as a stable backend

@@ -29,6 +29,7 @@ public:
     void Update(const PetVisualHostUpdate& update) override;
     void ApplyPose(const MouseCompanionPetPoseFrame& poseFrame) override;
     bool IsActive() const override;
+    PetVisualHostDiagnostics ReadDiagnostics() const override;
 
 private:
     void SyncWindow();

@@ -3,6 +3,8 @@
 #include <windows.h>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
 
@@ -23,6 +25,11 @@ public:
     bool IsVisible() const;
     bool IsCreated() const;
     bool Update(const Win32MouseCompanionVisualState& state);
+    std::string PreferredRendererBackendName() const;
+    std::string SelectedRendererBackendName() const;
+    std::string RendererBackendSelectionReason() const;
+    std::string RendererBackendFailureReason() const;
+    std::vector<std::string> AvailableRendererBackendNames() const;
 
 private:
     static constexpr UINT kMsgEnsureTopmost = WM_APP + 0x41;
@@ -56,6 +63,11 @@ private:
     HWINEVENTHOOK foregroundHook_{nullptr};
     std::unique_ptr<IWin32MouseCompanionRendererBackend> renderer_{};
     std::unique_ptr<Win32MouseCompanionPresenter> presenter_{};
+    std::string preferredRendererBackendName_;
+    std::string selectedRendererBackendName_;
+    std::string rendererBackendSelectionReason_;
+    std::string rendererBackendFailureReason_;
+    std::vector<std::string> availableRendererBackendNames_{};
 };
 
 } // namespace mousefx::windows

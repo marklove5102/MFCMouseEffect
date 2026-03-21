@@ -21,8 +21,14 @@ Win32MouseCompanionWindow* g_foregroundHookOwner = nullptr;
 } // namespace
 
 Win32MouseCompanionWindow::Win32MouseCompanionWindow()
-    : renderer_(CreateDefaultWin32MouseCompanionRendererBackend()),
-      presenter_(std::make_unique<Win32MouseCompanionPresenter>()) {
+    : presenter_(std::make_unique<Win32MouseCompanionPresenter>()) {
+    auto selection = SelectDefaultWin32MouseCompanionRendererBackend();
+    renderer_ = std::move(selection.backend);
+    preferredRendererBackendName_ = std::move(selection.preferredBackendName);
+    selectedRendererBackendName_ = std::move(selection.selectedBackendName);
+    rendererBackendSelectionReason_ = std::move(selection.selectionReason);
+    rendererBackendFailureReason_ = std::move(selection.failureReason);
+    availableRendererBackendNames_ = std::move(selection.availableBackendNames);
 }
 
 Win32MouseCompanionWindow::~Win32MouseCompanionWindow() {
@@ -143,6 +149,26 @@ bool Win32MouseCompanionWindow::Update(const Win32MouseCompanionVisualState& sta
         return false;
     }
     return RenderLayered(bounds, state);
+}
+
+std::string Win32MouseCompanionWindow::SelectedRendererBackendName() const {
+    return selectedRendererBackendName_;
+}
+
+std::string Win32MouseCompanionWindow::PreferredRendererBackendName() const {
+    return preferredRendererBackendName_;
+}
+
+std::string Win32MouseCompanionWindow::RendererBackendSelectionReason() const {
+    return rendererBackendSelectionReason_;
+}
+
+std::string Win32MouseCompanionWindow::RendererBackendFailureReason() const {
+    return rendererBackendFailureReason_;
+}
+
+std::vector<std::string> Win32MouseCompanionWindow::AvailableRendererBackendNames() const {
+    return availableRendererBackendNames_;
 }
 
 LRESULT CALLBACK Win32MouseCompanionWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
