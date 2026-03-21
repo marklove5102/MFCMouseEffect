@@ -42,6 +42,8 @@ Use it when P1 (`current.md`) is not enough and you need targeted deep context.
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-phase15-exit-contract.md`
 - Windows 真实渲染层接口契约：
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-real-renderer-contract.md`
+- Windows 手测与 backend 偏好验证：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/ops/windows-mouse-companion-manual-checklist.md`
 - 3D companion runtime blueprint and phased architecture (canonical `glb`, non-builtin animation pipeline):
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md`
 - Action clip asset contract and JSON schema (external skeleton action reuse):

@@ -181,10 +181,21 @@
   - `Win32MouseCompanionRendererRuntime` centralizes action decoding, normalized intensities, pose-sample lookup, facing sign, and clip access
   - placeholder motion/posture/action-profile/scene helpers now consume that runtime view instead of repeatedly decoding raw renderer input on their own
 - Backend-selection observability is now active too:
+  - Windows visual host now reports `preferred_renderer_backend_source`
   - Windows visual host now reports `preferred_renderer_backend`
   - Windows visual host can now report `selected_renderer_backend`
   - runtime/test diagnostics also expose `renderer_backend_selection_reason` and `renderer_backend_failure_reason`
   - runtime/test diagnostics also expose `available_renderer_backends`
+- Backend lifecycle fallback is now part of the seam:
+  - registry/factory selection no longer treats constructor success as enough
+  - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract
+  - this keeps future real-backend bring-up failures inside backend selection instead of leaking into host/window logic
+- Backend preference resolution is now isolated too:
+  - factory no longer owns environment-string normalization directly
+  - current canonicalization keeps `default` as an alias of `auto`
+  - future config-backed preference sources can reuse the same normalization seam without reworking backend selection
+  - preference source routing is now behind a dedicated registry, so future `settings` / debug / env sources can layer by priority instead of expanding factory conditionals
+  - explicit test/debug preference requests now also reuse that same source-resolution path instead of forming a parallel branch
 - Intended next-step order:
   1. close Phase1.5 behavior/structure boundary
   2. keep the current placeholder as a stable backend

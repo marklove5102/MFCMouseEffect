@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-21T12:21:11.623Z",
+  "generated_at": "2026-03-21T13:02:51.067Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -83,14 +83,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 208,
-      "size_bytes": 10017,
-      "estimated_tokens": 2505,
+      "line_count": 218,
+      "size_bytes": 10780,
+      "estimated_tokens": 2695,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "9ddcca86af02628114c1d166caaab0a630a96d3d",
-      "updated_at": "2026-03-21T12:18:51.009Z"
+      "hash_sha1": "8dadaf4707f6247197cf5622dc562bfcedba2a59",
+      "updated_at": "2026-03-21T13:01:29.669Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -121,14 +121,14 @@
       ],
       "summary": "This file is a P2 routing map.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 80,
-      "size_bytes": 4764,
-      "estimated_tokens": 1191,
+      "line_count": 82,
+      "size_bytes": 4920,
+      "estimated_tokens": 1230,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "80df23c08f88e793bba034da9c7baa058d6dcbf8",
-      "updated_at": "2026-03-21T10:44:44.938Z"
+      "hash_sha1": "07924484138eafce26df342859e889450ec29cc3",
+      "updated_at": "2026-03-21T12:27:39.696Z"
     },
     {
       "id": "docs/architecture/agent-doc-governance.md",
@@ -873,18 +873,19 @@
         "macos",
         "contract",
         "abi",
-        "routing"
+        "routing",
+        "debug"
       ],
       "summary": "1. close Phase1.5 behavior/structure boundary",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 215,
-      "size_bytes": 14411,
-      "estimated_tokens": 3603,
+      "line_count": 226,
+      "size_bytes": 15448,
+      "estimated_tokens": 3862,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "ed64cd90a6d875aff67df17f7d5ed8737f8fcf94",
-      "updated_at": "2026-03-21T12:18:56.413Z"
+      "hash_sha1": "ecc40ecd8a7a8f967fe11ff4ecb1a8a9862e72dd",
+      "updated_at": "2026-03-21T13:01:35.709Z"
     },
     {
       "id": "docs/architecture/windows-mouse-companion-phase15-exit-contract.md",
@@ -934,18 +935,19 @@
         "contract",
         "regression",
         "abi",
-        "routing"
+        "routing",
+        "debug"
       ],
       "summary": "This contract does **not** choose the final Windows rendering technology yet.",
       "when_to_read": "Read when executing manual/regression workflows.",
-      "line_count": 190,
-      "size_bytes": 8402,
-      "estimated_tokens": 2101,
+      "line_count": 202,
+      "size_bytes": 9666,
+      "estimated_tokens": 2417,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "7fc24da9d5c15fa4a8f37f5f9a9011de063b1234",
-      "updated_at": "2026-03-21T12:19:02.080Z"
+      "hash_sha1": "d8b830a7f2b2072bd3181a29fb621d8bfc618cd8",
+      "updated_at": "2026-03-21T13:01:41.654Z"
     },
     {
       "id": "docs/archive/architecture/README.md",
@@ -1222,14 +1224,14 @@
       ],
       "summary": "1. Build [MFCMouseEffect.vcxproj](/f:/language/cpp/code/MFCMouseEffect/MFCMouseEffect/MFCMouseEffect.vcxproj) with `Release|x64`.",
       "when_to_read": "Read when executing manual/regression workflows.",
-      "line_count": 120,
-      "size_bytes": 6719,
-      "estimated_tokens": 1680,
+      "line_count": 148,
+      "size_bytes": 8095,
+      "estimated_tokens": 2024,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "9d4050376f1cc0b3e126a9fc2f8047b01122187a",
-      "updated_at": "2026-03-21T10:37:40.733Z"
+      "hash_sha1": "132ed60e3dd727dc8bfd50e8cd97de2e9c01ea64",
+      "updated_at": "2026-03-21T12:35:06.728Z"
     },
     {
       "id": "docs/README.md",

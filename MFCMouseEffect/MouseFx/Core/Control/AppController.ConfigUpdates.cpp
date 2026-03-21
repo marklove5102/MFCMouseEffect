@@ -184,6 +184,7 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
         mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
         mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
         mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
+        mouseCompanionRuntimeStatus_.preferredRendererBackendSource.clear();
         mouseCompanionRuntimeStatus_.preferredRendererBackend.clear();
         mouseCompanionRuntimeStatus_.selectedRendererBackend.clear();
         mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();

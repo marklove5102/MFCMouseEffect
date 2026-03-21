@@ -120,6 +120,7 @@ public:
         bool appearanceProfileLoaded{false};
         bool poseBindingConfigured{false};
         int skeletonBoneCount{0};
+        std::string preferredRendererBackendSource;
         std::string preferredRendererBackend;
         std::string selectedRendererBackend;
         std::string rendererBackendSelectionReason;

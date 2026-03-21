@@ -61,6 +61,7 @@ json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRun
         {"appearance_profile_loaded", status.appearanceProfileLoaded},
         {"pose_binding_configured", status.poseBindingConfigured},
         {"skeleton_bone_count", status.skeletonBoneCount},
+        {"preferred_renderer_backend_source", status.preferredRendererBackendSource},
         {"preferred_renderer_backend", status.preferredRendererBackend},
         {"selected_renderer_backend", status.selectedRendererBackend},
         {"renderer_backend_selection_reason", status.rendererBackendSelectionReason},

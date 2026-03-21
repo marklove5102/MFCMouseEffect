@@ -75,11 +75,21 @@
   - appearance/action-library asset lanes
   - lightweight readiness diagnostics
 - Windows pet backend selection diagnostics are now active too:
+  - `preferred_renderer_backend_source`
   - `preferred_renderer_backend`
   - `selected_renderer_backend`
   - `renderer_backend_selection_reason`
   - `renderer_backend_failure_reason`
   - `available_renderer_backends`
+- Renderer backend lifecycle seam is now explicit too:
+  - backend selection no longer stops at constructor success
+  - factory now treats `Start() / IsReady() / LastErrorReason()` as first-class fallback signals
+  - placeholder backend is the current always-ready reference implementation
+- Backend preference parsing is now a separate seam too:
+  - factory no longer owns env-string normalization directly
+  - current canonicalization accepts `default` as an alias of `auto`
+  - preference source resolution now also routes through a dedicated registry; current built-ins are `env` and final `default`
+  - explicit preference requests now travel through the same registry path too, instead of bypassing source resolution
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

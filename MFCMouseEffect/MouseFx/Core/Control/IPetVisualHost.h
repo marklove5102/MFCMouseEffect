@@ -16,6 +16,7 @@ struct PetVisualHostUpdate {
 };
 
 struct PetVisualHostDiagnostics {
+    std::string preferredRendererBackendSource;
     std::string preferredRendererBackend;
     std::string selectedRendererBackend;
     std::string rendererBackendSelectionReason;

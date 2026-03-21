@@ -4,12 +4,15 @@
 #include <string>
 #include <vector>
 
+#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
+
 namespace mousefx::windows {
 
 class IWin32MouseCompanionRendererBackend;
 
 struct Win32MouseCompanionRendererBackendSelection {
     std::unique_ptr<IWin32MouseCompanionRendererBackend> backend{};
+    std::string preferredBackendSource;
     std::string preferredBackendName;
     std::string selectedBackendName;
     std::string selectionReason;

@@ -10,12 +10,30 @@
 
 namespace mousefx::windows {
 
+bool Win32MouseCompanionPlaceholderRenderer::Start() {
+    ready_ = true;
+    lastErrorReason_.clear();
+    return true;
+}
+
+void Win32MouseCompanionPlaceholderRenderer::Shutdown() {
+    ready_ = false;
+}
+
+bool Win32MouseCompanionPlaceholderRenderer::IsReady() const {
+    return ready_;
+}
+
+std::string Win32MouseCompanionPlaceholderRenderer::LastErrorReason() const {
+    return lastErrorReason_;
+}
+
 void Win32MouseCompanionPlaceholderRenderer::Render(
     const Win32MouseCompanionRendererInput& input,
     Gdiplus::Graphics* graphics,
     int width,
     int height) const {
-    if (!graphics || width <= 0 || height <= 0) {
+    if (!ready_ || !graphics || width <= 0 || height <= 0) {
         return;
     }
 

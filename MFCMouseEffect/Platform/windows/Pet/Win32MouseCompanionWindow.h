@@ -25,6 +25,7 @@ public:
     bool IsVisible() const;
     bool IsCreated() const;
     bool Update(const Win32MouseCompanionVisualState& state);
+    std::string PreferredRendererBackendSource() const;
     std::string PreferredRendererBackendName() const;
     std::string SelectedRendererBackendName() const;
     std::string RendererBackendSelectionReason() const;
@@ -63,6 +64,7 @@ private:
     HWINEVENTHOOK foregroundHook_{nullptr};
     std::unique_ptr<IWin32MouseCompanionRendererBackend> renderer_{};
     std::unique_ptr<Win32MouseCompanionPresenter> presenter_{};
+    std::string preferredRendererBackendSource_;
     std::string preferredRendererBackendName_;
     std::string selectedRendererBackendName_;
     std::string rendererBackendSelectionReason_;

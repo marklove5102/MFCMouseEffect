@@ -24,6 +24,7 @@ Win32MouseCompanionWindow::Win32MouseCompanionWindow()
     : presenter_(std::make_unique<Win32MouseCompanionPresenter>()) {
     auto selection = SelectDefaultWin32MouseCompanionRendererBackend();
     renderer_ = std::move(selection.backend);
+    preferredRendererBackendSource_ = std::move(selection.preferredBackendSource);
     preferredRendererBackendName_ = std::move(selection.preferredBackendName);
     selectedRendererBackendName_ = std::move(selection.selectedBackendName);
     rendererBackendSelectionReason_ = std::move(selection.selectionReason);
@@ -109,6 +110,9 @@ void Win32MouseCompanionWindow::Shutdown() {
         DestroyWindow(hwnd_);
         hwnd_ = nullptr;
     }
+    if (renderer_) {
+        renderer_->Shutdown();
+    }
     DestroySurface();
     visible_ = false;
 }
@@ -157,6 +161,10 @@ std::string Win32MouseCompanionWindow::SelectedRendererBackendName() const {
 
 std::string Win32MouseCompanionWindow::PreferredRendererBackendName() const {
     return preferredRendererBackendName_;
+}
+
+std::string Win32MouseCompanionWindow::PreferredRendererBackendSource() const {
+    return preferredRendererBackendSource_;
 }
 
 std::string Win32MouseCompanionWindow::RendererBackendSelectionReason() const {
@@ -284,7 +292,7 @@ void Win32MouseCompanionWindow::DestroySurface() {
 }
 
 bool Win32MouseCompanionWindow::RenderLayered(const RECT& bounds, const Win32MouseCompanionVisualState& state) {
-    if (!hwnd_ || !memDc_ || !bits_ || !renderer_) {
+    if (!hwnd_ || !memDc_ || !bits_ || !renderer_ || !renderer_->IsReady()) {
         return false;
     }
     ZeroMemory(bits_, static_cast<size_t>(surfaceWidth_) * static_cast<size_t>(surfaceHeight_) * 4);

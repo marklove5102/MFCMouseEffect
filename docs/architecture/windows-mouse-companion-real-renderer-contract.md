@@ -168,12 +168,24 @@ Before touching GPU-specific code, the safest first step is:
   - `Win32MouseCompanionRendererRuntime`
   - placeholder helper layers now consume a normalized runtime view instead of repeatedly decoding raw renderer input
 - Backend selection is now observable through runtime diagnostics:
+  - `preferred_renderer_backend_source`
   - `preferred_renderer_backend`
   - `selected_renderer_backend`
   - `renderer_backend_selection_reason`
   - `renderer_backend_failure_reason`
   - `available_renderer_backends`
   - this gives future backend bring-up a stable way to verify host/factory/registry routing before any visual parity work starts
+  - current test-friendly preference source is `env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`; when unset, diagnostics report `preferred_renderer_backend_source=default`
+  - backend preference normalization is now separated from the factory path, so future config-backed preference sources can reuse the same canonical `default -> auto` and lowercase/trim rules
+- Backend lifecycle is now part of the contract too:
+  - renderer backend construction alone is not treated as readiness
+  - backends are expected to implement `Start()`, `Shutdown()`, `IsReady()`, and `LastErrorReason()`
+  - future real backends should surface initialization failures through `LastErrorReason()` so factory fallback remains local to backend selection
+- Backend preference source routing is now explicit too:
+  - preference resolution no longer assumes only one hardcoded env source
+  - current built-ins are ordered as `configured_request -> env -> default`
+  - future config-backed preference sources should plug into the registry layer instead of expanding factory-side conditionals
+  - explicit caller-provided preference requests now reuse that same registry path, so source precedence stays uniform across test/debug/runtime entrypoints
 - Current limitation remains explicit:
   - the placeholder renderer is still the only backend implementation
   - built-in backend selection now routes through an explicit backend registry + registration step, so future Windows backends no longer need another factory/window rewrite

@@ -223,6 +223,7 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
     out["appearance_profile_loaded"] = status.appearanceProfileLoaded;
     out["pose_binding_configured"] = status.poseBindingConfigured;
     out["skeleton_bone_count"] = status.skeletonBoneCount;
+    out["preferred_renderer_backend_source"] = status.preferredRendererBackendSource;
     out["preferred_renderer_backend"] = status.preferredRendererBackend;
     out["selected_renderer_backend"] = status.selectedRendererBackend;
     out["renderer_backend_selection_reason"] = status.rendererBackendSelectionReason;

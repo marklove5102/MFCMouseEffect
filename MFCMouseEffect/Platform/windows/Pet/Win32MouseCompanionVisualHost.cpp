@@ -120,6 +120,7 @@ bool Win32MouseCompanionVisualHost::IsActive() const {
 
 PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const {
     PetVisualHostDiagnostics diagnostics{};
+    diagnostics.preferredRendererBackendSource = window_.PreferredRendererBackendSource();
     diagnostics.preferredRendererBackend = window_.PreferredRendererBackendName();
     diagnostics.selectedRendererBackend = window_.SelectedRendererBackendName();
     diagnostics.rendererBackendSelectionReason = window_.RendererBackendSelectionReason();

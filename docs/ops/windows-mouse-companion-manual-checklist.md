@@ -97,12 +97,40 @@ Check `/api/state.mouse_companion_runtime` or equivalent diagnostics snapshot an
 - `model_loaded`
 - `action_library_loaded`
 - `appearance_profile_loaded`
+- `preferred_renderer_backend_source`
+- `preferred_renderer_backend`
+- `selected_renderer_backend`
+- `renderer_backend_selection_reason`
+- `renderer_backend_failure_reason`
+- `available_renderer_backends`
 - `loaded_model_path`
 - `loaded_action_library_path`
 - `loaded_appearance_profile_path`
 - `model_load_error`
 - `action_library_load_error`
 - `appearance_profile_load_error`
+
+## Test-Friendly Backend Preference
+Current Windows pet backend preference is intentionally test-friendly and does not require a schema change yet.
+
+1. Leave `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND` unset.
+2. Launch the app and confirm runtime diagnostics report:
+   - `preferred_renderer_backend_source = default`
+   - `preferred_renderer_backend = auto`
+3. Set:
+   - `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND=placeholder`
+4. Relaunch the app and confirm runtime diagnostics now report:
+   - `preferred_renderer_backend_source = env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`
+   - `preferred_renderer_backend = placeholder`
+5. Set:
+   - `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND=default`
+6. Relaunch the app and confirm runtime diagnostics now report:
+   - `preferred_renderer_backend_source = env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`
+   - `preferred_renderer_backend = auto`
+7. If a future experimental backend name is forced but not registered, confirm:
+   - `renderer_backend_selection_reason` explains the fallback
+   - `renderer_backend_failure_reason` is non-empty
+   - `selected_renderer_backend` still resolves to the effective fallback backend
 
 ## Current Expected Boundary
 - `model_loaded` may still be `false` on Windows because the current Windows path does not render the real 3D model yet.
