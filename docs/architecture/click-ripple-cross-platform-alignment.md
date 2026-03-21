@@ -21,9 +21,8 @@ Record the current shared visual contract for the built-in click ripple after th
 - Do not force a shared renderer implementation across platforms.
 - Align visual semantics instead, with presentation clarity as the primary goal:
   - config-driven geometry on both platforms
-  - hollow-ring dominant shape instead of a heavy filled center
-  - thinner ring body with a low-occlusion center
-  - lighter fill and softer outer glow halo
+  - clear-center single-ring shape instead of a heavy filled center
+  - lighter single contour with softer outer glow halo
   - shorter default timing so click feedback is readable but does not linger
 
 ## Implementation
@@ -53,25 +52,25 @@ Record the current shared visual contract for the built-in click ripple after th
 - File:
   - `MouseFx/Renderers/Click/RippleRenderer.h`
 - Updated from a simple radial fill + single stroke to:
-  - hollow ring body fill
   - main outer contour
-  - secondary inner contour
   - softer multi-pass glow
 - 2026-03-21 baseline refresh further reduced:
   - ring thickness
-  - fill alpha
   - glow width and alpha
-  - secondary ring opacity
+- 2026-03-21 same-day rollback:
+  - removed the secondary inner contour again after visual review
+  - removed donut/body fill as well so the default ripple stays a true single-ring silhouette
 
 ### macOS renderer
 - File:
   - `Platform/macos/Effects/MacosClickPulseOverlayBridge.swift`
 - Ripple branch now mirrors the same design language:
-  - even-odd donut fill
   - main ring contour
-  - secondary inner ring
   - softer glow widths and alpha
 - 2026-03-21 baseline refresh matched the same reductions as Windows so both native paths stay close under the new default contract.
+- 2026-03-21 same-day rollback:
+  - removed the secondary inner ring again
+  - removed donut fill as well so macOS and Windows both keep a single-ring default ripple
 
 ## Non-Goals
 - No renderer-code unification between Windows and macOS in this pass.
@@ -95,6 +94,5 @@ Record the current shared visual contract for the built-in click ripple after th
 ## Follow-Up
 - If the default ripple still needs visual tuning after manual review, tune in this order:
   1. duration/window size defaults
-  2. ring width vs end radius
-  3. glow width and alpha
-  4. secondary ring opacity
+ 2. ring width vs end radius
+ 3. glow width and alpha

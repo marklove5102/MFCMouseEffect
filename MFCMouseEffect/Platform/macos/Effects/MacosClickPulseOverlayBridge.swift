@@ -86,15 +86,6 @@ private func mfxCreateClickStarPath(_ bounds: CGRect, points: Int) -> CGPath {
     return path
 }
 
-private func mfxCreateDonutPath(_ outer: CGRect, _ inner: CGRect) -> CGPath {
-    let path = CGMutablePath()
-    path.addEllipse(in: outer)
-    if inner.width > 0.5, inner.height > 0.5 {
-        path.addEllipse(in: inner)
-    }
-    return path
-}
-
 private func mfxMakeScaleFadeAnimationGroup(
     fromScale: CGFloat,
     toScale: CGFloat,
@@ -279,21 +270,13 @@ private func mfxCreateClickPulseOverlayOnMainThread(
             min: max(geometryStrokeWidth + 1.25, 2.6),
             max: max(3.4, endRadius * 0.42)
         )
-        let innerRadius = max(0.0, endRadius - ringWidth)
         let ringFrame = CGRect(
             x: (sizeCGFloat - endRadius * 2.0) * 0.5,
             y: (sizeCGFloat - endRadius * 2.0) * 0.5,
             width: endRadius * 2.0,
             height: endRadius * 2.0
         )
-        let innerFrame = CGRect(
-            x: (sizeCGFloat - innerRadius * 2.0) * 0.5,
-            y: (sizeCGFloat - innerRadius * 2.0) * 0.5,
-            width: innerRadius * 2.0,
-            height: innerRadius * 2.0
-        )
         let ringPath = CGPath(ellipseIn: ringFrame, transform: nil)
-        let donutPath = mfxCreateDonutPath(ringFrame, innerFrame)
         let ringStrokeWidth = mfxClamp(
             geometryStrokeWidth,
             min: 0.6,
@@ -307,12 +290,8 @@ private func mfxCreateClickPulseOverlayOnMainThread(
 
         let base = CAShapeLayer()
         base.frame = content.bounds
-        base.path = donutPath
-        base.fillRule = .evenOdd
-        base.fillColor = mfxColorFromArgb(
-            fillArgb,
-            alphaScale: mfxClamp(baseOpacityCGFloat * 0.66, min: 0.0, max: 1.0)
-        ).cgColor
+        base.path = ringPath
+        base.fillColor = NSColor.clear.cgColor
         base.strokeColor = mfxColorFromArgb(
             strokeArgb,
             alphaScale: mfxClamp(baseOpacityCGFloat, min: 0.0, max: 1.0)
@@ -329,35 +308,6 @@ private func mfxCreateClickPulseOverlayOnMainThread(
             duration: animationDurationSec
         )
         base.add(coreGroup, forKey: "mfx_click_pulse")
-
-        let secondaryRadius = max(startRadius, endRadius * 0.72)
-        if secondaryRadius > innerRadius + 1.0 {
-            let secondaryFrame = CGRect(
-                x: (sizeCGFloat - secondaryRadius * 2.0) * 0.5,
-                y: (sizeCGFloat - secondaryRadius * 2.0) * 0.5,
-                width: secondaryRadius * 2.0,
-                height: secondaryRadius * 2.0
-            )
-            let secondary = CAShapeLayer()
-            secondary.frame = content.bounds
-            secondary.path = CGPath(ellipseIn: secondaryFrame, transform: nil)
-            secondary.fillColor = NSColor.clear.cgColor
-            secondary.strokeColor = mfxColorFromArgb(
-                strokeArgb,
-                alphaScale: mfxClamp(baseOpacityCGFloat * 0.42, min: 0.0, max: 1.0)
-            ).cgColor
-            secondary.lineWidth = max(0.9, geometryStrokeWidth * 0.78)
-            secondary.lineCap = .round
-            secondary.opacity = Float(mfxResolveOpacity(baseOpacityCGFloat, -0.14, 0.0))
-            contentLayer.addSublayer(secondary)
-            let secondaryGroup = mfxMakeScaleFadeAnimationGroup(
-                fromScale: startScale,
-                toScale: 1.0,
-                fromOpacity: mfxResolveOpacity(baseOpacityCGFloat, -0.18, 0.02),
-                duration: animationDurationSec
-            )
-            secondary.add(secondaryGroup, forKey: "mfx_click_pulse_secondary")
-        }
 
         for index in 0..<3 {
             let glow = CAShapeLayer()

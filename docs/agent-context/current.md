@@ -28,10 +28,11 @@
 - `click/trail/scroll/hold/hover` are active in `core`.
 - Shared command tail (`blend_mode/sort_key/group_id`) is active.
 - Group-retained model is active; transform/material/pass remain host-owned.
-- Click ripple default baseline refresh (2026-03-21) is active:
+  - Click ripple default baseline refresh (2026-03-21) is active:
   - Problem classification: this was treated as a default-visual-quality issue, not a clear Windows/macOS divergence bug. Both platforms already shared similar click semantics; the weak point was that the built-in default pulse was still too heavy for recording/presentation use.
   - Windows click ripple no longer ignores `EffectConfig.ripple`; the native `ripple` / `star` path now builds click profiles from config-level geometry, per-button colors, and click size scale instead of theme-only defaults.
-  - The built-in default contract now targets presentation clarity first: shorter duration, smaller window, lighter fill, thinner hollow ring, softer glow, and stable per-button colors. Windows GDI+ ripple and macOS click-pulse overlay both follow that same contract instead of chasing separate platform-specific styling.
+  - The built-in default contract now targets presentation clarity first: shorter duration, smaller window, clear center, single main contour, softer glow, and stable per-button colors. Windows GDI+ ripple and macOS click-pulse overlay both follow that same contract instead of chasing separate platform-specific styling.
+  - Double-ring regression fix (2026-03-21): the experimental secondary inner contour was removed again on both Windows and macOS, and the remaining donut-style inner fill edge was also dropped. Default click ripple is now a true single-ring silhouette instead of a visible two-layer contour.
   - Current boundary: the cross-platform click command contract is still shared, but macOS remains on its native overlay implementation and Windows remains on the overlay-ripple renderer path; parity is visual/parameter-level, not renderer-code-level unification.
 
 ### Input Indicator
