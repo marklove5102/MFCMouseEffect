@@ -2,8 +2,6 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderMotion.h"
 
-#include "MouseFx/Utils/TimeUtils.h"
-
 #include <cmath>
 
 namespace mousefx::windows {
@@ -26,33 +24,25 @@ double ResolveSecondsPhase(uint64_t nowMs, double frequencyHz, double phaseOffse
     return t * frequencyHz * kTau + phaseOffset;
 }
 
-float ResolveActionWeight(const Win32MouseCompanionVisualState& state, const char* actionName) {
-    if (!actionName) {
-        return 0.0f;
-    }
-    return state.lastActionName == actionName ? ClampUnit(state.lastActionIntensity) : 0.0f;
-}
-
 } // namespace
 
 Win32MouseCompanionPlaceholderMotion BuildWin32MouseCompanionPlaceholderMotion(
-    const Win32MouseCompanionVisualState& state) {
+    const Win32MouseCompanionRendererRuntime& runtime) {
     Win32MouseCompanionPlaceholderMotion motion{};
 
-    const uint64_t nowMs = NowMs();
-    motion.reactive = BuildWin32MouseCompanionReactiveMotion(state, nowMs);
-    const float followWeight = ResolveActionWeight(state, "follow");
-    const float dragWeight = ResolveActionWeight(state, "drag");
-    const float holdWeight = ResolveActionWeight(state, "hold_react");
-    const float scrollWeight = ResolveActionWeight(state, "scroll_react");
-    const float clickWeight = ResolveActionWeight(state, "click_react");
+    motion.reactive = BuildWin32MouseCompanionReactiveMotion(runtime);
+    const float followWeight = runtime.follow ? runtime.actionIntensity : 0.0f;
+    const float dragWeight = runtime.drag ? runtime.actionIntensity : 0.0f;
+    const float holdWeight = runtime.hold ? runtime.actionIntensity : 0.0f;
+    const float scrollWeight = runtime.scroll ? runtime.actionIntensity : 0.0f;
+    const float clickWeight = (!runtime.drag && runtime.click) ? runtime.actionIntensity : 0.0f;
     const float moveWeight = followWeight + dragWeight * 0.85f;
     const float calmWeight = 1.0f - ClampUnit(moveWeight + holdWeight * 0.55f + scrollWeight * 0.35f);
 
-    const double idlePhase = ResolveSecondsPhase(nowMs, 0.82);
-    const double followPhase = ResolveSecondsPhase(nowMs, 1.65);
-    const double blinkPhase = ResolveSecondsPhase(nowMs, 0.36, 0.8);
-    const double tailPhase = ResolveSecondsPhase(nowMs, 1.05, 1.6);
+    const double idlePhase = ResolveSecondsPhase(runtime.nowMs, 0.82);
+    const double followPhase = ResolveSecondsPhase(runtime.nowMs, 1.65);
+    const double blinkPhase = ResolveSecondsPhase(runtime.nowMs, 0.36, 0.8);
+    const double tailPhase = ResolveSecondsPhase(runtime.nowMs, 1.05, 1.6);
 
     motion.bodyBobPx =
         static_cast<float>(std::sin(idlePhase) * (1.2 + calmWeight * 1.4) +
@@ -87,8 +77,8 @@ Win32MouseCompanionPlaceholderMotion BuildWin32MouseCompanionPlaceholderMotion(
         static_cast<float>(std::sin(tailPhase) * (2.4 + calmWeight * 1.0 + moveWeight * 2.2)) +
         motion.reactive.scrollDirection * motion.reactive.scrollKick * 3.4f;
 
-    const float frontScale = (state.facingDirection < 0) ? 1.0f : 0.82f;
-    const float rearScale = (state.facingDirection < 0) ? 0.82f : 1.0f;
+    const float frontScale = (runtime.facingSign < 0.0f) ? 1.0f : 0.82f;
+    const float rearScale = (runtime.facingSign < 0.0f) ? 0.82f : 1.0f;
     motion.frontEarLiftPx =
         static_cast<float>(std::sin(followPhase + 0.2) * (2.2 + moveWeight * 3.5) +
                            std::sin(idlePhase + 0.3) * calmWeight * 1.5) * frontScale +
@@ -145,7 +135,7 @@ Win32MouseCompanionPlaceholderMotion BuildWin32MouseCompanionPlaceholderMotion(
         motion.reactive.holdCompression * 0.05f;
     motion.bodyTiltDeg =
         motion.reactive.scrollDirection * motion.reactive.scrollKick * 7.5f +
-        motion.reactive.dragTension * static_cast<float>(state.facingDirection) * 2.0f;
+        motion.reactive.dragTension * runtime.facingSign * 2.0f;
     motion.eyeOpenScale =
         1.0f - motion.reactive.attentionFocus * 0.20f - motion.blinkAmount * 0.65f;
     motion.mouthOpenPx = motion.reactive.mouthOpen * 5.5f;

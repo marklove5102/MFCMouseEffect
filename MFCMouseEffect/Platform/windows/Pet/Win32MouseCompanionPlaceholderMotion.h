@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Platform/windows/Pet/Win32MouseCompanionReactiveMotion.h"
-#include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererRuntime.h"
 
 namespace mousefx::windows {
 
@@ -39,6 +39,6 @@ struct Win32MouseCompanionPlaceholderMotion {
 };
 
 Win32MouseCompanionPlaceholderMotion BuildWin32MouseCompanionPlaceholderMotion(
-    const Win32MouseCompanionVisualState& state);
+    const Win32MouseCompanionRendererRuntime& runtime);
 
 } // namespace mousefx::windows

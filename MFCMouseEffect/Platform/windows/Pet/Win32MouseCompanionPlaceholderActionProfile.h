@@ -2,7 +2,7 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderMotion.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderPosture.h"
-#include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererRuntime.h"
 
 namespace mousefx::windows {
 
@@ -22,7 +22,7 @@ struct Win32MouseCompanionPlaceholderActionProfile {
 };
 
 Win32MouseCompanionPlaceholderActionProfile BuildWin32MouseCompanionPlaceholderActionProfile(
-    const Win32MouseCompanionVisualState& state,
+    const Win32MouseCompanionRendererRuntime& runtime,
     const Win32MouseCompanionPlaceholderMotion& motion,
     const Win32MouseCompanionPlaceholderPosture& posture,
     float facingSign);

@@ -49,28 +49,20 @@ float SinePulse(float elapsedMs, float durationMs) {
     return static_cast<float>(std::sin(static_cast<double>(t) * kTau * 0.5));
 }
 
-float ResolveActionWeight(const Win32MouseCompanionVisualState& state, const char* actionName) {
-    if (!actionName) {
-        return 0.0f;
-    }
-    return state.lastActionName == actionName ? ClampUnit(state.lastActionIntensity) : 0.0f;
-}
-
 } // namespace
 
 Win32MouseCompanionReactiveMotion BuildWin32MouseCompanionReactiveMotion(
-    const Win32MouseCompanionVisualState& state,
-    uint64_t nowMs) {
+    const Win32MouseCompanionRendererRuntime& runtime) {
     Win32MouseCompanionReactiveMotion motion{};
 
-    const float clickWeight = ResolveActionWeight(state, "click_react");
-    const float dragWeight = ResolveActionWeight(state, "drag");
-    const float holdWeight = ResolveActionWeight(state, "hold_react");
-    const float scrollWeight = ResolveActionWeight(state, "scroll_react");
+    const float clickWeight = runtime.click ? runtime.actionIntensity : 0.0f;
+    const float dragWeight = runtime.drag ? runtime.actionIntensity : 0.0f;
+    const float holdWeight = runtime.hold ? runtime.actionIntensity : 0.0f;
+    const float scrollWeight = runtime.scroll ? runtime.actionIntensity : 0.0f;
 
-    const float clickElapsedMs = SafeElapsedMs(nowMs, state.lastClickTriggerTickMs);
-    const float scrollElapsedMs = SafeElapsedMs(nowMs, state.lastScrollTriggerTickMs);
-    const float holdElapsedMs = SafeElapsedMs(nowMs, state.lastHoldTriggerTickMs);
+    const float clickElapsedMs = SafeElapsedMs(runtime.nowMs, runtime.clickTriggerTickMs);
+    const float scrollElapsedMs = SafeElapsedMs(runtime.nowMs, runtime.scrollTriggerTickMs);
+    const float holdElapsedMs = SafeElapsedMs(runtime.nowMs, runtime.holdTriggerTickMs);
 
     const float clickPulse = DecayWindow(clickElapsedMs, kClickWindowMs);
     const float clickShape = SinePulse(clickElapsedMs, kClickWindowMs);
@@ -80,13 +72,13 @@ Win32MouseCompanionReactiveMotion BuildWin32MouseCompanionReactiveMotion(
     const float holdRamp = ClampUnit(holdElapsedMs / 180.0f);
     motion.holdCompression = holdWeight * (0.55f + EaseOutCubic(holdRamp) * 0.45f);
     if (holdWeight > 0.0f) {
-        const double holdPhase = (static_cast<double>(nowMs) / 1000.0) * 5.4;
+        const double holdPhase = (static_cast<double>(runtime.nowMs) / 1000.0) * 5.4;
         motion.holdPulse =
             static_cast<float>(std::sin(holdPhase) * 0.5 + 0.5) * holdWeight;
     }
 
     const float scrollPulse = DecayWindow(scrollElapsedMs, kScrollWindowMs);
-    const float scrollDirection = ClampSignedUnit(state.lastScrollSignedIntensity);
+    const float scrollDirection = ClampSignedUnit(runtime.scrollSignedIntensity);
     motion.scrollDirection = scrollDirection;
     motion.scrollKick = std::max(scrollWeight, scrollPulse) * (0.65f + std::abs(scrollDirection) * 0.35f);
 

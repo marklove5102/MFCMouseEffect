@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererRuntime.h"
 
 namespace mousefx::windows {
 
@@ -21,7 +21,7 @@ struct Win32MouseCompanionReactiveMotion {
 };
 
 Win32MouseCompanionReactiveMotion BuildWin32MouseCompanionReactiveMotion(
-    const Win32MouseCompanionVisualState& state,
+    const Win32MouseCompanionRendererRuntime& runtime,
     uint64_t nowMs);
 
 } // namespace mousefx::windows

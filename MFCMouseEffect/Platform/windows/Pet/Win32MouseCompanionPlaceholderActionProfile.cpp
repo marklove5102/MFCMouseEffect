@@ -8,30 +8,22 @@
 namespace mousefx::windows {
 namespace {
 
-float ClampUnit(float value) {
-    return std::clamp(value, 0.0f, 1.0f);
-}
-
-float ClampSigned(float value) {
-    return std::clamp(value, -1.0f, 1.0f);
-}
-
 } // namespace
 
 Win32MouseCompanionPlaceholderActionProfile BuildWin32MouseCompanionPlaceholderActionProfile(
-    const Win32MouseCompanionVisualState& state,
+    const Win32MouseCompanionRendererRuntime& runtime,
     const Win32MouseCompanionPlaceholderMotion& motion,
     const Win32MouseCompanionPlaceholderPosture& posture,
     float facingSign) {
     Win32MouseCompanionPlaceholderActionProfile profile{};
 
-    const float intensity = ClampUnit(state.lastActionIntensity);
-    const float signedIntensity = ClampSigned(state.lastActionIntensity);
-    const bool follow = state.lastActionName == "follow";
-    const bool drag = state.lastActionName == "drag";
-    const bool hold = state.lastActionName == "hold_react";
-    const bool scroll = state.lastActionName == "scroll_react";
-    const bool click = state.lastActionName == "click_react";
+    const float intensity = runtime.actionIntensity;
+    const float signedIntensity = runtime.signedActionIntensity;
+    const bool follow = runtime.follow;
+    const bool drag = runtime.drag;
+    const bool hold = runtime.hold;
+    const bool scroll = runtime.scroll;
+    const bool click = runtime.click && !runtime.drag;
 
     const float followDrive = follow ? (0.40f + intensity * 0.55f) : 0.0f;
     const float dragDrive = drag ? (0.48f + intensity * 0.65f) : 0.0f;

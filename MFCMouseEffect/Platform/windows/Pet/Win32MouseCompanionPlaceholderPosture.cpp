@@ -8,32 +8,24 @@
 namespace mousefx::windows {
 namespace {
 
-float ClampUnit(float value) {
-    return std::clamp(value, 0.0f, 1.0f);
-}
-
-float ClampSigned(float value) {
-    return std::clamp(value, -1.0f, 1.0f);
-}
-
 } // namespace
 
 Win32MouseCompanionPlaceholderPosture BuildWin32MouseCompanionPlaceholderPosture(
-    const Win32MouseCompanionVisualState& state,
+    const Win32MouseCompanionRendererRuntime& runtime,
     const Win32MouseCompanionPlaceholderMotion& motion,
     float facingSign) {
     Win32MouseCompanionPlaceholderPosture posture{};
 
-    const float intensity = ClampUnit(state.lastActionIntensity);
-    const bool follow = state.lastActionName == "follow";
-    const bool drag = state.lastActionName == "drag";
-    const bool hold = state.lastActionName == "hold_react";
-    const bool scroll = state.lastActionName == "scroll_react";
-    const bool click = state.lastActionName == "click_react";
+    const float intensity = runtime.actionIntensity;
+    const bool follow = runtime.follow;
+    const bool drag = runtime.drag;
+    const bool hold = runtime.hold;
+    const bool scroll = runtime.scroll;
+    const bool click = runtime.click && !runtime.drag;
     const float followDrive = follow ? (0.45f + intensity * 0.55f) : 0.0f;
     const float dragDrive = drag ? (0.55f + intensity * 0.60f) : 0.0f;
     const float holdDrive = hold ? (0.50f + intensity * 0.50f) : 0.0f;
-    const float scrollDrive = scroll ? std::abs(ClampSigned(state.lastActionIntensity)) : 0.0f;
+    const float scrollDrive = scroll ? std::abs(runtime.signedActionIntensity) : 0.0f;
     const float clickDrive = click ? (0.35f + intensity * 0.40f) : 0.0f;
 
     posture.bodyCenterYOffset += followDrive * 2.0f + dragDrive * 3.5f + holdDrive * 5.0f;

@@ -14,7 +14,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderPosture.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderRhythm.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderSilhouette.h"
-#include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererRuntime.h"
 
 namespace mousefx::windows {
 
@@ -81,10 +81,5 @@ struct Win32MouseCompanionPlaceholderScene {
     Win32MouseCompanionPlaceholderRhythm rhythm{};
     Win32MouseCompanionPlaceholderSilhouette silhouette{};
 };
-
-Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
-    const Win32MouseCompanionVisualState& state,
-    int width,
-    int height);
 
 } // namespace mousefx::windows

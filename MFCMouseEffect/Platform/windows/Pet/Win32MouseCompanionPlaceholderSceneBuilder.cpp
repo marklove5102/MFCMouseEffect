@@ -2,7 +2,7 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderActionProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderAccessory.h"
-#include "Platform/windows/Pet/Win32MouseCompanionPlaceholderScene.h"
+#include "Platform/windows/Pet/Win32MouseCompanionPlaceholderSceneBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderAdornment.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderGait.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderMotion.h"
@@ -16,36 +16,10 @@
 namespace mousefx::windows {
 namespace {
 
-constexpr int kBoneLeftEar = 0;
-constexpr int kBoneRightEar = 1;
-constexpr int kBoneLeftHand = 2;
-constexpr int kBoneRightHand = 3;
-constexpr int kBoneLeftLeg = 4;
-constexpr int kBoneRightLeg = 5;
-
-float ClampUnit(float value) {
-    return std::clamp(value, 0.0f, 1.0f);
-}
-
-float ResolveSignedUnit(float value) {
-    return std::clamp(value, -1.0f, 1.0f);
-}
-
-const MouseCompanionPetPoseSample* FindPoseSample(
-    const MouseCompanionPetPoseFrame& frame,
-    int boneIndex) {
-    for (const auto& sample : frame.samples) {
-        if (sample.boneIndex == boneIndex) {
-            return &sample;
-        }
-    }
-    return nullptr;
-}
-
 } // namespace
 
 Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
-    const Win32MouseCompanionVisualState& state,
+    const Win32MouseCompanionRendererRuntime& runtime,
     int width,
     int height) {
     Win32MouseCompanionPlaceholderScene scene{};
@@ -53,26 +27,25 @@ Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
         return scene;
     }
 
-    const float intensity = ClampUnit(state.lastActionIntensity);
-    const float signedIntensity = ResolveSignedUnit(state.lastActionIntensity);
-    const bool follow = state.lastActionName == "follow";
-    const bool click = state.lastActionName == "click_react" || state.lastActionName == "drag";
-    const bool drag = state.lastActionName == "drag";
-    const bool hold = state.lastActionName == "hold_react";
-    const bool scroll = state.lastActionName == "scroll_react";
-    const float tint = ClampUnit(state.lastHeadTintAmount);
-    const Win32MouseCompanionActionSample& clipSample = state.latestActionClipSample;
+    const float intensity = runtime.actionIntensity;
+    const float signedIntensity = runtime.signedActionIntensity;
+    const bool follow = runtime.follow;
+    const bool click = runtime.click;
+    const bool drag = runtime.drag;
+    const bool hold = runtime.hold;
+    const bool scroll = runtime.scroll;
+    const float tint = runtime.headTintAmount;
+    const Win32MouseCompanionActionSample& clipSample = *runtime.clipSample;
     const float clickSquash = click ? (0.10f + intensity * 0.14f) : 0.0f;
     const float holdSquat = hold ? (0.10f + intensity * 0.16f) : 0.0f;
     const float scrollLean = scroll ? signedIntensity * 0.12f : 0.0f;
 
-    const MouseCompanionPetPoseFrame& poseFrame = state.latestPoseFrame;
-    const MouseCompanionPetPoseSample* leftEarPose = FindPoseSample(poseFrame, kBoneLeftEar);
-    const MouseCompanionPetPoseSample* rightEarPose = FindPoseSample(poseFrame, kBoneRightEar);
-    const MouseCompanionPetPoseSample* leftHandPose = FindPoseSample(poseFrame, kBoneLeftHand);
-    const MouseCompanionPetPoseSample* rightHandPose = FindPoseSample(poseFrame, kBoneRightHand);
-    const MouseCompanionPetPoseSample* leftLegPose = FindPoseSample(poseFrame, kBoneLeftLeg);
-    const MouseCompanionPetPoseSample* rightLegPose = FindPoseSample(poseFrame, kBoneRightLeg);
+    const MouseCompanionPetPoseSample* leftEarPose = runtime.leftEarPose;
+    const MouseCompanionPetPoseSample* rightEarPose = runtime.rightEarPose;
+    const MouseCompanionPetPoseSample* leftHandPose = runtime.leftHandPose;
+    const MouseCompanionPetPoseSample* rightHandPose = runtime.rightHandPose;
+    const MouseCompanionPetPoseSample* leftLegPose = runtime.leftLegPose;
+    const MouseCompanionPetPoseSample* rightLegPose = runtime.rightLegPose;
     const float poseEarLift = leftEarPose ? leftEarPose->position[1] * 24.0f : 0.0f;
     const float poseEarSpread = leftEarPose ? -leftEarPose->position[0] * 18.0f : 0.0f;
     const float poseRightEarLift = rightEarPose ? rightEarPose->position[1] * 24.0f : 0.0f;
@@ -85,11 +58,11 @@ Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
     const float poseRightLegShift = rightLegPose ? rightLegPose->position[0] * 20.0f : 0.0f;
 
     scene.centerX = static_cast<float>(width) * 0.5f;
-    scene.facingSign = (state.facingDirection >= 0) ? 1.0f : -1.0f;
-    scene.motion = BuildWin32MouseCompanionPlaceholderMotion(state);
-    scene.posture = BuildWin32MouseCompanionPlaceholderPosture(state, scene.motion, scene.facingSign);
+    scene.facingSign = runtime.facingSign;
+    scene.motion = BuildWin32MouseCompanionPlaceholderMotion(runtime);
+    scene.posture = BuildWin32MouseCompanionPlaceholderPosture(runtime, scene.motion, scene.facingSign);
     scene.actionProfile = BuildWin32MouseCompanionPlaceholderActionProfile(
-        state,
+        runtime,
         scene.motion,
         scene.posture,
         scene.facingSign);
@@ -132,7 +105,7 @@ Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
     const float pawY = centerY - bodyH * 0.10f - handLift + scene.posture.pawYOffset;
 
     scene.palette = BuildWin32MouseCompanionPlaceholderPalette(
-        state.appearanceProfile.skinVariantId,
+        runtime.appearanceProfile ? runtime.appearanceProfile->skinVariantId : std::string{},
         tint,
         scroll,
         signedIntensity);
@@ -241,10 +214,10 @@ Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
         scene.rightHandRect.Width * 0.44f,
         scene.rightHandRect.Height * 0.20f);
 
-    scene.modelAssetAvailable = state.modelAssetAvailable;
-    scene.actionLibraryAvailable = state.actionLibraryAvailable;
-    scene.poseBadgeVisible = state.poseBindingConfigured || state.poseFrameAvailable;
-    scene.accessoryVisible = !state.appearanceProfile.enabledAccessoryIds.empty();
+    scene.modelAssetAvailable = runtime.modelAssetAvailable;
+    scene.actionLibraryAvailable = runtime.actionLibraryAvailable;
+    scene.poseBadgeVisible = runtime.poseBindingConfigured || runtime.poseFrameAvailable;
+    scene.accessoryVisible = runtime.appearanceProfile && !runtime.appearanceProfile->enabledAccessoryIds.empty();
     scene.eyeColor = scene.palette.eyeColor;
     scene.mouthColor = scene.palette.mouthColor;
     scene.blushColor = scene.palette.blushColor;
@@ -339,7 +312,7 @@ Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
         scene.bodyStroke);
     scene.gait.bridgeWidth += scene.rhythm.strideAccent * 0.25f;
     scene.accessory = BuildWin32MouseCompanionPlaceholderAccessory(
-        state.appearanceProfile.enabledAccessoryIds,
+        input.appearanceProfile.enabledAccessoryIds,
         scene.headRect,
         scene.bodyLeanPx,
         scene.facingSign,

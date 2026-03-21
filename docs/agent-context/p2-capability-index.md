@@ -38,6 +38,10 @@ Use it when P1 (`current.md`) is not enough and you need targeted deep context.
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md`
 - 后端重置契约（当前最高优先级，说明已清空旧后端实现并保留前端/配置兼容面）:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-backend-reset-contract.zh-CN.md`
+- Windows Phase1.5 收口退出契约：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-phase15-exit-contract.md`
+- Windows 真实渲染层接口契约：
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-real-renderer-contract.md`
 - 3D companion runtime blueprint and phased architecture (canonical `glb`, non-builtin animation pipeline):
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md`
 - Action clip asset contract and JSON schema (external skeleton action reuse):

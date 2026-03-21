@@ -8,7 +8,7 @@
 
 namespace mousefx::windows {
 
-class Win32MouseCompanionPlaceholderRenderer;
+class IWin32MouseCompanionRendererBackend;
 class Win32MouseCompanionPresenter;
 
 class Win32MouseCompanionWindow final {
@@ -54,7 +54,7 @@ private:
     bool visible_{false};
     uint64_t lastTopmostEnsureMs_{0};
     HWINEVENTHOOK foregroundHook_{nullptr};
-    std::unique_ptr<Win32MouseCompanionPlaceholderRenderer> renderer_{};
+    std::unique_ptr<IWin32MouseCompanionRendererBackend> renderer_{};
     std::unique_ptr<Win32MouseCompanionPresenter> presenter_{};
 };
 

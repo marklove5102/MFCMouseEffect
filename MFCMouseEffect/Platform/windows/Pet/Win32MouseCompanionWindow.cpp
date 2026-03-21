@@ -2,8 +2,10 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionWindow.h"
 
-#include "Platform/windows/Pet/Win32MouseCompanionPlaceholderRenderer.h"
+#include "Platform/windows/Pet/IWin32MouseCompanionRendererBackend.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPresenter.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendFactory.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererInputBuilder.h"
 #include "MouseFx/Utils/TimeUtils.h"
 
 #include <algorithm>
@@ -19,7 +21,7 @@ Win32MouseCompanionWindow* g_foregroundHookOwner = nullptr;
 } // namespace
 
 Win32MouseCompanionWindow::Win32MouseCompanionWindow()
-    : renderer_(std::make_unique<Win32MouseCompanionPlaceholderRenderer>()),
+    : renderer_(CreateDefaultWin32MouseCompanionRendererBackend()),
       presenter_(std::make_unique<Win32MouseCompanionPresenter>()) {
 }
 
@@ -268,7 +270,8 @@ bool Win32MouseCompanionWindow::RenderLayered(const RECT& bounds, const Win32Mou
         PixelFormat32bppPARGB,
         static_cast<BYTE*>(bits_));
     Gdiplus::Graphics graphics(&bitmap);
-    renderer_->Render(state, &graphics, surfaceWidth_, surfaceHeight_);
+    const Win32MouseCompanionRendererInput input = BuildWin32MouseCompanionRendererInput(state);
+    renderer_->Render(input, &graphics, surfaceWidth_, surfaceHeight_);
 
     POINT src{0, 0};
     POINT dst{bounds.left, bounds.top};

@@ -158,6 +158,33 @@
     - accessory/motion accents are now split too: collar/charm and low-cost dust/motion cues are built behind a dedicated adornment helper instead of inflating scene layout or renderer branches further
   - boundary remains explicit: Windows still does not render the real 3D model yet, but the host contract now already carries the same data classes that the later real renderer will consume.
 
+## Phase1.5 Closure And Next-Phase Routing
+- Phase1.5 exit is now explicitly defined in:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-phase15-exit-contract.md`
+- Future real-renderer backend preparation is now explicitly defined in:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-real-renderer-contract.md`
+- First renderer-adapter seam is now active:
+  - `Win32MouseCompanionWindow` no longer owns the placeholder renderer by concrete type only
+  - the current default backend is resolved through `IWin32MouseCompanionRendererBackend` + `Win32MouseCompanionRendererBackendFactory`
+  - this keeps the current placeholder backend intact while opening a single swap point for later renderer growth
+- Renderer input handoff has also started:
+  - renderer-facing payload now has an explicit `Win32MouseCompanionRendererInput`
+  - `Win32MouseCompanionRendererInputBuilder` now isolates backend input from host/window-only state
+  - this keeps placement/lifecycle policy out of later renderer implementations
+- Placeholder backend/painter split has now started too:
+  - `Win32MouseCompanionPlaceholderRenderer` is now only the placeholder backend coordinator
+  - `Win32MouseCompanionPlaceholderSceneBuilder` owns placeholder scene assembly
+  - `Win32MouseCompanionPlaceholderPainter` owns GDI+ painting only
+  - built-in backend resolution no longer ends at one hardcoded constructor: `Win32MouseCompanionRendererBackendRegistry` orders registered backends by priority, while the placeholder backend explicitly self-registers during default-factory setup
+  - this keeps future backend replacement from inheriting one large combined render/state file
+- Renderer runtime interpretation is now narrowing too:
+  - `Win32MouseCompanionRendererRuntime` centralizes action decoding, normalized intensities, pose-sample lookup, facing sign, and clip access
+  - placeholder motion/posture/action-profile/scene helpers now consume that runtime view instead of repeatedly decoding raw renderer input on their own
+- Intended next-step order:
+  1. close Phase1.5 behavior/structure boundary
+  2. keep the current placeholder as a stable backend
+  3. start a renderer-facing adapter contract before choosing a final Windows rendering technology
+
 ## Why This Structure
 - Prevents another controller rewrite when Windows pet becomes visible.
 - Keeps platform growth open:
