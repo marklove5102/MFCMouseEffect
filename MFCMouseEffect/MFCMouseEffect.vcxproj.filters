@@ -198,6 +198,9 @@
     <ClInclude Include="MouseFx\Server\settings\SettingsSchemaBuilder.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
+    <ClInclude Include="MouseFx\Server\diagnostics\MouseCompanionRendererBackendDiagnostics.h">
+      <Filter>头文件\MouseFx</Filter>
+    </ClInclude>
     <ClInclude Include="MouseFx\Server\settings\SettingsStateMapper.h">
       <Filter>头文件\MouseFx</Filter>
     </ClInclude>
@@ -498,6 +501,18 @@
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreference.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceSources.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRegistry.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
@@ -795,6 +810,9 @@
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.TokenMonitor.cpp">
+      <Filter>源文件\MouseFx</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\diagnostics\MouseCompanionRendererBackendDiagnostics.cpp">
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.Diagnostics.cpp">
@@ -1140,6 +1158,15 @@
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreference.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRegistry.cpp">

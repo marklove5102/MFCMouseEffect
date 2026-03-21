@@ -151,6 +151,14 @@ void ApplyRootToConfig(const nlohmann::json& root, EffectConfig& config) {
             companion,
             keys::mouse_companion::kHeadTintDecayPerSecond,
             config.mouseCompanion.headTintDecayPerSecond);
+        config.mouseCompanion.rendererBackendPreferenceSource = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kRendererBackendPreferenceSource,
+            config.mouseCompanion.rendererBackendPreferenceSource);
+        config.mouseCompanion.rendererBackendPreferenceName = parse_internal::GetOr<std::string>(
+            companion,
+            keys::mouse_companion::kRendererBackendPreferenceName,
+            config.mouseCompanion.rendererBackendPreferenceName);
         config.mouseCompanion.useTestProfile = parse_internal::GetOr<bool>(
             companion,
             keys::mouse_companion::kUseTestProfile,

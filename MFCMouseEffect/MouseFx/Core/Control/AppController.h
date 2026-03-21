@@ -126,10 +126,15 @@ public:
         std::string rendererBackendSelectionReason;
         std::string rendererBackendFailureReason;
         std::vector<std::string> availableRendererBackends;
+        std::vector<std::string> unavailableRendererBackends;
+        std::vector<PetVisualHostRendererBackendCatalogEntry> rendererBackendCatalog;
+        std::vector<std::string> realRendererUnmetRequirements;
         std::string configuredModelPath;
         std::string configuredActionLibraryPath;
         std::string configuredEffectProfilePath;
         std::string configuredAppearanceProfilePath;
+        std::string configuredRendererBackendPreferenceSource;
+        std::string configuredRendererBackendPreferenceName;
         std::string visualModelPath;
         std::string loadedModelPath;
         std::string loadedModelSourceFormat{"unknown"};

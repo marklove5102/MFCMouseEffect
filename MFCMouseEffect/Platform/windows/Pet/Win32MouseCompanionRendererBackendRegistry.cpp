@@ -14,7 +14,8 @@ Win32MouseCompanionRendererBackendRegistry& Win32MouseCompanionRendererBackendRe
 void Win32MouseCompanionRendererBackendRegistry::Register(
     const std::string& name,
     int priority,
-    Factory factory) {
+    Factory factory,
+    AvailabilityProbe availabilityProbe) {
     if (name.empty() || !factory) {
         return;
     }
@@ -25,12 +26,14 @@ void Win32MouseCompanionRendererBackendRegistry::Register(
         entry.priority = priority;
         entry.order = nextOrder_++;
         entry.factory = std::move(factory);
+        entry.availabilityProbe = std::move(availabilityProbe);
         entries_.emplace(name, std::move(entry));
         return;
     }
 
     it->second.priority = priority;
     it->second.factory = std::move(factory);
+    it->second.availabilityProbe = std::move(availabilityProbe);
 }
 
 std::unique_ptr<IWin32MouseCompanionRendererBackend> Win32MouseCompanionRendererBackendRegistry::Create(
@@ -67,6 +70,12 @@ Win32MouseCompanionRendererBackendRegistry::ListByPriority() const {
         RankedDescriptor item{};
         item.descriptor.name = kv.first;
         item.descriptor.priority = kv.second.priority;
+        if (kv.second.availabilityProbe) {
+            const auto availability = kv.second.availabilityProbe();
+            item.descriptor.available = availability.available;
+            item.descriptor.unavailableReason = availability.reason;
+            item.descriptor.unmetRequirements = availability.unmetRequirements;
+        }
         item.order = kv.second.order;
         ranked.push_back(std::move(item));
     }

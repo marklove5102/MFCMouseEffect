@@ -81,6 +81,8 @@
   - `renderer_backend_selection_reason`
   - `renderer_backend_failure_reason`
   - `available_renderer_backends`
+  - `unavailable_renderer_backends`
+  - `renderer_backend_catalog`
 - Renderer backend lifecycle seam is now explicit too:
   - backend selection no longer stops at constructor success
   - factory now treats `Start() / IsReady() / LastErrorReason()` as first-class fallback signals
@@ -90,6 +92,15 @@
   - current canonicalization accepts `default` as an alias of `auto`
   - preference source resolution now also routes through a dedicated registry; current built-ins are `env` and final `default`
   - explicit preference requests now travel through the same registry path too, instead of bypassing source resolution
+  - Windows visual host now forwards an internal runtime-config preference request into window/backend selection before renderer creation
+  - if that internal runtime-config backend preference changes after host start, the window now attempts an in-place backend reselection and preserves the current renderer if the replacement selection fails
+  - mouse companion config/json now already has hidden persistence lanes for backend preference source/name, but WebUI does not expose them yet
+  - hidden backend preference fields now also round-trip through settings state, apply-settings payloads, and runtime/test diagnostics
+  - runtime/test diagnostics now also report whether the hidden config preference is the active resolved preference via `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status`
+  - renderer registry/factory diagnostics now also distinguish currently unavailable backends from simply unselected ones, so future real-backend rollout can report machine/runtime gating reasons without changing the host contract again
+  - a `real` backend is now explicitly registered as an unavailable placeholder with reason `pending_implementation`, which keeps the rollout path visible in diagnostics without changing current placeholder-first behavior
+  - `renderer_backend_catalog` is now the structured source of truth for backend inventory; `available/unavailable` arrays remain as lightweight compatibility views
+  - the `real` backend now also publishes explicit unmet requirements through both `renderer_backend_catalog[*].unmet_requirements` and top-level `real_renderer_unmet_requirements`
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

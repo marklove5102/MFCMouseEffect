@@ -7,6 +7,7 @@
 
 #include "MouseFx/Core/Control/AppController.h"
 #include "MouseFx/Core/Protocol/InputTypes.h"
+#include "MouseFx/Server/diagnostics/MouseCompanionRendererBackendDiagnostics.h"
 #include "MouseFx/Server/http/HttpServer.h"
 #include "MouseFx/Server/routes/testing/WebSettingsServer.TestRouteCommon.h"
 #include "MouseFx/Utils/StringUtils.h"
@@ -40,6 +41,18 @@ MouseButton ResolveMouseButton(uint8_t rawButton) {
 }
 
 json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRuntimeStatus& status) {
+    const auto configuredBackendPreferenceDiagnostics =
+        EvaluateConfiguredMouseCompanionRendererBackendPreferenceDiagnostics(status);
+    json rendererBackendCatalog = json::array();
+    for (const auto& entry : status.rendererBackendCatalog) {
+        rendererBackendCatalog.push_back({
+            {"name", entry.name},
+            {"priority", entry.priority},
+            {"available", entry.available},
+            {"unavailable_reason", entry.unavailableReason},
+            {"unmet_requirements", entry.unmetRequirements},
+        });
+    }
     return json({
         {"config_enabled", status.configEnabled},
         {"runtime_present", status.runtimePresent},
@@ -67,10 +80,17 @@ json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRun
         {"renderer_backend_selection_reason", status.rendererBackendSelectionReason},
         {"renderer_backend_failure_reason", status.rendererBackendFailureReason},
         {"available_renderer_backends", status.availableRendererBackends},
+        {"unavailable_renderer_backends", status.unavailableRendererBackends},
+        {"renderer_backend_catalog", rendererBackendCatalog},
+        {"real_renderer_unmet_requirements", status.realRendererUnmetRequirements},
         {"configured_model_path", status.configuredModelPath},
         {"configured_action_library_path", status.configuredActionLibraryPath},
         {"configured_effect_profile_path", status.configuredEffectProfilePath},
         {"configured_appearance_profile_path", status.configuredAppearanceProfilePath},
+        {"configured_renderer_backend_preference_source", status.configuredRendererBackendPreferenceSource},
+        {"configured_renderer_backend_preference_name", status.configuredRendererBackendPreferenceName},
+        {"configured_renderer_backend_preference_effective", configuredBackendPreferenceDiagnostics.effective},
+        {"configured_renderer_backend_preference_status", configuredBackendPreferenceDiagnostics.status},
         {"visual_model_path", status.visualModelPath},
         {"loaded_model_path", status.loadedModelPath},
         {"loaded_model_source_format", status.loadedModelSourceFormat},

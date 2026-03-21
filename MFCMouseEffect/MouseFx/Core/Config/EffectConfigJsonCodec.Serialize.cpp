@@ -61,6 +61,8 @@ nlohmann::json BuildRootFromConfig(const EffectConfig& config) {
         {keys::mouse_companion::kHeadTintPerClick, companion.headTintPerClick},
         {keys::mouse_companion::kHeadTintMax, companion.headTintMax},
         {keys::mouse_companion::kHeadTintDecayPerSecond, companion.headTintDecayPerSecond},
+        {keys::mouse_companion::kRendererBackendPreferenceSource, companion.rendererBackendPreferenceSource},
+        {keys::mouse_companion::kRendererBackendPreferenceName, companion.rendererBackendPreferenceName},
         {keys::mouse_companion::kUseTestProfile, companion.useTestProfile},
         {keys::mouse_companion::kTestPressLiftPx, companion.testPressLiftPx},
         {keys::mouse_companion::kTestSmoothingPercent, companion.testSmoothingPercent},

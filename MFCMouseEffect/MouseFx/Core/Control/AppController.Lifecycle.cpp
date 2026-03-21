@@ -218,6 +218,8 @@ MouseCompanionPetRuntimeConfig BuildPetVisualHostConfig(const MouseCompanionConf
     runtime.positionMode = config.positionMode;
     runtime.targetMonitor = config.targetMonitor;
     runtime.edgeClampMode = config.edgeClampMode;
+    runtime.rendererBackendPreferenceSource = config.rendererBackendPreferenceSource;
+    runtime.rendererBackendPreferenceName = config.rendererBackendPreferenceName;
     return runtime;
 }
 
@@ -244,6 +246,10 @@ bool AppController::Start() {
         mouseCompanionRuntimeStatus_.configuredActionLibraryPath = companion.actionLibraryPath;
         mouseCompanionRuntimeStatus_.configuredEffectProfilePath = ResolveConfiguredPetEffectProfilePath();
         mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = companion.appearanceProfilePath;
+        mouseCompanionRuntimeStatus_.configuredRendererBackendPreferenceSource =
+            companion.rendererBackendPreferenceSource;
+        mouseCompanionRuntimeStatus_.configuredRendererBackendPreferenceName =
+            companion.rendererBackendPreferenceName;
         mouseCompanionRuntimeStatus_.runtimePresent = false;
     }
     SyncLaunchAtStartupManifest();
@@ -350,6 +356,9 @@ void AppController::Stop() {
         mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
         mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
         mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
+        mouseCompanionRuntimeStatus_.unavailableRendererBackends.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendCatalog.clear();
+        mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
     }
     for (auto& effect : effects_) {
         if (effect) {
@@ -412,6 +421,9 @@ void AppController::TryLoadDefaultPetModel() {
             mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
             mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
             mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
+            mouseCompanionRuntimeStatus_.unavailableRendererBackends.clear();
+            mouseCompanionRuntimeStatus_.rendererBackendCatalog.clear();
+            mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
             mouseCompanionRuntimeStatus_.visualModelPath.clear();
             mouseCompanionRuntimeStatus_.loadedModelPath.clear();
             mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "phase1_placeholder";
@@ -480,6 +492,16 @@ void AppController::TryLoadDefaultPetModel() {
         mouseCompanionRuntimeStatus_.rendererBackendFailureReason =
             visualHostDiagnostics.rendererBackendFailureReason;
         mouseCompanionRuntimeStatus_.availableRendererBackends = visualHostDiagnostics.availableRendererBackends;
+        mouseCompanionRuntimeStatus_.unavailableRendererBackends =
+            visualHostDiagnostics.unavailableRendererBackends;
+        mouseCompanionRuntimeStatus_.rendererBackendCatalog = visualHostDiagnostics.rendererBackendCatalog;
+        mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
+        for (const auto& entry : visualHostDiagnostics.rendererBackendCatalog) {
+            if (entry.name == "real") {
+                mouseCompanionRuntimeStatus_.realRendererUnmetRequirements = entry.unmetRequirements;
+                break;
+            }
+        }
         mouseCompanionRuntimeStatus_.loadedActionLibraryPath =
             loadedActionLibrary ? loadedPetActionLibraryPath_ : "";
         mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
@@ -564,6 +586,15 @@ void AppController::EnsurePetVisualHost() {
         mouseCompanionRuntimeStatus_.rendererBackendSelectionReason = diagnostics.rendererBackendSelectionReason;
         mouseCompanionRuntimeStatus_.rendererBackendFailureReason = diagnostics.rendererBackendFailureReason;
         mouseCompanionRuntimeStatus_.availableRendererBackends = diagnostics.availableRendererBackends;
+        mouseCompanionRuntimeStatus_.unavailableRendererBackends = diagnostics.unavailableRendererBackends;
+        mouseCompanionRuntimeStatus_.rendererBackendCatalog = diagnostics.rendererBackendCatalog;
+        mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
+        for (const auto& entry : diagnostics.rendererBackendCatalog) {
+            if (entry.name == "real") {
+                mouseCompanionRuntimeStatus_.realRendererUnmetRequirements = entry.unmetRequirements;
+                break;
+            }
+        }
     } else {
         mouseCompanionRuntimeStatus_.preferredRendererBackendSource.clear();
         mouseCompanionRuntimeStatus_.preferredRendererBackend.clear();
@@ -571,6 +602,9 @@ void AppController::EnsurePetVisualHost() {
         mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
         mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
         mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
+        mouseCompanionRuntimeStatus_.unavailableRendererBackends.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendCatalog.clear();
+        mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
     }
 }
 
@@ -601,6 +635,9 @@ void AppController::ShutdownPetVisualHost() {
     mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
     mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
     mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
+    mouseCompanionRuntimeStatus_.unavailableRendererBackends.clear();
+    mouseCompanionRuntimeStatus_.rendererBackendCatalog.clear();
+    mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
     mouseCompanionRuntimeStatus_.visualModelPath.clear();
     mouseCompanionRuntimeStatus_.visualModelLoadError = "phase1_visual_host_inactive";
 }

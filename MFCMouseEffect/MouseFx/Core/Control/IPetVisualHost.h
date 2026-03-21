@@ -15,6 +15,14 @@ struct PetVisualHostUpdate {
     float headTintAmount{0.0f};
 };
 
+struct PetVisualHostRendererBackendCatalogEntry {
+    std::string name;
+    int priority{0};
+    bool available{false};
+    std::string unavailableReason;
+    std::vector<std::string> unmetRequirements;
+};
+
 struct PetVisualHostDiagnostics {
     std::string preferredRendererBackendSource;
     std::string preferredRendererBackend;
@@ -22,6 +30,8 @@ struct PetVisualHostDiagnostics {
     std::string rendererBackendSelectionReason;
     std::string rendererBackendFailureReason;
     std::vector<std::string> availableRendererBackends;
+    std::vector<std::string> unavailableRendererBackends;
+    std::vector<PetVisualHostRendererBackendCatalogEntry> rendererBackendCatalog;
 };
 
 class IPetVisualHost {

@@ -186,6 +186,12 @@
   - Windows visual host can now report `selected_renderer_backend`
   - runtime/test diagnostics also expose `renderer_backend_selection_reason` and `renderer_backend_failure_reason`
   - runtime/test diagnostics also expose `available_renderer_backends`
+  - runtime/test diagnostics also expose `unavailable_renderer_backends`
+  - runtime/test diagnostics now also expose `renderer_backend_catalog`
+  - runtime/test diagnostics now also expose `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status` so config/env/default precedence can be verified directly
+  - backend preference updates that arrive through runtime config now trigger an in-place window/backend reselection instead of being ignored after the first backend is created
+  - a `real` backend is now explicitly registered into the backend registry as `unavailable(pending_implementation)` so diagnostics and preference routing can exercise the future path without changing current rendering behavior
+  - the `real` backend now also declares explicit unmet requirements (`asset_resource_adapter`, `scene_runtime_adapter`, `renderer_draw_execution`) so rollout work can converge against a named checklist instead of a generic pending marker
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract
@@ -196,6 +202,9 @@
   - future config-backed preference sources can reuse the same normalization seam without reworking backend selection
   - preference source routing is now behind a dedicated registry, so future `settings` / debug / env sources can layer by priority instead of expanding factory conditionals
   - explicit test/debug preference requests now also reuse that same source-resolution path instead of forming a parallel branch
+  - internal runtime-config request forwarding now reaches the window before backend creation, so a future settings-backed preference no longer requires another window lifecycle rewrite
+  - hidden config/json persistence lanes now exist for backend preference source/name, but they are intentionally not exposed in current settings UI
+  - those hidden fields now also survive settings-state export, apply-settings ingestion, and runtime/test diagnostics without needing another contract expansion
 - Intended next-step order:
   1. close Phase1.5 behavior/structure boundary
   2. keep the current placeholder as a stable backend

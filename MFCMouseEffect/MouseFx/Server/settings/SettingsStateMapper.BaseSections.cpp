@@ -111,6 +111,8 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
         {"head_tint_per_click", companion.headTintPerClick},
         {"head_tint_max", companion.headTintMax},
         {"head_tint_decay_per_second", companion.headTintDecayPerSecond},
+        {"renderer_backend_preference_source", EnsureUtf8(companion.rendererBackendPreferenceSource)},
+        {"renderer_backend_preference_name", EnsureUtf8(companion.rendererBackendPreferenceName)},
         {"use_test_profile", companion.useTestProfile},
         {"test_press_lift_px", companion.testPressLiftPx},
         {"test_smoothing_percent", companion.testSmoothingPercent},

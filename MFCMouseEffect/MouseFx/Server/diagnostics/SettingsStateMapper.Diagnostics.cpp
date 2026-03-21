@@ -7,6 +7,7 @@
 
 #include "MouseFx/Core/Config/ConfigPathResolver.h"
 #include "MouseFx/Core/Control/AppController.h"
+#include "MouseFx/Server/diagnostics/MouseCompanionRendererBackendDiagnostics.h"
 
 using json = nlohmann::json;
 
@@ -202,6 +203,8 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
 
     const AppController::MouseCompanionRuntimeStatus status =
         controller->ReadMouseCompanionRuntimeStatus();
+    const auto configuredBackendPreferenceDiagnostics =
+        EvaluateConfiguredMouseCompanionRendererBackendPreferenceDiagnostics(status);
     json out = json::object();
     out["config_enabled"] = status.configEnabled;
     out["runtime_present"] = status.runtimePresent;
@@ -229,10 +232,29 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
     out["renderer_backend_selection_reason"] = status.rendererBackendSelectionReason;
     out["renderer_backend_failure_reason"] = status.rendererBackendFailureReason;
     out["available_renderer_backends"] = status.availableRendererBackends;
+    out["unavailable_renderer_backends"] = status.unavailableRendererBackends;
+    json rendererBackendCatalog = json::array();
+    for (const auto& entry : status.rendererBackendCatalog) {
+        rendererBackendCatalog.push_back({
+            {"name", entry.name},
+            {"priority", entry.priority},
+            {"available", entry.available},
+            {"unavailable_reason", entry.unavailableReason},
+            {"unmet_requirements", entry.unmetRequirements},
+        });
+    }
+    out["renderer_backend_catalog"] = std::move(rendererBackendCatalog);
+    out["real_renderer_unmet_requirements"] = status.realRendererUnmetRequirements;
     out["configured_model_path"] = status.configuredModelPath;
     out["configured_action_library_path"] = status.configuredActionLibraryPath;
     out["configured_effect_profile_path"] = status.configuredEffectProfilePath;
     out["configured_appearance_profile_path"] = status.configuredAppearanceProfilePath;
+    out["configured_renderer_backend_preference_source"] = status.configuredRendererBackendPreferenceSource;
+    out["configured_renderer_backend_preference_name"] = status.configuredRendererBackendPreferenceName;
+    out["configured_renderer_backend_preference_effective"] =
+        configuredBackendPreferenceDiagnostics.effective;
+    out["configured_renderer_backend_preference_status"] =
+        configuredBackendPreferenceDiagnostics.status;
     out["visual_model_path"] = status.visualModelPath;
     out["loaded_model_path"] = status.loadedModelPath;
     out["loaded_model_source_format"] = status.loadedModelSourceFormat;

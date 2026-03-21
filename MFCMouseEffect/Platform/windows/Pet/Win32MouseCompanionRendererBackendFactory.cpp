@@ -5,6 +5,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendRegistry.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderRenderer.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererBackend.h"
 
 #include <algorithm>
 
@@ -44,9 +45,16 @@ void PrioritizePreferredBackend(
 std::string ComposeSelectionReason(
     const std::string& preferredBackendName,
     const std::string& selectedBackendName,
-    bool preferredRegistered) {
+    bool preferredRegistered,
+    bool preferredAvailable) {
     if (selectedBackendName.empty()) {
-        return preferredRegistered ? "no_backend_available" : "preferred_backend_not_registered";
+        if (!preferredRegistered) {
+            return "preferred_backend_not_registered";
+        }
+        if (!preferredAvailable) {
+            return "preferred_backend_unavailable";
+        }
+        return "no_backend_available";
     }
     if (preferredBackendName.empty() || IsAutoWin32MouseCompanionRendererBackendName(preferredBackendName)) {
         return "auto_highest_priority_selected";
@@ -54,7 +62,13 @@ std::string ComposeSelectionReason(
     if (selectedBackendName == preferredBackendName) {
         return "preferred_backend_selected";
     }
-    return preferredRegistered ? "preferred_backend_fallback_selected" : "preferred_backend_not_registered";
+    if (!preferredRegistered) {
+        return "preferred_backend_not_registered";
+    }
+    if (!preferredAvailable) {
+        return "preferred_backend_unavailable_fallback_selected";
+    }
+    return "preferred_backend_fallback_selected";
 }
 
 } // namespace
@@ -64,18 +78,13 @@ std::string GetEffectiveWin32MouseCompanionRendererBackendPreference() {
 }
 
 Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRendererBackend(
-    const std::string& preferredBackendName) {
+    const Win32MouseCompanionRendererBackendPreferenceRequest& request) {
+    RegisterWin32MouseCompanionRealRendererBackend();
     RegisterWin32MouseCompanionPlaceholderRendererBackend();
     Win32MouseCompanionRendererBackendSelection selection{};
-    if (preferredBackendName.empty()) {
-        const auto preference = ResolveWin32MouseCompanionRendererBackendPreference();
-        selection.preferredBackendSource = preference.source;
-        selection.preferredBackendName = preference.backendName;
-    } else {
-        const auto preference = ResolveExplicitWin32MouseCompanionRendererBackendPreference(preferredBackendName);
-        selection.preferredBackendSource = preference.source;
-        selection.preferredBackendName = preference.backendName;
-    }
+    const auto preference = ResolveWin32MouseCompanionRendererBackendPreference(request);
+    selection.preferredBackendSource = preference.source;
+    selection.preferredBackendName = preference.backendName;
 
     auto descriptors = Win32MouseCompanionRendererBackendRegistry::Instance().ListByPriority();
     const bool preferredRegistered =
@@ -85,14 +94,33 @@ Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRend
             : std::any_of(descriptors.begin(), descriptors.end(), [&](const auto& descriptor) {
                   return descriptor.name == selection.preferredBackendName;
               });
+    const bool preferredAvailable =
+        selection.preferredBackendName.empty() ||
+            IsAutoWin32MouseCompanionRendererBackendName(selection.preferredBackendName)
+            ? true
+            : std::any_of(descriptors.begin(), descriptors.end(), [&](const auto& descriptor) {
+                  return descriptor.name == selection.preferredBackendName && descriptor.available;
+              });
     PrioritizePreferredBackend(&descriptors, selection.preferredBackendName);
 
     selection.availableBackendNames.reserve(descriptors.size());
+    selection.unavailableBackendReasons.reserve(descriptors.size());
     for (const auto& descriptor : descriptors) {
-        selection.availableBackendNames.push_back(descriptor.name);
+        if (descriptor.available) {
+            selection.availableBackendNames.push_back(descriptor.name);
+            continue;
+        }
+        std::string reason = descriptor.name;
+        if (!descriptor.unavailableReason.empty()) {
+            reason += ":" + descriptor.unavailableReason;
+        }
+        selection.unavailableBackendReasons.push_back(std::move(reason));
     }
 
     for (const auto& descriptor : descriptors) {
+        if (!descriptor.available) {
+            continue;
+        }
         auto backend = Win32MouseCompanionRendererBackendRegistry::Instance().Create(descriptor.name);
         if (!backend) {
             selection.failureReason = ComposeBackendFailureReason(descriptor.name, "backend_create_failed");
@@ -116,14 +144,22 @@ Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRend
         }
         selection.selectedBackendName = descriptor.name;
         selection.selectionReason =
-            ComposeSelectionReason(selection.preferredBackendName, selection.selectedBackendName, preferredRegistered);
+            ComposeSelectionReason(
+                selection.preferredBackendName,
+                selection.selectedBackendName,
+                preferredRegistered,
+                preferredAvailable);
         selection.backend = std::move(backend);
         return selection;
     }
 
     selection.selectedBackendName = "placeholder_fallback";
     selection.selectionReason =
-        ComposeSelectionReason(selection.preferredBackendName, selection.selectedBackendName, preferredRegistered);
+        ComposeSelectionReason(
+            selection.preferredBackendName,
+            selection.selectedBackendName,
+            preferredRegistered,
+            preferredAvailable);
     selection.backend = std::make_unique<Win32MouseCompanionPlaceholderRenderer>();
     if (selection.backend && !selection.backend->Start()) {
         selection.failureReason = ComposeBackendFailureReason(
@@ -139,6 +175,17 @@ Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRend
         selection.failureReason = "no_registered_renderer_backend";
     }
     return selection;
+}
+
+Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRendererBackend(
+    const std::string& preferredBackendName) {
+    if (preferredBackendName.empty()) {
+        return SelectDefaultWin32MouseCompanionRendererBackend(Win32MouseCompanionRendererBackendPreferenceRequest{});
+    }
+    Win32MouseCompanionRendererBackendPreferenceRequest request{};
+    request.preferredBackendSource = "explicit_argument";
+    request.preferredBackendName = preferredBackendName;
+    return SelectDefaultWin32MouseCompanionRendererBackend(request);
 }
 
 std::unique_ptr<IWin32MouseCompanionRendererBackend> CreateDefaultWin32MouseCompanionRendererBackend() {

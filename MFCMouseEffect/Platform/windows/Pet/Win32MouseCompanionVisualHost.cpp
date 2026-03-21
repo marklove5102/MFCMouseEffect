@@ -5,6 +5,8 @@
 #include "MouseFx/Utils/StringUtils.h"
 #include "MouseFx/Utils/TimeUtils.h"
 #include "Platform/windows/Pet/Win32MouseCompanionActionRuntime.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendRegistry.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreferenceRequestBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionVisualRuntime.h"
 
 namespace mousefx::windows {
@@ -12,6 +14,7 @@ namespace mousefx::windows {
 bool Win32MouseCompanionVisualHost::Start(const MouseCompanionPetRuntimeConfig& config) {
     actionLibrary_ = {};
     actionRuntime_ = {};
+    window_.SetRendererBackendPreferenceRequest(BuildWin32MouseCompanionRendererBackendPreferenceRequest(config));
     ResetWin32MouseCompanionVisualState(&state_, config, config.enabled && window_.Create());
     return state_.active;
 }
@@ -25,6 +28,7 @@ void Win32MouseCompanionVisualHost::Shutdown() {
 }
 
 bool Win32MouseCompanionVisualHost::Configure(const MouseCompanionPetRuntimeConfig& config) {
+    window_.SetRendererBackendPreferenceRequest(BuildWin32MouseCompanionRendererBackendPreferenceRequest(config));
     ApplyWin32MouseCompanionVisualConfig(&state_, config);
     if (!state_.active) {
         state_.visible = false;
@@ -126,6 +130,16 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
     diagnostics.rendererBackendSelectionReason = window_.RendererBackendSelectionReason();
     diagnostics.rendererBackendFailureReason = window_.RendererBackendFailureReason();
     diagnostics.availableRendererBackends = window_.AvailableRendererBackendNames();
+    diagnostics.unavailableRendererBackends = window_.UnavailableRendererBackendNames();
+    for (const auto& descriptor : Win32MouseCompanionRendererBackendRegistry::Instance().ListByPriority()) {
+        PetVisualHostRendererBackendCatalogEntry entry{};
+        entry.name = descriptor.name;
+        entry.priority = descriptor.priority;
+        entry.available = descriptor.available;
+        entry.unavailableReason = descriptor.unavailableReason;
+        entry.unmetRequirements = descriptor.unmetRequirements;
+        diagnostics.rendererBackendCatalog.push_back(std::move(entry));
+    }
     return diagnostics;
 }
 

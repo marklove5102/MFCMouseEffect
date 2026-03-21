@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
 #include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
 
 namespace mousefx::windows {
@@ -18,6 +19,7 @@ public:
     Win32MouseCompanionWindow();
     ~Win32MouseCompanionWindow();
 
+    void SetRendererBackendPreferenceRequest(const Win32MouseCompanionRendererBackendPreferenceRequest& request);
     bool Create();
     void Shutdown();
     bool Show();
@@ -31,6 +33,7 @@ public:
     std::string RendererBackendSelectionReason() const;
     std::string RendererBackendFailureReason() const;
     std::vector<std::string> AvailableRendererBackendNames() const;
+    std::vector<std::string> UnavailableRendererBackendNames() const;
 
 private:
     static constexpr UINT kMsgEnsureTopmost = WM_APP + 0x41;
@@ -48,6 +51,11 @@ private:
         DWORD eventTime);
 
     LRESULT OnMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+    bool EnsureRendererBackendSelected();
+    bool ApplyRendererBackendSelection(
+        const Win32MouseCompanionRendererBackendPreferenceRequest& request,
+        bool preserveCurrentOnFailure);
+    void ClearRendererBackendSelectionDiagnostics();
     void EnsureTopmostZOrder(bool force);
     bool EnsureSurface(int width, int height);
     void DestroySurface();
@@ -62,6 +70,7 @@ private:
     bool visible_{false};
     uint64_t lastTopmostEnsureMs_{0};
     HWINEVENTHOOK foregroundHook_{nullptr};
+    Win32MouseCompanionRendererBackendPreferenceRequest rendererBackendPreferenceRequest_{};
     std::unique_ptr<IWin32MouseCompanionRendererBackend> renderer_{};
     std::unique_ptr<Win32MouseCompanionPresenter> presenter_{};
     std::string preferredRendererBackendSource_;
@@ -70,6 +79,7 @@ private:
     std::string rendererBackendSelectionReason_;
     std::string rendererBackendFailureReason_;
     std::vector<std::string> availableRendererBackendNames_{};
+    std::vector<std::string> unavailableRendererBackendNames_{};
 };
 
 } // namespace mousefx::windows

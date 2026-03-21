@@ -755,6 +755,8 @@ MouseCompanionPetRuntimeConfig AppController::BuildMouseCompanionPluginRuntimeCo
     out.positionMode = cfg.positionMode;
     out.targetMonitor = cfg.targetMonitor;
     out.edgeClampMode = cfg.edgeClampMode;
+    out.rendererBackendPreferenceSource = cfg.rendererBackendPreferenceSource;
+    out.rendererBackendPreferenceName = cfg.rendererBackendPreferenceName;
     return out;
 }
 

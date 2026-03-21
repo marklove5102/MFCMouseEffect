@@ -151,6 +151,8 @@ struct MouseCompanionConfig {
     double headTintPerClick = 0.11;
     double headTintMax = 0.70;
     double headTintDecayPerSecond = 0.36;
+    std::string rendererBackendPreferenceSource;
+    std::string rendererBackendPreferenceName;
     bool useTestProfile = false;
     int testPressLiftPx = 48;
     int testSmoothingPercent = 32;

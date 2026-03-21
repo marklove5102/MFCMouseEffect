@@ -18,9 +18,12 @@ struct Win32MouseCompanionRendererBackendSelection {
     std::string selectionReason;
     std::string failureReason;
     std::vector<std::string> availableBackendNames;
+    std::vector<std::string> unavailableBackendReasons;
 };
 
 std::string GetEffectiveWin32MouseCompanionRendererBackendPreference();
+Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRendererBackend(
+    const Win32MouseCompanionRendererBackendPreferenceRequest& request);
 Win32MouseCompanionRendererBackendSelection SelectDefaultWin32MouseCompanionRendererBackend(
     const std::string& preferredBackendName = {});
 std::unique_ptr<IWin32MouseCompanionRendererBackend> CreateDefaultWin32MouseCompanionRendererBackend();

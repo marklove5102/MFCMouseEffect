@@ -62,6 +62,8 @@ struct MouseCompanionPetRuntimeConfig {
     std::string positionMode;
     std::string targetMonitor;
     std::string edgeClampMode;
+    std::string rendererBackendPreferenceSource;
+    std::string rendererBackendPreferenceName;
 };
 
 struct MouseCompanionPetPoseSample {

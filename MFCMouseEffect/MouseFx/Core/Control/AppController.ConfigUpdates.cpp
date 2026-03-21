@@ -151,6 +151,8 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
         std::fabs(config_.mouseCompanion.headTintPerClick - normalized.headTintPerClick) < 1e-6 &&
         std::fabs(config_.mouseCompanion.headTintMax - normalized.headTintMax) < 1e-6 &&
         std::fabs(config_.mouseCompanion.headTintDecayPerSecond - normalized.headTintDecayPerSecond) < 1e-6 &&
+        config_.mouseCompanion.rendererBackendPreferenceSource == normalized.rendererBackendPreferenceSource &&
+        config_.mouseCompanion.rendererBackendPreferenceName == normalized.rendererBackendPreferenceName &&
         config_.mouseCompanion.useTestProfile == normalized.useTestProfile &&
         config_.mouseCompanion.testPressLiftPx == normalized.testPressLiftPx &&
         config_.mouseCompanion.testSmoothingPercent == normalized.testSmoothingPercent &&
@@ -190,10 +192,17 @@ void AppController::SetMouseCompanionConfig(const MouseCompanionConfig& cfg) {
         mouseCompanionRuntimeStatus_.rendererBackendSelectionReason.clear();
         mouseCompanionRuntimeStatus_.rendererBackendFailureReason.clear();
         mouseCompanionRuntimeStatus_.availableRendererBackends.clear();
+        mouseCompanionRuntimeStatus_.unavailableRendererBackends.clear();
+        mouseCompanionRuntimeStatus_.rendererBackendCatalog.clear();
+        mouseCompanionRuntimeStatus_.realRendererUnmetRequirements.clear();
         mouseCompanionRuntimeStatus_.configuredModelPath = normalized.modelPath;
         mouseCompanionRuntimeStatus_.configuredActionLibraryPath = normalized.actionLibraryPath;
         mouseCompanionRuntimeStatus_.configuredEffectProfilePath = "MFCMouseEffect/Assets/Pet3D/source/pet-effects.json";
         mouseCompanionRuntimeStatus_.configuredAppearanceProfilePath = normalized.appearanceProfilePath;
+        mouseCompanionRuntimeStatus_.configuredRendererBackendPreferenceSource =
+            normalized.rendererBackendPreferenceSource;
+        mouseCompanionRuntimeStatus_.configuredRendererBackendPreferenceName =
+            normalized.rendererBackendPreferenceName;
         mouseCompanionRuntimeStatus_.visualModelPath.clear();
         mouseCompanionRuntimeStatus_.loadedModelPath.clear();
         mouseCompanionRuntimeStatus_.loadedModelSourceFormat = "unknown";

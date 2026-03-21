@@ -174,8 +174,22 @@ Before touching GPU-specific code, the safest first step is:
   - `renderer_backend_selection_reason`
   - `renderer_backend_failure_reason`
   - `available_renderer_backends`
+  - `unavailable_renderer_backends`
+  - `renderer_backend_catalog`
+  - `configured_renderer_backend_preference_effective`
+  - `configured_renderer_backend_preference_status`
   - this gives future backend bring-up a stable way to verify host/factory/registry routing before any visual parity work starts
+  - `unavailable_renderer_backends` is reserved for registered-but-currently-unavailable backends so future real renderers can publish runtime gating reasons without faking constructor/start failures
+  - the first concrete use of that lane now exists: backend name `real` is registered but reports `requirements_unmet`, so factory/diagnostics behavior can already be exercised before the renderer itself lands
+  - `renderer_backend_catalog` is the structured backend inventory contract; future renderer rollout should extend it instead of adding more ad-hoc string lists
+  - the current `real` backend capability helper names the initial unmet requirements as:
+    - `asset_resource_adapter`
+    - `scene_runtime_adapter`
+    - `renderer_draw_execution`
+  - both `renderer_backend_catalog[*].unmet_requirements` and top-level `real_renderer_unmet_requirements` should stay stable enough for future automation/manual validation
   - current test-friendly preference source is `env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`; when unset, diagnostics report `preferred_renderer_backend_source=default`
+  - configured-preference diagnostics tell us whether config-backed preference resolution is currently active; they do not imply that the final selected backend matched the preferred backend
+  - runtime-config preference updates now re-enter backend selection after host start; if a replacement backend cannot be created, the current backend stays alive so the host does not drop rendering during preference experiments
   - backend preference normalization is now separated from the factory path, so future config-backed preference sources can reuse the same canonical `default -> auto` and lowercase/trim rules
 - Backend lifecycle is now part of the contract too:
   - renderer backend construction alone is not treated as readiness
@@ -186,6 +200,9 @@ Before touching GPU-specific code, the safest first step is:
   - current built-ins are ordered as `configured_request -> env -> default`
   - future config-backed preference sources should plug into the registry layer instead of expanding factory-side conditionals
   - explicit caller-provided preference requests now reuse that same registry path, so source precedence stays uniform across test/debug/runtime entrypoints
+  - Windows visual host now forwards an internal runtime-config preference request before backend creation; this is intentionally an internal seam first, not a user-facing schema flag yet
+  - hidden config/json fields now persist backend preference source/name so future settings-backed preference can be enabled without changing runtime/request plumbing again
+  - hidden settings/apply/diagnostics lanes now round-trip those fields too, so future renderer preference rollout no longer depends on adding a new transport path
 - Current limitation remains explicit:
   - the placeholder renderer is still the only backend implementation
   - built-in backend selection now routes through an explicit backend registry + registration step, so future Windows backends no longer need another factory/window rewrite

@@ -283,6 +283,10 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionPresenter.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendFactory.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreference.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceSources.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRegistry.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendRegistry.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererInput.h" />
@@ -369,6 +373,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClInclude Include="MouseFx\Server\webui\WebUiAssets.h" />
     <ClInclude Include="MouseFx\Server\core\WebSettingsServer.h" />
     <ClInclude Include="MouseFx\Server\settings\SettingsSchemaBuilder.h" />
+    <ClInclude Include="MouseFx\Server\diagnostics\MouseCompanionRendererBackendDiagnostics.h" />
     <ClInclude Include="MouseFx\Server\settings\SettingsStateMapper.h" />
     <ClInclude Include="MouseFx\Effects\RippleEffect.h" />
     <ClInclude Include="MouseFx\Styles\RippleStyle.h" />
@@ -602,6 +607,9 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionPresenter.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendFactory.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreference.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRegistry.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendRegistry.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererInputBuilder.cpp" />
@@ -767,6 +775,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.cpp" />
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.Routing.cpp" />
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.TokenMonitor.cpp" />
+    <ClCompile Include="MouseFx\Server\diagnostics\MouseCompanionRendererBackendDiagnostics.cpp" />
     <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.Diagnostics.cpp" />
     <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.InputCaptureDiagnostics.cpp" />
     <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.WasmDiagnostics.cpp" />

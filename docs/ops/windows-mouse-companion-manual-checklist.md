@@ -103,6 +103,11 @@ Check `/api/state.mouse_companion_runtime` or equivalent diagnostics snapshot an
 - `renderer_backend_selection_reason`
 - `renderer_backend_failure_reason`
 - `available_renderer_backends`
+- `unavailable_renderer_backends`
+- `renderer_backend_catalog`
+- `real_renderer_unmet_requirements`
+- `configured_renderer_backend_preference_effective`
+- `configured_renderer_backend_preference_status`
 - `loaded_model_path`
 - `loaded_action_library_path`
 - `loaded_appearance_profile_path`
@@ -112,25 +117,47 @@ Check `/api/state.mouse_companion_runtime` or equivalent diagnostics snapshot an
 
 ## Test-Friendly Backend Preference
 Current Windows pet backend preference is intentionally test-friendly and does not require a schema change yet.
+The current config-backed preference seam is internal-only for now; manual validation still uses env override as the public test path.
+Hidden `config.json` fields now persist backend preference source/name, but they are not yet part of the supported settings UI contract.
+Those hidden fields now also round-trip through settings-state output and apply-settings payloads, even though the current UI does not render them.
+If those hidden fields change while the host is already active, the Windows visual host now attempts an in-place backend reselection instead of waiting for a full restart.
 
 1. Leave `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND` unset.
 2. Launch the app and confirm runtime diagnostics report:
    - `preferred_renderer_backend_source = default`
    - `preferred_renderer_backend = auto`
+   - `configured_renderer_backend_preference_status = not_configured`
 3. Set:
    - `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND=placeholder`
 4. Relaunch the app and confirm runtime diagnostics now report:
    - `preferred_renderer_backend_source = env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`
    - `preferred_renderer_backend = placeholder`
+   - if hidden config preference fields are also populated, `configured_renderer_backend_preference_status = overridden_by_env`
 5. Set:
    - `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND=default`
 6. Relaunch the app and confirm runtime diagnostics now report:
    - `preferred_renderer_backend_source = env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`
    - `preferred_renderer_backend = auto`
+   - if hidden config preference fields are also populated, `configured_renderer_backend_preference_status = overridden_by_env`
 7. If a future experimental backend name is forced but not registered, confirm:
    - `renderer_backend_selection_reason` explains the fallback
    - `renderer_backend_failure_reason` is non-empty
    - `selected_renderer_backend` still resolves to the effective fallback backend
+8. If a future backend is registered but currently unavailable on the machine/runtime, confirm:
+   - `unavailable_renderer_backends` contains an entry in the form `backend_name:reason`
+   - `available_renderer_backends` still lists only selectable backends
+   - `renderer_backend_selection_reason` reports either direct fallback or unavailable-preferred fallback semantics
+   - `renderer_backend_catalog` includes both available and unavailable entries with explicit `priority` and `unavailable_reason`
+9. Current baseline expectation after this refactor:
+   - `unavailable_renderer_backends` should include `real:requirements_unmet`
+   - `available_renderer_backends` should still include `placeholder`
+   - `renderer_backend_catalog` should contain at least `real` and `placeholder` entries in priority order
+   - the `real` catalog entry should carry unmet requirements:
+     - `asset_resource_adapter`
+     - `scene_runtime_adapter`
+     - `renderer_draw_execution`
+   - top-level `real_renderer_unmet_requirements` should mirror that same requirement list
+   - default selection should continue to resolve to the placeholder path until a real backend becomes available
 
 ## Current Expected Boundary
 - `model_loaded` may still be `false` on Windows because the current Windows path does not render the real 3D model yet.

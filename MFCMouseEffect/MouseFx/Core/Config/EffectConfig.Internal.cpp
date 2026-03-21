@@ -180,6 +180,8 @@ MouseCompanionConfig SanitizeMouseCompanionConfig(MouseCompanionConfig config) {
     config.headTintPerClick = std::clamp(config.headTintPerClick, 0.01, 1.0);
     config.headTintMax = std::clamp(config.headTintMax, config.headTintPerClick, 1.0);
     config.headTintDecayPerSecond = std::clamp(config.headTintDecayPerSecond, 0.05, 4.0);
+    config.rendererBackendPreferenceSource = TrimAscii(config.rendererBackendPreferenceSource);
+    config.rendererBackendPreferenceName = TrimAscii(config.rendererBackendPreferenceName);
     config.testPressLiftPx = ClampInt(config.testPressLiftPx, 0, 320);
     config.testSmoothingPercent = ClampInt(config.testSmoothingPercent, 0, 95);
     config.testClickStreakBreakMs = ClampInt(config.testClickStreakBreakMs, 120, 3000);

@@ -286,6 +286,12 @@ void ApplyMouseCompanionSettings(const json& payload, AppController* controller)
     applyDouble("head_tint_per_click", &companion.headTintPerClick);
     applyDouble("head_tint_max", &companion.headTintMax);
     applyDouble("head_tint_decay_per_second", &companion.headTintDecayPerSecond);
+    if (source.contains("renderer_backend_preference_source") && source["renderer_backend_preference_source"].is_string()) {
+        companion.rendererBackendPreferenceSource = source["renderer_backend_preference_source"].get<std::string>();
+    }
+    if (source.contains("renderer_backend_preference_name") && source["renderer_backend_preference_name"].is_string()) {
+        companion.rendererBackendPreferenceName = source["renderer_backend_preference_name"].get<std::string>();
+    }
     if (source.contains("use_test_profile") && source["use_test_profile"].is_boolean()) {
         companion.useTestProfile = source["use_test_profile"].get<bool>();
     }
