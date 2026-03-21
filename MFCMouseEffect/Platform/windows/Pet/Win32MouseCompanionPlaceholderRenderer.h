@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "Platform/windows/Pet/IWin32MouseCompanionRendererBackend.h"
 
 namespace mousefx::windows {
@@ -15,10 +17,13 @@ public:
         Gdiplus::Graphics* graphics,
         int width,
         int height) const override;
+    Win32MouseCompanionRendererBackendRuntimeDiagnostics ReadRuntimeDiagnostics() const override;
 
 private:
     bool ready_ = false;
     std::string lastErrorReason_{};
+    mutable std::mutex runtimeDiagnosticsMutex_{};
+    mutable Win32MouseCompanionRendererBackendRuntimeDiagnostics runtimeDiagnostics_{};
 };
 
 void RegisterWin32MouseCompanionPlaceholderRendererBackend();

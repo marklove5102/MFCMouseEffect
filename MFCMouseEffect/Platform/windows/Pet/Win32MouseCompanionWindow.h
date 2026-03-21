@@ -6,12 +6,12 @@
 #include <string>
 #include <vector>
 
+#include "Platform/windows/Pet/IWin32MouseCompanionRendererBackend.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
 #include "Platform/windows/Pet/Win32MouseCompanionVisualState.h"
 
 namespace mousefx::windows {
 
-class IWin32MouseCompanionRendererBackend;
 class Win32MouseCompanionPresenter;
 
 class Win32MouseCompanionWindow final {
@@ -34,6 +34,7 @@ public:
     std::string RendererBackendFailureReason() const;
     std::vector<std::string> AvailableRendererBackendNames() const;
     std::vector<std::string> UnavailableRendererBackendNames() const;
+    Win32MouseCompanionRendererBackendRuntimeDiagnostics RendererRuntimeDiagnostics() const;
 
 private:
     static constexpr UINT kMsgEnsureTopmost = WM_APP + 0x41;

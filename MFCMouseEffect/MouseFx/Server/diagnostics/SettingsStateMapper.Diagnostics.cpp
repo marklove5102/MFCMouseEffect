@@ -205,6 +205,8 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         controller->ReadMouseCompanionRuntimeStatus();
     const auto configuredBackendPreferenceDiagnostics =
         EvaluateConfiguredMouseCompanionRendererBackendPreferenceDiagnostics(status);
+    const auto realRendererPreviewDiagnostics =
+        EvaluateMouseCompanionRealRendererPreviewDiagnostics(status);
     json out = json::object();
     out["config_enabled"] = status.configEnabled;
     out["runtime_present"] = status.runtimePresent;
@@ -224,6 +226,7 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
     out["action_library_loaded"] = status.actionLibraryLoaded;
     out["effect_profile_loaded"] = status.effectProfileLoaded;
     out["appearance_profile_loaded"] = status.appearanceProfileLoaded;
+    out["pose_frame_available"] = status.poseFrameAvailable;
     out["pose_binding_configured"] = status.poseBindingConfigured;
     out["skeleton_bone_count"] = status.skeletonBoneCount;
     out["preferred_renderer_backend_source"] = status.preferredRendererBackendSource;
@@ -245,6 +248,27 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
     }
     out["renderer_backend_catalog"] = std::move(rendererBackendCatalog);
     out["real_renderer_unmet_requirements"] = status.realRendererUnmetRequirements;
+    out["real_renderer_preview"] = {
+        {"rollout_enabled", realRendererPreviewDiagnostics.rolloutEnabled},
+        {"preview_selected", realRendererPreviewDiagnostics.previewSelected},
+        {"preview_active", realRendererPreviewDiagnostics.previewActive},
+        {"rendered_frame", realRendererPreviewDiagnostics.renderedFrame},
+        {"rendered_frame_count", realRendererPreviewDiagnostics.renderedFrameCount},
+        {"last_render_tick_ms", realRendererPreviewDiagnostics.lastRenderTickMs},
+        {"availability_reason", realRendererPreviewDiagnostics.availabilityReason},
+        {"model_ready", realRendererPreviewDiagnostics.modelReady},
+        {"action_library_ready", realRendererPreviewDiagnostics.actionLibraryReady},
+        {"appearance_profile_ready", realRendererPreviewDiagnostics.appearanceProfileReady},
+        {"pose_frame_available", realRendererPreviewDiagnostics.poseFrameAvailable},
+        {"pose_binding_configured", realRendererPreviewDiagnostics.poseBindingConfigured},
+        {"surface_width", realRendererPreviewDiagnostics.surfaceWidth},
+        {"surface_height", realRendererPreviewDiagnostics.surfaceHeight},
+        {"action_name", realRendererPreviewDiagnostics.actionName},
+        {"action_intensity", realRendererPreviewDiagnostics.actionIntensity},
+        {"reactive_action_name", realRendererPreviewDiagnostics.reactiveActionName},
+        {"reactive_action_intensity", realRendererPreviewDiagnostics.reactiveActionIntensity},
+        {"model_source_format", realRendererPreviewDiagnostics.modelSourceFormat},
+    };
     out["configured_model_path"] = status.configuredModelPath;
     out["configured_action_library_path"] = status.configuredActionLibraryPath;
     out["configured_effect_profile_path"] = status.configuredEffectProfilePath;
@@ -255,6 +279,27 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         configuredBackendPreferenceDiagnostics.effective;
     out["configured_renderer_backend_preference_status"] =
         configuredBackendPreferenceDiagnostics.status;
+    out["renderer_runtime_backend"] = status.rendererRuntimeBackend;
+    out["renderer_runtime_ready"] = status.rendererRuntimeReady;
+    out["renderer_runtime_frame_rendered"] = status.rendererRuntimeFrameRendered;
+    out["renderer_runtime_frame_count"] = status.rendererRuntimeFrameCount;
+    out["renderer_runtime_last_render_tick_ms"] = status.rendererRuntimeLastRenderTickMs;
+    out["renderer_runtime_action_name"] = status.rendererRuntimeActionName;
+    out["renderer_runtime_reactive_action_name"] = status.rendererRuntimeReactiveActionName;
+    out["renderer_runtime_action_intensity"] = status.rendererRuntimeActionIntensity;
+    out["renderer_runtime_reactive_action_intensity"] =
+        status.rendererRuntimeReactiveActionIntensity;
+    out["renderer_runtime_model_ready"] = status.rendererRuntimeModelReady;
+    out["renderer_runtime_action_library_ready"] = status.rendererRuntimeActionLibraryReady;
+    out["renderer_runtime_appearance_profile_ready"] =
+        status.rendererRuntimeAppearanceProfileReady;
+    out["renderer_runtime_pose_frame_available"] = status.rendererRuntimePoseFrameAvailable;
+    out["renderer_runtime_pose_binding_configured"] =
+        status.rendererRuntimePoseBindingConfigured;
+    out["renderer_runtime_facing_direction"] = status.rendererRuntimeFacingDirection;
+    out["renderer_runtime_surface_width"] = status.rendererRuntimeSurfaceWidth;
+    out["renderer_runtime_surface_height"] = status.rendererRuntimeSurfaceHeight;
+    out["renderer_runtime_model_source_format"] = status.rendererRuntimeModelSourceFormat;
     out["visual_model_path"] = status.visualModelPath;
     out["loaded_model_path"] = status.loadedModelPath;
     out["loaded_model_source_format"] = status.loadedModelSourceFormat;

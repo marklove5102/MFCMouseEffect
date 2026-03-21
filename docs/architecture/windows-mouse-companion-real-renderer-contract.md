@@ -176,18 +176,32 @@ Before touching GPU-specific code, the safest first step is:
   - `available_renderer_backends`
   - `unavailable_renderer_backends`
   - `renderer_backend_catalog`
+  - `real_renderer_preview`
+  - `renderer_runtime_*`
   - `configured_renderer_backend_preference_effective`
   - `configured_renderer_backend_preference_status`
   - this gives future backend bring-up a stable way to verify host/factory/registry routing before any visual parity work starts
   - `unavailable_renderer_backends` is reserved for registered-but-currently-unavailable backends so future real renderers can publish runtime gating reasons without faking constructor/start failures
-  - the first concrete use of that lane now exists: backend name `real` is registered but reports `requirements_unmet`, so factory/diagnostics behavior can already be exercised before the renderer itself lands
+  - the first concrete use of that lane now exists: backend name `real` is registered with a complete internal preview pipeline, but default availability is still gated as `rollout_disabled` so factory/diagnostics behavior can be exercised before wider rollout
   - `renderer_backend_catalog` is the structured backend inventory contract; future renderer rollout should extend it instead of adding more ad-hoc string lists
+  - `real_renderer_preview` is the rollout-facing preview summary contract; it should remain stable enough for manual verification and AI-IDE consumption without requiring direct access to renderer-private scene objects
+  - `renderer_runtime_*` is the backend-owned runtime snapshot contract; it should reflect the last successful renderer input/render state instead of forcing diagnostics to reconstruct preview state only from higher controller layers
+  - `renderer_runtime_frame_count`, `renderer_runtime_last_render_tick_ms`, and renderer surface-size fields are part of the render-proof subset of that contract; future real-backend rollout should preserve their semantics so test automation can detect actual rendered-frame advancement
   - the first real-renderer requirement seam is now active too:
     - `Win32MouseCompanionRealRendererAssetResources`
     - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract
-  - the current `real` backend capability helper now names the remaining unmet requirements as:
-    - `scene_runtime_adapter`
-    - `renderer_draw_execution`
+  - the second real-renderer requirement seam is now active too:
+    - `Win32MouseCompanionRealRendererSceneRuntime`
+    - it adapts shared runtime action / pose / facing state into a renderer-facing scene-runtime contract
+  - the third seam is now active too:
+    - `Win32MouseCompanionRealRendererSceneBuilder`
+    - `Win32MouseCompanionRealRendererPainter`
+    - `Win32MouseCompanionRealRendererBackend::Render(...)`
+    - the current output is still a preview backend, but it now renders a stylized pet-like scene with ears/limbs/face/accessory markers instead of only abstract readiness geometry
+  - current rollout rule:
+    - default `real` availability is gated by `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE`
+    - when unset, diagnostics should report `unavailable_reason=rollout_disabled`
+    - when set to `1/true/on/yes`, the preview backend becomes selectable for explicit testing
   - both `renderer_backend_catalog[*].unmet_requirements` and top-level `real_renderer_unmet_requirements` should stay stable enough for future automation/manual validation
   - current test-friendly preference source is `env:MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND`; when unset, diagnostics report `preferred_renderer_backend_source=default`
   - configured-preference diagnostics tell us whether config-backed preference resolution is currently active; they do not imply that the final selected backend matched the preferred backend

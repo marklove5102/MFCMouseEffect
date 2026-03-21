@@ -8,16 +8,36 @@
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderScene.h"
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderSceneBuilder.h"
 
+#include <chrono>
+
 namespace mousefx::windows {
+namespace {
+
+uint64_t ReadRendererRuntimeTickMs() {
+    using Clock = std::chrono::steady_clock;
+    return static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            Clock::now().time_since_epoch())
+            .count());
+}
+
+} // namespace
 
 bool Win32MouseCompanionPlaceholderRenderer::Start() {
     ready_ = true;
     lastErrorReason_.clear();
+    std::lock_guard<std::mutex> guard(runtimeDiagnosticsMutex_);
+    runtimeDiagnostics_ = Win32MouseCompanionRendererBackendRuntimeDiagnostics{};
+    runtimeDiagnostics_.backendName = "placeholder";
+    runtimeDiagnostics_.ready = true;
     return true;
 }
 
 void Win32MouseCompanionPlaceholderRenderer::Shutdown() {
     ready_ = false;
+    std::lock_guard<std::mutex> guard(runtimeDiagnosticsMutex_);
+    runtimeDiagnostics_.ready = false;
+    runtimeDiagnostics_.renderedFrame = false;
 }
 
 bool Win32MouseCompanionPlaceholderRenderer::IsReady() const {
@@ -44,6 +64,35 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         BuildWin32MouseCompanionPlaceholderScene(runtime, width, height);
     const Win32MouseCompanionPlaceholderPainter painter{};
     painter.Paint(scene, graphics, width, height);
+
+    Win32MouseCompanionRendererBackendRuntimeDiagnostics diagnostics{};
+    diagnostics.backendName = "placeholder";
+    diagnostics.ready = ready_;
+    diagnostics.renderedFrame = true;
+    diagnostics.renderedFrameCount = 1;
+    diagnostics.lastRenderTickMs = ReadRendererRuntimeTickMs();
+    diagnostics.actionName = input.actionName;
+    diagnostics.reactiveActionName = input.reactiveActionName;
+    diagnostics.actionIntensity = input.actionIntensity;
+    diagnostics.reactiveActionIntensity = input.reactiveActionIntensity;
+    diagnostics.modelReady = input.modelAssetAvailable;
+    diagnostics.actionLibraryReady = input.actionLibraryAvailable;
+    diagnostics.appearanceProfileReady = true;
+    diagnostics.poseFrameAvailable = input.poseFrameAvailable;
+    diagnostics.poseBindingConfigured = input.poseBindingConfigured;
+    diagnostics.facingDirection = input.facingDirection;
+    diagnostics.surfaceWidth = width;
+    diagnostics.surfaceHeight = height;
+    diagnostics.modelSourceFormat = "phase1_placeholder";
+    std::lock_guard<std::mutex> guard(runtimeDiagnosticsMutex_);
+    diagnostics.renderedFrameCount = runtimeDiagnostics_.renderedFrameCount + 1;
+    runtimeDiagnostics_ = std::move(diagnostics);
+}
+
+Win32MouseCompanionRendererBackendRuntimeDiagnostics
+Win32MouseCompanionPlaceholderRenderer::ReadRuntimeDiagnostics() const {
+    std::lock_guard<std::mutex> guard(runtimeDiagnosticsMutex_);
+    return runtimeDiagnostics_;
 }
 
 void RegisterWin32MouseCompanionPlaceholderRendererBackend() {

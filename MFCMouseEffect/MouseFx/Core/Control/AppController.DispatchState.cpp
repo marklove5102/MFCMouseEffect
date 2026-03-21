@@ -1206,6 +1206,17 @@ void AppController::ResetPetDispatchRuntimeState() {
         mouseCompanionRuntimeStatus_.lastActionIntensity = 0.0f;
         mouseCompanionRuntimeStatus_.lastActionTickMs = nowTickMs;
         mouseCompanionRuntimeStatus_.lastActionName = "idle";
+        mouseCompanionRuntimeStatus_.poseFrameAvailable = false;
+        mouseCompanionRuntimeStatus_.rendererRuntimeFrameRendered = false;
+        mouseCompanionRuntimeStatus_.rendererRuntimeFrameCount = 0;
+        mouseCompanionRuntimeStatus_.rendererRuntimeLastRenderTickMs = 0;
+        mouseCompanionRuntimeStatus_.rendererRuntimeActionName = "idle";
+        mouseCompanionRuntimeStatus_.rendererRuntimeReactiveActionName = "idle";
+        mouseCompanionRuntimeStatus_.rendererRuntimeActionIntensity = 0.0f;
+        mouseCompanionRuntimeStatus_.rendererRuntimeReactiveActionIntensity = 0.0f;
+        mouseCompanionRuntimeStatus_.rendererRuntimePoseFrameAvailable = false;
+        mouseCompanionRuntimeStatus_.rendererRuntimeSurfaceWidth = 0;
+        mouseCompanionRuntimeStatus_.rendererRuntimeSurfaceHeight = 0;
         mouseCompanionRuntimeStatus_.clickStreak = 0;
         mouseCompanionRuntimeStatus_.clickStreakTintAmount = 0.0f;
     }
@@ -1223,6 +1234,7 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
         mouseCompanionRuntimeStatus_.lastActionIntensity = clampedIntensity;
         mouseCompanionRuntimeStatus_.lastActionTickMs = nowTickMs;
         mouseCompanionRuntimeStatus_.lastActionName = ResolvePetActionName(actionCode);
+        mouseCompanionRuntimeStatus_.poseFrameAvailable = false;
         mouseCompanionRuntimeStatus_.clickStreakTintAmount = clampedTint;
     }
 
@@ -1433,6 +1445,12 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
 
             petVisualHost_->ApplyPose(pluginPoseFrame);
         }
+        SyncPetVisualHostDiagnostics(petVisualHost_->ReadDiagnostics());
+    }
+
+    {
+        std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+        mouseCompanionRuntimeStatus_.poseFrameAvailable = !pluginPoseFrame.samples.empty();
     }
 
     CommitMouseCompanionPluginResolvedFrame(pluginPoseFrame);
@@ -1443,6 +1461,7 @@ bool AppController::EnsurePetVisualPoseBinding() {
     if (!petVisualHost_ || !petVisualHost_->IsActive()) {
         petVisualPoseBindingAttempted_ = false;
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+        mouseCompanionRuntimeStatus_.poseFrameAvailable = false;
         mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
         mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
         return false;
@@ -1457,6 +1476,7 @@ bool AppController::EnsurePetVisualPoseBinding() {
         petVisualPoseBindingConfigured_ = petVisualHost_->ConfigurePoseBinding(boneNames);
     }
     std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.poseFrameAvailable = false;
     mouseCompanionRuntimeStatus_.poseBindingConfigured = petVisualPoseBindingConfigured_;
     mouseCompanionRuntimeStatus_.skeletonBoneCount = petVisualPoseBindingConfigured_ ? kPetPoseBoneCount : 0;
     return petVisualPoseBindingConfigured_;

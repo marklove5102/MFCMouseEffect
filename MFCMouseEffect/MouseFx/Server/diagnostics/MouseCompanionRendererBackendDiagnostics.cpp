@@ -3,8 +3,12 @@
 #include "MouseFx/Server/diagnostics/MouseCompanionRendererBackendDiagnostics.h"
 
 #include "MouseFx/Utils/StringUtils.h"
+#include "Platform/PlatformTarget.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreferenceSources.h"
+#if MFX_PLATFORM_WINDOWS
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererCapabilities.h"
+#endif
 
 namespace mousefx {
 namespace {
@@ -19,6 +23,30 @@ bool StartsWithAscii(const std::string& value, const char* prefix) {
 std::string ResolveConfiguredPreferenceSource(const AppController::MouseCompanionRuntimeStatus& status) {
     const std::string configuredSource = TrimAscii(status.configuredRendererBackendPreferenceSource);
     return configuredSource.empty() ? kConfiguredRuntimeConfigRendererBackendPreferenceSource : configuredSource;
+}
+
+const PetVisualHostRendererBackendCatalogEntry* FindRendererBackendCatalogEntry(
+    const AppController::MouseCompanionRuntimeStatus& status,
+    const char* backendName) {
+    if (!backendName) {
+        return nullptr;
+    }
+    const std::string normalizedBackendName =
+        windows::NormalizeWin32MouseCompanionRendererBackendName(backendName);
+    for (const auto& entry : status.rendererBackendCatalog) {
+        if (windows::NormalizeWin32MouseCompanionRendererBackendName(entry.name) == normalizedBackendName) {
+            return &entry;
+        }
+    }
+    return nullptr;
+}
+
+bool IsRealRendererRolloutEnabledForCurrentPlatform() {
+#if MFX_PLATFORM_WINDOWS
+    return windows::IsWin32MouseCompanionRealRendererRolloutEnabled();
+#else
+    return false;
+#endif
 }
 
 } // namespace
@@ -62,6 +90,47 @@ EvaluateConfiguredMouseCompanionRendererBackendPreferenceDiagnostics(
     }
 
     diagnostics.status = "overridden_by_other_source";
+    return diagnostics;
+}
+
+MouseCompanionRealRendererPreviewDiagnostics
+EvaluateMouseCompanionRealRendererPreviewDiagnostics(
+    const AppController::MouseCompanionRuntimeStatus& status) {
+    MouseCompanionRealRendererPreviewDiagnostics diagnostics{};
+    diagnostics.rolloutEnabled = IsRealRendererRolloutEnabledForCurrentPlatform();
+    diagnostics.previewSelected =
+        windows::NormalizeWin32MouseCompanionRendererBackendName(status.selectedRendererBackend) == "real";
+    diagnostics.previewActive =
+        diagnostics.rolloutEnabled &&
+        diagnostics.previewSelected &&
+        status.runtimePresent &&
+        status.visualHostActive &&
+        status.rendererRuntimeReady &&
+        status.rendererRuntimeFrameRendered;
+    diagnostics.renderedFrame = status.rendererRuntimeFrameRendered;
+    diagnostics.renderedFrameCount = status.rendererRuntimeFrameCount;
+    diagnostics.lastRenderTickMs = status.rendererRuntimeLastRenderTickMs;
+    diagnostics.modelReady = status.rendererRuntimeModelReady;
+    diagnostics.actionLibraryReady = status.rendererRuntimeActionLibraryReady;
+    diagnostics.appearanceProfileReady = status.rendererRuntimeAppearanceProfileReady;
+    diagnostics.poseFrameAvailable = status.rendererRuntimePoseFrameAvailable;
+    diagnostics.poseBindingConfigured = status.rendererRuntimePoseBindingConfigured;
+    diagnostics.surfaceWidth = status.rendererRuntimeSurfaceWidth;
+    diagnostics.surfaceHeight = status.rendererRuntimeSurfaceHeight;
+    diagnostics.actionName = TrimAscii(status.rendererRuntimeActionName).empty()
+        ? "idle"
+        : status.rendererRuntimeActionName;
+    diagnostics.reactiveActionName = TrimAscii(status.rendererRuntimeReactiveActionName).empty()
+        ? "idle"
+        : status.rendererRuntimeReactiveActionName;
+    diagnostics.actionIntensity = status.rendererRuntimeActionIntensity;
+    diagnostics.reactiveActionIntensity = status.rendererRuntimeReactiveActionIntensity;
+    diagnostics.modelSourceFormat = TrimAscii(status.rendererRuntimeModelSourceFormat).empty()
+        ? "unknown"
+        : status.rendererRuntimeModelSourceFormat;
+    if (const auto* realEntry = FindRendererBackendCatalogEntry(status, "real")) {
+        diagnostics.availabilityReason = realEntry->available ? "" : realEntry->unavailableReason;
+    }
     return diagnostics;
 }
 

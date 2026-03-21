@@ -83,6 +83,8 @@
   - `available_renderer_backends`
   - `unavailable_renderer_backends`
   - `renderer_backend_catalog`
+  - `real_renderer_preview`
+  - `renderer_runtime_*`
 - Renderer backend lifecycle seam is now explicit too:
   - backend selection no longer stops at constructor success
   - factory now treats `Start() / IsReady() / LastErrorReason()` as first-class fallback signals
@@ -98,10 +100,13 @@
   - hidden backend preference fields now also round-trip through settings state, apply-settings payloads, and runtime/test diagnostics
   - runtime/test diagnostics now also report whether the hidden config preference is the active resolved preference via `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status`
   - renderer registry/factory diagnostics now also distinguish currently unavailable backends from simply unselected ones, so future real-backend rollout can report machine/runtime gating reasons without changing the host contract again
-  - a `real` backend is now explicitly registered as an unavailable placeholder with reason `requirements_unmet`, which keeps the rollout path visible in diagnostics without changing current placeholder-first behavior
+  - a `real` backend now has a complete internal preview pipeline (`asset resources -> scene runtime -> scene builder -> painter -> render`), and the preview output is already a pose/action-aware stylized pet instead of a pure diagnostics card; default selection still keeps it unavailable behind a rollout gate, so current placeholder-first behavior stays unchanged
   - `renderer_backend_catalog` is now the structured source of truth for backend inventory; `available/unavailable` arrays remain as lightweight compatibility views
   - the `real` backend now also publishes explicit unmet requirements through both `renderer_backend_catalog[*].unmet_requirements` and top-level `real_renderer_unmet_requirements`
-  - the first `real` renderer requirement seam is now active via `Win32MouseCompanionRealRendererAssetResources`, so the current unmet list is down to `scene_runtime_adapter` and `renderer_draw_execution`
+  - `real_renderer_unmet_requirements` is now expected to be empty on current code; default unavailability is controlled by rollout gate `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE`
+  - runtime/test diagnostics now also publish a derived `real_renderer_preview` summary so Windows bring-up can verify rollout gate, selected backend, preview-active state, action lane, pose lane, and asset-lane readiness without reading renderer internals
+  - the selected Windows renderer backend now also reports a backend-owned runtime snapshot (`renderer_runtime_*`), so diagnostics no longer have to infer preview state only from controller-side cached fields
+  - backend-owned runtime diagnostics now also include render-proof fields (`frame_count`, `last_render_tick_ms`, `surface_width`, `surface_height`) so Windows bring-up can confirm that a test event really produced a new rendered frame
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

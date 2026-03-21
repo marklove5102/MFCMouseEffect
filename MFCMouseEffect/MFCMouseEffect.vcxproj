@@ -286,6 +286,10 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetResources.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererPainter.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererScene.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererSceneBuilder.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererSceneRuntime.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceSources.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRegistry.h" />
@@ -611,6 +615,9 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetResources.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererPainter.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererSceneBuilder.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererSceneRuntime.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRequestBuilder.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendPreferenceRegistry.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRendererBackendRegistry.cpp" />

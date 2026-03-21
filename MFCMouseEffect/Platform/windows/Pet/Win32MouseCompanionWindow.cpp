@@ -248,6 +248,12 @@ std::vector<std::string> Win32MouseCompanionWindow::UnavailableRendererBackendNa
     return unavailableRendererBackendNames_;
 }
 
+Win32MouseCompanionRendererBackendRuntimeDiagnostics
+Win32MouseCompanionWindow::RendererRuntimeDiagnostics() const {
+    return renderer_ ? renderer_->ReadRuntimeDiagnostics()
+                     : Win32MouseCompanionRendererBackendRuntimeDiagnostics{};
+}
+
 LRESULT CALLBACK Win32MouseCompanionWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     Win32MouseCompanionWindow* self = nullptr;
     if (msg == WM_NCCREATE) {

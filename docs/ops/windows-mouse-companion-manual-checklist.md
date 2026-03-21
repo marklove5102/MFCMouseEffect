@@ -97,6 +97,7 @@ Check `/api/state.mouse_companion_runtime` or equivalent diagnostics snapshot an
 - `model_loaded`
 - `action_library_loaded`
 - `appearance_profile_loaded`
+- `pose_frame_available`
 - `preferred_renderer_backend_source`
 - `preferred_renderer_backend`
 - `selected_renderer_backend`
@@ -106,6 +107,22 @@ Check `/api/state.mouse_companion_runtime` or equivalent diagnostics snapshot an
 - `unavailable_renderer_backends`
 - `renderer_backend_catalog`
 - `real_renderer_unmet_requirements`
+- `real_renderer_preview`
+- `renderer_runtime_backend`
+- `renderer_runtime_ready`
+- `renderer_runtime_frame_rendered`
+- `renderer_runtime_frame_count`
+- `renderer_runtime_last_render_tick_ms`
+- `renderer_runtime_action_name`
+- `renderer_runtime_reactive_action_name`
+- `renderer_runtime_model_ready`
+- `renderer_runtime_action_library_ready`
+- `renderer_runtime_appearance_profile_ready`
+- `renderer_runtime_pose_frame_available`
+- `renderer_runtime_pose_binding_configured`
+- `renderer_runtime_model_source_format`
+- `renderer_runtime_surface_width`
+- `renderer_runtime_surface_height`
 - `configured_renderer_backend_preference_effective`
 - `configured_renderer_backend_preference_status`
 - `loaded_model_path`
@@ -149,15 +166,38 @@ If those hidden fields change while the host is already active, the Windows visu
    - `renderer_backend_selection_reason` reports either direct fallback or unavailable-preferred fallback semantics
    - `renderer_backend_catalog` includes both available and unavailable entries with explicit `priority` and `unavailable_reason`
 9. Current baseline expectation after this refactor:
-   - `unavailable_renderer_backends` should include `real:requirements_unmet`
+   - by default `unavailable_renderer_backends` should include `real:rollout_disabled`
    - `available_renderer_backends` should still include `placeholder`
    - `renderer_backend_catalog` should contain at least `real` and `placeholder` entries in priority order
-   - the `real` catalog entry should carry unmet requirements:
-     - `scene_runtime_adapter`
-     - `renderer_draw_execution`
-   - top-level `real_renderer_unmet_requirements` should mirror that same requirement list
+   - the `real` catalog entry should now carry an empty unmet-requirements list
+   - top-level `real_renderer_unmet_requirements` should also be empty
+   - this list should no longer include `scene_runtime_adapter`; if it reappears, treat it as a regression in the real-renderer readiness seam
    - this list should no longer include `asset_resource_adapter`; if it reappears, treat it as a regression in the real-renderer readiness seam
+   - this list should no longer include `renderer_draw_execution`; if it reappears, treat it as a regression in the real-renderer draw seam
    - default selection should continue to resolve to the placeholder path until a real backend becomes available
+10. Hidden rollout-gate validation:
+   - set `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE=1`
+   - optionally set `MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND=real`
+   - expected diagnostics:
+     - `preferred_renderer_backend=real` when explicit backend env is set
+     - `selected_renderer_backend=real` only when rollout gate is enabled
+     - `renderer_backend_catalog` entry for `real` should flip to `available=true`
+     - `real_renderer_preview.rollout_enabled=true`
+     - `real_renderer_preview.preview_selected=true`
+     - `real_renderer_preview.preview_active=true` after the visual host is active
+     - `real_renderer_preview.action_name` should track the latest runtime action
+     - `real_renderer_preview.reactive_action_name` should reflect the current reactive lane
+     - `real_renderer_preview.pose_binding_configured` and `real_renderer_preview.pose_frame_available` should reflect whether the preview path is really receiving pose data
+     - `real_renderer_preview.model_ready / action_library_ready / appearance_profile_ready` should expose the three asset lanes directly
+     - `renderer_runtime_backend=real`
+     - `renderer_runtime_frame_rendered=true` after at least one frame
+     - repeated dispatch events should increase `renderer_runtime_frame_count`
+     - repeated dispatch events should advance `renderer_runtime_last_render_tick_ms`
+     - `renderer_runtime_action_name` and `renderer_runtime_reactive_action_name` should follow the last renderer-fed runtime state
+     - `renderer_runtime_surface_width` / `renderer_runtime_surface_height` should stay non-zero while the preview window is active
+   - expected visual boundary:
+     - current `real` backend still looks like a preview renderer, not macOS SceneKit parity
+     - but it should now render a stylized pet silhouette with visible ears/limbs/face plus asset-lane badges, rather than only an abstract diagnostics card
 
 ## Current Expected Boundary
 - `model_loaded` may still be `false` on Windows because the current Windows path does not render the real 3D model yet.

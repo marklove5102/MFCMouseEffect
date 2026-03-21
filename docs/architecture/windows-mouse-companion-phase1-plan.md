@@ -188,11 +188,17 @@
   - runtime/test diagnostics also expose `available_renderer_backends`
   - runtime/test diagnostics also expose `unavailable_renderer_backends`
   - runtime/test diagnostics now also expose `renderer_backend_catalog`
+  - runtime/test diagnostics now also expose `real_renderer_preview`
+  - runtime/test diagnostics now also expose backend-owned `renderer_runtime_*` fields from the currently selected renderer
   - runtime/test diagnostics now also expose `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status` so config/env/default precedence can be verified directly
   - backend preference updates that arrive through runtime config now trigger an in-place window/backend reselection instead of being ignored after the first backend is created
-  - a `real` backend is now explicitly registered into the backend registry as `unavailable(requirements_unmet)` so diagnostics and preference routing can exercise the future path without changing current rendering behavior
-  - the first real-renderer requirement seam is now active through `Win32MouseCompanionRealRendererAssetResources`, which adapts shared asset lanes into a renderer-facing resource contract
-  - the current `real` backend unmet requirements are now `scene_runtime_adapter` and `renderer_draw_execution`
+  - a `real` backend now has a complete internal preview pipeline through `Win32MouseCompanionRealRendererAssetResources`, `Win32MouseCompanionRealRendererSceneRuntime`, `Win32MouseCompanionRealRendererSceneBuilder`, and `Win32MouseCompanionRealRendererPainter`
+  - that preview path is no longer just a readiness card; it now renders a stylized pet-like scene that reacts to action/facing/pose lanes under the hidden rollout gate
+  - default diagnostics should now show `real` as `unavailable(rollout_disabled)` instead of `requirements_unmet`
+  - current `real_renderer_unmet_requirements` should be empty; rollout is now controlled by the hidden test gate `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE=1`
+  - `real_renderer_preview` now acts as the current bring-up truth view for rollout gate state, preview-active state, current action lane, pose lane, and asset-lane readiness
+  - backend-owned runtime diagnostics now travel through `renderer -> window -> visual host -> AppController -> settings/test diagnostics`, so future renderer swaps do not need a second controller-side inference path
+  - those runtime diagnostics now also include render-proof counters/timestamps/surface-size fields, making it possible to verify that a dispatched test event caused a fresh frame instead of only changing logical state
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract

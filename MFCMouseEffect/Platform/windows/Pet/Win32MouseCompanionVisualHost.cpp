@@ -131,6 +131,25 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
     diagnostics.rendererBackendFailureReason = window_.RendererBackendFailureReason();
     diagnostics.availableRendererBackends = window_.AvailableRendererBackendNames();
     diagnostics.unavailableRendererBackends = window_.UnavailableRendererBackendNames();
+    const auto rendererRuntime = window_.RendererRuntimeDiagnostics();
+    diagnostics.rendererRuntime.backendName = rendererRuntime.backendName;
+    diagnostics.rendererRuntime.ready = rendererRuntime.ready;
+    diagnostics.rendererRuntime.renderedFrame = rendererRuntime.renderedFrame;
+    diagnostics.rendererRuntime.renderedFrameCount = rendererRuntime.renderedFrameCount;
+    diagnostics.rendererRuntime.lastRenderTickMs = rendererRuntime.lastRenderTickMs;
+    diagnostics.rendererRuntime.actionName = rendererRuntime.actionName;
+    diagnostics.rendererRuntime.reactiveActionName = rendererRuntime.reactiveActionName;
+    diagnostics.rendererRuntime.actionIntensity = rendererRuntime.actionIntensity;
+    diagnostics.rendererRuntime.reactiveActionIntensity = rendererRuntime.reactiveActionIntensity;
+    diagnostics.rendererRuntime.modelReady = rendererRuntime.modelReady;
+    diagnostics.rendererRuntime.actionLibraryReady = rendererRuntime.actionLibraryReady;
+    diagnostics.rendererRuntime.appearanceProfileReady = rendererRuntime.appearanceProfileReady;
+    diagnostics.rendererRuntime.poseFrameAvailable = rendererRuntime.poseFrameAvailable;
+    diagnostics.rendererRuntime.poseBindingConfigured = rendererRuntime.poseBindingConfigured;
+    diagnostics.rendererRuntime.facingDirection = rendererRuntime.facingDirection;
+    diagnostics.rendererRuntime.surfaceWidth = rendererRuntime.surfaceWidth;
+    diagnostics.rendererRuntime.surfaceHeight = rendererRuntime.surfaceHeight;
+    diagnostics.rendererRuntime.modelSourceFormat = rendererRuntime.modelSourceFormat;
     for (const auto& descriptor : Win32MouseCompanionRendererBackendRegistry::Instance().ListByPriority()) {
         PetVisualHostRendererBackendCatalogEntry entry{};
         entry.name = descriptor.name;
