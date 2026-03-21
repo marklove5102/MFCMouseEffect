@@ -271,6 +271,7 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClInclude Include="Platform\PlatformEntryRunner.h" />
     <ClInclude Include="Platform\PlatformTarget.h" />
     <ClInclude Include="Platform\PlatformLaunchAtStartup.h" />
+    <ClInclude Include="Platform\windows\System\Win32LaunchAtStartup.h" />
     <ClInclude Include="Platform\PlatformStartupOptionsFactory.h" />
     <ClInclude Include="Platform\PlatformWasmRuntimeFactory.h" />
     <ClInclude Include="Platform\PlatformTextEncoding.h" />
@@ -557,6 +558,7 @@ if exist "$(ProjectDir)Runtime\Dawn\d3dcompiler_47.dll" copy /Y "$(ProjectDir)Ru
     <ClCompile Include="MouseFx\Core\Control\CommandHandler.ApplySettings.AutomationWasm.cpp" />
     <ClCompile Include="MouseFx\Core\Control\CommandHandler.ApplySettings.Visual.cpp" />
     <ClCompile Include="Platform\windows\System\Win32RuntimeEnvironment.cpp" />
+    <ClCompile Include="Platform\windows\System\Win32LaunchAtStartup.cpp" />
     <ClCompile Include="MouseFx\Core\Control\DispatchRouter.cpp" />
     <ClCompile Include="MouseFx\Core\Control\DispatchRouter.Pointer.cpp" />
     <ClCompile Include="MouseFx\Effects\RippleBasedHoldRuntime.cpp" />

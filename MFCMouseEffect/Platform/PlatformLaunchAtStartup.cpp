@@ -4,6 +4,10 @@
 
 #include "Platform/PlatformTarget.h"
 
+#if MFX_PLATFORM_WINDOWS
+#include "Platform/windows/System/Win32LaunchAtStartup.h"
+#endif
+
 #if MFX_PLATFORM_MACOS
 #include "Platform/macos/System/MacosLaunchAtStartupSwiftBridge.h"
 #endif
@@ -14,7 +18,7 @@
 namespace mousefx::platform {
 
 bool IsLaunchAtStartupSupported() {
-#if MFX_PLATFORM_MACOS
+#if MFX_PLATFORM_WINDOWS || MFX_PLATFORM_MACOS
     return true;
 #else
     return false;
@@ -41,6 +45,8 @@ bool ConfigureLaunchAtStartup(bool enabled, std::string* outError) {
         }
     }
     return false;
+#elif MFX_PLATFORM_WINDOWS
+    return windows::ConfigureLaunchAtStartup(enabled, outError);
 #else
     if (outError) {
         *outError = "launch_at_startup_not_supported";
@@ -69,6 +75,8 @@ bool SyncLaunchAtStartupManifest(bool enabled, std::string* outError) {
         }
     }
     return false;
+#elif MFX_PLATFORM_WINDOWS
+    return windows::SyncLaunchAtStartupManifest(enabled, outError);
 #else
     if (outError) {
         *outError = "launch_at_startup_not_supported";

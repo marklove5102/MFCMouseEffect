@@ -151,6 +151,12 @@
   - Expected behavior is now:
     - manual launch repairs stale plist paths (for example from repo binary to `/Applications/...`) without spawning a second instance
     - login launch uses the already-written LaunchAgent and should surface the menu-bar `MFX` item while staying alive
+- Windows launch-at-startup contract (active):
+  - Problem classification: this was a capability gap, not a regression. The Web setting and controller apply path already existed, but `PlatformLaunchAtStartup` only had a macOS native implementation and returned `launch_at_startup_not_supported` on Windows.
+  - Windows now reconciles launch-at-startup through `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` using the per-user value `MFCMouseEffect`.
+  - The stored command is the fully quoted current executable path, so a later normal app launch can repair stale paths after binary relocation.
+  - `ConfigureLaunchAtStartup` and `SyncLaunchAtStartupManifest` intentionally share the same idempotent registry reconciliation on Windows because there is no separate LaunchAgent-style manifest/runtime split to preserve.
+  - Detailed contract: `docs/architecture/windows-launch-at-startup-contract.md`.
 - macOS portable packaging (active):
   - `./mfx package` is now the preferred user entrypoint for a full build + macOS `.app` package; `./mfx package-no-build` skips both core and WebUI rebuilds, and `./mfx pack` / `./mfx pkg` stay as compatibility aliases.
   - `run/start/package` now share the same macOS core/WebUI preparation helper (`mfx_manual_prepare_core_host_binary`) instead of carrying separate build paths; this keeps full-build vs skip-build behavior consistent across local run and packaging flows.

@@ -465,6 +465,9 @@
     <ClInclude Include="Platform\PlatformLaunchAtStartup.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\windows\System\Win32LaunchAtStartup.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
     <ClInclude Include="Platform\PlatformStartupOptionsFactory.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
@@ -1005,6 +1008,9 @@
       <Filter>源文件\MouseFx</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\System\Win32RuntimeEnvironment.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\System\Win32LaunchAtStartup.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Effects\Win32HoldQuantumHaloGpuV2DirectRuntime.cpp">
