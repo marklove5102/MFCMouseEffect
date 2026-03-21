@@ -21,6 +21,7 @@
 #include "MouseFx/Core/System/IKeyboardInjector.h"
 #include "MouseFx/Core/Overlay/IInputIndicatorOverlay.h"
 #include "MouseFx/Core/Control/InputIndicatorWasmDispatchFeature.h"
+#include "MouseFx/Core/Control/IPetVisualHost.h"
 #include "MouseFx/Core/Control/MouseCompanionPluginHostPhase0.h"
 #include "MouseFx/Core/Control/MouseCompanionPluginHostV1.h"
 #include "MouseFx/Core/Automation/InputAutomationEngine.h"
@@ -353,6 +354,9 @@ private:
     void ShutdownPetVisualHost();
     bool TryLoadPetModelIntoVisualHost(const std::string& modelPath);
     bool TryLoadPetActionLibraryIntoVisualHost(const std::string& actionLibraryPath);
+    bool TryLoadPetAppearanceProfileIntoVisualHost(const std::string& appearanceProfilePath);
+    void TryApplyPetModelToVisualHost();
+    void TryApplyPetActionLibraryToVisualHost();
     void ApplyPetVisualFollowProfile();
     void TryApplyPetAppearanceToVisualHost();
     bool EnsurePetVisualPoseBinding();
@@ -458,13 +462,11 @@ private:
     mutable std::mutex mouseCompanionRuntimeStatusMutex_{};
     MouseCompanionRuntimeStatus mouseCompanionRuntimeStatus_{};
     InputAutomationEngine inputAutomationEngine_{};
-    void* petVisualHostHandle_{nullptr};
+    std::unique_ptr<IPetVisualHost> petVisualHost_{};
     std::string loadedPetModelPath_{};
     std::string loadedPetActionLibraryPath_{};
     std::string loadedPetEffectProfilePath_{};
     std::string loadedPetAppearanceProfilePath_{};
-    std::vector<std::string> petVisualSkeletonNames_{};
-    std::vector<const char*> petVisualSkeletonNamePtrs_{};
     bool petVisualPoseBindingConfigured_{false};
     bool petVisualPoseBindingAttempted_{false};
     bool petDragging_ = false;

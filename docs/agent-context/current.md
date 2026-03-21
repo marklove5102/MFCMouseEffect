@@ -60,6 +60,19 @@
   - Runtime diagnostics expose plugin-host fields (`plugin_host_ready`, `active_plugin_id`, `compatibility_status`, `plugin_event_count`).
   - `MouseCompanionPluginHostV1` builtin plugin bridge is now active in parallel: typed `PetInputEvent / PetRuntimeConfig / PetPoseFrame` plus `Initialize / OnInput / Tick / SamplePose / OnConfigChanged / Shutdown` host surface are live, and the builtin native plugin now receives `AppController`'s resolved action/head-tint/pose-frame snapshot each frame.
   - Current boundary: v1 builtin plugin is now a real unified snapshot sink, but it still does not drive visible pet rendering yet; Phase0 diagnostics remain the stable user-facing runtime contract until final render-path migration starts.
+  - Cross-platform visual-host abstraction is now active: `AppController` no longer owns a raw macOS pet panel handle directly. Shared `IPetVisualHost` + `PlatformPetVisualHost` factory now isolate platform pet rendering entrypoints so Windows pet work can grow without adding more controller-side `#if` branching.
+  - Windows pet Phase1.5 groundwork is now active: `Platform/windows/Pet/Win32MouseCompanionVisualHost.*` now drives a real transparent layered host window plus a dedicated placeholder renderer. The Windows host already consumes shared placement config (`relative / absolute / fixed_bottom_left`, `strict / soft / free`, target-monitor resolution), while model loading and richer pose playback remain deferred.
+  - Windows placeholder stability pass (active): when the visual host has not yet received a real pointer sample, `relative` placement now falls back to the target-monitor center instead of screen origin, so first-show placement no longer snaps near `(0,0)` before the first move event. Placeholder action silhouettes are also more differentiated now: `click` uses squash, `hold` uses a deeper squat + short eyes, `scroll` uses signed lean, `drag` widens paw spread, and `follow` pushes ear/leg motion further.
+  - Windows placeholder runtime-consumption pass (active): the placeholder renderer now consumes the shared `PetPoseFrame` payload and applies semantic offsets to ear/hand/leg parts instead of reacting only to action labels. It also exposes lightweight readiness badges for model-path, action-library-path, and pose-binding/pose-sample availability so Windows visual host state is now partially observable without a real 3D renderer.
+  - Windows non-GPU clip sampling pass (active): `pet-actions.json` is now parsed on Windows through a dedicated action-library module, and sampled clip output already feeds placeholder body/head squash and lean. This keeps action-library parsing outside the renderer and lets the current Windows path reuse the same action asset contract before any future real-model renderer lands.
+  - Windows appearance-profile host path is now active: `pet-appearance.json` reload no longer needs a full pet-model reload cycle, and appearance runtime status is updated through an explicit visual-host apply path instead of being hidden inside `TryLoadDefaultPetModel()`.
+  - Windows pet asset-apply normalization is in progress: `model`, `action_library`, and `appearance_profile` are being split into separate controller-to-host apply lanes so later pet asset growth does not keep expanding one monolithic reload function.
+  - Windows model asset lane now also updates its own runtime status directly (`loaded_model_path`, `loaded_model_source_format`, `model_load_error`) instead of leaving those fields coupled only to the aggregate bootstrapping path.
+  - Windows pet asset coordination helper is now active: `PetVisualAssetCoordinator` owns the repeated non-GPU asset-apply control flow, while `AppController` keeps path resolution and runtime-status ownership.
+  - Windows presenter split has started: pet window-bound geometry/clamp resolution now lives in `Win32MouseCompanionPresenter`, which keeps layout policy separate from layered-window plumbing.
+  - Windows visual-runtime helper is now active: `Win32MouseCompanionVisualRuntime` owns the repeated host-side state mutation for follow/action/pose updates, which keeps `Win32MouseCompanionVisualHost` closer to a coordinator role.
+  - Windows placeholder scene helper is now active: pre-render interpretation of `action/pose/appearance` state has started moving out of `Win32MouseCompanionPlaceholderRenderer` into a separate draw-model builder, so the renderer is trending toward paint-only responsibility.
+  - Windows action-runtime helper is now active: clip timeline selection and sampling are no longer owned directly by `Win32MouseCompanionVisualHost`; active action key / restart policy / sampled clip refresh now live behind a dedicated helper.
   - Phase1 click-first backend semantics are active:
   - click gate: `press<=220ms && travel<=10px` with scroll suppression window.
   - pet placement and pet action semantics are now separate contracts: walking `follow` remains an action lane, while panel placement is moving to the shared `relative / absolute` contract aligned with `Input Indicator` (legacy `fixed_bottom_left / follow` values remain accepted during migration).
@@ -210,6 +223,10 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/p2-capability-index.md`
 - Mouse companion plugin roadmap:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md`
+- Windows mouse companion Phase1 plan:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-phase1-plan.md`
+- Windows mouse companion manual checklist:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/ops/windows-mouse-companion-manual-checklist.md`
 - Mouse companion backend reset contract:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-backend-reset-contract.zh-CN.md`
 - Input indicator capability references:

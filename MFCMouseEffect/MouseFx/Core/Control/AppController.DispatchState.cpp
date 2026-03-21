@@ -8,10 +8,10 @@
 #include <string>
 
 #include "MouseFx/Core/Overlay/InputIndicatorKeyFilter.h"
+#include "MouseFx/Core/Control/IPetVisualHost.h"
 #include "Platform/PlatformTarget.h"
 #if MFX_PLATFORM_MACOS
 #include "Platform/macos/Effects/MacosOverlayRenderSupport.h"
-#include "Platform/macos/Pet/MacosMouseCompanionPhase1SwiftBridge.h"
 #elif MFX_PLATFORM_WINDOWS
 #include "Platform/windows/Overlay/Win32OverlayTimerSupport.h"
 #endif
@@ -1112,8 +1112,7 @@ void AppController::DispatchPetHoldEnd(const ScreenPoint& pt) {
 }
 
 void AppController::TickPetVisualFrame() {
-#if MFX_PLATFORM_MACOS
-    if (!petVisualHostHandle_ || !config_.mouseCompanion.enabled) {
+    if (!petVisualHost_ || !petVisualHost_->IsActive() || !config_.mouseCompanion.enabled) {
         return;
     }
 
@@ -1149,9 +1148,6 @@ void AppController::TickPetVisualFrame() {
     }
 
     UpdatePetVisualState(pt, actionCode, actionIntensity, petClickStreak_.tintAmount);
-#else
-    (void)this;
-#endif
 }
 
 ScreenPoint AppController::ResolvePetRuntimeCursorPoint(
@@ -1235,20 +1231,17 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
     pluginPoseFrame.actionIntensity = clampedIntensity;
     pluginPoseFrame.headTintAmount = clampedTint;
 
-#if MFX_PLATFORM_MACOS
-    if (petVisualHostHandle_ && config_.mouseCompanion.enabled) {
-        mfx_macos_mouse_companion_panel_update_v1(
-            petVisualHostHandle_,
+    if (petVisualHost_ && petVisualHost_->IsActive() && config_.mouseCompanion.enabled) {
+        petVisualHost_->Update(PetVisualHostUpdate{
+            pt,
             actionCode,
             hostActionIntensity,
-            clampedTint);
+            clampedTint,
+        });
         const MouseCompanionConfig activeConfig = ResolveActiveMouseCompanionConfig(config_.mouseCompanion);
         const PetVisualMotionProfile& visualProfile =
             ResolvePetVisualMotionProfile(activeConfig.useTestProfile);
-        mfx_macos_mouse_companion_panel_move_follow_v1(
-            petVisualHostHandle_,
-            pt.x,
-            pt.y);
+        petVisualHost_->MoveFollow(pt);
 
         if (EnsurePetVisualPoseBinding()) {
             if (petVisualPoseRuntime_.lastTickMs == 0 || nowTickMs <= petVisualPoseRuntime_.lastTickMs) {
@@ -1436,26 +1429,16 @@ void AppController::UpdatePetVisualState(const ScreenPoint& pt, int actionCode, 
                 pluginPoseFrame.samples.push_back(sample);
             }
 
-            mfx_macos_mouse_companion_panel_apply_pose_v1(
-                petVisualHostHandle_,
-                boneIndices.data(),
-                positions.data(),
-                rotations.data(),
-                scales.data(),
-                kPetPoseBoneCount);
+            petVisualHost_->ApplyPose(pluginPoseFrame);
         }
     }
-#else
-    (void)pt;
-#endif
 
     CommitMouseCompanionPluginResolvedFrame(pluginPoseFrame);
     petPluginHostV1_.SamplePose(&pluginPoseFrame);
 }
 
 bool AppController::EnsurePetVisualPoseBinding() {
-#if MFX_PLATFORM_MACOS
-    if (!petVisualHostHandle_) {
+    if (!petVisualHost_ || !petVisualHost_->IsActive()) {
         petVisualPoseBindingAttempted_ = false;
         std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
         mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
@@ -1464,24 +1447,17 @@ bool AppController::EnsurePetVisualPoseBinding() {
     }
     if (!petVisualPoseBindingAttempted_) {
         petVisualPoseBindingAttempted_ = true;
-        petVisualPoseBindingConfigured_ = mfx_macos_mouse_companion_panel_configure_pose_binding_v1(
-            petVisualHostHandle_,
-            kPetPoseBoneNames.data(),
-            kPetPoseBoneCount);
+        std::vector<std::string> boneNames;
+        boneNames.reserve(kPetPoseBoneNames.size());
+        for (const char* name : kPetPoseBoneNames) {
+            boneNames.emplace_back(name ? name : "");
+        }
+        petVisualPoseBindingConfigured_ = petVisualHost_->ConfigurePoseBinding(boneNames);
     }
     std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
     mouseCompanionRuntimeStatus_.poseBindingConfigured = petVisualPoseBindingConfigured_;
     mouseCompanionRuntimeStatus_.skeletonBoneCount = petVisualPoseBindingConfigured_ ? kPetPoseBoneCount : 0;
     return petVisualPoseBindingConfigured_;
-#else
-    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-    mouseCompanionRuntimeStatus_.poseBindingConfigured = false;
-    mouseCompanionRuntimeStatus_.skeletonBoneCount = 0;
-    return false;
-#endif
-}
-
-void AppController::TryApplyPetAppearanceToVisualHost() {
 }
 
 void AppController::RememberLastPointerPoint(const ScreenPoint& pt) {

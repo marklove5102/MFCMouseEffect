@@ -4,16 +4,15 @@
 
 #include "MouseFx/Core/Config/ConfigPathResolver.h"
 #include "MouseFx/Core/Config/EffectConfigInternal.h"
+#include "MouseFx/Core/Control/PetVisualAssetCoordinator.h"
 #include "MouseFx/Core/Overlay/OverlayHostService.h"
 #include "MouseFx/Core/System/GdiPlusSession.h"
 #include "MouseFx/Renderers/Hold/Presentation/QuantumHaloPresenterSelection.h"
 #include "MouseFx/Styles/ThemeStyle.h"
 #include "MouseFx/Utils/StringUtils.h"
+#include "Platform/PlatformPetVisualHost.h"
 #include "Platform/PlatformRuntimeEnvironment.h"
 #include "Platform/PlatformTarget.h"
-#if MFX_PLATFORM_MACOS
-#include "Platform/macos/Pet/MacosMouseCompanionPhase1SwiftBridge.h"
-#endif
 
 #include <filesystem>
 #include <vector>
@@ -199,26 +198,27 @@ void ResetActionCoverageStatusFields(AppController::MouseCompanionRuntimeStatus*
     status->actionCoverageActions.clear();
 }
 
-int ResolveMouseCompanionEdgeClampModeCode(const std::string& mode) {
-    const std::string normalized = ToLowerAscii(TrimAscii(mode));
-    if (normalized == "strict") {
-        return 0;
-    }
-    if (normalized == "free") {
-        return 2;
-    }
-    return 1; // soft
-}
-
-int ResolveMouseCompanionPositionModeCode(const std::string& mode) {
-    const std::string normalized = ToLowerAscii(TrimAscii(mode));
-    if (normalized == "relative" || normalized == "follow") {
-        return 0;
-    }
-    if (normalized == "absolute") {
-        return 1;
-    }
-    return 2; // fixed_bottom_left legacy compatibility
+MouseCompanionPetRuntimeConfig BuildPetVisualHostConfig(const MouseCompanionConfig& config) {
+    MouseCompanionPetRuntimeConfig runtime{};
+    runtime.enabled = config.enabled;
+    runtime.useTestProfile = config.useTestProfile;
+    runtime.sizePx = config.sizePx;
+    runtime.offsetX = config.offsetX;
+    runtime.offsetY = config.offsetY;
+    runtime.absoluteX = config.absoluteX;
+    runtime.absoluteY = config.absoluteY;
+    runtime.pressLiftPx = config.pressLiftPx;
+    runtime.smoothingPercent = config.smoothingPercent;
+    runtime.followThresholdPx = config.followThresholdPx;
+    runtime.releaseHoldMs = config.releaseHoldMs;
+    runtime.clickStreakBreakMs = config.clickStreakBreakMs;
+    runtime.headTintPerClick = static_cast<float>(config.headTintPerClick);
+    runtime.headTintMax = static_cast<float>(config.headTintMax);
+    runtime.headTintDecayPerSecond = static_cast<float>(config.headTintDecayPerSecond);
+    runtime.positionMode = config.positionMode;
+    runtime.targetMonitor = config.targetMonitor;
+    runtime.edgeClampMode = config.edgeClampMode;
+    return runtime;
 }
 
 } // namespace
@@ -433,61 +433,17 @@ void AppController::TryLoadDefaultPetModel() {
     EnsurePetVisualHost();
     ApplyPetVisualFollowProfile();
 
-    const bool visualHostActive = (petVisualHostHandle_ != nullptr);
-    bool loadedVisualModel = false;
-    std::filesystem::path loadedVisualModelPath;
-    bool loadedActionLibrary = false;
-    std::filesystem::path loadedActionLibraryPath;
-    if (visualHostActive) {
-        const std::filesystem::path preferredModelPath =
-            ResolveExistingDefaultPetModelPath(companion.modelPath);
-        const std::vector<std::filesystem::path> modelCandidates =
-            BuildPetVisualModelCandidatePaths(
-                preferredModelPath,
-                "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb");
-        for (const auto& candidate : modelCandidates) {
-            if (candidate.empty()) {
-                continue;
-            }
-            if (TryLoadPetModelIntoVisualHost(candidate.string())) {
-                loadedVisualModel = true;
-                loadedVisualModelPath = candidate;
-                break;
-            }
-        }
-        if (loadedVisualModel) {
-            loadedPetModelPath_ = loadedVisualModelPath.string();
-        }
-
-        const std::filesystem::path preferredActionLibraryPath =
-            ResolveExistingDefaultPetActionLibraryPath(companion.actionLibraryPath);
-        if (!preferredActionLibraryPath.empty() &&
-            TryLoadPetActionLibraryIntoVisualHost(preferredActionLibraryPath.string())) {
-            loadedActionLibrary = true;
-            loadedActionLibraryPath = preferredActionLibraryPath;
-            loadedPetActionLibraryPath_ = loadedActionLibraryPath.string();
-        }
-    }
+    const bool visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
+    TryApplyPetModelToVisualHost();
+    TryApplyPetActionLibraryToVisualHost();
+    TryApplyPetAppearanceToVisualHost();
+    const bool loadedVisualModel = !loadedPetModelPath_.empty();
+    const bool loadedActionLibrary = !loadedPetActionLibraryPath_.empty();
+    const bool loadedAppearanceProfile = !loadedPetAppearanceProfilePath_.empty();
     const bool poseBindingReady = visualHostActive && EnsurePetVisualPoseBinding();
-#if MFX_PLATFORM_MACOS
     if (visualHostActive) {
-        mfx_macos_mouse_companion_panel_update_v1(
-            petVisualHostHandle_,
-            0,
-            0.0f,
-            0.0f);
-    }
-#endif
-
-    std::string loadedModelSourceFormat = "phase1_placeholder";
-    if (loadedVisualModel) {
-        std::string ext = ToLowerAscii(TrimAscii(loadedVisualModelPath.extension().string()));
-        if (!ext.empty() && ext[0] == '.') {
-            ext.erase(0, 1);
-        }
-        if (!ext.empty()) {
-            loadedModelSourceFormat = ext;
-        }
+        PetVisualHostUpdate idleUpdate{};
+        petVisualHost_->Update(idleUpdate);
     }
 
     {
@@ -498,27 +454,24 @@ void AppController::TryLoadDefaultPetModel() {
         mouseCompanionRuntimeStatus_.modelLoaded = loadedVisualModel;
         mouseCompanionRuntimeStatus_.actionLibraryLoaded = loadedActionLibrary;
         mouseCompanionRuntimeStatus_.effectProfileLoaded = false;
-        mouseCompanionRuntimeStatus_.appearanceProfileLoaded = false;
+        mouseCompanionRuntimeStatus_.appearanceProfileLoaded = loadedAppearanceProfile;
         mouseCompanionRuntimeStatus_.poseBindingConfigured = poseBindingReady;
         mouseCompanionRuntimeStatus_.skeletonBoneCount = poseBindingReady ? 6 : 0;
-        mouseCompanionRuntimeStatus_.visualModelPath =
-            loadedVisualModel ? loadedPetModelPath_ : (visualHostActive ? "phase1://placeholder/usagi" : "");
-        mouseCompanionRuntimeStatus_.loadedModelPath = loadedVisualModel ? loadedPetModelPath_ : "";
-        mouseCompanionRuntimeStatus_.loadedModelSourceFormat = loadedModelSourceFormat;
         mouseCompanionRuntimeStatus_.loadedActionLibraryPath =
             loadedActionLibrary ? loadedPetActionLibraryPath_ : "";
         mouseCompanionRuntimeStatus_.loadedEffectProfilePath.clear();
-        mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath.clear();
+        mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath =
+            loadedAppearanceProfile ? loadedPetAppearanceProfilePath_ : "";
         mouseCompanionRuntimeStatus_.modelConvertedToCanonical = false;
         mouseCompanionRuntimeStatus_.modelImportDiagnostics.clear();
-        mouseCompanionRuntimeStatus_.visualModelLoadError =
-            visualHostActive ? "" : "phase1_swift_host_unavailable";
-        mouseCompanionRuntimeStatus_.modelLoadError =
-            loadedVisualModel ? "" : "phase2_visual_model_fallback_placeholder";
         mouseCompanionRuntimeStatus_.actionLibraryLoadError =
             loadedActionLibrary ? "" : "phase2_visual_action_library_unavailable";
         mouseCompanionRuntimeStatus_.effectProfileLoadError = "phase1_effect_profile_pending";
-        mouseCompanionRuntimeStatus_.appearanceProfileLoadError = "phase1_appearance_profile_pending";
+        mouseCompanionRuntimeStatus_.appearanceProfileLoadError =
+            loadedAppearanceProfile
+                ? ""
+                : (visualHostActive ? "phase1_appearance_profile_unavailable"
+                                    : "phase1_visual_host_unavailable");
         mouseCompanionRuntimeStatus_.actionCoverageReady = false;
         mouseCompanionRuntimeStatus_.actionCoverageExpectedActionCount = 0;
         mouseCompanionRuntimeStatus_.actionCoverageCoveredActionCount = 0;
@@ -539,11 +492,11 @@ void AppController::TryLoadDefaultPetModel() {
 }
 
 void AppController::TryLoadDefaultPetActionLibrary() {
-    TryLoadDefaultPetModel();
+    TryApplyPetActionLibraryToVisualHost();
 }
 
 void AppController::TryLoadDefaultPetAppearanceProfile() {
-    TryLoadDefaultPetModel();
+    TryApplyPetAppearanceToVisualHost();
 }
 
 void AppController::TryLoadDefaultPetEffectProfile() {
@@ -567,55 +520,38 @@ void AppController::RecomputePetActionCoverageStatus() {
 }
 
 void AppController::EnsurePetVisualHost() {
-#if MFX_PLATFORM_MACOS
-    if (!petVisualHostHandle_) {
-        const MouseCompanionConfig companion = config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
-        petVisualHostHandle_ = mfx_macos_mouse_companion_panel_create_v1(
-            companion.sizePx,
-            companion.offsetX,
-            companion.offsetY);
+    const MouseCompanionConfig companion = config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
+    if (!petVisualHost_) {
+        petVisualHost_ = platform::CreatePetVisualHost();
     }
-    if (petVisualHostHandle_) {
+    if (petVisualHost_ && !petVisualHost_->IsActive()) {
+        petVisualHost_->Start(BuildPetVisualHostConfig(companion));
+    }
+    if (petVisualHost_ && petVisualHost_->IsActive()) {
         ApplyPetVisualFollowProfile();
-        mfx_macos_mouse_companion_panel_show_v1(petVisualHostHandle_);
+        petVisualHost_->Show();
     }
-#endif
     std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
-    mouseCompanionRuntimeStatus_.visualHostActive = (petVisualHostHandle_ != nullptr);
+    mouseCompanionRuntimeStatus_.visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
 }
 
 void AppController::ApplyPetVisualFollowProfile() {
-#if MFX_PLATFORM_MACOS
-    if (!petVisualHostHandle_) {
+    if (!petVisualHost_ || !petVisualHost_->IsActive()) {
         return;
     }
     const MouseCompanionConfig companion = config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
-    mfx_macos_mouse_companion_panel_configure_v1(
-        petVisualHostHandle_,
-        companion.sizePx,
-        ResolveMouseCompanionPositionModeCode(companion.positionMode),
-        ResolveMouseCompanionEdgeClampModeCode(companion.edgeClampMode),
-        companion.offsetX,
-        companion.offsetY,
-        companion.absoluteX,
-        companion.absoluteY,
-        companion.targetMonitor.c_str());
-#endif
+    petVisualHost_->Configure(BuildPetVisualHostConfig(companion));
 }
 
 void AppController::ShutdownPetVisualHost() {
-#if MFX_PLATFORM_MACOS
-    if (petVisualHostHandle_) {
-        mfx_macos_mouse_companion_panel_hide_v1(petVisualHostHandle_);
-        mfx_macos_mouse_companion_panel_release_v1(petVisualHostHandle_);
+    if (petVisualHost_) {
+        petVisualHost_->Hide();
+        petVisualHost_->Shutdown();
     }
-#endif
-    petVisualHostHandle_ = nullptr;
+    petVisualHost_.reset();
     petVisualPoseBindingConfigured_ = false;
     petVisualPoseBindingAttempted_ = false;
     petVisualPoseRuntime_ = PetVisualPoseRuntimeState{};
-    petVisualSkeletonNamePtrs_.clear();
-    petVisualSkeletonNames_.clear();
     std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
     mouseCompanionRuntimeStatus_.visualHostActive = false;
     mouseCompanionRuntimeStatus_.visualModelLoaded = false;
@@ -625,39 +561,108 @@ void AppController::ShutdownPetVisualHost() {
 }
 
 bool AppController::TryLoadPetModelIntoVisualHost(const std::string& modelPath) {
-#if MFX_PLATFORM_MACOS
-    if (!petVisualHostHandle_) {
+    if (!petVisualHost_ || !petVisualHost_->IsActive()) {
         return false;
     }
     const std::string trimmed = TrimAscii(modelPath);
     if (trimmed.empty()) {
         return false;
     }
-    return mfx_macos_mouse_companion_panel_load_model_v1(
-        petVisualHostHandle_,
-        trimmed.c_str());
-#else
-    (void)modelPath;
-    return false;
-#endif
+    return petVisualHost_->LoadModel(trimmed);
 }
 
 bool AppController::TryLoadPetActionLibraryIntoVisualHost(const std::string& actionLibraryPath) {
-#if MFX_PLATFORM_MACOS
-    if (!petVisualHostHandle_) {
+    if (!petVisualHost_ || !petVisualHost_->IsActive()) {
         return false;
     }
     const std::string trimmed = TrimAscii(actionLibraryPath);
     if (trimmed.empty()) {
         return false;
     }
-    return mfx_macos_mouse_companion_panel_load_action_library_v1(
-        petVisualHostHandle_,
-        trimmed.c_str());
-#else
-    (void)actionLibraryPath;
-    return false;
-#endif
+    return petVisualHost_->LoadActionLibrary(trimmed);
+}
+
+bool AppController::TryLoadPetAppearanceProfileIntoVisualHost(const std::string& appearanceProfilePath) {
+    if (!petVisualHost_ || !petVisualHost_->IsActive()) {
+        return false;
+    }
+    const std::string trimmed = TrimAscii(appearanceProfilePath);
+    if (trimmed.empty()) {
+        return false;
+    }
+    return petVisualHost_->LoadAppearanceProfile(trimmed);
+}
+
+void AppController::TryApplyPetModelToVisualHost() {
+    loadedPetModelPath_.clear();
+
+    const MouseCompanionConfig companion =
+        config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
+    const bool visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
+    const std::filesystem::path preferredModelPath =
+        ResolveExistingDefaultPetModelPath(companion.modelPath);
+    const PetVisualAssetApplyResult result = ApplyPetVisualModelAsset(
+        companion.enabled,
+        visualHostActive,
+        BuildPetVisualModelCandidatePaths(
+            preferredModelPath,
+            "MFCMouseEffect/Assets/Pet3D/source/pet-main.glb"),
+        [this](const std::string& path) { return TryLoadPetModelIntoVisualHost(path); });
+    loadedPetModelPath_ = result.loadedPath;
+
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.modelLoaded = result.loaded;
+    mouseCompanionRuntimeStatus_.loadedModelPath = result.loadedPath;
+    mouseCompanionRuntimeStatus_.loadedModelSourceFormat =
+        ResolvePetVisualModelSourceFormat(result.loadedPath);
+    mouseCompanionRuntimeStatus_.visualModelPath =
+        result.loaded ? result.loadedPath : (visualHostActive ? "phase1://placeholder/usagi" : "");
+    mouseCompanionRuntimeStatus_.visualModelLoadError =
+        visualHostActive ? "" : "phase1_visual_host_unavailable";
+    mouseCompanionRuntimeStatus_.modelLoadError = result.loaded ? "" : result.loadError;
+}
+
+void AppController::TryApplyPetActionLibraryToVisualHost() {
+    loadedPetActionLibraryPath_.clear();
+
+    const MouseCompanionConfig companion =
+        config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
+    const bool visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
+    const PetVisualAssetApplyResult result = ApplyPetVisualSinglePathAsset(
+        companion.enabled,
+        visualHostActive,
+        ResolveExistingDefaultPetActionLibraryPath(companion.actionLibraryPath),
+        [this](const std::string& path) { return TryLoadPetActionLibraryIntoVisualHost(path); },
+        "phase2_visual_action_library_missing",
+        "phase2_visual_action_library_unavailable");
+    loadedPetActionLibraryPath_ = result.loadedPath;
+
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.actionLibraryLoaded = result.loaded;
+    mouseCompanionRuntimeStatus_.loadedActionLibraryPath = result.loadedPath;
+    mouseCompanionRuntimeStatus_.actionLibraryLoadError = result.loaded ? "" : result.loadError;
+}
+
+void AppController::TryApplyPetAppearanceToVisualHost() {
+    loadedPetAppearanceProfilePath_.clear();
+
+    const MouseCompanionConfig companion =
+        config_internal::SanitizeMouseCompanionConfig(config_.mouseCompanion);
+    const bool visualHostActive = petVisualHost_ && petVisualHost_->IsActive();
+    const PetVisualAssetApplyResult result = ApplyPetVisualSinglePathAsset(
+        companion.enabled,
+        visualHostActive,
+        ResolveExistingDefaultPetAppearanceProfilePath(companion.appearanceProfilePath),
+        [this](const std::string& path) { return TryLoadPetAppearanceProfileIntoVisualHost(path); },
+        "phase1_appearance_profile_missing",
+        "phase1_appearance_profile_unavailable");
+    loadedPetAppearanceProfilePath_ = result.loadedPath;
+
+    std::lock_guard<std::mutex> guard(mouseCompanionRuntimeStatusMutex_);
+    mouseCompanionRuntimeStatus_.appearanceProfileLoaded = result.loaded;
+    mouseCompanionRuntimeStatus_.loadedAppearanceProfilePath = result.loadedPath;
+    mouseCompanionRuntimeStatus_.appearanceProfileLoadError =
+        result.loaded ? "" : result.loadError;
 }
 
 } // namespace mousefx
