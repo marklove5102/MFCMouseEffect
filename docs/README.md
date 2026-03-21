@@ -73,15 +73,17 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
   - `route` always keeps first-read baseline (P0 + P1) and adds keyword-matched P2 docs under token budget.
   - `check` fails when markdown/AGENTS changed but index was not refreshed.
 
-## macOS Local Commands
+## Local Commands
 ```bash
 ./mfx run
 # skips core/WebUI rebuild
 ./mfx run-no-build
 ./mfx run-no-build --seconds 30
-# full build + macOS ARM64 .app/zip/dmg package
+# full build + native package for current host
+# macOS: .app/zip/dmg
+# Windows: installer exe
 ./mfx package
-# skips core/WebUI rebuild while packaging
+# skips rebuild while packaging
 ./mfx package-no-build
 # same as package
 ./mfx pkg
@@ -99,6 +101,12 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
 ./tools/platform/regression/run-macos-objcxx-surface-regression.sh
 ./tools/platform/regression/run-theme-catalog-surface-regression.sh
+```
+
+Windows terminal wrapper:
+```powershell
+.\mfx.cmd package
+.\mfx.cmd package-no-build
 ```
 
 ## Note

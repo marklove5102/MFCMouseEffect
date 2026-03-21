@@ -74,15 +74,17 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
   - `route` 固定包含首读基线（P0 + P1），再按关键词和 token 预算补充 P2。
   - `check` 在 AGENTS/docs 已变化但未刷新索引时失败。
 
-## macOS 本地命令
+## 本地命令
 ```bash
 ./mfx run
 # 跳过 core/WebUI 编译
 ./mfx run-no-build
 ./mfx run-no-build --seconds 30
-# 完整编译后打包 macOS ARM64 .app + zip + dmg
+# 完整编译后打包当前宿主平台原生产物
+# macOS: .app + zip + dmg
+# Windows: installer exe
 ./mfx package
-# 跳过 core/WebUI 编译直接打包
+# 跳过编译直接打包
 ./mfx package-no-build
 # 等价于 package
 ./mfx pkg
@@ -100,6 +102,12 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 ./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
 ./tools/platform/regression/run-macos-objcxx-surface-regression.sh
 ./tools/platform/regression/run-theme-catalog-surface-regression.sh
+```
+
+Windows 终端包装器：
+```powershell
+.\mfx.cmd package
+.\mfx.cmd package-no-build
 ```
 
 ## 维护规则

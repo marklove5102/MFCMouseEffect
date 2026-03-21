@@ -18,11 +18,13 @@ Commands:
       Run macOS core host without rebuilding core/WebUI.
       Default auto stop: 30 minutes.
 
-  package [--build-dir <path>] [--output-dir <path>] [--package-name <name>] [--no-zip] [--no-dmg] [--skip-build] [--skip-webui-build]
-      Build WebUI + core host and produce macOS .app package + dmg.
+  package [platform options...]
+      Build native package for current host platform.
+      macOS: .app + zip + dmg
+      Windows: installer exe
 
-  package-no-build [--build-dir <path>] [--output-dir <path>] [--package-name <name>] [--no-zip] [--no-dmg]
-      Produce macOS .app package + dmg without rebuilding core/WebUI.
+  package-no-build [platform options...]
+      Produce native package for current host platform without rebuilding.
 
   effects [--skip-build] [--strict]
       Run macOS effects type parity selfcheck.
@@ -124,6 +126,19 @@ run_package() {
     shift
     shift
     local -a args=()
+    local package_script=""
+    case "$OSTYPE" in
+    darwin*)
+        package_script="$repo_root/tools/platform/package/build-macos-portable.sh"
+        ;;
+    msys*|cygwin*|win32*)
+        package_script="$repo_root/tools/platform/package/build-windows-installer.sh"
+        ;;
+    *)
+        echo "package is unsupported on this host platform: $OSTYPE" >&2
+        exit 2
+        ;;
+    esac
     while [[ $# -gt 0 ]]; do
         case "$1" in
         --build-dir|--output-dir|--package-name)
@@ -132,7 +147,12 @@ run_package() {
             shift 2
             ;;
         --no-zip|--no-dmg)
-            args+=("$1")
+            if [[ "$OSTYPE" == darwin* ]]; then
+                args+=("$1")
+            else
+                echo "$1 is only supported on macOS packaging" >&2
+                exit 2
+            fi
             shift
             ;;
         --skip-build)
@@ -157,7 +177,7 @@ run_package() {
         args+=(--skip-webui-build)
     fi
 
-    exec "$repo_root/tools/platform/package/build-macos-portable.sh" "${args[@]}"
+    exec "$package_script" "${args[@]}"
 }
 
 run_effects() {

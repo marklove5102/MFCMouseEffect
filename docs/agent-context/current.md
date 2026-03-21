@@ -190,6 +190,14 @@
   - Problem classification: this is a distribution-policy decision, not a runtime regression.
   - `d3dcompiler_47.dll` is no longer copied into the Windows release output or bundled into the Inno Setup installer.
   - Current policy is to rely on the system-provided Direct3D compiler runtime instead of side-loading a repo-shipped copy, because the project wants to avoid forcing one bundled compiler DLL across different target machines.
+  - Installer cleanup is now active:
+    - the Inno package no longer duplicates launch-at-startup control with an installer-side `startup` task/registry write; startup policy is owned by the Web settings + native platform layer instead
+    - optional `README` / `LICENSE` files are no longer copied into the install directory; delivered payload stays runtime-focused (`exe + config + webui + runtime dlls`)
+    - Windows setup artifact naming is now normalized to `MFCMouseEffect-windows-x64-setup-<version>.exe`
+  - Packaging command is now aligned with the macOS user-facing workflow: Windows package build should be entered through `./mfx package` / `./mfx package-no-build` instead of exposing `ISCC.exe` directly as the primary workflow surface.
+  - Default Windows installer output root is now `Install/windows`, matching the install-family layout already used by `Install/macos`.
+  - Windows terminal wrapper is now active: `mfx.cmd` forwards `cmd/PowerShell` calls into the shared `mfx` bash entry, so Windows users can use `.\mfx.cmd package` / `.\mfx.cmd package-no-build` without manually invoking Git Bash.
+  - Wrapper regression fix (active): Windows `package` now disables MSYS argument path-conversion when invoking `MSBuild.exe` / `ISCC.exe`, so `.\mfx.cmd package` no longer corrupts `/t /p /nologo /v` style switches under Git Bash forwarding.
 
 ## Contracts That Must Not Drift
 - Keep stdin JSON command compatibility.

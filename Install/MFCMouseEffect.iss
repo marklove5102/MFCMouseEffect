@@ -84,8 +84,8 @@ VersionInfoProductVersion={#MyAppVersion}
 VersionInfoCopyright=Copyright (C) 2026 {#MyAppPublisher}
 VersionInfoProductName={#MyAppName}
 
-OutputDir=Output
-OutputBaseFilename=MFCMouseEffect_{#MyAppVersion}_Setup_x64
+OutputDir=windows
+OutputBaseFilename=MFCMouseEffect-windows-x64-setup-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -111,7 +111,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-Name: "startup"; Description: "Run at Windows startup"; GroupDescription: "Additional options:"
 
 [Files]
 ; Binaries + config
@@ -122,10 +121,6 @@ Source: "..\x64\Release\webui\*"; DestDir: "{app}\webui"; Flags: ignoreversion r
 ; Runtime DLLs
 Source: "..\x64\Release\webgpu_dawn.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "..\x64\Release\mfx_wasm_runtime.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
-; Docs + license (optional)
-Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
-Source: "..\README.en.md"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -133,10 +128,6 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
-[Registry]
-; Optional: Add startup entry if selected
-Root: HKA; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: """{app}\{#MyAppExeName}"" -mode tray"; Tasks: startup; Flags: uninsdeletevalue
 
 [Code]
 function KillAppIfRunning(): Boolean;
