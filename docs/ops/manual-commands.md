@@ -18,6 +18,10 @@ Keep P1 concise; add details here when needed.
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-gesture-calibration-sweep.sh --skip-build`
 
 ## Windows Mouse Companion Bring-Up
+- `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route sweep`
+- `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route proof -Event click`
+- `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Preset real-preview-smoke`
+- Windows-native bring-up should prefer the `.cmd` entry; it forwards into the PowerShell implementation and does not require Git Bash
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route sweep`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route proof --event click`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route proof --event click --expected-backend real --expect-preview-active true`

@@ -251,6 +251,14 @@ If those hidden fields change while the host is already active, the Windows visu
        - the action results that request frame advance should report:
          - `renderer_runtime_expectation_met=true`
          - `renderer_runtime_expectation_status=frame_advanced`
+   - for a reusable Windows-native entry, run:
+     - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route sweep`
+     - single-event proof is also supported:
+       - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route proof -Event click`
+     - when validating the gated real preview path, prefer:
+       - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Preset real-preview-smoke`
+     - the `.cmd` entry forwards into a PowerShell implementation, so Windows bring-up no longer depends on Git Bash just to issue proof/sweep checks
+     - the Windows-native entry exits non-zero if proof expectations are missed, so it can be used as a simple bring-up gate instead of only a logging helper
    - for a reusable Git Bash entry on Windows, run:
      - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route sweep`
      - single-event proof is also supported:
