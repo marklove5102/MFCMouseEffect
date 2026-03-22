@@ -144,6 +144,11 @@ void BuildWin32MouseCompanionRealRendererFace(
         scene.headRect.Y + scene.headRect.Height * style.underEyeContourYRatio,
         scene.headRect.Width * style.underEyeContourWidthRatio,
         scene.headRect.Height * style.underEyeContourHeightRatio);
+    scene.noseBridgeRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.noseBridgeWidthRatio * 0.5f,
+        scene.headRect.Y + scene.headRect.Height * style.noseBridgeYRatio,
+        scene.headRect.Width * style.noseBridgeWidthRatio,
+        scene.headRect.Height * style.noseBridgeHeightRatio);
     scene.eyeHighlightAlpha = profile.eyeHighlightAlpha;
     scene.whiskerStrokeWidth = 1.0f + profile.whiskerSpread * 0.35f;
 

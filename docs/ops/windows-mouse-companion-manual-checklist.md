@@ -308,8 +308,22 @@ If those hidden fields change while the host is already active, the Windows visu
          - light temple contours should make the eyes feel seated into a face volume instead of floating in open space
        - eye-socket lower structure should also read cleaner:
          - light under-eye contours should make the eye area feel continuous instead of ending abruptly under the eyeballs
-       - whole-body posture should now react too:
-         - `click` should feel slightly lifted/lightened
+       - face centerline should also read cleaner:
+         - a light nose bridge should make the forehead and muzzle feel connected instead of like two separate face islands
+      - torso mass should also read cleaner:
+        - light belly/flank contours should make the body feel less like one flat oval and help balance the newer face-detail work
+      - torso centerline should also read cleaner:
+        - a light sternum contour should make the chest-to-belly transition feel continuous instead of like separate upper/lower body islands
+      - upper torso should also read cleaner:
+        - a light upper-torso contour should make the shoulder/chest area feel more continuous instead of relying only on shoulder patches plus a chest oval
+      - rear torso should also read cleaner:
+        - light back contours should make the body feel less like only front-facing patches layered on one torso oval
+      - limb attachment should also read cleaner:
+        - light hand/leg root cuffs should make the limbs feel more anchored into the torso instead of pasted directly onto it
+      - limb outer silhouette should also read cleaner:
+        - light hand/leg silhouette bridges should make the limb-to-torso transition feel smoother instead of like a pile of local connection patches
+      - whole-body posture should now react too:
+        - `click` should feel slightly lifted/lightened
          - `hold` should feel lower and more planted
          - `follow` should feel forward/alert with more kinetic cadence
          - `scroll` should show a tilted, slightly orbiting stance

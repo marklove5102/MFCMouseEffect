@@ -146,6 +146,13 @@
   - upper-face structure now reads a bit cleaner too: a lightweight forehead pad now reinforces the brow/eye zone, so the top half of the face no longer depends only on brows and highlights
   - eye-zone side structure now reads a bit cleaner too: lightweight temple contours now reinforce the eye-socket area, so the face feels less like isolated eyes placed on a flat circle
   - eye-zone lower structure now reads a bit cleaner too: lightweight under-eye contours now reinforce the lower eye socket, so the face volume reads more continuous around the eyes
+  - face centerline now reads a bit cleaner too: a lightweight nose bridge now reinforces the brow-to-muzzle connection, so the front face reads less like separate upper/lower pads
+  - torso volume now reads a bit cleaner too: lightweight belly/flank contours now reinforce the body mass, so the preview feels less face-heavy and less like a single flat torso oval
+  - torso centerline now reads a bit cleaner too: a lightweight sternum contour now reinforces the chest-to-belly transition, so the body no longer depends only on a single chest patch plus one lower-belly oval
+  - upper torso now reads a bit cleaner too: a lightweight upper-torso contour now reinforces the shoulder-to-chest transition, so the torso volume feels more continuous from the top down
+  - back mass now reads a bit cleaner too: lightweight back contours now reinforce the torso rear plane, so the body no longer reads only as front-facing patches layered on one oval
+  - limb attachment now reads a bit cleaner too: lightweight hand/leg root cuffs now reinforce appendage entry points, so limbs feel less like rounded rectangles pasted directly onto the torso
+  - limb silhouette now reads a bit cleaner too: lightweight hand/leg silhouette bridges now reinforce the outer transition into the torso, so attachment reads less like a stack of local patches
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

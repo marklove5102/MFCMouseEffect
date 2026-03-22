@@ -213,6 +213,30 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     FillRoundedRect(graphics, scene.rightLegRect, scene.bodyFillRear, scene.bodyStroke, scene.limbStrokeWidth);
     FillEllipse(
         graphics,
+        scene.leftLegSilhouetteBridgeRect,
+        WithAlpha(scene.bodyFillRear, 144.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightLegSilhouetteBridgeRect,
+        WithAlpha(scene.bodyFillRear, 144.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.leftLegRootCuffRect,
+        WithAlpha(scene.bodyFillRear, 156.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightLegRootCuffRect,
+        WithAlpha(scene.bodyFillRear, 156.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
         scene.leftLegPadRect,
         WithAlpha(scene.blushFill, 196.0f),
         Gdiplus::Color(0, 0, 0, 0),
@@ -267,10 +291,76 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         WithAlpha(scene.bodyFillRear, 166.0f),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
+    FillEllipse(
+        graphics,
+        scene.bellyContourRect,
+        WithAlpha(scene.headFillRear, 138.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.sternumContourRect,
+        WithAlpha(scene.headFillRear, 122.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.upperTorsoContourRect,
+        WithAlpha(scene.headFillRear, 132.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.leftBackContourRect,
+        WithAlpha(scene.bodyFillRear, 146.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightBackContourRect,
+        WithAlpha(scene.bodyFillRear, 146.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.leftFlankContourRect,
+        WithAlpha(scene.bodyFillRear, 150.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightFlankContourRect,
+        WithAlpha(scene.bodyFillRear, 150.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
     graphics->Restore(saved);
 
     FillRoundedRect(graphics, scene.leftHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
     FillRoundedRect(graphics, scene.rightHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.leftHandSilhouetteBridgeRect,
+        WithAlpha(scene.headFillRear, 150.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightHandSilhouetteBridgeRect,
+        WithAlpha(scene.headFillRear, 150.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.leftHandRootCuffRect,
+        WithAlpha(scene.headFillRear, 166.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightHandRootCuffRect,
+        WithAlpha(scene.headFillRear, 166.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
     FillEllipse(
         graphics,
         scene.leftHandPadRect,
@@ -336,6 +426,12 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         graphics,
         scene.rightUnderEyeContourRect,
         WithAlpha(scene.headFillRear, 126.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.noseBridgeRect,
+        WithAlpha(scene.headFillRear, 118.0f),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
 

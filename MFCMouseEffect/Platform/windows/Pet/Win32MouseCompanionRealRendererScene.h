@@ -72,6 +72,13 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::RectF rightShoulderPatchRect{};
     Gdiplus::RectF leftHipPatchRect{};
     Gdiplus::RectF rightHipPatchRect{};
+    Gdiplus::RectF bellyContourRect{};
+    Gdiplus::RectF sternumContourRect{};
+    Gdiplus::RectF upperTorsoContourRect{};
+    Gdiplus::RectF leftBackContourRect{};
+    Gdiplus::RectF rightBackContourRect{};
+    Gdiplus::RectF leftFlankContourRect{};
+    Gdiplus::RectF rightFlankContourRect{};
     Gdiplus::RectF headRect{};
     Gdiplus::RectF tailRect{};
     Gdiplus::RectF tailRootCuffRect{};
@@ -84,6 +91,14 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::RectF rightHandRect{};
     Gdiplus::RectF leftLegRect{};
     Gdiplus::RectF rightLegRect{};
+    Gdiplus::RectF leftHandRootCuffRect{};
+    Gdiplus::RectF rightHandRootCuffRect{};
+    Gdiplus::RectF leftLegRootCuffRect{};
+    Gdiplus::RectF rightLegRootCuffRect{};
+    Gdiplus::RectF leftHandSilhouetteBridgeRect{};
+    Gdiplus::RectF rightHandSilhouetteBridgeRect{};
+    Gdiplus::RectF leftLegSilhouetteBridgeRect{};
+    Gdiplus::RectF rightLegSilhouetteBridgeRect{};
     Gdiplus::RectF leftHandPadRect{};
     Gdiplus::RectF rightHandPadRect{};
     Gdiplus::RectF leftLegPadRect{};
@@ -118,6 +133,7 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::RectF rightTempleContourRect{};
     Gdiplus::RectF leftUnderEyeContourRect{};
     Gdiplus::RectF rightUnderEyeContourRect{};
+    Gdiplus::RectF noseBridgeRect{};
     float eyeHighlightAlpha{190.0f};
     float whiskerStrokeWidth{1.0f};
     Gdiplus::RectF pedestalRect{};

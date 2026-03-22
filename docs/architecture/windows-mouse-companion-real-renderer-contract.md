@@ -204,6 +204,13 @@ Before touching GPU-specific code, the safest first step is:
   - lightweight forehead-pad cues should remain face-builder/painter-owned preview details too, so brow/eye-zone readability improves without creating another controller-visible forehead-state surface
   - lightweight temple-contour cues should remain face-builder/painter-owned preview details too, so eye-socket readability improves without creating another controller-visible temple-state surface
   - lightweight under-eye contour cues should remain face-builder/painter-owned preview details too, so eye-socket continuity improves without creating another controller-visible under-eye-state surface
+  - lightweight nose-bridge cues should remain face-builder/painter-owned preview details too, so brow-to-muzzle continuity improves without creating another controller-visible nose-bridge-state surface
+  - lightweight belly/flank contour cues should remain frame-builder/painter-owned preview details too, so torso volume improves without creating another controller-visible body-contour-state surface
+  - lightweight sternum/torso-centerline cues should remain frame-builder/painter-owned preview details too, so chest-to-belly continuity improves without creating another controller-visible torso-centerline-state surface
+  - lightweight upper-torso contour cues should remain frame-builder/painter-owned preview details too, so shoulder-to-chest continuity improves without creating another controller-visible upper-torso-state surface
+  - lightweight back-contour cues should remain frame-builder/painter-owned preview details too, so torso front/back readability improves without creating another controller-visible rear-torso-state surface
+  - lightweight hand/leg root-cuff cues should remain appendage-builder/painter-owned preview details too, so limb attachment continuity improves without creating another controller-visible limb-root-state surface
+  - lightweight hand/leg silhouette-bridge cues should remain appendage-builder/painter-owned preview details too, so limb outer-contour continuity improves without creating another controller-visible limb-silhouette-state surface
   - the first real-renderer requirement seam is now active too:
     - `Win32MouseCompanionRealRendererAssetResources`
     - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract

@@ -115,6 +115,26 @@ void BuildWin32MouseCompanionRealRendererAppendages(
             profile.idleHandFloat,
         metrics.bodyWidth * style.handWidthRatio,
         metrics.bodyHeight * style.handHeightRatio);
+    scene.leftHandRootCuffRect = Gdiplus::RectF(
+        scene.leftHandRect.X + scene.leftHandRect.Width * style.handRootCuffInsetRatio,
+        scene.leftHandRect.Y - scene.leftHandRect.Height * style.handRootCuffHeightRatio * 0.35f,
+        scene.leftHandRect.Width * style.handRootCuffWidthRatio,
+        scene.leftHandRect.Height * style.handRootCuffHeightRatio);
+    scene.rightHandRootCuffRect = Gdiplus::RectF(
+        scene.rightHandRect.GetRight() - scene.rightHandRect.Width * (style.handRootCuffInsetRatio + style.handRootCuffWidthRatio),
+        scene.rightHandRect.Y - scene.rightHandRect.Height * style.handRootCuffHeightRatio * 0.35f,
+        scene.rightHandRect.Width * style.handRootCuffWidthRatio,
+        scene.rightHandRect.Height * style.handRootCuffHeightRatio);
+    scene.leftHandSilhouetteBridgeRect = Gdiplus::RectF(
+        scene.leftHandRect.GetRight() - scene.leftHandRect.Width * style.handSilhouetteBridgeWidthRatio,
+        scene.leftHandRootCuffRect.Y + scene.leftHandRootCuffRect.Height * 0.15f,
+        scene.leftHandRect.Width * style.handSilhouetteBridgeWidthRatio,
+        scene.leftHandRect.Height * style.handSilhouetteBridgeHeightRatio);
+    scene.rightHandSilhouetteBridgeRect = Gdiplus::RectF(
+        scene.rightHandRect.X,
+        scene.rightHandRootCuffRect.Y + scene.rightHandRootCuffRect.Height * 0.15f,
+        scene.rightHandRect.Width * style.handSilhouetteBridgeWidthRatio,
+        scene.rightHandRect.Height * style.handSilhouetteBridgeHeightRatio);
     scene.leftLegRect = Gdiplus::RectF(
         scene.centerX - metrics.bodyWidth * style.legLeftXRatio - profile.legStride * style.legStrideRatio + poseLeftLegShift,
         scene.bodyRect.GetBottom() - metrics.bodyHeight * style.legYOffsetRatio + (runtime.follow ? style.followLegPhasePx : 0.0f) -
@@ -127,6 +147,26 @@ void BuildWin32MouseCompanionRealRendererAppendages(
             profile.legLift * 0.45f,
         metrics.bodyWidth * style.legWidthRatio,
         metrics.bodyHeight * style.legHeightRatio);
+    scene.leftLegRootCuffRect = Gdiplus::RectF(
+        scene.leftLegRect.X + scene.leftLegRect.Width * style.legRootCuffInsetRatio,
+        scene.leftLegRect.Y - scene.leftLegRect.Height * style.legRootCuffHeightRatio * 0.30f,
+        scene.leftLegRect.Width * style.legRootCuffWidthRatio,
+        scene.leftLegRect.Height * style.legRootCuffHeightRatio);
+    scene.rightLegRootCuffRect = Gdiplus::RectF(
+        scene.rightLegRect.GetRight() - scene.rightLegRect.Width * (style.legRootCuffInsetRatio + style.legRootCuffWidthRatio),
+        scene.rightLegRect.Y - scene.rightLegRect.Height * style.legRootCuffHeightRatio * 0.30f,
+        scene.rightLegRect.Width * style.legRootCuffWidthRatio,
+        scene.rightLegRect.Height * style.legRootCuffHeightRatio);
+    scene.leftLegSilhouetteBridgeRect = Gdiplus::RectF(
+        scene.leftLegRect.GetRight() - scene.leftLegRect.Width * style.legSilhouetteBridgeWidthRatio,
+        scene.leftLegRootCuffRect.Y + scene.leftLegRootCuffRect.Height * 0.10f,
+        scene.leftLegRect.Width * style.legSilhouetteBridgeWidthRatio,
+        scene.leftLegRect.Height * style.legSilhouetteBridgeHeightRatio);
+    scene.rightLegSilhouetteBridgeRect = Gdiplus::RectF(
+        scene.rightLegRect.X,
+        scene.rightLegRootCuffRect.Y + scene.rightLegRootCuffRect.Height * 0.10f,
+        scene.rightLegRect.Width * style.legSilhouetteBridgeWidthRatio,
+        scene.rightLegRect.Height * style.legSilhouetteBridgeHeightRatio);
     scene.leftHandPadRect = BuildPadRect(scene.leftHandRect, style);
     scene.rightHandPadRect = BuildPadRect(scene.rightHandRect, style);
     scene.leftLegPadRect = BuildPadRect(scene.leftLegRect, style);

@@ -105,6 +105,41 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         scene.bodyRect.GetBottom() - metrics.bodyHeight * (style.hipPatchYOffsetRatio + style.hipPatchHeightRatio),
         metrics.bodyWidth * style.hipPatchWidthRatio,
         metrics.bodyHeight * style.hipPatchHeightRatio);
+    scene.bellyContourRect = Gdiplus::RectF(
+        scene.centerX - metrics.bodyWidth * style.bellyContourWidthRatio * 0.5f,
+        scene.bodyRect.Y + metrics.bodyHeight * style.bellyContourYRatio,
+        metrics.bodyWidth * style.bellyContourWidthRatio,
+        metrics.bodyHeight * style.bellyContourHeightRatio);
+    scene.sternumContourRect = Gdiplus::RectF(
+        scene.centerX - metrics.bodyWidth * style.sternumContourWidthRatio * 0.5f,
+        scene.bodyRect.Y + metrics.bodyHeight * style.sternumContourYRatio,
+        metrics.bodyWidth * style.sternumContourWidthRatio,
+        metrics.bodyHeight * style.sternumContourHeightRatio);
+    scene.upperTorsoContourRect = Gdiplus::RectF(
+        scene.centerX - metrics.bodyWidth * style.upperTorsoContourWidthRatio * 0.5f,
+        scene.bodyRect.Y + metrics.bodyHeight * style.upperTorsoContourYRatio,
+        metrics.bodyWidth * style.upperTorsoContourWidthRatio,
+        metrics.bodyHeight * style.upperTorsoContourHeightRatio);
+    scene.leftBackContourRect = Gdiplus::RectF(
+        scene.bodyRect.X + metrics.bodyWidth * style.backContourXRatio,
+        scene.bodyRect.Y + metrics.bodyHeight * style.backContourYRatio,
+        metrics.bodyWidth * style.backContourWidthRatio,
+        metrics.bodyHeight * style.backContourHeightRatio);
+    scene.rightBackContourRect = Gdiplus::RectF(
+        scene.bodyRect.GetRight() - metrics.bodyWidth * (style.backContourXRatio + style.backContourWidthRatio),
+        scene.bodyRect.Y + metrics.bodyHeight * style.backContourYRatio,
+        metrics.bodyWidth * style.backContourWidthRatio,
+        metrics.bodyHeight * style.backContourHeightRatio);
+    scene.leftFlankContourRect = Gdiplus::RectF(
+        scene.bodyRect.X + metrics.bodyWidth * style.flankContourXRatio,
+        scene.bodyRect.Y + metrics.bodyHeight * style.flankContourYRatio,
+        metrics.bodyWidth * style.flankContourWidthRatio,
+        metrics.bodyHeight * style.flankContourHeightRatio);
+    scene.rightFlankContourRect = Gdiplus::RectF(
+        scene.bodyRect.GetRight() - metrics.bodyWidth * (style.flankContourXRatio + style.flankContourWidthRatio),
+        scene.bodyRect.Y + metrics.bodyHeight * style.flankContourYRatio,
+        metrics.bodyWidth * style.flankContourWidthRatio,
+        metrics.bodyHeight * style.flankContourHeightRatio);
     scene.pedestalRect = Gdiplus::RectF(
         scene.centerX - metrics.bodyWidth * style.pedestalXOffsetRatio,
         scene.shadowRect.GetBottom() - metrics.bodyHeight * style.pedestalYOffsetRatio,

@@ -238,6 +238,13 @@
   - upper-face detailing now also includes a lightweight forehead pad, improving brow/eye-zone readability while still keeping the cue renderer-owned and low-cost
   - eye-zone side detailing now also includes lightweight temple contours, improving eye-socket readability while still keeping the cue renderer-owned and low-cost
   - eye-zone lower detailing now also includes lightweight under-eye contours, improving eye-socket continuity while still keeping the cue renderer-owned and low-cost
+  - face centerline detailing now also includes a lightweight nose bridge, improving brow-to-muzzle continuity while still keeping the cue renderer-owned and low-cost
+  - torso detailing now also includes lightweight belly/flank contours, improving body-mass readability while still keeping the cue renderer-owned and low-cost
+  - torso centerline detailing now also includes a lightweight sternum contour, improving chest-to-belly continuity while still keeping the cue renderer-owned and low-cost
+  - upper-torso detailing now also includes a lightweight upper-torso contour, improving shoulder-to-chest continuity while still keeping the cue renderer-owned and low-cost
+  - rear-torso detailing now also includes lightweight back contours, improving torso front/back readability while still keeping the cue renderer-owned and low-cost
+  - appendage attachment detailing now also includes lightweight hand/leg root cuffs, improving limb-to-torso continuity while still keeping the cue renderer-owned and low-cost
+  - appendage silhouette detailing now also includes lightweight hand/leg silhouette bridges, improving limb outer-contour continuity while still keeping the cue renderer-owned and low-cost
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract
