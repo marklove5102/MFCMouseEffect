@@ -135,6 +135,7 @@
   - the Windows Git Bash bring-up helper now also exposes a `real-preview-smoke` preset, so the shortest real-preview gate no longer needs callers to repeat the sweep/backend/preview expectation arguments by hand
   - that same smoke preset now also prints a short human-readable expectation checklist before running, so manual Windows bring-up can sanity-check env/gate assumptions without reopening docs first
   - real preview face detail is now more alive too: pupils shift with facing/action focus and eye highlights vary by state, so `click / hold / drag / follow` read less like the same sticker with a different mouth arc
+  - face readability now also includes whisker focus cues: whiskers spread more on stronger reactions and tilt slightly with drag/scroll direction, so state differences no longer rely only on mouth/brow/eye changes
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

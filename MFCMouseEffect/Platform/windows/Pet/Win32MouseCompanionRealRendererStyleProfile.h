@@ -67,6 +67,15 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float mouthHeightBasePx{7.0f};
     float mouthReactiveHeightPx{3.0f};
     float mouthYRatio{0.60f};
+    float whiskerAnchorYRatio{0.58f};
+    float whiskerInnerXRatio{0.16f};
+    float whiskerOuterLengthPx{9.0f};
+    float whiskerMiddleLengthPx{8.0f};
+    float whiskerLowerLengthPx{7.0f};
+    float whiskerTopYOffsetPx{3.0f};
+    float whiskerLowerYOffsetPx{3.0f};
+    float whiskerSpreadScale{0.55f};
+    float whiskerTiltScale{0.60f};
     float browYRatio{0.34f};
     float leftBrowStartXRatio{0.26f};
     float leftBrowEndXRatio{0.10f};

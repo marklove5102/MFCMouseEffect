@@ -283,6 +283,10 @@ If those hidden fields change while the host is already active, the Windows visu
        - the eyes should no longer read as static stickers:
          - pupils should bias slightly toward facing/action direction
          - eye highlights should feel brighter in `click/follow` and more restrained in `hold`
+       - whiskers should no longer stay frozen:
+         - `click` should spread them a bit more
+         - `drag/scroll` should tilt them slightly with directional intent
+         - `hold` should keep them tighter than `click`
          - `follow` should look more alert
        - whole-body posture should now react too:
          - `click` should feel slightly lifted/lightened

@@ -5,6 +5,25 @@
 #include <algorithm>
 
 namespace mousefx::windows {
+namespace {
+
+void SetWhiskerPair(
+    float anchorX,
+    float anchorY,
+    float direction,
+    float length,
+    float verticalOffset,
+    float spread,
+    float tilt,
+    Gdiplus::PointF& start,
+    Gdiplus::PointF& end) {
+    start = Gdiplus::PointF(anchorX, anchorY + verticalOffset);
+    end = Gdiplus::PointF(
+        anchorX + direction * length,
+        anchorY + verticalOffset + verticalOffset * spread + tilt);
+}
+
+} // namespace
 
 void BuildWin32MouseCompanionRealRendererFace(
     const Win32MouseCompanionRealRendererMotionProfile& profile,
@@ -81,6 +100,73 @@ void BuildWin32MouseCompanionRealRendererFace(
         style.blushWidthPx,
         style.blushHeightPx);
     scene.eyeHighlightAlpha = profile.eyeHighlightAlpha;
+    scene.whiskerStrokeWidth = 1.0f + profile.whiskerSpread * 0.35f;
+
+    const float whiskerAnchorY = scene.headRect.Y + scene.headRect.Height * style.whiskerAnchorYRatio;
+    const float leftWhiskerX = scene.centerX - scene.headRect.Width * style.whiskerInnerXRatio;
+    const float rightWhiskerX = scene.centerX + scene.headRect.Width * style.whiskerInnerXRatio;
+    const float whiskerSpread = profile.whiskerSpread * style.whiskerSpreadScale;
+    const float whiskerTilt = profile.whiskerTilt * style.whiskerTiltScale;
+    SetWhiskerPair(
+        leftWhiskerX,
+        whiskerAnchorY,
+        -1.0f,
+        style.whiskerOuterLengthPx,
+        -style.whiskerTopYOffsetPx,
+        whiskerSpread,
+        -whiskerTilt,
+        scene.leftWhiskerStart[0],
+        scene.leftWhiskerEnd[0]);
+    SetWhiskerPair(
+        leftWhiskerX,
+        whiskerAnchorY,
+        -1.0f,
+        style.whiskerMiddleLengthPx,
+        0.0f,
+        0.0f,
+        -whiskerTilt * 0.5f,
+        scene.leftWhiskerStart[1],
+        scene.leftWhiskerEnd[1]);
+    SetWhiskerPair(
+        leftWhiskerX,
+        whiskerAnchorY,
+        -1.0f,
+        style.whiskerLowerLengthPx,
+        style.whiskerLowerYOffsetPx,
+        -whiskerSpread,
+        -whiskerTilt,
+        scene.leftWhiskerStart[2],
+        scene.leftWhiskerEnd[2]);
+    SetWhiskerPair(
+        rightWhiskerX,
+        whiskerAnchorY,
+        1.0f,
+        style.whiskerOuterLengthPx,
+        -style.whiskerTopYOffsetPx,
+        whiskerSpread,
+        whiskerTilt,
+        scene.rightWhiskerStart[0],
+        scene.rightWhiskerEnd[0]);
+    SetWhiskerPair(
+        rightWhiskerX,
+        whiskerAnchorY,
+        1.0f,
+        style.whiskerMiddleLengthPx,
+        0.0f,
+        0.0f,
+        whiskerTilt * 0.5f,
+        scene.rightWhiskerStart[1],
+        scene.rightWhiskerEnd[1]);
+    SetWhiskerPair(
+        rightWhiskerX,
+        whiskerAnchorY,
+        1.0f,
+        style.whiskerLowerLengthPx,
+        style.whiskerLowerYOffsetPx,
+        -whiskerSpread,
+        whiskerTilt,
+        scene.rightWhiskerStart[2],
+        scene.rightWhiskerEnd[2]);
 }
 
 } // namespace mousefx::windows

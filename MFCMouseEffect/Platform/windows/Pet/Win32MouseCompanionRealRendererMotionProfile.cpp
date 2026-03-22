@@ -168,6 +168,17 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
         : runtime.follow                    ? 205.0f
         : runtime.scroll                    ? 190.0f
                                             : 182.0f;
+    profile.whiskerSpread = runtime.click ? 1.0f
+        : runtime.hold                    ? 0.55f
+        : runtime.follow                  ? 0.42f
+        : runtime.drag                    ? 0.36f
+        : runtime.scroll                  ? 0.48f
+                                          : 0.18f;
+    profile.whiskerTilt = runtime.drag ? runtime.facingSign * 0.95f
+        : runtime.scroll               ? runtime.scrollSignedIntensity * 0.80f
+        : runtime.follow               ? runtime.facingSign * 0.45f
+        : runtime.click                ? runtime.facingSign * 0.18f
+                                       : 0.0f;
     profile.browTilt = runtime.drag ? runtime.facingSign * 4.5f
         : runtime.scroll            ? runtime.scrollSignedIntensity * 5.5f
         : runtime.click             ? runtime.facingSign * 1.6f

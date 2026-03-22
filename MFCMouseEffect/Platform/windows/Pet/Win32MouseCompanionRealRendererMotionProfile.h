@@ -37,6 +37,8 @@ struct Win32MouseCompanionRealRendererMotionProfile final {
     float pupilFocusX{0.0f};
     float pupilFocusY{0.0f};
     float eyeHighlightAlpha{190.0f};
+    float whiskerSpread{0.0f};
+    float whiskerTilt{0.0f};
     float browTilt{0.0f};
     float browLift{0.0f};
     float mouthStartDeg{10.0f};

@@ -236,6 +236,16 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     }
 
     {
+        Gdiplus::Pen whiskerPen(WithAlpha(scene.mouthFill, 210.0f), scene.whiskerStrokeWidth);
+        whiskerPen.SetStartCap(Gdiplus::LineCapRound);
+        whiskerPen.SetEndCap(Gdiplus::LineCapRound);
+        for (size_t i = 0; i < scene.leftWhiskerStart.size(); ++i) {
+            graphics->DrawLine(&whiskerPen, scene.leftWhiskerStart[i], scene.leftWhiskerEnd[i]);
+            graphics->DrawLine(&whiskerPen, scene.rightWhiskerStart[i], scene.rightWhiskerEnd[i]);
+        }
+    }
+
+    {
         Gdiplus::Pen mouthPen(scene.mouthFill, scene.mouthStrokeWidth);
         mouthPen.SetStartCap(Gdiplus::LineCapRound);
         mouthPen.SetEndCap(Gdiplus::LineCapRound);
