@@ -245,6 +245,15 @@
   - rear-torso detailing now also includes lightweight back contours, improving torso front/back readability while still keeping the cue renderer-owned and low-cost
   - appendage attachment detailing now also includes lightweight hand/leg root cuffs, improving limb-to-torso continuity while still keeping the cue renderer-owned and low-cost
   - appendage silhouette detailing now also includes lightweight hand/leg silhouette bridges, improving limb outer-contour continuity while still keeping the cue renderer-owned and low-cost
+  - action-aware proportion tuning now lightly biases head scale, hand reach, and leg stance for `follow / hold / click / drag`, improving whole-silhouette readability while still keeping the cue renderer-owned and low-cost
+  - action-aware body-stance tuning now also lightly biases torso width/height/center lift for `follow / hold / click / drag`, improving whole-block readability while still keeping the cue renderer-owned and low-cost
+  - action-aware appendage-proportion tuning now also lightly biases tail width/height and ear spread/lift for `follow / hold / click / scroll`, improving whole-pet silhouette readability while still keeping the cue renderer-owned and low-cost
+  - action-aware atmosphere-grounding tuning now also lightly biases glow/shadow/pedestal scale for `follow / hold / drag`, improving whole-scene readability while still keeping the cue renderer-owned and low-cost
+  - action-aware atmosphere-grounding offset tuning now also lightly biases shadow/pedestal placement for `follow / hold / drag`, improving whole-scene readability while still keeping the cue renderer-owned and low-cost
+  - action-aware atmosphere-grounding weight tuning now also lightly biases shadow/pedestal alpha for `follow / hold / drag`, improving whole-scene readability while still keeping the cue renderer-owned and low-cost
+  - action-aware upper-atmosphere tuning now also lightly biases glow alpha/offset for `follow / hold / drag`, improving whole-scene readability while still keeping the cue renderer-owned and low-cost
+  - click/scroll atmosphere tuning now also lightly biases glow/shadow/pedestal geometry and weight, improving whole-scene readability while still keeping the cue renderer-owned and low-cost
+  - atmosphere tint tuning now also lightly biases shadow/pedestal hue toward the active action tint, improving whole-scene readability while still keeping the cue renderer-owned and low-cost
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract

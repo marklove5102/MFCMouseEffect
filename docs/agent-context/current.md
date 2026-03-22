@@ -153,6 +153,15 @@
   - back mass now reads a bit cleaner too: lightweight back contours now reinforce the torso rear plane, so the body no longer reads only as front-facing patches layered on one oval
   - limb attachment now reads a bit cleaner too: lightweight hand/leg root cuffs now reinforce appendage entry points, so limbs feel less like rounded rectangles pasted directly onto the torso
   - limb silhouette now reads a bit cleaner too: lightweight hand/leg silhouette bridges now reinforce the outer transition into the torso, so attachment reads less like a stack of local patches
+  - whole-pet proportion now reads a bit cleaner too: `follow / hold / click / drag` now lightly bias head scale, hand reach, and leg stance, so state changes register in the full silhouette instead of only in local detail layers
+  - body stance now reads a bit cleaner too: `follow / hold / click / drag` now also lightly bias body width/height/center lift, so the torso block itself participates in the state change instead of remaining visually neutral
+  - appendage proportion now reads a bit cleaner too: `follow / hold / click / scroll` now lightly bias tail width/height and ear spread/lift, so tail/ears participate in the same whole-pet state language instead of staying on default geometry
+  - atmosphere grounding now reads a bit cleaner too: `follow / hold / drag` now lightly bias glow/shadow/pedestal scale, so the preview's ambient block and landing feel shift with the same state language instead of staying visually static under the pet
+  - atmosphere grounding position now reads a bit cleaner too: `follow / hold / drag` now also lightly bias shadow/pedestal offset, so the landing feel changes in both size and placement instead of only as centered scaling
+  - atmosphere grounding weight now reads a bit cleaner too: `follow / hold / drag` now also lightly bias shadow/pedestal alpha, so the preview feels lighter or more planted through opacity as well as geometry
+  - upper atmosphere now reads a bit cleaner too: `follow / hold / drag` now also lightly bias glow alpha/offset, so the ambient cap above the pet moves with the same state language instead of staying visually fixed while grounding changes underneath it
+  - click/scroll atmosphere now reads a bit cleaner too: those two states now also lightly bias glow/shadow/pedestal instead of leaving the atmosphere lane mainly to `follow / hold / drag`
+  - atmosphere tint now reads a bit cleaner too: shadow/pedestal now also pick up a light action tint, so upper/lower atmosphere feel like one state language instead of separate color systems
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

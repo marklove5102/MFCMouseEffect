@@ -49,6 +49,16 @@ void BuildWin32MouseCompanionRealRendererPalette(
         emphasis + (runtime.hold ? 0.18f : 0.0f) + (runtime.follow ? 0.08f : 0.0f),
         0.0f,
         1.0f);
+    const float shadowAlphaBias = runtime.follow ? style.followShadowAlphaBias
+        : runtime.hold                           ? style.holdShadowAlphaBias
+        : runtime.scroll                         ? style.scrollShadowAlphaBias
+        : runtime.drag                           ? style.dragShadowAlphaBias
+                                                 : 0.0f;
+    const float pedestalAlphaBias = runtime.follow ? style.followPedestalAlphaBias
+        : runtime.hold                             ? style.holdPedestalAlphaBias
+        : runtime.scroll                           ? style.scrollPedestalAlphaBias
+        : runtime.drag                             ? style.dragPedestalAlphaBias
+                                                   : 0.0f;
     const auto actionTint = profile.overlayAccentColor;
     scene.glowColor = BlendToward(palette.glowColor, actionTint, emphasis * style.glowActionTintMix);
     scene.bodyFill = BlendToward(baseBody, actionTint, emphasis * style.bodyActionTintMix);
@@ -77,15 +87,21 @@ void BuildWin32MouseCompanionRealRendererPalette(
         BlendChannel(palette.accentFill.GetG(), actionTint.GetG(), emphasis * style.accentActionTintMix),
         BlendChannel(palette.accentFill.GetB(), actionTint.GetB(), emphasis * style.accentActionTintMix));
     scene.shadowFill = MakeColor(
-        static_cast<BYTE>(std::clamp(style.shadowBaseAlpha + shadowEmphasis * style.shadowActionAlphaScale, 0.0f, 255.0f)),
-        palette.pedestalFill.GetR(),
-        palette.pedestalFill.GetG(),
-        palette.pedestalFill.GetB());
+        static_cast<BYTE>(std::clamp(
+            style.shadowBaseAlpha + shadowEmphasis * style.shadowActionAlphaScale + shadowAlphaBias,
+            0.0f,
+            255.0f)),
+        BlendChannel(palette.pedestalFill.GetR(), actionTint.GetR(), emphasis * style.shadowActionTintMix),
+        BlendChannel(palette.pedestalFill.GetG(), actionTint.GetG(), emphasis * style.shadowActionTintMix),
+        BlendChannel(palette.pedestalFill.GetB(), actionTint.GetB(), emphasis * style.shadowActionTintMix));
     scene.pedestalFill = MakeColor(
-        static_cast<BYTE>(std::clamp(style.pedestalBaseAlpha + shadowEmphasis * style.pedestalActionAlphaScale, 0.0f, 255.0f)),
-        palette.pedestalFill.GetR(),
-        palette.pedestalFill.GetG(),
-        palette.pedestalFill.GetB());
+        static_cast<BYTE>(std::clamp(
+            style.pedestalBaseAlpha + shadowEmphasis * style.pedestalActionAlphaScale + pedestalAlphaBias,
+            0.0f,
+            255.0f)),
+        BlendChannel(palette.pedestalFill.GetR(), actionTint.GetR(), emphasis * style.pedestalActionTintMix),
+        BlendChannel(palette.pedestalFill.GetG(), actionTint.GetG(), emphasis * style.pedestalActionTintMix),
+        BlendChannel(palette.pedestalFill.GetB(), actionTint.GetB(), emphasis * style.pedestalActionTintMix));
     scene.badgeReadyFill = palette.badgeReadyFill;
     scene.badgePendingFill = palette.badgePendingFill;
     scene.accessoryFill = palette.accessoryFill;

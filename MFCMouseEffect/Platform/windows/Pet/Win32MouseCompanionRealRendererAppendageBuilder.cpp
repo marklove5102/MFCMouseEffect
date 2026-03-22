@@ -34,14 +34,29 @@ void BuildWin32MouseCompanionRealRendererAppendages(
     const float poseRightHandLift = runtime.rightHandPose ? -runtime.rightHandPose->position[1] * style.rightHandPoseLiftScale : 0.0f;
     const float poseLeftLegShift = runtime.leftLegPose ? runtime.leftLegPose->position[0] * style.leftLegPoseShiftScale : 0.0f;
     const float poseRightLegShift = runtime.rightLegPose ? runtime.rightLegPose->position[0] * style.rightLegPoseShiftScale : 0.0f;
+    const float handReachBias = runtime.follow ? metrics.bodyWidth * style.followHandReachRatio
+        : runtime.hold                        ? -metrics.bodyWidth * style.holdHandTuckRatio
+        : runtime.drag                        ? metrics.bodyWidth * style.dragHandReachRatio
+                                              : 0.0f;
+    const float legStanceBias = runtime.follow ? metrics.bodyWidth * style.followLegStanceRatio
+        : runtime.hold                        ? -metrics.bodyWidth * style.holdLegStanceRatio
+                                              : 0.0f;
+    const float tailWidthScale = runtime.follow ? style.followTailWidthScale
+        : runtime.hold                         ? style.holdTailWidthScale
+                                               : 1.0f;
+    const float tailHeightScale = runtime.scroll ? style.scrollTailHeightScale : 1.0f;
+    const float earSpreadScale = runtime.follow ? style.followEarSpreadScale
+        : runtime.hold                         ? style.holdEarSpreadScale
+                                               : 1.0f;
+    const float clickEarLift = runtime.click ? style.clickEarLiftPx : 0.0f;
 
     scene.tailRect = Gdiplus::RectF(
         scene.bodyRect.GetRight() - metrics.bodyWidth * style.tailXOffsetRatio -
             scene.facingSign * metrics.bodyWidth * style.tailFacingRatio +
             profile.idleTailSway * scene.facingSign + profile.tailSwing,
         scene.centerY - metrics.bodyHeight * style.tailYOffsetRatio + profile.tailLift,
-        metrics.bodyWidth * style.tailWidthRatio,
-        metrics.bodyHeight * style.tailHeightRatio);
+        metrics.bodyWidth * style.tailWidthRatio * tailWidthScale,
+        metrics.bodyHeight * style.tailHeightRatio * tailHeightScale);
     scene.tailRootCuffRect = Gdiplus::RectF(
         scene.tailRect.X - scene.tailRect.Width * style.tailRootCuffXOffsetRatio,
         scene.tailRect.Y + scene.tailRect.Height * style.tailRootCuffYOffsetRatio,
@@ -55,9 +70,9 @@ void BuildWin32MouseCompanionRealRendererAppendages(
 
     const float earBaseY = scene.headRect.Y + scene.headRect.Height * style.earBaseYOffsetRatio;
     const float earTipY = scene.headRect.Y - scene.headRect.Height * style.earTipYOffsetRatio - profile.earLift - poseEarLift -
-        profile.idleEarCadence;
+        profile.idleEarCadence - clickEarLift;
     const float rightEarTipY = scene.headRect.Y - scene.headRect.Height * style.earTipYOffsetRatio - profile.earLift -
-        poseRightEarLift + profile.idleEarCadence * style.earIdleCadenceRatio;
+        poseRightEarLift + profile.idleEarCadence * style.earIdleCadenceRatio - clickEarLift;
     const float earBaseOffset = scene.headRect.Width * style.earBaseOffsetRatio;
     const float earRootCuffWidth = scene.headRect.Width * style.earRootCuffWidthRatio;
     const float earRootCuffHeight = scene.headRect.Height * style.earRootCuffHeightRatio;
@@ -75,12 +90,12 @@ void BuildWin32MouseCompanionRealRendererAppendages(
         Gdiplus::PointF(scene.centerX - earBaseOffset, earBaseY),
         Gdiplus::PointF(
             scene.centerX - earBaseOffset - scene.headRect.Width * style.earOuterSpreadRatio + poseEarSpread - profile.earSwing -
-                profile.earSpreadPulse -
+                profile.earSpreadPulse * earSpreadScale -
                 profile.idleHeadSway,
             scene.headRect.Y + scene.headRect.Height * style.earBaseYRatio),
         Gdiplus::PointF(
-            scene.centerX - scene.headRect.Width * style.earTipSpreadRatio + poseEarSpread -
-                profile.earSwing * style.leftEarSwingScale - profile.earSpreadPulse -
+            scene.centerX - scene.headRect.Width * style.earTipSpreadRatio * earSpreadScale + poseEarSpread -
+                profile.earSwing * style.leftEarSwingScale - profile.earSpreadPulse * earSpreadScale -
                 profile.idleHeadSway,
             earTipY),
         Gdiplus::PointF(
@@ -91,11 +106,11 @@ void BuildWin32MouseCompanionRealRendererAppendages(
         Gdiplus::PointF(scene.centerX + earBaseOffset, earBaseY),
         Gdiplus::PointF(
             scene.centerX + earBaseOffset + scene.headRect.Width * style.earOuterSpreadRatio + poseRightEarSpread -
-                profile.earSwing + profile.earSpreadPulse + profile.idleHeadSway,
+                profile.earSwing + profile.earSpreadPulse * earSpreadScale + profile.idleHeadSway,
             scene.headRect.Y + scene.headRect.Height * style.earBaseYRatio),
         Gdiplus::PointF(
-            scene.centerX + scene.headRect.Width * style.earTipSpreadRatio + poseRightEarSpread -
-                profile.earSwing * style.rightEarSwingScale + profile.earSpreadPulse +
+            scene.centerX + scene.headRect.Width * style.earTipSpreadRatio * earSpreadScale + poseRightEarSpread -
+                profile.earSwing * style.rightEarSwingScale + profile.earSpreadPulse * earSpreadScale +
                 profile.idleHeadSway,
             rightEarTipY),
         Gdiplus::PointF(
@@ -104,13 +119,13 @@ void BuildWin32MouseCompanionRealRendererAppendages(
     }};
 
     scene.leftHandRect = Gdiplus::RectF(
-        scene.bodyRect.X - metrics.bodyWidth * style.handXOffsetRatio - profile.handSwing,
+        scene.bodyRect.X - metrics.bodyWidth * style.handXOffsetRatio - profile.handSwing - handReachBias,
         scene.centerY - metrics.bodyHeight * style.handYOffsetRatio - profile.handLift - poseLeftHandLift + profile.headNod * style.handHeadNodRatio -
             profile.idleHandFloat,
         metrics.bodyWidth * style.handWidthRatio,
         metrics.bodyHeight * style.handHeightRatio);
     scene.rightHandRect = Gdiplus::RectF(
-        scene.bodyRect.GetRight() - metrics.bodyWidth * style.tailXOffsetRatio + profile.handSwing,
+        scene.bodyRect.GetRight() - metrics.bodyWidth * style.tailXOffsetRatio + profile.handSwing + handReachBias,
         scene.centerY - metrics.bodyHeight * style.handYOffsetRatio - profile.handLift - poseRightHandLift + profile.headNod * style.handHeadNodRatio +
             profile.idleHandFloat,
         metrics.bodyWidth * style.handWidthRatio,
@@ -136,13 +151,13 @@ void BuildWin32MouseCompanionRealRendererAppendages(
         scene.rightHandRect.Width * style.handSilhouetteBridgeWidthRatio,
         scene.rightHandRect.Height * style.handSilhouetteBridgeHeightRatio);
     scene.leftLegRect = Gdiplus::RectF(
-        scene.centerX - metrics.bodyWidth * style.legLeftXRatio - profile.legStride * style.legStrideRatio + poseLeftLegShift,
+        scene.centerX - metrics.bodyWidth * style.legLeftXRatio - profile.legStride * style.legStrideRatio + poseLeftLegShift - legStanceBias,
         scene.bodyRect.GetBottom() - metrics.bodyHeight * style.legYOffsetRatio + (runtime.follow ? style.followLegPhasePx : 0.0f) -
             profile.legLift,
         metrics.bodyWidth * style.legWidthRatio,
         metrics.bodyHeight * style.legHeightRatio);
     scene.rightLegRect = Gdiplus::RectF(
-        scene.centerX + metrics.bodyWidth * style.legRightXRatio + profile.legStride * style.legStrideRatio + poseRightLegShift,
+        scene.centerX + metrics.bodyWidth * style.legRightXRatio + profile.legStride * style.legStrideRatio + poseRightLegShift + legStanceBias,
         scene.bodyRect.GetBottom() - metrics.bodyHeight * style.legYOffsetRatio - (runtime.follow ? style.followLegPhasePx : 0.0f) +
             profile.legLift * 0.45f,
         metrics.bodyWidth * style.legWidthRatio,

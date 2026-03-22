@@ -211,6 +211,15 @@ Before touching GPU-specific code, the safest first step is:
   - lightweight back-contour cues should remain frame-builder/painter-owned preview details too, so torso front/back readability improves without creating another controller-visible rear-torso-state surface
   - lightweight hand/leg root-cuff cues should remain appendage-builder/painter-owned preview details too, so limb attachment continuity improves without creating another controller-visible limb-root-state surface
   - lightweight hand/leg silhouette-bridge cues should remain appendage-builder/painter-owned preview details too, so limb outer-contour continuity improves without creating another controller-visible limb-silhouette-state surface
+  - action-aware proportion tuning should remain frame/appendage-builder-owned, so head scale, hand reach, and leg stance can bias by runtime state without creating another controller-visible proportion-state surface
+  - action-aware body-stance tuning should remain frame-builder-owned, so torso width/height/center lift can bias by runtime state without creating another controller-visible body-stance-state surface
+  - action-aware appendage-proportion tuning should remain appendage-builder-owned, so tail width/height and ear spread/lift can bias by runtime state without creating another controller-visible appendage-proportion-state surface
+  - action-aware atmosphere-grounding tuning should remain frame-builder-owned, so glow/shadow/pedestal scale can bias by runtime state without creating another controller-visible atmosphere-grounding-state surface
+  - action-aware atmosphere-grounding offset tuning should remain frame-builder-owned, so shadow/pedestal placement can bias by runtime state without creating another controller-visible atmosphere-grounding-offset-state surface
+  - action-aware atmosphere-grounding weight tuning should remain palette/frame-owned, so shadow/pedestal alpha can bias by runtime state without creating another controller-visible atmosphere-grounding-weight-state surface
+  - action-aware upper-atmosphere tuning should remain frame-builder-owned, so glow alpha/offset can bias by runtime state without creating another controller-visible upper-atmosphere-state surface
+  - click/scroll atmosphere tuning should remain frame/palette-owned, so glow/shadow/pedestal responses can expand to those states without creating another controller-visible atmosphere-state matrix
+  - atmosphere tint tuning should remain palette-owned, so shadow/pedestal hue can bias by runtime state without creating another controller-visible atmosphere-tint-state surface
   - the first real-renderer requirement seam is now active too:
     - `Win32MouseCompanionRealRendererAssetResources`
     - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract

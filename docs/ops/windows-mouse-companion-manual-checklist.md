@@ -322,6 +322,38 @@ If those hidden fields change while the host is already active, the Windows visu
         - light hand/leg root cuffs should make the limbs feel more anchored into the torso instead of pasted directly onto it
       - limb outer silhouette should also read cleaner:
         - light hand/leg silhouette bridges should make the limb-to-torso transition feel smoother instead of like a pile of local connection patches
+      - whole silhouette should also read more state-aware:
+        - `follow` should feel slightly more alert with a larger head/readier stance
+        - `hold` should feel slightly tucked with a tighter hand/leg stance
+        - `click / drag` should lightly bias head or hand reach instead of relying only on overlays
+      - torso block should also read more state-aware:
+        - `follow` should feel a little narrower/taller and slightly lifted
+        - `hold` should still feel wider/lower than the other states
+        - `click / drag` should lightly bias torso shape instead of leaving the body block visually unchanged
+      - appendages should also read more state-aware:
+        - `follow` should feel a bit more alert in both tail and ears
+        - `hold` should feel slightly more tucked in the appendages
+        - `click / scroll` should lightly bias ear lift or tail energy instead of leaving appendages on fully default proportions
+      - atmosphere grounding should also read more state-aware:
+        - `follow` should feel a little lighter/cleaner under the pet
+        - `hold` should feel a little more planted in shadow/pedestal
+        - `drag` should lightly bias the ambient block instead of leaving glow/shadow/pedestal fully static
+      - atmosphere grounding should also shift slightly in placement:
+        - `follow / drag` should not feel perfectly centered under every pose
+        - `hold` should feel slightly heavier/lower in its landing without changing the visible contract outside test mode
+      - atmosphere grounding should also shift slightly in weight:
+        - `follow` should read a little lighter through shadow/pedestal opacity
+        - `hold` should read a little more planted through shadow/pedestal opacity
+        - `drag` should get a mild weight bias instead of staying fully neutral
+      - upper atmosphere should also read more state-aware:
+        - `follow` should feel a little more lifted/airy above the pet
+        - `hold` should feel slightly tighter/denser above the pet
+        - `drag` should lightly bias the glow cap direction instead of leaving it perfectly centered
+      - `click / scroll` should also affect atmosphere now:
+        - `click` should lightly tighten/brighten the upper atmosphere instead of only changing the pet body
+        - `scroll` should lightly energize both the upper atmosphere and the grounding lane instead of leaving them mostly neutral
+      - atmosphere color should also feel more unified:
+        - shadow/pedestal should lightly pick up the same action color family instead of staying on a separate neutral track while glow changes above
       - whole-body posture should now react too:
         - `click` should feel slightly lifted/lightened
          - `hold` should feel lower and more planted
