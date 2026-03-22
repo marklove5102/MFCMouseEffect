@@ -22,7 +22,7 @@ bool StartsWithAscii(const std::string& value, const char* prefix) {
 
 std::string ResolveConfiguredPreferenceSource(const AppController::MouseCompanionRuntimeStatus& status) {
     const std::string configuredSource = TrimAscii(status.configuredRendererBackendPreferenceSource);
-    return configuredSource.empty() ? kConfiguredRuntimeConfigRendererBackendPreferenceSource : configuredSource;
+    return configuredSource.empty() ? windows::kConfiguredRuntimeConfigRendererBackendPreferenceSource : configuredSource;
 }
 
 const PetVisualHostRendererBackendCatalogEntry* FindRendererBackendCatalogEntry(

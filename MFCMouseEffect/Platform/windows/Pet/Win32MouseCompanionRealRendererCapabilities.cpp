@@ -5,14 +5,34 @@
 #include "MouseFx/Utils/StringUtils.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetResources.h"
 
+#include <cstdlib>
+
 namespace mousefx::windows {
 namespace {
 
 constexpr const char* kRealRendererEnableEnvVar = "MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE";
 
+std::string ReadEnvCopy(const char* key) {
+    if (!key || !*key) {
+        return {};
+    }
+    char* raw = nullptr;
+    size_t rawSize = 0;
+    const errno_t result = _dupenv_s(&raw, &rawSize, key);
+    if (result != 0 || !raw || rawSize == 0) {
+        if (raw) {
+            free(raw);
+        }
+        return {};
+    }
+    std::string value(raw);
+    free(raw);
+    return value;
+}
+
 bool IsEnabledByEnv(const char* key) {
-    const char* raw = std::getenv(key);
-    if (!raw) {
+    const std::string raw = ReadEnvCopy(key);
+    if (raw.empty()) {
         return false;
     }
     const std::string normalized = ToLowerAscii(TrimAscii(raw));

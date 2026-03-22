@@ -312,7 +312,7 @@ Win32MouseCompanionPlaceholderScene BuildWin32MouseCompanionPlaceholderScene(
         scene.bodyStroke);
     scene.gait.bridgeWidth += scene.rhythm.strideAccent * 0.25f;
     scene.accessory = BuildWin32MouseCompanionPlaceholderAccessory(
-        input.appearanceProfile.enabledAccessoryIds,
+        runtime.appearanceProfile ? runtime.appearanceProfile->enabledAccessoryIds : std::vector<std::string>{},
         scene.headRect,
         scene.bodyLeanPx,
         scene.facingSign,

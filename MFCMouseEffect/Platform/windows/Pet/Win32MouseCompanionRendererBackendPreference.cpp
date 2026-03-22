@@ -14,6 +14,24 @@ constexpr const char* kAutoBackend = "auto";
 constexpr const char* kDefaultBackendAlias = "default";
 constexpr const char* kBackendEnvVar = "MFX_WIN32_MOUSE_COMPANION_RENDERER_BACKEND";
 
+std::string ReadEnvCopy(const char* key) {
+    if (!key || !*key) {
+        return {};
+    }
+    char* raw = nullptr;
+    size_t rawSize = 0;
+    const errno_t result = _dupenv_s(&raw, &rawSize, key);
+    if (result != 0 || !raw || rawSize == 0) {
+        if (raw) {
+            free(raw);
+        }
+        return {};
+    }
+    std::string value(raw);
+    free(raw);
+    return value;
+}
+
 Win32MouseCompanionRendererBackendPreferenceResolution ResolveConfiguredRendererBackendPreference(
     const Win32MouseCompanionRendererBackendPreferenceRequest& request) {
     if (TrimAscii(request.preferredBackendName).empty()) {
@@ -30,8 +48,8 @@ Win32MouseCompanionRendererBackendPreferenceResolution ResolveConfiguredRenderer
 
 Win32MouseCompanionRendererBackendPreferenceResolution ResolveEnvRendererBackendPreference(
     const Win32MouseCompanionRendererBackendPreferenceRequest&) {
-    const char* raw = std::getenv(kBackendEnvVar);
-    if (!raw || TrimAscii(raw).empty()) {
+    const std::string raw = ReadEnvCopy(kBackendEnvVar);
+    if (TrimAscii(raw).empty()) {
         return {};
     }
 

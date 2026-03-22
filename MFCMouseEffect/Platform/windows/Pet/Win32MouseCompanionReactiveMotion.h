@@ -21,7 +21,6 @@ struct Win32MouseCompanionReactiveMotion {
 };
 
 Win32MouseCompanionReactiveMotion BuildWin32MouseCompanionReactiveMotion(
-    const Win32MouseCompanionRendererRuntime& runtime,
-    uint64_t nowMs);
+    const Win32MouseCompanionRendererRuntime& runtime);
 
 } // namespace mousefx::windows
