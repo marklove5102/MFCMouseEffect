@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-21T15:18:58.030Z",
+  "generated_at": "2026-03-22T00:29:32.073Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -70,6 +70,7 @@
         "plugin",
         "effects",
         "indicator",
+        "theme",
         "regression",
         "workflow",
         "swift",
@@ -83,14 +84,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 242,
-      "size_bytes": 15093,
-      "estimated_tokens": 3774,
+      "line_count": 251,
+      "size_bytes": 17126,
+      "estimated_tokens": 4282,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": true,
-      "hash_sha1": "5f89d631924209ce9171950f4c08a27824ffcc54",
-      "updated_at": "2026-03-21T15:16:49.708Z"
+      "hash_sha1": "89efcf18fccbaac80896ab927d0dfad6f91277cc",
+      "updated_at": "2026-03-22T00:23:36.366Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -869,6 +870,7 @@
         "phase1",
         "plan",
         "plugin",
+        "theme",
         "swift",
         "macos",
         "contract",
@@ -878,14 +880,14 @@
       ],
       "summary": "1. close Phase1.5 behavior/structure boundary",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 249,
-      "size_bytes": 19584,
-      "estimated_tokens": 4896,
+      "line_count": 258,
+      "size_bytes": 21710,
+      "estimated_tokens": 5428,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "f007d7a605ebc6598aea337d805afedd602af37b",
-      "updated_at": "2026-03-21T15:16:58.138Z"
+      "hash_sha1": "d60adad5143974fbbd137af54cfa116faf2f19b6",
+      "updated_at": "2026-03-22T00:23:41.865Z"
     },
     {
       "id": "docs/architecture/windows-mouse-companion-phase15-exit-contract.md",
@@ -934,6 +936,7 @@
         "renderer",
         "contract",
         "automation",
+        "theme",
         "regression",
         "abi",
         "routing",
@@ -941,14 +944,14 @@
       ],
       "summary": "This contract does **not** choose the final Windows rendering technology yet.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 260,
-      "size_bytes": 15466,
-      "estimated_tokens": 3867,
+      "line_count": 290,
+      "size_bytes": 19035,
+      "estimated_tokens": 4759,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "a181c4b67b375ea40025ba181e5604226e61ec8f",
-      "updated_at": "2026-03-21T15:17:08.934Z"
+      "hash_sha1": "127f581c31c552864b39bf25046c2c2d4767b5ad",
+      "updated_at": "2026-03-22T00:23:46.799Z"
     },
     {
       "id": "docs/archive/architecture/README.md",

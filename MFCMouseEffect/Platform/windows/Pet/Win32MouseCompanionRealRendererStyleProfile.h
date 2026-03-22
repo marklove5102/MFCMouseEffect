@@ -1,0 +1,156 @@
+#pragma once
+
+namespace mousefx::windows {
+
+struct Win32MouseCompanionRealRendererStyleProfile final {
+    float bodyWidthRatio{0.31f};
+    float holdBodyWidthRatio{0.34f};
+    float bodyHeightRatio{0.31f};
+    float holdBodyHeightRatio{0.27f};
+    float headWidthRatio{0.78f};
+    float headHeightRatio{0.66f};
+
+    float glowWidthScale{1.96f};
+    float glowHeightScale{1.95f};
+    float glowXOffsetRatio{0.98f};
+    float glowYOffsetRatio{0.90f};
+    float glowStateLiftScale{0.10f};
+    float glowBaseAlpha{28.0f};
+    float glowActionAlphaScale{54.0f};
+    float glowHeadTintAlphaScale{18.0f};
+    float shadowWidthScale{1.16f};
+    float shadowHeightScale{0.22f};
+    float shadowXOffsetRatio{0.58f};
+    float shadowYRatio{0.50f};
+    float shadowBreathScale{1.4f};
+    float pedestalWidthScale{1.16f};
+    float pedestalHeightScale{0.20f};
+    float pedestalXOffsetRatio{0.58f};
+    float pedestalYOffsetRatio{0.04f};
+    float centerXRatio{0.50f};
+    float holdCenterYRatio{0.60f};
+    float idleCenterYRatio{0.58f};
+    float facingMomentumScale{0.03f};
+    float facingMomentumClampPx{12.0f};
+    float bodyXOffsetRatio{0.50f};
+    float bodyYOffsetRatio{0.50f};
+    float bodyClickSquashLiftPx{6.0f};
+    float bodyClickSquashWidthScale{0.40f};
+    float bodyClickSquashHeightScale{0.32f};
+    float chestXOffsetRatio{0.18f};
+    float chestYOffsetRatio{0.04f};
+    float chestWidthRatio{0.36f};
+    float chestHeightRatio{0.28f};
+    float headXOffsetRatio{0.50f};
+    float headDragLeanScale{0.18f};
+    float headBodyForwardScale{0.35f};
+    float headYOffsetRatio{0.48f};
+    float headActionLiftPx{4.0f};
+
+    float eyeWidthPx{5.0f};
+    float eyeHeightRatio{0.12f};
+    float eyeLeftXRatio{0.20f};
+    float eyeRightXRatio{0.20f};
+    float eyeYRatio{0.43f};
+    float noseWidthPx{4.0f};
+    float noseHeightPx{3.0f};
+    float noseYRatio{0.54f};
+    float mouthWidthPx{12.0f};
+    float mouthHeightBasePx{7.0f};
+    float mouthReactiveHeightPx{3.0f};
+    float mouthYRatio{0.60f};
+    float browYRatio{0.34f};
+    float leftBrowStartXRatio{0.26f};
+    float leftBrowEndXRatio{0.10f};
+    float rightBrowStartXRatio{0.10f};
+    float rightBrowEndXRatio{0.26f};
+    float leftBrowStartTiltScale{0.22f};
+    float leftBrowEndTiltScale{0.20f};
+    float rightBrowStartTiltScale{0.20f};
+    float rightBrowEndTiltScale{0.22f};
+    float blushWidthPx{9.0f};
+    float blushHeightPx{5.0f};
+    float blushXRatio{0.32f};
+    float blushYRatio{0.60f};
+
+    float tailXOffsetRatio{0.12f};
+    float tailFacingRatio{0.34f};
+    float tailWidthRatio{0.44f};
+    float tailHeightRatio{0.18f};
+    float tailYOffsetRatio{0.02f};
+    float leftEarPoseLiftScale{22.0f};
+    float rightEarPoseLiftScale{22.0f};
+    float leftEarPoseSpreadScale{18.0f};
+    float rightEarPoseSpreadScale{18.0f};
+    float leftHandPoseLiftScale{26.0f};
+    float rightHandPoseLiftScale{26.0f};
+    float leftLegPoseShiftScale{18.0f};
+    float rightLegPoseShiftScale{18.0f};
+    float earBaseYOffsetRatio{0.08f};
+    float earTipYOffsetRatio{0.42f};
+    float earIdleCadenceRatio{0.5f};
+    float earBaseOffsetRatio{0.22f};
+    float earOuterSpreadRatio{0.10f};
+    float earTipSpreadRatio{0.24f};
+    float leftEarSwingScale{0.7f};
+    float rightEarSwingScale{0.5f};
+    float earRootInsetRatio{0.06f};
+    float earBaseYRatio{0.06f};
+    float earRootYRatio{0.04f};
+    float handXOffsetRatio{0.06f};
+    float handWidthRatio{0.18f};
+    float handHeightRatio{0.30f};
+    float handYOffsetRatio{0.02f};
+    float handHeadNodRatio{0.12f};
+    float legLeftXRatio{0.26f};
+    float legRightXRatio{0.09f};
+    float legStrideRatio{0.24f};
+    float legWidthRatio{0.17f};
+    float legHeightRatio{0.22f};
+    float legYOffsetRatio{0.03f};
+    float followLegPhasePx{1.0f};
+
+    float badgeYOffsetRatio{0.02f};
+    float badgeWidthRatio{0.18f};
+    float badgeHeightRatio{0.13f};
+    float badgeStartXScale{1.8f};
+    float badgeGapScale{1.4f};
+    float poseBadgeXRatio{0.12f};
+    float poseBadgeYRatio{0.03f};
+    float poseBadgeSizeRatio{0.22f};
+    float accessoryXRatio{0.08f};
+    float accessoryYRatio{0.18f};
+    float accessoryOuterRatio{0.11f};
+    float accessoryInnerRatio{0.05f};
+    float accessoryStarInnerYOffsetRatio{0.12f};
+
+    float clickRingScale{1.28f};
+    float clickRingIntensityScale{0.26f};
+    float clickRingHeightScale{0.94f};
+    float clickRingCenterYRatio{0.52f};
+    float holdBandInsetRatio{0.10f};
+    float holdBandYOffsetRatio{0.18f};
+    float holdBandWidthInsetRatio{0.20f};
+    float holdBandHeightRatio{0.12f};
+    float scrollArcCenterYRatio{0.04f};
+    float scrollArcWidthRatio{1.50f};
+    float scrollArcHeightRatio{1.26f};
+    float dragLineStartXRatio{0.60f};
+    float dragLineStartYRatio{0.34f};
+    float dragLineEndXRatio{0.14f};
+    float dragLineEndYRatio{0.08f};
+    float followTrailBaseXRatio{0.62f};
+    float followTrailBaseYRatio{0.02f};
+    float followTrailStepXRatio{0.12f};
+    float followTrailStepYRatio{0.05f};
+    float followTrailWidthRatio{0.17f};
+    float followTrailHeightRatio{0.13f};
+    float followTrailShrinkPerStep{0.18f};
+
+    float bodyRearDarkenFactor{0.12f};
+    float tailDarkenFactor{0.08f};
+};
+
+Win32MouseCompanionRealRendererStyleProfile BuildWin32MouseCompanionRealRendererStyleProfile();
+
+} // namespace mousefx::windows

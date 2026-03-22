@@ -223,6 +223,36 @@ Before touching GPU-specific code, the safest first step is:
       - tail can sway slightly
       - hands can float slightly
       - this rhythm should remain renderer-local and reuse existing runtime ticks rather than requiring a second idle animation subsystem
+    - motion tuning now has a dedicated `Win32MouseCompanionRealRendererMotionProfile` seam:
+      - it owns action-strength curves and idle rhythm shaping
+      - `SceneBuilder` should consume that profile rather than growing a second formula bucket
+    - overlay geometry now has a dedicated `Win32MouseCompanionRealRendererActionOverlayBuilder` seam:
+      - it owns `click / hold / scroll / drag / follow` overlay placement and shape rules
+      - `SceneBuilder` should delegate overlay assembly there so body/head/limb layout stays the stable core scene seam
+    - face geometry now has a dedicated `Win32MouseCompanionRealRendererFaceBuilder` seam:
+      - it owns brow/eye/mouth/blush placement derived from the motion profile
+      - `SceneBuilder` should delegate expressive face assembly there so posture/layout and expression tuning evolve independently
+    - accessory/badge assembly now has a dedicated `Win32MouseCompanionRealRendererAdornmentBuilder` seam:
+      - it owns lane badges, pose badge, and accessory marker placement
+      - `SceneBuilder` should delegate those adornment concerns there so the core scene seam stays centered on body/head/limb geometry
+    - palette assignment now has a dedicated `Win32MouseCompanionRealRendererPaletteBuilder` seam:
+      - it owns skin/theme/status-derived colors and material-like fill/stroke choices
+      - `SceneBuilder` should delegate those presentation choices there so geometry and visual theming remain independently tunable
+      - renderer-owned palette tokens now also travel through `Win32MouseCompanionRealRendererPaletteProfile`, so theme constants can evolve without reintroducing color literals into the builder itself
+    - appendage geometry now has a dedicated `Win32MouseCompanionRealRendererAppendageBuilder` seam:
+      - it owns tail/ear/hand/leg placement driven by pose samples and the motion profile
+      - `SceneBuilder` should delegate that appendage assembly there so the core scene seam stays focused on body/head/frame layout
+    - core frame geometry now has a dedicated `Win32MouseCompanionRealRendererFrameBuilder` seam:
+      - it owns body/head/shadow/pedestal layout derived from runtime-facing momentum and the motion profile
+      - `SceneBuilder` should delegate that frame assembly there so top-level orchestration remains a composition layer rather than another long-lived geometry bucket
+    - shared layout metrics now have a dedicated `Win32MouseCompanionRealRendererLayoutMetrics` contract:
+      - builder seams should exchange stable body/head sizing conventions through that struct rather than passing multiple bare float dimensions
+      - this keeps future preview geometry evolution localized and makes builder signatures less brittle
+    - shared visual ratios now have a dedicated `Win32MouseCompanionRealRendererStyleProfile` contract:
+      - builder seams should consume common ratio/scale defaults there rather than duplicating ring/face/body/appendage/adornment sizing constants in each file
+      - this keeps future Windows preview tuning centralized and avoids re-coupling geometry seams through copied magic numbers
+      - current frame/appendage/face/adornment/overlay builders are expected to keep migrating new visual ratios into that style contract instead of reintroducing local hardcoded scale clusters
+      - current face-expression anchors, accessory-star offset rules, and frame/palette tuning values now also belong to that style contract, so preview tuning can stay centralized without reopening builder-local geometry literals
   - current rollout rule:
     - default `real` availability is gated by `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE`
     - when unset, diagnostics should report `unavailable_reason=rollout_disabled`
