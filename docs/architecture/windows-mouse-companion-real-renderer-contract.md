@@ -199,6 +199,11 @@ Before touching GPU-specific code, the safest first step is:
   - lightweight tail-tip and paw-pad accents should remain appendage/painter-owned preview details too, so material/detail readability improves without creating another controller-visible accent-state surface
   - lightweight tail-root attachment cues such as a rear cuff should remain appendage/painter-owned preview details too, so tail/body cohesion improves without creating another controller-visible attachment-state surface
   - lightweight ear-root attachment cues such as top cuffs should remain appendage/painter-owned preview details too, so ear/head cohesion improves without creating another controller-visible attachment-state surface
+  - lightweight cheek/jaw contour cues should remain face-builder/painter-owned preview details too, so lower-head silhouette readability improves without creating another controller-visible contour-state surface
+  - lightweight muzzle-pad cues should remain face-builder/painter-owned preview details too, so nose/mouth plane readability improves without creating another controller-visible muzzle-state surface
+  - lightweight forehead-pad cues should remain face-builder/painter-owned preview details too, so brow/eye-zone readability improves without creating another controller-visible forehead-state surface
+  - lightweight temple-contour cues should remain face-builder/painter-owned preview details too, so eye-socket readability improves without creating another controller-visible temple-state surface
+  - lightweight under-eye contour cues should remain face-builder/painter-owned preview details too, so eye-socket continuity improves without creating another controller-visible under-eye-state surface
   - the first real-renderer requirement seam is now active too:
     - `Win32MouseCompanionRealRendererAssetResources`
     - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract

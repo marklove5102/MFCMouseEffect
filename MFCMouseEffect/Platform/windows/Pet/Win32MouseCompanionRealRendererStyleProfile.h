@@ -101,6 +101,27 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float blushHeightPx{5.0f};
     float blushXRatio{0.32f};
     float blushYRatio{0.60f};
+    float cheekContourWidthRatio{0.18f};
+    float cheekContourHeightRatio{0.12f};
+    float cheekContourXRatio{0.34f};
+    float cheekContourYRatio{0.66f};
+    float jawContourWidthRatio{0.28f};
+    float jawContourHeightRatio{0.14f};
+    float jawContourYRatio{0.74f};
+    float muzzlePadWidthRatio{0.22f};
+    float muzzlePadHeightRatio{0.16f};
+    float muzzlePadYRatio{0.58f};
+    float foreheadPadWidthRatio{0.34f};
+    float foreheadPadHeightRatio{0.16f};
+    float foreheadPadYRatio{0.18f};
+    float templeContourWidthRatio{0.12f};
+    float templeContourHeightRatio{0.16f};
+    float templeContourXRatio{0.36f};
+    float templeContourYRatio{0.34f};
+    float underEyeContourWidthRatio{0.14f};
+    float underEyeContourHeightRatio{0.10f};
+    float underEyeContourXRatio{0.24f};
+    float underEyeContourYRatio{0.50f};
 
     float tailXOffsetRatio{0.12f};
     float tailFacingRatio{0.34f};

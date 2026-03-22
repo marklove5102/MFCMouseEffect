@@ -99,6 +99,51 @@ void BuildWin32MouseCompanionRealRendererFace(
         scene.headRect.Y + scene.headRect.Height * style.blushYRatio,
         style.blushWidthPx,
         style.blushHeightPx);
+    scene.leftCheekContourRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.cheekContourXRatio,
+        scene.headRect.Y + scene.headRect.Height * style.cheekContourYRatio,
+        scene.headRect.Width * style.cheekContourWidthRatio,
+        scene.headRect.Height * style.cheekContourHeightRatio);
+    scene.rightCheekContourRect = Gdiplus::RectF(
+        scene.centerX + scene.headRect.Width * style.cheekContourXRatio - scene.headRect.Width * style.cheekContourWidthRatio,
+        scene.headRect.Y + scene.headRect.Height * style.cheekContourYRatio,
+        scene.headRect.Width * style.cheekContourWidthRatio,
+        scene.headRect.Height * style.cheekContourHeightRatio);
+    scene.jawContourRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.jawContourWidthRatio * 0.5f,
+        scene.headRect.Y + scene.headRect.Height * style.jawContourYRatio,
+        scene.headRect.Width * style.jawContourWidthRatio,
+        scene.headRect.Height * style.jawContourHeightRatio);
+    scene.muzzlePadRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.muzzlePadWidthRatio * 0.5f,
+        scene.headRect.Y + scene.headRect.Height * style.muzzlePadYRatio,
+        scene.headRect.Width * style.muzzlePadWidthRatio,
+        scene.headRect.Height * style.muzzlePadHeightRatio);
+    scene.foreheadPadRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.foreheadPadWidthRatio * 0.5f,
+        scene.headRect.Y + scene.headRect.Height * style.foreheadPadYRatio,
+        scene.headRect.Width * style.foreheadPadWidthRatio,
+        scene.headRect.Height * style.foreheadPadHeightRatio);
+    scene.leftTempleContourRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.templeContourXRatio,
+        scene.headRect.Y + scene.headRect.Height * style.templeContourYRatio,
+        scene.headRect.Width * style.templeContourWidthRatio,
+        scene.headRect.Height * style.templeContourHeightRatio);
+    scene.rightTempleContourRect = Gdiplus::RectF(
+        scene.centerX + scene.headRect.Width * style.templeContourXRatio - scene.headRect.Width * style.templeContourWidthRatio,
+        scene.headRect.Y + scene.headRect.Height * style.templeContourYRatio,
+        scene.headRect.Width * style.templeContourWidthRatio,
+        scene.headRect.Height * style.templeContourHeightRatio);
+    scene.leftUnderEyeContourRect = Gdiplus::RectF(
+        scene.centerX - scene.headRect.Width * style.underEyeContourXRatio,
+        scene.headRect.Y + scene.headRect.Height * style.underEyeContourYRatio,
+        scene.headRect.Width * style.underEyeContourWidthRatio,
+        scene.headRect.Height * style.underEyeContourHeightRatio);
+    scene.rightUnderEyeContourRect = Gdiplus::RectF(
+        scene.centerX + scene.headRect.Width * style.underEyeContourXRatio - scene.headRect.Width * style.underEyeContourWidthRatio,
+        scene.headRect.Y + scene.headRect.Height * style.underEyeContourYRatio,
+        scene.headRect.Width * style.underEyeContourWidthRatio,
+        scene.headRect.Height * style.underEyeContourHeightRatio);
     scene.eyeHighlightAlpha = profile.eyeHighlightAlpha;
     scene.whiskerStrokeWidth = 1.0f + profile.whiskerSpread * 0.35f;
 

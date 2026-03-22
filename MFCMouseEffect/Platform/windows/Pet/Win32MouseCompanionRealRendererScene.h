@@ -109,6 +109,15 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::RectF noseRect{};
     Gdiplus::RectF leftBlushRect{};
     Gdiplus::RectF rightBlushRect{};
+    Gdiplus::RectF leftCheekContourRect{};
+    Gdiplus::RectF rightCheekContourRect{};
+    Gdiplus::RectF jawContourRect{};
+    Gdiplus::RectF muzzlePadRect{};
+    Gdiplus::RectF foreheadPadRect{};
+    Gdiplus::RectF leftTempleContourRect{};
+    Gdiplus::RectF rightTempleContourRect{};
+    Gdiplus::RectF leftUnderEyeContourRect{};
+    Gdiplus::RectF rightUnderEyeContourRect{};
     float eyeHighlightAlpha{190.0f};
     float whiskerStrokeWidth{1.0f};
     Gdiplus::RectF pedestalRect{};

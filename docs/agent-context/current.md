@@ -141,6 +141,11 @@
   - appendage/detail readability is now slightly stronger too: tail tip and paw-pad accents are now assembled behind the appendage/painter path, so small material cues read consistently without reopening host/runtime contracts
   - tail/body attachment also reads a bit cleaner now: a lightweight tail-root cuff now reinforces the tail entry point so the rear silhouette feels less detached without turning into a separate shading system
   - head/ear attachment also reads a bit cleaner now: lightweight ear-root cuffs now reinforce the ear entry points so the top silhouette feels less pasted-on without adding another explicit state lane
+  - face shape now reads a bit cleaner too: lightweight cheek/jaw contours now reinforce the lower head silhouette, so expression no longer relies only on eyes/brows/mouth/blush
+  - nose/mouth placement now reads a bit cleaner too: a lightweight muzzle pad now reinforces the front-face plane, so nose and mouth no longer sit directly on a perfectly flat head circle
+  - upper-face structure now reads a bit cleaner too: a lightweight forehead pad now reinforces the brow/eye zone, so the top half of the face no longer depends only on brows and highlights
+  - eye-zone side structure now reads a bit cleaner too: lightweight temple contours now reinforce the eye-socket area, so the face feels less like isolated eyes placed on a flat circle
+  - eye-zone lower structure now reads a bit cleaner too: lightweight under-eye contours now reinforce the lower eye socket, so the face volume reads more continuous around the eyes
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

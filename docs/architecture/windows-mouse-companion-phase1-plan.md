@@ -233,6 +233,11 @@
   - appendage detailing now also includes tail-tip and paw-pad accents, improving small-form readability while still keeping those cues behind appendage/painter seams instead of growing another controller-visible material/detail contract
   - appendage/body attachment now also includes a lightweight tail-root cuff, improving rear silhouette cohesion while keeping the cue renderer-owned and low-cost
   - head/appendage attachment now also includes lightweight ear-root cuffs, improving top silhouette cohesion while still keeping the cue renderer-owned and low-cost
+  - face contour detailing now also includes lightweight cheek/jaw cues, improving lower-head silhouette cohesion while still keeping the cue renderer-owned and low-cost
+  - front-face detailing now also includes a lightweight muzzle pad, improving nose/mouth placement readability while still keeping the cue renderer-owned and low-cost
+  - upper-face detailing now also includes a lightweight forehead pad, improving brow/eye-zone readability while still keeping the cue renderer-owned and low-cost
+  - eye-zone side detailing now also includes lightweight temple contours, improving eye-socket readability while still keeping the cue renderer-owned and low-cost
+  - eye-zone lower detailing now also includes lightweight under-eye contours, improving eye-socket continuity while still keeping the cue renderer-owned and low-cost
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract

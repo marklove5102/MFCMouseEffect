@@ -284,6 +284,60 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(graphics, scene.headRect, scene.headFill, scene.bodyStroke, scene.headStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.leftCheekContourRect,
+        WithAlpha(scene.headFillRear, 168.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightCheekContourRect,
+        WithAlpha(scene.headFillRear, 168.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.jawContourRect,
+        WithAlpha(scene.headFillRear, 154.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.muzzlePadRect,
+        WithAlpha(scene.headFillRear, 188.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.foreheadPadRect,
+        WithAlpha(scene.headFillRear, 148.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.leftTempleContourRect,
+        WithAlpha(scene.headFillRear, 132.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightTempleContourRect,
+        WithAlpha(scene.headFillRear, 132.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.leftUnderEyeContourRect,
+        WithAlpha(scene.headFillRear, 126.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightUnderEyeContourRect,
+        WithAlpha(scene.headFillRear, 126.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
 
     FillEllipse(graphics, scene.leftEyeRect, scene.eyeFill, scene.eyeFill, 0.0f);
     FillEllipse(graphics, scene.rightEyeRect, scene.eyeFill, scene.eyeFill, 0.0f);

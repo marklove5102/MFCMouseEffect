@@ -298,6 +298,16 @@ If those hidden fields change while the host is already active, the Windows visu
          - a light tail-root cuff should make the tail feel seated into the body instead of pasted on as a separate oval
        - head/ear attachment should also read cleaner:
          - light ear-root cuffs should make the ears feel seated into the head instead of pasted on as separate triangles
+       - lower-head silhouette should also read cleaner:
+         - cheek/jaw contour cues should make the face feel less like a plain circle with features stamped on top
+       - nose/mouth placement should also read cleaner:
+         - a light muzzle pad should make the nose and mouth feel seated on a front face plane instead of floating directly on the head circle
+       - brow/eye zone should also read cleaner:
+         - a light forehead pad should make the upper face feel like a surface, not just brows and eye highlights laid on a flat circle
+       - eye-socket side structure should also read cleaner:
+         - light temple contours should make the eyes feel seated into a face volume instead of floating in open space
+       - eye-socket lower structure should also read cleaner:
+         - light under-eye contours should make the eye area feel continuous instead of ending abruptly under the eyeballs
        - whole-body posture should now react too:
          - `click` should feel slightly lifted/lightened
          - `hold` should feel lower and more planted
