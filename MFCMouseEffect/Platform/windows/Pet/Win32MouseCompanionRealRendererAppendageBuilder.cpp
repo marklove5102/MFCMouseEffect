@@ -4,6 +4,22 @@
 
 namespace mousefx::windows {
 
+namespace {
+
+Gdiplus::RectF BuildPadRect(
+    const Gdiplus::RectF& limbRect,
+    const Win32MouseCompanionRealRendererStyleProfile& style) {
+    const float padWidth = limbRect.Width * style.pawPadWidthRatio;
+    const float padHeight = limbRect.Height * style.pawPadHeightRatio;
+    return Gdiplus::RectF(
+        limbRect.X + (limbRect.Width - padWidth) * 0.5f,
+        limbRect.GetBottom() - padHeight - limbRect.Height * style.pawPadBottomInsetRatio,
+        padWidth,
+        padHeight);
+}
+
+} // namespace
+
 void BuildWin32MouseCompanionRealRendererAppendages(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime,
     const Win32MouseCompanionRealRendererMotionProfile& profile,
@@ -26,6 +42,16 @@ void BuildWin32MouseCompanionRealRendererAppendages(
         scene.centerY - metrics.bodyHeight * style.tailYOffsetRatio + profile.tailLift,
         metrics.bodyWidth * style.tailWidthRatio,
         metrics.bodyHeight * style.tailHeightRatio);
+    scene.tailRootCuffRect = Gdiplus::RectF(
+        scene.tailRect.X - scene.tailRect.Width * style.tailRootCuffXOffsetRatio,
+        scene.tailRect.Y + scene.tailRect.Height * style.tailRootCuffYOffsetRatio,
+        scene.tailRect.Width * style.tailRootCuffWidthRatio,
+        scene.tailRect.Height * style.tailRootCuffHeightRatio);
+    scene.tailTipRect = Gdiplus::RectF(
+        scene.tailRect.GetRight() - scene.tailRect.Width * (style.tailTipXOffsetRatio + style.tailTipWidthRatio),
+        scene.tailRect.Y + scene.tailRect.Height * style.tailTipYOffsetRatio - profile.tailLift * 0.08f,
+        scene.tailRect.Width * style.tailTipWidthRatio,
+        scene.tailRect.Height * style.tailTipHeightRatio);
 
     const float earBaseY = scene.headRect.Y + scene.headRect.Height * style.earBaseYOffsetRatio;
     const float earTipY = scene.headRect.Y - scene.headRect.Height * style.earTipYOffsetRatio - profile.earLift - poseEarLift -
@@ -33,6 +59,18 @@ void BuildWin32MouseCompanionRealRendererAppendages(
     const float rightEarTipY = scene.headRect.Y - scene.headRect.Height * style.earTipYOffsetRatio - profile.earLift -
         poseRightEarLift + profile.idleEarCadence * style.earIdleCadenceRatio;
     const float earBaseOffset = scene.headRect.Width * style.earBaseOffsetRatio;
+    const float earRootCuffWidth = scene.headRect.Width * style.earRootCuffWidthRatio;
+    const float earRootCuffHeight = scene.headRect.Height * style.earRootCuffHeightRatio;
+    scene.leftEarRootCuffRect = Gdiplus::RectF(
+        scene.centerX - earBaseOffset - earRootCuffWidth * 0.55f,
+        earBaseY - earRootCuffHeight * (0.5f + style.earRootCuffYOffsetRatio),
+        earRootCuffWidth,
+        earRootCuffHeight);
+    scene.rightEarRootCuffRect = Gdiplus::RectF(
+        scene.centerX + earBaseOffset - earRootCuffWidth * 0.45f,
+        earBaseY - earRootCuffHeight * (0.5f + style.earRootCuffYOffsetRatio),
+        earRootCuffWidth,
+        earRootCuffHeight);
     scene.leftEar = {{
         Gdiplus::PointF(scene.centerX - earBaseOffset, earBaseY),
         Gdiplus::PointF(
@@ -89,6 +127,10 @@ void BuildWin32MouseCompanionRealRendererAppendages(
             profile.legLift * 0.45f,
         metrics.bodyWidth * style.legWidthRatio,
         metrics.bodyHeight * style.legHeightRatio);
+    scene.leftHandPadRect = BuildPadRect(scene.leftHandRect, style);
+    scene.rightHandPadRect = BuildPadRect(scene.rightHandRect, style);
+    scene.leftLegPadRect = BuildPadRect(scene.leftLegRect, style);
+    scene.rightLegPadRect = BuildPadRect(scene.rightLegRect, style);
 }
 
 } // namespace mousefx::windows

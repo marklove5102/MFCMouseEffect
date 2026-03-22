@@ -42,6 +42,18 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float chestYOffsetRatio{0.04f};
     float chestWidthRatio{0.36f};
     float chestHeightRatio{0.28f};
+    float neckBridgeWidthRatio{0.20f};
+    float neckBridgeHeightRatio{0.16f};
+    float neckBridgeXOffsetRatio{0.10f};
+    float neckBridgeYOffsetRatio{0.06f};
+    float shoulderPatchWidthRatio{0.18f};
+    float shoulderPatchHeightRatio{0.14f};
+    float shoulderPatchXOffsetRatio{0.08f};
+    float shoulderPatchYOffsetRatio{0.20f};
+    float hipPatchWidthRatio{0.20f};
+    float hipPatchHeightRatio{0.15f};
+    float hipPatchXOffsetRatio{0.05f};
+    float hipPatchYOffsetRatio{0.06f};
     float headXOffsetRatio{0.50f};
     float headDragLeanScale{0.18f};
     float headBodyForwardScale{0.35f};
@@ -95,6 +107,14 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float tailWidthRatio{0.44f};
     float tailHeightRatio{0.18f};
     float tailYOffsetRatio{0.02f};
+    float tailRootCuffWidthRatio{0.18f};
+    float tailRootCuffHeightRatio{0.16f};
+    float tailRootCuffXOffsetRatio{0.08f};
+    float tailRootCuffYOffsetRatio{0.04f};
+    float tailTipWidthRatio{0.18f};
+    float tailTipHeightRatio{0.12f};
+    float tailTipXOffsetRatio{0.10f};
+    float tailTipYOffsetRatio{0.03f};
     float leftEarPoseLiftScale{22.0f};
     float rightEarPoseLiftScale{22.0f};
     float leftEarPoseSpreadScale{18.0f};
@@ -107,6 +127,9 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float earTipYOffsetRatio{0.42f};
     float earIdleCadenceRatio{0.5f};
     float earBaseOffsetRatio{0.22f};
+    float earRootCuffWidthRatio{0.14f};
+    float earRootCuffHeightRatio{0.11f};
+    float earRootCuffYOffsetRatio{0.02f};
     float earOuterSpreadRatio{0.10f};
     float earTipSpreadRatio{0.24f};
     float leftEarSwingScale{0.7f};
@@ -125,6 +148,9 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float legWidthRatio{0.17f};
     float legHeightRatio{0.22f};
     float legYOffsetRatio{0.03f};
+    float pawPadWidthRatio{0.55f};
+    float pawPadHeightRatio{0.22f};
+    float pawPadBottomInsetRatio{0.10f};
     float followLegPhasePx{1.0f};
 
     float badgeYOffsetRatio{0.02f};

@@ -176,6 +176,30 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     DrawActionOverlay(graphics, scene.actionOverlay, scene.bodyStroke);
     FillRoundedRect(graphics, scene.pedestalRect, scene.pedestalFill, scene.pedestalFill, 0.0f);
     FillEllipse(graphics, scene.tailRect, scene.tailFill, scene.bodyStroke, scene.tailStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.tailRootCuffRect,
+        WithAlpha(scene.bodyFillRear, 214.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.tailTipRect,
+        WithAlpha(scene.headFill, 236.0f),
+        scene.bodyStroke,
+        std::max(0.9f, scene.tailStrokeWidth - 0.2f));
+    FillEllipse(
+        graphics,
+        scene.leftEarRootCuffRect,
+        WithAlpha(scene.headFillRear, 214.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightEarRootCuffRect,
+        WithAlpha(scene.headFillRear, 214.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
 
     if (scene.facingSign < 0.0f) {
         FillEar(graphics, scene.rightEar, scene.earFillRear, scene.earInner, scene.bodyStroke);
@@ -187,6 +211,18 @@ void Win32MouseCompanionRealRendererPainter::Paint(
 
     FillRoundedRect(graphics, scene.leftLegRect, scene.bodyFillRear, scene.bodyStroke, scene.limbStrokeWidth);
     FillRoundedRect(graphics, scene.rightLegRect, scene.bodyFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.leftLegPadRect,
+        WithAlpha(scene.blushFill, 196.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightLegPadRect,
+        WithAlpha(scene.blushFill, 196.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
 
     const Gdiplus::GraphicsState saved = graphics->Save();
     const float cx = scene.bodyRect.X + scene.bodyRect.Width * 0.5f;
@@ -197,14 +233,56 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     FillEllipse(graphics, scene.bodyRect, scene.bodyFill, scene.bodyStroke, scene.bodyStrokeWidth);
     FillEllipse(
         graphics,
+        scene.leftShoulderPatchRect,
+        WithAlpha(scene.bodyFillRear, 176.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightShoulderPatchRect,
+        WithAlpha(scene.bodyFillRear, 176.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillRoundedRect(
+        graphics,
+        scene.neckBridgeRect,
+        WithAlpha(scene.headFillRear, 210.0f),
+        scene.bodyStroke,
+        std::max(1.0f, scene.bodyStrokeWidth - 0.2f));
+    FillEllipse(
+        graphics,
         scene.chestRect,
         WithAlpha(scene.headFill, scene.chestFillAlpha),
         scene.bodyStroke,
         scene.chestStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.leftHipPatchRect,
+        WithAlpha(scene.bodyFillRear, 166.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightHipPatchRect,
+        WithAlpha(scene.bodyFillRear, 166.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
     graphics->Restore(saved);
 
     FillRoundedRect(graphics, scene.leftHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
     FillRoundedRect(graphics, scene.rightHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.leftHandPadRect,
+        WithAlpha(scene.blushFill, 206.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        scene.rightHandPadRect,
+        WithAlpha(scene.blushFill, 206.0f),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
     FillEllipse(graphics, scene.headRect, scene.headFill, scene.bodyStroke, scene.headStrokeWidth);
 
     FillEllipse(graphics, scene.leftEyeRect, scene.eyeFill, scene.eyeFill, 0.0f);

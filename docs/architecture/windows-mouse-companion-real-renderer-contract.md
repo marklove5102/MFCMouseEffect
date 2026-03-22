@@ -194,6 +194,11 @@ Before touching GPU-specific code, the safest first step is:
   - preview palette emphasis is renderer-owned too; future visual tuning should keep action-family tinting behind palette/style contracts instead of scattering ad-hoc color shifts through painter code
   - face focus detailing is renderer-owned too; pupil offset and eye-highlight intensity should remain face-builder inputs derived from runtime motion state rather than controller-side flags or painter-local heuristics
   - whisker focus detailing is renderer-owned too; whisker spread/tilt should remain face-builder outputs derived from runtime motion state rather than another controller-visible action-specific toggle list
+  - lightweight body/head cohesion cues such as a neck bridge should remain frame/painter-owned preview details, not a reason to reopen host/runtime contracts or add controller-side geometry flags
+  - lightweight front/rear depth cues such as shoulder/hip patches should also remain frame/painter-owned preview details, so silhouette readability improves without creating another controller-visible detail state surface
+  - lightweight tail-tip and paw-pad accents should remain appendage/painter-owned preview details too, so material/detail readability improves without creating another controller-visible accent-state surface
+  - lightweight tail-root attachment cues such as a rear cuff should remain appendage/painter-owned preview details too, so tail/body cohesion improves without creating another controller-visible attachment-state surface
+  - lightweight ear-root attachment cues such as top cuffs should remain appendage/painter-owned preview details too, so ear/head cohesion improves without creating another controller-visible attachment-state surface
   - the first real-renderer requirement seam is now active too:
     - `Win32MouseCompanionRealRendererAssetResources`
     - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract

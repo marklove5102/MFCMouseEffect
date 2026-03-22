@@ -136,6 +136,11 @@
   - that same smoke preset now also prints a short human-readable expectation checklist before running, so manual Windows bring-up can sanity-check env/gate assumptions without reopening docs first
   - real preview face detail is now more alive too: pupils shift with facing/action focus and eye highlights vary by state, so `click / hold / drag / follow` read less like the same sticker with a different mouth arc
   - face readability now also includes whisker focus cues: whiskers spread more on stronger reactions and tilt slightly with drag/scroll direction, so state differences no longer rely only on mouth/brow/eye changes
+  - body/head cohesion is now slightly stronger too: a light neck bridge now sits between head and torso, so the Windows real preview reads less like separate stickers and more like one creature
+  - front/rear depth now reads a bit more clearly too: lightweight shoulder/hip patches now reinforce body mass and layering without turning the preview into a noisy shaded character
+  - appendage/detail readability is now slightly stronger too: tail tip and paw-pad accents are now assembled behind the appendage/painter path, so small material cues read consistently without reopening host/runtime contracts
+  - tail/body attachment also reads a bit cleaner now: a lightweight tail-root cuff now reinforces the tail entry point so the rear silhouette feels less detached without turning into a separate shading system
+  - head/ear attachment also reads a bit cleaner now: lightweight ear-root cuffs now reinforce the ear entry points so the top silhouette feels less pasted-on without adding another explicit state lane
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

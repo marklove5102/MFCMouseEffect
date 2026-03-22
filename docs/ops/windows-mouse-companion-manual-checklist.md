@@ -288,6 +288,16 @@ If those hidden fields change while the host is already active, the Windows visu
          - `drag/scroll` should tilt them slightly with directional intent
          - `hold` should keep them tighter than `click`
          - `follow` should look more alert
+       - head/body should read more connected:
+         - a light neck bridge should make the head feel attached instead of floating as a separate sticker
+       - front/rear depth should read more clearly too:
+         - shoulder and hip patches should make the body mass feel less flat without turning into noisy shading blobs
+       - small appendage/material accents should now read more coherently too:
+         - tail tip and paw pads should look attached to the same creature palette instead of like unrelated hardcoded stickers
+       - tail/body attachment should also read cleaner:
+         - a light tail-root cuff should make the tail feel seated into the body instead of pasted on as a separate oval
+       - head/ear attachment should also read cleaner:
+         - light ear-root cuffs should make the ears feel seated into the head instead of pasted on as separate triangles
        - whole-body posture should now react too:
          - `click` should feel slightly lifted/lightened
          - `hold` should feel lower and more planted

@@ -228,6 +228,11 @@
   - that smoke preset now also prints a short human-readable expectation checklist before it runs, so the shortest bring-up path can confirm env/gate assumptions without sending readers back to a separate doc first
   - face detailing is now action-aware too: pupil focus and eye-highlight intensity are renderer-owned, so state readability no longer depends only on brows/mouth/overlay geometry
   - whisker detailing is now action-aware too: whisker spread/tilt is renderer-owned, so `click / hold / drag / scroll` gain another low-cost facial readability cue without pushing more state flags into controller/host layers
+  - frame detailing now also includes a lightweight neck-bridge cue, improving body/head cohesion without reopening controller/runtime seams or turning the preview into a noisy overdraw experiment
+  - lightweight shoulder/hip patches are now part of frame detailing too, improving front/rear depth readability while still keeping mass cues renderer-owned and low-cost
+  - appendage detailing now also includes tail-tip and paw-pad accents, improving small-form readability while still keeping those cues behind appendage/painter seams instead of growing another controller-visible material/detail contract
+  - appendage/body attachment now also includes a lightweight tail-root cuff, improving rear silhouette cohesion while keeping the cue renderer-owned and low-cost
+  - head/appendage attachment now also includes lightweight ear-root cuffs, improving top silhouette cohesion while still keeping the cue renderer-owned and low-cost
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract
