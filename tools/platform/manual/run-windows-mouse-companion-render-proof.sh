@@ -16,6 +16,7 @@ Options:
   --base-url <url>              Required API base URL, e.g. http://127.0.0.1:8787
   --token <token>               Required x-mfcmouseeffect-token value
   --route <proof|sweep>         Route kind (default: sweep)
+  --preset <name>               Named preset (currently: real-preview-smoke)
   --event <name>                Single proof event when --route proof (default: status)
   --x <int>                     Pointer x (default: 640)
   --y <int>                     Pointer y (default: 360)
@@ -34,6 +35,7 @@ EOF
 base_url=""
 token=""
 route_kind="sweep"
+preset_name=""
 event_name="status"
 x=640
 y=360
@@ -61,6 +63,11 @@ while [[ $# -gt 0 ]]; do
     --route)
         mfx_require_option_value "$1" "${2:-}"
         route_kind="$2"
+        shift 2
+        ;;
+    --preset)
+        mfx_require_option_value "$1" "${2:-}"
+        preset_name="$2"
         shift 2
         ;;
     --event)
@@ -138,6 +145,21 @@ case "$route_kind" in
     proof|sweep) ;;
     *)
         mfx_fail "invalid --route value: $route_kind (expected: proof|sweep)"
+        ;;
+esac
+
+case "$preset_name" in
+    "")
+        ;;
+    real-preview-smoke)
+        route_kind="sweep"
+        wait_for_frame_ms=120
+        expect_frame_advance="true"
+        expected_backend="real"
+        expect_preview_active="true"
+        ;;
+    *)
+        mfx_fail "invalid --preset value: $preset_name (expected: real-preview-smoke)"
         ;;
 esac
 

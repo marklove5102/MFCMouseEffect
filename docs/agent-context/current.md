@@ -131,6 +131,8 @@
   - a matching Git Bash helper now exists too: `tools/platform/manual/run-windows-mouse-companion-render-proof.sh`, so Windows bring-up can call single proof or sweep proof without manually rebuilding curl payloads
   - the sweep proof route and Git Bash helper now also produce pass/fail summaries, so Windows bring-up can detect missed frame-advance expectations without manually counting per-event proof rows
   - both the single proof path and the sweep path now support optional `expected_backend` and `expect_preview_active` checks, so Windows bring-up can verify renderer selection, preview activation, and frame advance through the same gated proof contract
+  - real preview palette emphasis is now action-themed too: overlay accent, glow, body/head tint, and accent fill all lean toward the current action color family instead of only changing amplitude
+  - the Windows Git Bash bring-up helper now also exposes a `real-preview-smoke` preset, so the shortest real-preview gate no longer needs callers to repeat the sweep/backend/preview expectation arguments by hand
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

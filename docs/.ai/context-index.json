@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-22T01:09:24.425Z",
+  "generated_at": "2026-03-22T01:13:00.527Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -84,14 +84,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 259,
-      "size_bytes": 18933,
-      "estimated_tokens": 4734,
+      "line_count": 261,
+      "size_bytes": 19343,
+      "estimated_tokens": 4836,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": true,
-      "hash_sha1": "844e5576c0f1224f4681666ca7b675df76883092",
-      "updated_at": "2026-03-22T01:08:27.273Z"
+      "hash_sha1": "4a43311883a4998b2971003303d12a5816502166",
+      "updated_at": "2026-03-22T01:12:19.644Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -880,14 +880,14 @@
       ],
       "summary": "1. close Phase1.5 behavior/structure boundary",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 266,
-      "size_bytes": 23548,
-      "estimated_tokens": 5887,
+      "line_count": 268,
+      "size_bytes": 23926,
+      "estimated_tokens": 5982,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "36caf00b0fd8922185b56992d2b6381bd47c97e8",
-      "updated_at": "2026-03-22T01:08:34.423Z"
+      "hash_sha1": "be2319ad0b2df6bfb535e7dea54295b7f02d1b7e",
+      "updated_at": "2026-03-22T01:12:23.846Z"
     },
     {
       "id": "docs/architecture/windows-mouse-companion-phase15-exit-contract.md",
@@ -944,14 +944,14 @@
       ],
       "summary": "This contract does **not** choose the final Windows rendering technology yet.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 307,
-      "size_bytes": 20517,
-      "estimated_tokens": 5130,
+      "line_count": 308,
+      "size_bytes": 20718,
+      "estimated_tokens": 5180,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "974b5d8b0d19bc73f1e4eb3247493f58b0b3b814",
-      "updated_at": "2026-03-22T01:08:41.110Z"
+      "hash_sha1": "49bf3fe960dc6120c0923c256cde16f8cb33b7bc",
+      "updated_at": "2026-03-22T01:11:03.319Z"
     },
     {
       "id": "docs/archive/architecture/README.md",
@@ -1172,14 +1172,14 @@
       ],
       "summary": "Common manual commands for local iteration and debugging.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 27,
-      "size_bytes": 1802,
-      "estimated_tokens": 451,
-      "max_read_tokens": 571,
+      "line_count": 28,
+      "size_bytes": 1986,
+      "estimated_tokens": 497,
+      "max_read_tokens": 617,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "ad4e9dbd0600c1c25eb3ceaa238f74d8b4d8d24e",
-      "updated_at": "2026-03-22T01:08:20.183Z"
+      "hash_sha1": "4a8880dc9f578cef068891b47a23373b54051b3b",
+      "updated_at": "2026-03-22T01:12:08.123Z"
     },
     {
       "id": "docs/ops/windows-installer-packaging.md",
@@ -1213,7 +1213,7 @@
       "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/ops/windows-mouse-companion-manual-checklist.md",
       "priority": "P2",
       "role": "capability",
-      "topic": "workflow",
+      "topic": "theme",
       "first_read_rank": 0,
       "tags": [
         "ops",
@@ -1222,6 +1222,7 @@
         "companion",
         "manual",
         "checklist",
+        "theme",
         "regression",
         "macos",
         "contract",
@@ -1230,14 +1231,14 @@
       ],
       "summary": "1. Build [MFCMouseEffect.vcxproj](/f:/language/cpp/code/MFCMouseEffect/MFCMouseEffect/MFCMouseEffect.vcxproj) with `Release|x64`.",
       "when_to_read": "Read when executing manual/regression workflows.",
-      "line_count": 299,
-      "size_bytes": 18180,
-      "estimated_tokens": 4545,
+      "line_count": 307,
+      "size_bytes": 18702,
+      "estimated_tokens": 4676,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "671d0ed76e9c21d96084c68547b8d375ad47d890",
-      "updated_at": "2026-03-22T01:08:15.355Z"
+      "hash_sha1": "82005201362267dc479d087f23dfabce8267c052",
+      "updated_at": "2026-03-22T01:12:15.265Z"
     },
     {
       "id": "docs/README.md",

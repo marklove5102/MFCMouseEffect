@@ -20,6 +20,21 @@ Gdiplus::Color Darken(const Gdiplus::Color& color, float factor) {
     return MakeColor(color.GetA(), scale(color.GetR()), scale(color.GetG()), scale(color.GetB()));
 }
 
+BYTE BlendChannel(BYTE from, BYTE to, float mix) {
+    const float clampedMix = std::clamp(mix, 0.0f, 1.0f);
+    const float blended =
+        static_cast<float>(from) + (static_cast<float>(to) - static_cast<float>(from)) * clampedMix;
+    return static_cast<BYTE>(std::clamp(std::lround(blended), 0L, 255L));
+}
+
+Gdiplus::Color BlendToward(const Gdiplus::Color& base, const Gdiplus::Color& tint, float mix) {
+    return MakeColor(
+        BlendChannel(base.GetA(), tint.GetA(), mix),
+        BlendChannel(base.GetR(), tint.GetR(), mix),
+        BlendChannel(base.GetG(), tint.GetG(), mix),
+        BlendChannel(base.GetB(), tint.GetB(), mix));
+}
+
 } // namespace
 
 void BuildWin32MouseCompanionRealRendererPalette(
@@ -34,16 +49,17 @@ void BuildWin32MouseCompanionRealRendererPalette(
         emphasis + (runtime.hold ? 0.18f : 0.0f) + (runtime.follow ? 0.08f : 0.0f),
         0.0f,
         1.0f);
-    scene.glowColor = palette.glowColor;
-    scene.bodyFill = baseBody;
-    scene.bodyFillRear = Darken(baseBody, style.bodyRearDarkenFactor);
+    const auto actionTint = profile.overlayAccentColor;
+    scene.glowColor = BlendToward(palette.glowColor, actionTint, emphasis * style.glowActionTintMix);
+    scene.bodyFill = BlendToward(baseBody, actionTint, emphasis * style.bodyActionTintMix);
+    scene.bodyFillRear = Darken(scene.bodyFill, style.bodyRearDarkenFactor);
     scene.bodyStroke = MakeColor(
         static_cast<BYTE>(std::clamp(style.bodyStrokeBaseAlpha + emphasis * style.bodyStrokeActionAlphaScale, 0.0f, 255.0f)),
-        palette.bodyStroke.GetR(),
-        palette.bodyStroke.GetG(),
-        palette.bodyStroke.GetB());
-    scene.headFill = palette.headFill;
-    scene.headFillRear = palette.headFillRear;
+        BlendChannel(palette.bodyStroke.GetR(), actionTint.GetR(), emphasis * style.strokeActionTintMix),
+        BlendChannel(palette.bodyStroke.GetG(), actionTint.GetG(), emphasis * style.strokeActionTintMix),
+        BlendChannel(palette.bodyStroke.GetB(), actionTint.GetB(), emphasis * style.strokeActionTintMix));
+    scene.headFill = BlendToward(palette.headFill, actionTint, emphasis * style.headActionTintMix);
+    scene.headFillRear = BlendToward(palette.headFillRear, actionTint, emphasis * style.headActionTintMix * 0.7f);
     scene.earFill = palette.earFill;
     scene.earFillRear = palette.earFillRear;
     scene.earInner = palette.earInner;
@@ -54,12 +70,12 @@ void BuildWin32MouseCompanionRealRendererPalette(
         palette.blushRgb.GetR(),
         palette.blushRgb.GetG(),
         palette.blushRgb.GetB());
-    scene.tailFill = Darken(baseBody, style.tailDarkenFactor);
+    scene.tailFill = Darken(scene.bodyFill, style.tailDarkenFactor);
     scene.accentFill = MakeColor(
         static_cast<BYTE>(std::clamp(style.accentBaseAlpha + emphasis * style.accentActionAlphaScale, 0.0f, 255.0f)),
-        palette.accentFill.GetR(),
-        palette.accentFill.GetG(),
-        palette.accentFill.GetB());
+        BlendChannel(palette.accentFill.GetR(), actionTint.GetR(), emphasis * style.accentActionTintMix),
+        BlendChannel(palette.accentFill.GetG(), actionTint.GetG(), emphasis * style.accentActionTintMix),
+        BlendChannel(palette.accentFill.GetB(), actionTint.GetB(), emphasis * style.accentActionTintMix));
     scene.shadowFill = MakeColor(
         static_cast<BYTE>(std::clamp(style.shadowBaseAlpha + shadowEmphasis * style.shadowActionAlphaScale, 0.0f, 255.0f)),
         palette.pedestalFill.GetR(),

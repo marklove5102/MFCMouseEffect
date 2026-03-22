@@ -150,6 +150,11 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
 
     float bodyRearDarkenFactor{0.12f};
     float tailDarkenFactor{0.08f};
+    float bodyActionTintMix{0.10f};
+    float headActionTintMix{0.08f};
+    float strokeActionTintMix{0.14f};
+    float glowActionTintMix{0.28f};
+    float accentActionTintMix{0.34f};
     float bodyStrokeBaseAlpha{255.0f};
     float bodyStrokeActionAlphaScale{0.0f};
     float accentBaseAlpha{255.0f};

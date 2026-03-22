@@ -257,6 +257,8 @@ If those hidden fields change while the host is already active, the Windows visu
        - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route proof --event click`
      - when validating the gated real preview path, prefer:
        - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route sweep --expected-backend real --expect-preview-active true`
+       - or use the shortest preset form:
+         - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --preset real-preview-smoke`
      - the script now exits non-zero if proof expectations are missed, so it can be used as a simple bring-up gate instead of only a logging helper
    - expected visual boundary:
      - current `real` backend still looks like a preview renderer, not macOS SceneKit parity
@@ -267,6 +269,12 @@ If those hidden fields change while the host is already active, the Windows visu
        - `scroll` should show an orbit arc around the body
        - `follow` should show a short trailing-motion overlay
        - `drag` should show a directional motion slash
+       - action changes should also carry a mild theme tint:
+         - `click` should read warmer/pinker
+         - `hold` should read warmer/golden
+         - `scroll` should read cooler/cyan
+         - `drag` should read more violet
+         - `follow` should read fresher/green-cyan
        - the face should now react too:
          - `click` should read as the happiest/openest expression
          - `hold` should look more concentrated/tense
