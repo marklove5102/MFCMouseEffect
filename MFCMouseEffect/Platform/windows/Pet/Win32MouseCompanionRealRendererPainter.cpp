@@ -7,6 +7,14 @@
 namespace mousefx::windows {
 namespace {
 
+Gdiplus::Color WithAlpha(const Gdiplus::Color& color, float alpha) {
+    return Gdiplus::Color(
+        static_cast<BYTE>(std::clamp(alpha, 0.0f, 255.0f)),
+        color.GetR(),
+        color.GetG(),
+        color.GetB());
+}
+
 void FillEllipse(
     Gdiplus::Graphics* graphics,
     const Gdiplus::RectF& rect,
@@ -99,18 +107,18 @@ void DrawActionOverlay(
 
     if (overlay.followTrailVisible) {
         for (size_t i = 0; i < overlay.followTrailRects.size(); ++i) {
-            const BYTE alpha = static_cast<BYTE>(std::max(48, 150 - static_cast<int>(i) * 34));
+            const float alpha = std::max(48.0f, overlay.followTrailBaseAlpha - static_cast<float>(i) * 34.0f);
             FillEllipse(
                 graphics,
                 overlay.followTrailRects[i],
-                Gdiplus::Color(alpha, overlay.accentColor.GetR(), overlay.accentColor.GetG(), overlay.accentColor.GetB()),
+                WithAlpha(overlay.accentColor, alpha),
                 Gdiplus::Color(0, 0, 0, 0),
                 0.0f);
         }
     }
 
     if (overlay.scrollArcVisible) {
-        Gdiplus::Pen arcPen(overlay.accentColor, 3.0f);
+        Gdiplus::Pen arcPen(WithAlpha(overlay.accentColor, overlay.scrollArcAlpha), overlay.scrollArcStrokeWidth);
         arcPen.SetStartCap(Gdiplus::LineCapRound);
         arcPen.SetEndCap(Gdiplus::LineCapRound);
         graphics->DrawArc(
@@ -121,7 +129,7 @@ void DrawActionOverlay(
     }
 
     if (overlay.dragLineVisible) {
-        Gdiplus::Pen dashPen(overlay.accentColor, 2.4f);
+        Gdiplus::Pen dashPen(WithAlpha(overlay.accentColor, overlay.dragLineAlpha), overlay.dragLineStrokeWidth);
         dashPen.SetStartCap(Gdiplus::LineCapRound);
         dashPen.SetEndCap(Gdiplus::LineCapRound);
         const Gdiplus::REAL dashPattern[2] = {4.0f, 3.0f};
@@ -130,7 +138,7 @@ void DrawActionOverlay(
     }
 
     if (overlay.clickRingVisible) {
-        Gdiplus::Pen ringPen(overlay.accentColor, 2.2f);
+        Gdiplus::Pen ringPen(WithAlpha(overlay.accentColor, overlay.clickRingAlpha), overlay.clickRingStrokeWidth);
         ringPen.SetAlignment(Gdiplus::PenAlignmentCenter);
         graphics->DrawEllipse(&ringPen, overlay.clickRingRect);
     }
@@ -139,7 +147,7 @@ void DrawActionOverlay(
         FillRoundedRect(
             graphics,
             overlay.holdBandRect,
-            Gdiplus::Color(150, overlay.accentColor.GetR(), overlay.accentColor.GetG(), overlay.accentColor.GetB()),
+            WithAlpha(overlay.accentColor, overlay.holdBandAlpha),
             stroke,
             1.0f);
     }
@@ -162,12 +170,12 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         scene.glowColor.GetR(),
         scene.glowColor.GetG(),
         scene.glowColor.GetB()));
-    Gdiplus::SolidBrush shadowBrush(scene.pedestalFill);
+    Gdiplus::SolidBrush shadowBrush(scene.shadowFill);
     graphics->FillEllipse(&glowBrush, scene.glowRect);
     graphics->FillEllipse(&shadowBrush, scene.shadowRect);
     DrawActionOverlay(graphics, scene.actionOverlay, scene.bodyStroke);
     FillRoundedRect(graphics, scene.pedestalRect, scene.pedestalFill, scene.pedestalFill, 0.0f);
-    FillEllipse(graphics, scene.tailRect, scene.tailFill, scene.bodyStroke, 1.2f);
+    FillEllipse(graphics, scene.tailRect, scene.tailFill, scene.bodyStroke, scene.tailStrokeWidth);
 
     if (scene.facingSign < 0.0f) {
         FillEar(graphics, scene.rightEar, scene.earFillRear, scene.earInner, scene.bodyStroke);
@@ -177,8 +185,8 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         FillEar(graphics, scene.rightEar, scene.earFill, scene.earInner, scene.bodyStroke);
     }
 
-    FillRoundedRect(graphics, scene.leftLegRect, scene.bodyFillRear, scene.bodyStroke, 1.2f);
-    FillRoundedRect(graphics, scene.rightLegRect, scene.bodyFillRear, scene.bodyStroke, 1.2f);
+    FillRoundedRect(graphics, scene.leftLegRect, scene.bodyFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillRoundedRect(graphics, scene.rightLegRect, scene.bodyFillRear, scene.bodyStroke, scene.limbStrokeWidth);
 
     const Gdiplus::GraphicsState saved = graphics->Save();
     const float cx = scene.bodyRect.X + scene.bodyRect.Width * 0.5f;
@@ -186,13 +194,18 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     graphics->TranslateTransform(cx, cy);
     graphics->RotateTransform(scene.bodyTiltDeg);
     graphics->TranslateTransform(-cx, -cy);
-    FillEllipse(graphics, scene.bodyRect, scene.bodyFill, scene.bodyStroke, 1.8f);
-    FillEllipse(graphics, scene.chestRect, scene.headFill, scene.bodyStroke, 1.1f);
+    FillEllipse(graphics, scene.bodyRect, scene.bodyFill, scene.bodyStroke, scene.bodyStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.chestRect,
+        WithAlpha(scene.headFill, scene.chestFillAlpha),
+        scene.bodyStroke,
+        scene.chestStrokeWidth);
     graphics->Restore(saved);
 
-    FillRoundedRect(graphics, scene.leftHandRect, scene.headFillRear, scene.bodyStroke, 1.2f);
-    FillRoundedRect(graphics, scene.rightHandRect, scene.headFillRear, scene.bodyStroke, 1.2f);
-    FillEllipse(graphics, scene.headRect, scene.headFill, scene.bodyStroke, 1.8f);
+    FillRoundedRect(graphics, scene.leftHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillRoundedRect(graphics, scene.rightHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillEllipse(graphics, scene.headRect, scene.headFill, scene.bodyStroke, scene.headStrokeWidth);
 
     FillEllipse(graphics, scene.leftEyeRect, scene.eyeFill, scene.eyeFill, 0.0f);
     FillEllipse(graphics, scene.rightEyeRect, scene.eyeFill, scene.eyeFill, 0.0f);

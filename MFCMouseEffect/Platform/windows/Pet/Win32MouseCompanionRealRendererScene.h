@@ -10,17 +10,25 @@ struct Win32MouseCompanionRealRendererActionOverlay final {
     Gdiplus::Color accentColor{};
     bool clickRingVisible{false};
     Gdiplus::RectF clickRingRect{};
+    float clickRingStrokeWidth{2.2f};
+    float clickRingAlpha{210.0f};
     bool holdBandVisible{false};
     Gdiplus::RectF holdBandRect{};
+    float holdBandAlpha{150.0f};
     bool scrollArcVisible{false};
     Gdiplus::RectF scrollArcRect{};
     float scrollArcStartDeg{0.0f};
     float scrollArcSweepDeg{0.0f};
+    float scrollArcStrokeWidth{3.0f};
+    float scrollArcAlpha{220.0f};
     bool dragLineVisible{false};
     Gdiplus::PointF dragLineStart{};
     Gdiplus::PointF dragLineEnd{};
+    float dragLineStrokeWidth{2.4f};
+    float dragLineAlpha{210.0f};
     bool followTrailVisible{false};
     std::array<Gdiplus::RectF, 3> followTrailRects{};
+    float followTrailBaseAlpha{150.0f};
 };
 
 struct Win32MouseCompanionRealRendererScene final {
@@ -43,11 +51,18 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::Color blushFill{};
     Gdiplus::Color tailFill{};
     Gdiplus::Color accentFill{};
+    Gdiplus::Color shadowFill{};
     Gdiplus::Color pedestalFill{};
     Gdiplus::Color badgeReadyFill{};
     Gdiplus::Color badgePendingFill{};
     Gdiplus::Color accessoryFill{};
     Gdiplus::Color accessoryStroke{};
+    float bodyStrokeWidth{1.8f};
+    float headStrokeWidth{1.8f};
+    float limbStrokeWidth{1.2f};
+    float tailStrokeWidth{1.2f};
+    float chestStrokeWidth{1.1f};
+    float chestFillAlpha{255.0f};
     Gdiplus::RectF glowRect{};
     Gdiplus::RectF shadowRect{};
     Gdiplus::RectF bodyRect{};

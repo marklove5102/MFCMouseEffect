@@ -15,12 +15,16 @@ struct Win32MouseCompanionRealRendererMotionProfile final {
     float scrollLean{0.0f};
     float earLift{0.0f};
     float earSwing{0.0f};
+    float earSpreadPulse{0.0f};
     float handLift{0.0f};
+    float handSwing{0.0f};
     float legStride{0.0f};
+    float legLift{0.0f};
     float stateLift{0.0f};
     float headNod{0.0f};
     float bodyForward{0.0f};
     float tailLift{0.0f};
+    float tailSwing{0.0f};
     float shadowScale{1.0f};
     float breathLift{0.0f};
     float breathScale{1.0f};

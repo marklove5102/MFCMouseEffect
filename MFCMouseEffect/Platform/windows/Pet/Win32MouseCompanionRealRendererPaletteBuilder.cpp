@@ -29,10 +29,19 @@ void BuildWin32MouseCompanionRealRendererPalette(
     const Win32MouseCompanionRealRendererPaletteProfile& palette,
     Win32MouseCompanionRealRendererScene& scene) {
     const auto baseBody = palette.baseBodyFill;
+    const float emphasis = std::max({profile.actionIntensity, profile.reactiveIntensity, profile.scrollIntensity});
+    const float shadowEmphasis = std::clamp(
+        emphasis + (runtime.hold ? 0.18f : 0.0f) + (runtime.follow ? 0.08f : 0.0f),
+        0.0f,
+        1.0f);
     scene.glowColor = palette.glowColor;
     scene.bodyFill = baseBody;
     scene.bodyFillRear = Darken(baseBody, style.bodyRearDarkenFactor);
-    scene.bodyStroke = palette.bodyStroke;
+    scene.bodyStroke = MakeColor(
+        static_cast<BYTE>(std::clamp(style.bodyStrokeBaseAlpha + emphasis * style.bodyStrokeActionAlphaScale, 0.0f, 255.0f)),
+        palette.bodyStroke.GetR(),
+        palette.bodyStroke.GetG(),
+        palette.bodyStroke.GetB());
     scene.headFill = palette.headFill;
     scene.headFillRear = palette.headFillRear;
     scene.earFill = palette.earFill;
@@ -46,8 +55,21 @@ void BuildWin32MouseCompanionRealRendererPalette(
         palette.blushRgb.GetG(),
         palette.blushRgb.GetB());
     scene.tailFill = Darken(baseBody, style.tailDarkenFactor);
-    scene.accentFill = palette.accentFill;
-    scene.pedestalFill = palette.pedestalFill;
+    scene.accentFill = MakeColor(
+        static_cast<BYTE>(std::clamp(style.accentBaseAlpha + emphasis * style.accentActionAlphaScale, 0.0f, 255.0f)),
+        palette.accentFill.GetR(),
+        palette.accentFill.GetG(),
+        palette.accentFill.GetB());
+    scene.shadowFill = MakeColor(
+        static_cast<BYTE>(std::clamp(style.shadowBaseAlpha + shadowEmphasis * style.shadowActionAlphaScale, 0.0f, 255.0f)),
+        palette.pedestalFill.GetR(),
+        palette.pedestalFill.GetG(),
+        palette.pedestalFill.GetB());
+    scene.pedestalFill = MakeColor(
+        static_cast<BYTE>(std::clamp(style.pedestalBaseAlpha + shadowEmphasis * style.pedestalActionAlphaScale, 0.0f, 255.0f)),
+        palette.pedestalFill.GetR(),
+        palette.pedestalFill.GetG(),
+        palette.pedestalFill.GetB());
     scene.badgeReadyFill = palette.badgeReadyFill;
     scene.badgePendingFill = palette.badgePendingFill;
     scene.accessoryFill = palette.accessoryFill;

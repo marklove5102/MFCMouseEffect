@@ -103,9 +103,13 @@
   - runtime/test diagnostics now also report whether the hidden config preference is the active resolved preference via `configured_renderer_backend_preference_effective` and `configured_renderer_backend_preference_status`
   - renderer registry/factory diagnostics now also distinguish currently unavailable backends from simply unselected ones, so future real-backend rollout can report machine/runtime gating reasons without changing the host contract again
   - a `real` backend now has a complete internal preview pipeline (`asset resources -> scene runtime -> scene builder -> painter -> render`), and the preview output is already a pose/action-aware stylized pet instead of a pure diagnostics card; default selection still keeps it unavailable behind a rollout gate, so current placeholder-first behavior stays unchanged
-  - that preview path now also adds action-specific overlays inside `scene -> painter`, so `click / hold / scroll / follow / drag` are easier to distinguish visually during Windows bring-up instead of relying only on diagnostics fields
+  - that preview path now also adds action-specific overlays inside `scene -> painter`, and those overlays now vary stroke/alpha emphasis per action intensity too, so `click / hold / scroll / follow / drag` are easier to distinguish visually during Windows bring-up instead of relying only on diagnostics fields
   - the preview face is now action-aware too: brows, mouth arc, and blush strength react to `click / hold / scroll / follow / drag`, so real-preview verification is not limited to silhouettes and motion marks
   - the preview posture is now action-aware too: body lift, head offset, shadow compression, tail lift, and limb cadence all vary per action, so Windows bring-up can distinguish states from whole-body rhythm rather than only overlays
+  - the preview body/head/limb silhouette emphasis is now action-aware too: stroke weight and chest emphasis vary with action intensity so state separation is visible even before reading overlay glyphs
+  - the preview glow/shadow/palette emphasis is now action-aware too: glow size, shadow/pedestal alpha, and accent presence now vary with action intensity so overall mood changes along with the active state
+  - the preview action rhythm is now more state-specific too: click rebound, hold squeeze, scroll bob, drag pull, and follow gait all ride renderer-owned time phases instead of only changing static amplitudes
+  - that action rhythm now also propagates through appendages more coherently: ears, tail, hands, and legs share the same renderer-owned gait/squeeze/pull phases instead of moving as mostly independent amplitude offsets
   - idle preview now also has a lightweight time-driven life rhythm via `poseSampleTickMs`: breathing, subtle hand float, ear cadence, shadow breathing, and tail sway keep the Windows preview from freezing into a static card when no action is active
   - real preview motion semantics are now split behind a dedicated `Win32MouseCompanionRealRendererMotionProfile` seam, so future visual tuning does not keep inflating `SceneBuilder`
   - real preview action overlay geometry is now split behind `Win32MouseCompanionRealRendererActionOverlayBuilder`, so overlay variants evolve independently from core body/head/limb layout
@@ -123,6 +127,10 @@
   - the selected Windows renderer backend now also reports a backend-owned runtime snapshot (`renderer_runtime_*`), so diagnostics no longer have to infer preview state only from controller-side cached fields
   - backend-owned runtime diagnostics now also include render-proof fields (`frame_count`, `last_render_tick_ms`, `surface_width`, `surface_height`) so Windows bring-up can confirm that a test event really produced a new rendered frame
   - render-proof helpers are now extracted out of the mouse-companion test route, and Windows test API now also exposes a compact `/api/mouse-companion/test-render-proof` path for frame-advance validation without returning the full runtime payload
+  - Windows test API now also exposes `/api/mouse-companion/test-render-proof-sweep`, so bring-up can check a compact status/click/hold/scroll/move/hold-end proof sequence in one response instead of replaying those calls by hand
+  - a matching Git Bash helper now exists too: `tools/platform/manual/run-windows-mouse-companion-render-proof.sh`, so Windows bring-up can call single proof or sweep proof without manually rebuilding curl payloads
+  - the sweep proof route and Git Bash helper now also produce pass/fail summaries, so Windows bring-up can detect missed frame-advance expectations without manually counting per-event proof rows
+  - both the single proof path and the sweep path now support optional `expected_backend` and `expect_preview_active` checks, so Windows bring-up can verify renderer selection, preview activation, and frame advance through the same gated proof contract
 - Current boundary:
   - visible backend is stable enough for `Phase1.5` structural work
   - Windows still does not render the real 3D model yet

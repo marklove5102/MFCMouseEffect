@@ -18,6 +18,7 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
     float glowBaseAlpha{28.0f};
     float glowActionAlphaScale{54.0f};
     float glowHeadTintAlphaScale{18.0f};
+    float glowActionScale{0.08f};
     float shadowWidthScale{1.16f};
     float shadowHeightScale{0.22f};
     float shadowXOffsetRatio{0.58f};
@@ -149,6 +150,14 @@ struct Win32MouseCompanionRealRendererStyleProfile final {
 
     float bodyRearDarkenFactor{0.12f};
     float tailDarkenFactor{0.08f};
+    float bodyStrokeBaseAlpha{255.0f};
+    float bodyStrokeActionAlphaScale{0.0f};
+    float accentBaseAlpha{255.0f};
+    float accentActionAlphaScale{0.0f};
+    float shadowBaseAlpha{88.0f};
+    float shadowActionAlphaScale{42.0f};
+    float pedestalBaseAlpha{105.0f};
+    float pedestalActionAlphaScale{28.0f};
 };
 
 Win32MouseCompanionRealRendererStyleProfile BuildWin32MouseCompanionRealRendererStyleProfile();

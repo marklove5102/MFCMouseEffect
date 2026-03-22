@@ -7,6 +7,10 @@
 namespace mousefx::windows {
 namespace {
 
+float ClampAlpha(float value) {
+    return std::clamp(value, 0.0f, 255.0f);
+}
+
 Gdiplus::RectF MakeCenteredRect(float centerX, float centerY, float width, float height) {
     return Gdiplus::RectF(centerX - width * 0.5f, centerY - height * 0.5f, width, height);
 }
@@ -25,6 +29,8 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
         const float ringSize = std::max(scene.headRect.Width, scene.headRect.Height) *
             (style.clickRingScale + profile.actionIntensity * style.clickRingIntensityScale);
         scene.actionOverlay.clickRingVisible = true;
+        scene.actionOverlay.clickRingStrokeWidth = 2.2f + profile.actionIntensity * 1.4f;
+        scene.actionOverlay.clickRingAlpha = ClampAlpha(205.0f + profile.actionIntensity * 36.0f);
         scene.actionOverlay.clickRingRect = MakeCenteredRect(
             scene.centerX,
             scene.headRect.Y + scene.headRect.Height * style.clickRingCenterYRatio,
@@ -34,6 +40,7 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
 
     if (runtime.hold) {
         scene.actionOverlay.holdBandVisible = true;
+        scene.actionOverlay.holdBandAlpha = ClampAlpha(145.0f + profile.actionIntensity * 78.0f);
         scene.actionOverlay.holdBandRect = Gdiplus::RectF(
             scene.leftHandRect.X + scene.leftHandRect.Width * style.holdBandInsetRatio,
             std::min(scene.leftHandRect.Y, scene.rightHandRect.Y) + metrics.bodyHeight * style.holdBandYOffsetRatio,
@@ -43,6 +50,8 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
 
     if (runtime.scroll) {
         scene.actionOverlay.scrollArcVisible = true;
+        scene.actionOverlay.scrollArcStrokeWidth = 3.0f + profile.scrollIntensity * 1.6f;
+        scene.actionOverlay.scrollArcAlpha = ClampAlpha(180.0f + profile.scrollIntensity * 56.0f);
         scene.actionOverlay.scrollArcRect = MakeCenteredRect(
             scene.centerX,
             scene.centerY - metrics.bodyHeight * style.scrollArcCenterYRatio,
@@ -54,6 +63,8 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
 
     if (runtime.drag) {
         scene.actionOverlay.dragLineVisible = true;
+        scene.actionOverlay.dragLineStrokeWidth = 2.4f + profile.actionIntensity * 1.2f;
+        scene.actionOverlay.dragLineAlpha = ClampAlpha(178.0f + profile.actionIntensity * 52.0f);
         scene.actionOverlay.dragLineStart = Gdiplus::PointF(
             scene.centerX - runtime.facingSign * metrics.bodyWidth * style.dragLineStartXRatio,
             scene.centerY - metrics.bodyHeight * style.dragLineStartYRatio);
@@ -64,6 +75,7 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
 
     if (runtime.follow) {
         scene.actionOverlay.followTrailVisible = true;
+        scene.actionOverlay.followTrailBaseAlpha = ClampAlpha(150.0f + profile.actionIntensity * 68.0f);
         const float trailBaseX = scene.centerX - runtime.facingSign * metrics.bodyWidth * style.followTrailBaseXRatio;
         const float trailBaseY = scene.centerY + metrics.bodyHeight * style.followTrailBaseYRatio;
         for (size_t i = 0; i < scene.actionOverlay.followTrailRects.size(); ++i) {

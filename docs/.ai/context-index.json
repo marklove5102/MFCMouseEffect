@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-22T00:29:32.073Z",
+  "generated_at": "2026-03-22T01:09:24.425Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -84,14 +84,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 251,
-      "size_bytes": 17126,
-      "estimated_tokens": 4282,
+      "line_count": 259,
+      "size_bytes": 18933,
+      "estimated_tokens": 4734,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": true,
-      "hash_sha1": "89efcf18fccbaac80896ab927d0dfad6f91277cc",
-      "updated_at": "2026-03-22T00:23:36.366Z"
+      "hash_sha1": "844e5576c0f1224f4681666ca7b675df76883092",
+      "updated_at": "2026-03-22T01:08:27.273Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -880,14 +880,14 @@
       ],
       "summary": "1. close Phase1.5 behavior/structure boundary",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
-      "line_count": 258,
-      "size_bytes": 21710,
-      "estimated_tokens": 5428,
+      "line_count": 266,
+      "size_bytes": 23548,
+      "estimated_tokens": 5887,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "d60adad5143974fbbd137af54cfa116faf2f19b6",
-      "updated_at": "2026-03-22T00:23:41.865Z"
+      "hash_sha1": "36caf00b0fd8922185b56992d2b6381bd47c97e8",
+      "updated_at": "2026-03-22T01:08:34.423Z"
     },
     {
       "id": "docs/architecture/windows-mouse-companion-phase15-exit-contract.md",
@@ -944,14 +944,14 @@
       ],
       "summary": "This contract does **not** choose the final Windows rendering technology yet.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 290,
-      "size_bytes": 19035,
-      "estimated_tokens": 4759,
+      "line_count": 307,
+      "size_bytes": 20517,
+      "estimated_tokens": 5130,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "127f581c31c552864b39bf25046c2c2d4767b5ad",
-      "updated_at": "2026-03-22T00:23:46.799Z"
+      "hash_sha1": "974b5d8b0d19bc73f1e4eb3247493f58b0b3b814",
+      "updated_at": "2026-03-22T01:08:41.110Z"
     },
     {
       "id": "docs/archive/architecture/README.md",
@@ -1167,18 +1167,19 @@
         "gesture",
         "effects",
         "macos",
+        "windows",
         "debug"
       ],
       "summary": "Common manual commands for local iteration and debugging.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 22,
-      "size_bytes": 1174,
-      "estimated_tokens": 294,
-      "max_read_tokens": 414,
+      "line_count": 27,
+      "size_bytes": 1802,
+      "estimated_tokens": 451,
+      "max_read_tokens": 571,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "09ca559e9b373cc5f382b7e034c1dfa3b9648ba2",
-      "updated_at": "2026-03-17T02:46:13.741Z"
+      "hash_sha1": "ad4e9dbd0600c1c25eb3ceaa238f74d8b4d8d24e",
+      "updated_at": "2026-03-22T01:08:20.183Z"
     },
     {
       "id": "docs/ops/windows-installer-packaging.md",
@@ -1229,14 +1230,14 @@
       ],
       "summary": "1. Build [MFCMouseEffect.vcxproj](/f:/language/cpp/code/MFCMouseEffect/MFCMouseEffect/MFCMouseEffect.vcxproj) with `Release|x64`.",
       "when_to_read": "Read when executing manual/regression workflows.",
-      "line_count": 272,
-      "size_bytes": 16176,
-      "estimated_tokens": 4044,
+      "line_count": 299,
+      "size_bytes": 18180,
+      "estimated_tokens": 4545,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "5d149e2e542b1c634b08f62067e5ea75561bbfc8",
-      "updated_at": "2026-03-21T15:17:19.654Z"
+      "hash_sha1": "671d0ed76e9c21d96084c68547b8d375ad47d890",
+      "updated_at": "2026-03-22T01:08:15.355Z"
     },
     {
       "id": "docs/README.md",

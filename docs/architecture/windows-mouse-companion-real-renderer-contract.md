@@ -189,7 +189,8 @@ Before touching GPU-specific code, the safest first step is:
   - `renderer_runtime_frame_count`, `renderer_runtime_last_render_tick_ms`, and renderer surface-size fields are part of the render-proof subset of that contract; future real-backend rollout should preserve their semantics so test automation can detect actual rendered-frame advancement
   - the current test route contract now includes `renderer_runtime_before / renderer_runtime_after / renderer_runtime_delta`; future renderer bring-up should preserve this diff-friendly proof shape instead of forcing callers to reconstruct transitions manually
   - the test route also accepts bounded wait/expect parameters (`wait_for_frame_ms`, `expect_frame_advance`) so proof-of-render can tolerate short asynchronous frame delays while staying explicit and machine-readable
-  - a compact `/api/mouse-companion/test-render-proof` route now exists beside dispatch testing; it should remain focused on renderer proof + preview summary, while `/api/mouse-companion/test-dispatch` remains the heavier end-to-end dispatch contract
+  - a compact `/api/mouse-companion/test-render-proof` route now exists beside dispatch testing; it should remain focused on renderer proof + preview summary, and it now shares the same optional backend/preview expectation checks as the sweep path while `/api/mouse-companion/test-dispatch` remains the heavier end-to-end dispatch contract
+  - a compact `/api/mouse-companion/test-render-proof-sweep` route now also exists for bring-up sequencing; it should remain focused on a small fixed proof sequence and reuse the same render-proof/result semantics instead of inventing a second diagnostics schema
   - the first real-renderer requirement seam is now active too:
     - `Win32MouseCompanionRealRendererAssetResources`
     - it adapts shared `model / action_library / appearance_profile` lanes into a renderer-facing resource contract
@@ -207,6 +208,7 @@ Before touching GPU-specific code, the safest first step is:
       - `scroll` -> orbit arc
       - `follow` -> trail overlay
       - `drag` -> motion slash
+      - overlay stroke/alpha emphasis is now also renderer-owned, so preview intensity changes remain visible without adding a second controller-side visual-strength contract
     - face expression is now part of the same renderer-owned preview contract:
       - brows tilt/lift per action
       - mouth arc shape changes per action
@@ -217,6 +219,21 @@ Before touching GPU-specific code, the safest first step is:
       - tail can lift/sag
       - shadow scale can compress/spread with the apparent weight shift
       - limb placement can change with follow/hold cadence
+    - silhouette emphasis is now part of that renderer-owned preview contract too:
+      - body/head/limb stroke weight can vary with action intensity
+      - chest emphasis can tighten/soften with action state
+    - atmosphere emphasis is now part of that renderer-owned preview contract too:
+      - glow size can expand with action intensity
+      - shadow/pedestal alpha can respond to follow/hold emphasis
+      - accent visibility can strengthen with action intensity
+    - action rhythm is now part of that renderer-owned preview contract too:
+      - click can carry a rebound pulse
+      - hold can carry a squeeze cadence
+      - scroll can carry a bob/swirl cadence
+      - drag can carry a pull pulse
+      - follow can carry a gait rhythm
+    - appendage coordination is now part of that renderer-owned preview contract too:
+      - ears, tail, hands, and legs can reuse those action phases instead of only reading independent static offsets
     - idle life rhythm is also part of the preview contract:
       - lightweight breathing can modulate body/shadow scale
       - ears can keep a subtle cadence

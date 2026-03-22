@@ -231,6 +231,33 @@ If those hidden fields change while the host is already active, the Windows visu
        - `selected_renderer_backend=real`
        - `real_renderer_preview.preview_active=true`
        - `renderer_runtime_delta.frame_count_delta > 0` once a new frame is observed
+       - when `expected_backend` is provided, `backend_expectation_met=true`
+       - when `expect_preview_active=true`, `preview_expectation_met=true`
+       - `all_expectations_met=true` once frame/backend/preview checks all pass
+   - for compact multi-step bring-up checks, call `/api/mouse-companion/test-render-proof-sweep`
+     - expected compact result:
+       - response `event=render_proof_sweep`
+       - response `summary.all_expectations_met=true`
+       - when `expected_backend` is provided, `summary.all_backend_expectations_met=true`
+       - when `expect_preview_active=true`, `summary.all_preview_expectations_met=true`
+       - response `results` includes at least:
+         - `status`
+         - `click`
+         - `hold_start`
+         - `scroll`
+         - `move`
+         - `hold_end`
+       - each result keeps the same `renderer_runtime_before / after / delta` shape as the single proof route
+       - the action results that request frame advance should report:
+         - `renderer_runtime_expectation_met=true`
+         - `renderer_runtime_expectation_status=frame_advanced`
+   - for a reusable Git Bash entry on Windows, run:
+     - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route sweep`
+     - single-event proof is also supported:
+       - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route proof --event click`
+     - when validating the gated real preview path, prefer:
+       - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-windows-mouse-companion-render-proof.sh --base-url <url> --token <token> --route sweep --expected-backend real --expect-preview-active true`
+     - the script now exits non-zero if proof expectations are missed, so it can be used as a simple bring-up gate instead of only a logging helper
    - expected visual boundary:
      - current `real` backend still looks like a preview renderer, not macOS SceneKit parity
      - but it should now render a stylized pet silhouette with visible ears/limbs/face plus asset-lane badges, rather than only an abstract diagnostics card

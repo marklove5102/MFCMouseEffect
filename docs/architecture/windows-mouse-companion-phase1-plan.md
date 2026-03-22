@@ -194,9 +194,13 @@
   - backend preference updates that arrive through runtime config now trigger an in-place window/backend reselection instead of being ignored after the first backend is created
   - a `real` backend now has a complete internal preview pipeline through `Win32MouseCompanionRealRendererAssetResources`, `Win32MouseCompanionRealRendererSceneRuntime`, `Win32MouseCompanionRealRendererSceneBuilder`, and `Win32MouseCompanionRealRendererPainter`
   - that preview path is no longer just a readiness card; it now renders a stylized pet-like scene that reacts to action/facing/pose lanes under the hidden rollout gate
-  - the preview path now also keeps action-specific differentiation inside the renderer seam itself: `click` adds a ring, `hold` adds a grip band, `scroll` adds orbit arcs, and `follow/drag` add motion overlays, so visual bring-up can verify action changes without reading only JSON diagnostics
+  - the preview path now also keeps action-specific differentiation inside the renderer seam itself: `click` adds a ring, `hold` adds a grip band, `scroll` adds orbit arcs, and `follow/drag` add motion overlays, and those overlays now also vary stroke/alpha emphasis with runtime intensity so visual bring-up can verify action changes without reading only JSON diagnostics
   - the same preview seam now also owns action-aware face semantics, so brow/mouth/blush changes stay renderer-local instead of expanding controller-side preview rules
   - whole-body posture is now also renderer-owned: center-of-mass lift, head offset, tail lift, shadow scale, and limb placement vary per action so visible state separation does not depend only on overlay glyphs
+  - body/head/limb silhouette emphasis is now also renderer-owned: stroke weight and chest emphasis vary with action intensity so visible state separation does not depend only on overlay glyphs
+  - glow/shadow/palette emphasis is now also renderer-owned: glow size plus shadow/pedestal/accent alpha vary with action intensity so overall mood changes do not require controller-side state styling
+  - action rhythm is now also more renderer-owned and state-specific: click rebound, hold squeeze, scroll bob, drag pull, and follow gait now ride renderer-local time phases instead of only reusing static action amplitudes
+  - appendage coordination is now also more rhythm-aware: ears, tail, hands, and legs now reuse those renderer-local phases so follow/hold/scroll/drag feel more like one coordinated body instead of a set of unrelated offsets
   - idle life rhythm is now also renderer-owned and time-driven from existing runtime ticks, so breathing/ear cadence/tail sway stay inside the preview seam instead of introducing another controller-side idle animation track
   - preview motion tuning now has its own `Win32MouseCompanionRealRendererMotionProfile` seam, so action-strength curves can evolve without turning `SceneBuilder` into another multi-hundred-line behavior bucket
   - preview action overlay geometry now has its own `Win32MouseCompanionRealRendererActionOverlayBuilder` seam, so `click / hold / scroll / drag / follow` overlay iteration does not bloat the main scene builder again
@@ -215,6 +219,10 @@
   - the test mouse-companion route now returns explicit `renderer_runtime_before / after / delta` payloads, so renderer proof no longer requires two manual snapshot requests and client-side diffing
   - the same route now also supports bounded waiting (`wait_for_frame_ms`) and expectation reporting (`expect_frame_advance`), which keeps Windows renderer verification test-friendly without changing production runtime behavior
   - compact render-proof handling is now split into its own helper seam, and `/api/mouse-companion/test-render-proof` now exists as a minimal verification path when we only need renderer frame proof and preview summary rather than the full mouse-companion runtime object
+  - `/api/mouse-companion/test-render-proof-sweep` now exists as the compact bring-up path when we want one response covering `status / click / hold_start / scroll / move / hold_end` proof transitions instead of manually replaying multiple proof calls
+  - a matching Git Bash helper now exists too: `tools/platform/manual/run-windows-mouse-companion-render-proof.sh`, so Windows bring-up can hit either the single proof or sweep proof route without rebuilding curl payloads by hand
+  - the sweep proof route/helper now also emit compact pass/fail summaries, so bring-up can fail fast when frame-advance expectations are missed instead of forcing manual inspection of every row
+  - the compact proof path and the sweep proof path now both support optional expected-backend and preview-active checks, so bring-up can validate renderer selection, preview activation, and frame advance through the same expectation model
 - Backend lifecycle fallback is now part of the seam:
   - registry/factory selection no longer treats constructor success as enough
   - backend startup now has an explicit `Start() / Shutdown() / IsReady() / LastErrorReason()` contract

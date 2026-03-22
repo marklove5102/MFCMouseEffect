@@ -50,6 +50,9 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
     profile.scrollIntensity = std::abs(ClampSigned(runtime.scrollSignedIntensity));
 
     const float breathePhase = TimePhaseRadians(runtime.poseSampleTickMs, 2100.0f);
+    const float gesturePhaseFast = TimePhaseRadians(runtime.poseSampleTickMs, 720.0f);
+    const float gesturePhaseMedium = TimePhaseRadians(runtime.poseSampleTickMs, 960.0f);
+    const float gaitPhase = TimePhaseRadians(runtime.poseSampleTickMs, 820.0f);
     const float idleBreath = std::sin(breathePhase);
     const float idleSway = std::sin(breathePhase * 0.7f + 0.9f);
     const float idlePulse = runtime.click || runtime.hold || runtime.scroll || runtime.drag || runtime.follow
@@ -63,9 +66,12 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
         (runtime.scroll ? profile.scrollIntensity * 12.0f : 0.0f);
     profile.earSwing =
         runtime.facingSign * (runtime.follow ? 6.0f + profile.actionIntensity * 4.5f : 2.0f);
+    profile.earSpreadPulse = 0.0f;
     profile.handLift =
         runtime.hold ? (13.0f + profile.actionIntensity * 11.0f) : (runtime.follow ? 3.5f : 0.0f);
+    profile.handSwing = 0.0f;
     profile.legStride = runtime.follow ? (7.0f + profile.actionIntensity * 7.0f) : 0.0f;
+    profile.legLift = 0.0f;
     profile.stateLift = runtime.click ? (8.0f + profile.actionIntensity * 6.0f)
         : runtime.follow             ? (4.5f + profile.actionIntensity * 3.5f)
         : runtime.scroll             ? (2.0f + profile.scrollIntensity * 2.5f)
@@ -84,6 +90,7 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
         : runtime.hold                ? 4.5f
         : runtime.scroll              ? runtime.scrollSignedIntensity * 4.5f
                                       : 0.0f;
+    profile.tailSwing = 0.0f;
     profile.shadowScale = runtime.click ? 0.86f : runtime.follow ? 0.92f : runtime.hold ? 1.08f : 1.0f;
 
     profile.breathLift = idlePulse * (idleBreath * 2.2f);
@@ -92,6 +99,50 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
     profile.idleEarCadence = idlePulse * idleBreath * 3.0f;
     profile.idleHeadSway = idlePulse * idleSway * 1.6f;
     profile.idleHandFloat = idlePulse * std::sin(breathePhase * 1.15f + 0.6f) * 1.8f;
+
+    if (runtime.click) {
+        const float rebound = std::max(0.0f, std::sin(gesturePhaseFast));
+        profile.clickSquash += rebound * 0.04f;
+        profile.stateLift += rebound * 1.8f;
+        profile.headNod -= rebound * 1.3f;
+        profile.tailLift -= rebound * 0.9f;
+        profile.tailSwing += runtime.facingSign * rebound * 1.2f;
+    }
+    if (runtime.hold) {
+        const float squeeze = std::sin(gesturePhaseMedium + 0.4f);
+        profile.handLift += squeeze * 2.2f;
+        profile.handSwing += runtime.facingSign * squeeze * 0.8f;
+        profile.headNod += squeeze * 1.1f;
+        profile.shadowScale += std::max(0.0f, squeeze) * 0.04f;
+        profile.earSpreadPulse += squeeze * 0.9f;
+    }
+    if (runtime.scroll) {
+        const float swirl = std::sin(gesturePhaseMedium * 1.15f + runtime.scrollSignedIntensity * 0.8f);
+        profile.stateLift += swirl * profile.scrollIntensity * 1.4f;
+        profile.headNod -= swirl * profile.scrollIntensity * 1.1f;
+        profile.tailLift += swirl * profile.scrollIntensity * 1.6f;
+        profile.tailSwing += runtime.scrollSignedIntensity * swirl * 1.5f;
+        profile.earSpreadPulse += swirl * profile.scrollIntensity * 0.8f;
+    }
+    if (runtime.drag) {
+        const float dragPulse = std::sin(gesturePhaseFast * 0.8f + 0.5f);
+        profile.dragLean += runtime.facingSign * dragPulse * 1.3f;
+        profile.bodyForward += runtime.facingSign * std::max(0.0f, dragPulse) * 1.2f;
+        profile.handSwing += runtime.facingSign * dragPulse * 1.4f;
+    }
+    if (runtime.follow) {
+        const float gaitWave = std::sin(gaitPhase);
+        const float gaitCounter = std::sin(gaitPhase + 1.5707963f);
+        profile.legStride += gaitWave * 2.4f;
+        profile.legLift += std::abs(gaitCounter) * (1.6f + profile.actionIntensity * 0.8f);
+        profile.bodyForward += runtime.facingSign * gaitWave * 1.4f;
+        profile.headNod += gaitCounter * 1.3f;
+        profile.tailLift += gaitWave * 1.1f;
+        profile.tailSwing += runtime.facingSign * gaitCounter * 1.8f;
+        profile.earSwing += runtime.facingSign * gaitCounter * 1.2f;
+        profile.handSwing += runtime.facingSign * gaitCounter * 1.1f;
+        profile.earSpreadPulse += gaitWave * 0.7f;
+    }
 
     profile.overlayAccentColor = runtime.click ? MakeColor(230, 255, 118, 186)
         : runtime.hold                         ? MakeColor(220, 255, 180, 104)

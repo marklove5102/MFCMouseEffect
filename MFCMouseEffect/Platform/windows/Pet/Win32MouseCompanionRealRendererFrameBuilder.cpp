@@ -22,6 +22,7 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     const float glowBoost = std::max({profile.actionIntensity, profile.reactiveIntensity, profile.scrollIntensity});
     const float facingOffset = runtime.facingSign *
         std::min(runtime.facingMomentumPx * style.facingMomentumScale, style.facingMomentumClampPx);
+    const float glowScale = 1.0f + glowBoost * style.glowActionScale;
 
     scene.centerX = static_cast<float>(width) * style.centerXRatio + facingOffset + profile.bodyForward + profile.idleHeadSway;
     scene.centerY = static_cast<float>(height) * (runtime.hold ? style.holdCenterYRatio : style.idleCenterYRatio) -
@@ -30,12 +31,32 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     scene.bodyTiltDeg = profile.scrollLean + profile.dragLean;
     scene.glowAlpha =
         style.glowBaseAlpha + glowBoost * style.glowActionAlphaScale + runtime.headTintAmount * style.glowHeadTintAlphaScale;
+    scene.bodyStrokeWidth = runtime.click ? (1.9f + profile.actionIntensity * 1.0f)
+        : runtime.hold      ? (1.8f + profile.actionIntensity * 0.9f)
+        : runtime.scroll    ? (1.8f + profile.scrollIntensity * 0.8f)
+                            : 1.8f;
+    scene.headStrokeWidth = runtime.drag ? (1.9f + profile.actionIntensity * 0.9f)
+        : runtime.click                  ? (1.8f + profile.actionIntensity * 0.8f)
+        : runtime.follow                 ? (1.8f + profile.actionIntensity * 0.6f)
+                                         : 1.8f;
+    scene.limbStrokeWidth = runtime.follow ? (1.2f + profile.actionIntensity * 0.7f)
+        : runtime.hold                     ? (1.2f + profile.actionIntensity * 0.5f)
+                                           : 1.2f;
+    scene.tailStrokeWidth = runtime.follow ? (1.2f + profile.actionIntensity * 0.6f)
+        : runtime.scroll                   ? (1.2f + profile.scrollIntensity * 0.5f)
+                                           : 1.2f;
+    scene.chestStrokeWidth = runtime.hold ? (1.1f + profile.actionIntensity * 0.5f)
+        : runtime.click                   ? (1.1f + profile.actionIntensity * 0.4f)
+                                          : 1.1f;
+    scene.chestFillAlpha = runtime.hold ? (255.0f - profile.actionIntensity * 18.0f)
+        : runtime.follow                 ? (248.0f - profile.actionIntensity * 10.0f)
+                                         : 255.0f;
 
     scene.glowRect = Gdiplus::RectF(
         scene.centerX - metrics.bodyWidth * style.glowXOffsetRatio,
         scene.centerY - metrics.bodyHeight * style.glowYOffsetRatio - profile.stateLift * style.glowStateLiftScale,
-        metrics.bodyWidth * style.glowWidthScale,
-        metrics.bodyHeight * style.glowHeightScale);
+        metrics.bodyWidth * style.glowWidthScale * glowScale,
+        metrics.bodyHeight * style.glowHeightScale * glowScale);
     scene.shadowRect = Gdiplus::RectF(
         scene.centerX - metrics.bodyWidth * style.shadowXOffsetRatio * profile.shadowScale,
         scene.centerY + metrics.bodyHeight * style.shadowYRatio,

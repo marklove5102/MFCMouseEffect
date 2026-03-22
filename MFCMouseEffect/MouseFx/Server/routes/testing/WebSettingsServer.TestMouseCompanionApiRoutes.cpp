@@ -43,6 +43,74 @@ MouseButton ResolveMouseButton(uint8_t rawButton) {
     }
 }
 
+struct MouseCompanionProofSweepEvent final {
+    const char* name{nullptr};
+    bool expectFrameAdvance{true};
+};
+
+bool DispatchMouseCompanionTestEvent(
+    AppController* controller,
+    const std::string& event,
+    const ScreenPoint& pt,
+    int32_t delta,
+    uint32_t holdMs,
+    uint8_t rawButton,
+    int button,
+    std::string& errorOut) {
+    if (!controller) {
+        errorOut = "no_controller";
+        return false;
+    }
+    if (event == "status") {
+        return true;
+    }
+    if (event == "move") {
+        controller->DispatchPetMove(pt);
+        return true;
+    }
+    if (event == "scroll") {
+        controller->DispatchPetScroll(pt, delta);
+        return true;
+    }
+    if (event == "button_down") {
+        controller->DispatchPetButtonDown(pt, button);
+        return true;
+    }
+    if (event == "button_up") {
+        controller->DispatchPetButtonUp(pt, button);
+        return true;
+    }
+    if (event == "click") {
+        ClickEvent ev{};
+        ev.pt = pt;
+        ev.button = ResolveMouseButton(rawButton);
+        controller->DispatchPetClick(ev);
+        return true;
+    }
+    if (event == "hover_start") {
+        controller->DispatchPetHoverStart(pt);
+        return true;
+    }
+    if (event == "hover_end") {
+        controller->DispatchPetHoverEnd(pt);
+        return true;
+    }
+    if (event == "hold_start") {
+        controller->DispatchPetHoldStart(pt, button, holdMs);
+        return true;
+    }
+    if (event == "hold_update") {
+        controller->DispatchPetHoldUpdate(pt, holdMs);
+        return true;
+    }
+    if (event == "hold_end") {
+        controller->DispatchPetHoldEnd(pt);
+        return true;
+    }
+    errorOut = event;
+    return false;
+}
+
 json BuildMouseCompanionRuntimeStatusJson(const AppController::MouseCompanionRuntimeStatus& status) {
     const auto configuredBackendPreferenceDiagnostics =
         EvaluateConfiguredMouseCompanionRendererBackendPreferenceDiagnostics(status);
@@ -248,6 +316,16 @@ json BuildMouseCompanionRenderProofJson(const MouseCompanionRenderProofResult& p
     };
 }
 
+bool IsMouseCompanionPreviewExpectationMet(
+    const AppController::MouseCompanionRuntimeStatus& status,
+    bool expectPreviewActive) {
+    if (!expectPreviewActive) {
+        return true;
+    }
+    const auto preview = EvaluateMouseCompanionRealRendererPreviewDiagnostics(status);
+    return preview.previewActive;
+}
+
 json BuildRealRendererPreviewJson(const AppController::MouseCompanionRuntimeStatus& status) {
     const auto preview = EvaluateMouseCompanionRealRendererPreviewDiagnostics(status);
     return {
@@ -282,7 +360,8 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
     HttpResponse& resp) {
     if (req.method != "POST" ||
         (path != "/api/mouse-companion/test-dispatch" &&
-         path != "/api/mouse-companion/test-render-proof")) {
+         path != "/api/mouse-companion/test-render-proof" &&
+         path != "/api/mouse-companion/test-render-proof-sweep")) {
         return false;
     }
 
@@ -301,9 +380,13 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
 
     const json payload = ParseObjectOrEmpty(req.body);
     const bool proofOnly = path == "/api/mouse-companion/test-render-proof";
+    const bool proofSweepOnly = path == "/api/mouse-companion/test-render-proof-sweep";
     const std::string event = ToLowerAscii(TrimAscii(payload.value("event", std::string("status"))));
     const bool expectFrameAdvance =
         ParseBooleanOrDefault(payload, "expect_frame_advance", false);
+    const std::string expectedBackend = TrimAscii(payload.value("expected_backend", std::string("")));
+    const bool expectPreviewActive =
+        ParseBooleanOrDefault(payload, "expect_preview_active", false);
     const uint32_t waitForFrameMs = std::min<uint32_t>(
         ParseUInt32OrDefault(payload, "wait_for_frame_ms", expectFrameAdvance ? 120 : 0),
         2000);
@@ -313,46 +396,135 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
     ScreenPoint pt{};
     pt.x = ParseInt32OrDefault(payload, "x", 640);
     pt.y = ParseInt32OrDefault(payload, "y", 360);
-    int32_t delta = 120;
-    uint32_t holdMs = 420;
-    int button = 1;
+    int32_t delta = ParseInt32OrDefault(payload, "delta", 120);
+    uint32_t holdMs = static_cast<uint32_t>(std::max(0, ParseInt32OrDefault(payload, "hold_ms", 420)));
+    const uint8_t rawButton = ParseButtonOrDefault(payload, "button", 1);
+    int button = std::max(0, static_cast<int>(rawButton));
+
+    if (proofSweepOnly) {
+        const std::array<MouseCompanionProofSweepEvent, 6> sweepEvents{{
+            {"status", false},
+            {"click", true},
+            {"hold_start", true},
+            {"scroll", true},
+            {"move", true},
+            {"hold_end", true},
+        }};
+        json sweepResults = json::array();
+        size_t expectationRequestedCount = 0;
+        size_t expectationMetCount = 0;
+        size_t frameAdvancedCount = 0;
+        size_t backendExpectationCount = 0;
+        size_t backendExpectationMetCount = 0;
+        size_t previewExpectationCount = 0;
+        size_t previewExpectationMetCount = 0;
+        for (const auto& sweepEvent : sweepEvents) {
+            const AppController::MouseCompanionRuntimeStatus sweepBeforeStatus =
+                controller->ReadMouseCompanionRuntimeStatus();
+            std::string dispatchError;
+            if (!DispatchMouseCompanionTestEvent(
+                    controller,
+                    sweepEvent.name,
+                    pt,
+                    delta,
+                    holdMs,
+                    rawButton,
+                    button,
+                    dispatchError)) {
+                SetJsonResponse(resp, json({
+                    {"ok", false},
+                    {"error", "unsupported_event"},
+                    {"event", dispatchError},
+                }).dump());
+                return true;
+            }
+            const MouseCompanionRenderProofResult sweepProof = CaptureMouseCompanionRenderProof(
+                controller,
+                sweepBeforeStatus,
+                waitForFrameMs,
+                sweepEvent.expectFrameAdvance);
+            const auto previewJson = BuildRealRendererPreviewJson(sweepProof.afterStatus);
+            const bool backendExpectationMet =
+                expectedBackend.empty() || sweepProof.afterStatus.selectedRendererBackend == expectedBackend;
+            const bool previewExpectationMet =
+                !expectPreviewActive || previewJson.value("preview_active", false);
+            if (sweepProof.expectFrameAdvance) {
+                ++expectationRequestedCount;
+                if (sweepProof.expectationMet) {
+                    ++expectationMetCount;
+                }
+            }
+            if (!expectedBackend.empty()) {
+                ++backendExpectationCount;
+                if (backendExpectationMet) {
+                    ++backendExpectationMetCount;
+                }
+            }
+            if (expectPreviewActive) {
+                ++previewExpectationCount;
+                if (previewExpectationMet) {
+                    ++previewExpectationMetCount;
+                }
+            }
+            if (DidMouseCompanionRenderProofAdvanceFrame(sweepProof.beforeStatus, sweepProof.afterStatus)) {
+                ++frameAdvancedCount;
+            }
+            sweepResults.push_back({
+                {"event", sweepEvent.name},
+                {"proof", BuildMouseCompanionRenderProofJson(sweepProof)},
+                {"selected_renderer_backend", sweepProof.afterStatus.selectedRendererBackend},
+                {"backend_expectation_met", backendExpectationMet},
+                {"preview_expectation_met", previewExpectationMet},
+                {"real_renderer_preview", previewJson},
+            });
+        }
+        const bool allFrameExpectationsMet = expectationMetCount == expectationRequestedCount;
+        const bool allBackendExpectationsMet = backendExpectationMetCount == backendExpectationCount;
+        const bool allPreviewExpectationsMet = previewExpectationMetCount == previewExpectationCount;
+        SetJsonResponse(resp, json({
+            {"ok", true},
+            {"event", "render_proof_sweep"},
+            {"point", {{"x", pt.x}, {"y", pt.y}}},
+            {"delta", delta},
+            {"hold_ms", holdMs},
+            {"button", button},
+            {"expected_backend", expectedBackend},
+            {"expect_preview_active", expectPreviewActive},
+            {"summary", {
+                {"result_count", sweepResults.size()},
+                {"expectation_requested_count", expectationRequestedCount},
+                {"expectation_met_count", expectationMetCount},
+                {"frame_advanced_count", frameAdvancedCount},
+                {"backend_expectation_count", backendExpectationCount},
+                {"backend_expectation_met_count", backendExpectationMetCount},
+                {"preview_expectation_count", previewExpectationCount},
+                {"preview_expectation_met_count", previewExpectationMetCount},
+                {"all_frame_expectations_met", allFrameExpectationsMet},
+                {"all_backend_expectations_met", allBackendExpectationsMet},
+                {"all_preview_expectations_met", allPreviewExpectationsMet},
+                {"all_expectations_met",
+                 allFrameExpectationsMet && allBackendExpectationsMet && allPreviewExpectationsMet},
+            }},
+            {"results", std::move(sweepResults)},
+        }).dump());
+        return true;
+    }
 
     if (!proofOnly) {
-        delta = ParseInt32OrDefault(payload, "delta", 120);
-        holdMs = static_cast<uint32_t>(std::max(0, ParseInt32OrDefault(payload, "hold_ms", 420)));
-        const uint8_t rawButton = ParseButtonOrDefault(payload, "button", 1);
-        button = std::max(0, static_cast<int>(rawButton));
-
-        if (event == "status") {
-            // No-op: return current runtime snapshot only.
-        } else if (event == "move") {
-            controller->DispatchPetMove(pt);
-        } else if (event == "scroll") {
-            controller->DispatchPetScroll(pt, delta);
-        } else if (event == "button_down") {
-            controller->DispatchPetButtonDown(pt, button);
-        } else if (event == "button_up") {
-            controller->DispatchPetButtonUp(pt, button);
-        } else if (event == "click") {
-            ClickEvent ev{};
-            ev.pt = pt;
-            ev.button = ResolveMouseButton(rawButton);
-            controller->DispatchPetClick(ev);
-        } else if (event == "hover_start") {
-            controller->DispatchPetHoverStart(pt);
-        } else if (event == "hover_end") {
-            controller->DispatchPetHoverEnd(pt);
-        } else if (event == "hold_start") {
-            controller->DispatchPetHoldStart(pt, button, holdMs);
-        } else if (event == "hold_update") {
-            controller->DispatchPetHoldUpdate(pt, holdMs);
-        } else if (event == "hold_end") {
-            controller->DispatchPetHoldEnd(pt);
-        } else {
+        std::string dispatchError;
+        if (!DispatchMouseCompanionTestEvent(
+                controller,
+                event,
+                pt,
+                delta,
+                holdMs,
+                rawButton,
+                button,
+                dispatchError)) {
             SetJsonResponse(resp, json({
                 {"ok", false},
                 {"error", "unsupported_event"},
-                {"event", event},
+                {"event", dispatchError},
                 {"supported_events", json::array({
                     "status",
                     "move",
@@ -383,7 +555,17 @@ bool HandleWebSettingsTestMouseCompanionApiRoute(
     };
     response.update(BuildMouseCompanionRenderProofJson(proof));
     if (proofOnly) {
+        const bool backendExpectationMet =
+            expectedBackend.empty() || status.selectedRendererBackend == expectedBackend;
+        const bool previewExpectationMet =
+            IsMouseCompanionPreviewExpectationMet(status, expectPreviewActive);
         response["selected_renderer_backend"] = status.selectedRendererBackend;
+        response["expected_backend"] = expectedBackend;
+        response["expect_preview_active"] = expectPreviewActive;
+        response["backend_expectation_met"] = backendExpectationMet;
+        response["preview_expectation_met"] = previewExpectationMet;
+        response["all_expectations_met"] =
+            proof.expectationMet && backendExpectationMet && previewExpectationMet;
         response["real_renderer_preview"] = BuildRealRendererPreviewJson(status);
     } else {
         response["point"] = {
