@@ -25,6 +25,8 @@ param(
     [string]$ExpectedDefaultLaneSource = "",
     [string]$ExpectedDefaultLaneRolloutStatus = "",
     [string]$ExpectedDefaultLaneStyleIntent = "",
+    [ValidateSet("default", "agile", "dreamy", "charming")]
+    [string]$WasmV1Style = "default",
     [string]$JsonOutput = "",
     [switch]$Help
 )
@@ -62,6 +64,7 @@ Options:
   -ExpectedDefaultLaneSource <name> Require runtime default lane source to match this name
   -ExpectedDefaultLaneRolloutStatus <name> Require runtime default lane rollout status to match this name
   -ExpectedDefaultLaneStyleIntent <name> Require runtime default lane style intent to match this name
+  -WasmV1Style <style>        Optional `wasm_v1` checked-in style for wasm-v1 smoke: default|agile|dreamy|charming
   -JsonOutput <path>           Save full JSON response to file
   -Help                        Show this help
 '@
@@ -74,6 +77,15 @@ function Write-Ok([string]$Message) {
 function Fail([string]$Message) {
     Write-Error "[mfx:fail] $Message"
     exit 1
+}
+
+function Resolve-WasmV1StyleIntent([string]$Style) {
+    switch ($Style) {
+    "agile" { return "style_candidate:agile_follow_drag" }
+    "dreamy" { return "style_candidate:dreamy_follow_scroll" }
+    "charming" { return "style_candidate:charming_click_hold" }
+    default { return "style_candidate:balanced_default_candidate" }
+    }
 }
 
 function Show-RealPreviewSmokeHint {
@@ -148,6 +160,7 @@ function Show-RendererSidecarWasmV1SmokeHint {
     - <manifest>.mouse_companion_renderer.json
     - appearance_semantics_mode=wasm_v1
     - appearance_semantics object present
+    - optional checked-in style: WASM_V1_STYLE
   - expected gate:
     - selected backend should resolve to real
     - preview should be active
@@ -157,8 +170,8 @@ function Show-RendererSidecarWasmV1SmokeHint {
     - default_lane_candidate should be wasm_v1
     - default_lane_source should be env_wasm_candidate
     - default_lane_rollout_status should be candidate_pending_manual_confirmation
-    - default_lane_style_intent should be one of the checked-in wasm_v1 style intents
-'@ | Write-Host
+    - default_lane_style_intent should match the selected wasm_v1 style intent
+'@.Replace("WASM_V1_STYLE", $WasmV1Style) | Write-Host
 }
 
 function Resolve-DefaultRuntimeFile {
@@ -532,7 +545,7 @@ switch ($Preset) {
         $ExpectedDefaultLaneCandidate = "wasm_v1"
         $ExpectedDefaultLaneSource = "env_wasm_candidate"
         $ExpectedDefaultLaneRolloutStatus = "candidate_pending_manual_confirmation"
-        $ExpectedDefaultLaneStyleIntent = "style_candidate:balanced_default_candidate"
+        $ExpectedDefaultLaneStyleIntent = Resolve-WasmV1StyleIntent $WasmV1Style
         Show-RealPreviewSmokeHint
         Show-RendererSidecarWasmV1SmokeHint
     }

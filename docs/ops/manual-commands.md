@@ -27,6 +27,8 @@ Keep P1 concise; add details here when needed.
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -Preset renderer-sidecar-smoke`
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-renderer-sidecar-wasm-v1-smoke.cmd`
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -Preset renderer-sidecar-wasm-v1-smoke`
+  - optional single-style assertion:
+    - `-WasmV1Style default|agile|dreamy|charming`
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-renderer-lane-matrix.cmd`
   - optional style switch:
     - `-WasmV1Style default|agile|dreamy|charming`

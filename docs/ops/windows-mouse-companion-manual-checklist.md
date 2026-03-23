@@ -241,6 +241,9 @@
      - `default_lane_source = env_wasm_candidate`
      - `default_lane_rollout_status = candidate_pending_manual_confirmation`
      - `default_lane_style_intent = style_candidate:balanced_default_candidate`
+   - optional single-style assertion:
+     - `-WasmV1Style default|agile|dreamy|charming`
+     - when used, the same smoke route will assert the matching `default_lane_style_intent`
    - if you use the sample sidecar unchanged, expect the effective combo persona to move toward `dreamy` and the dynamic motion to feel more lifted/elastic during `follow / click / drag / hold / scroll`
    - if you use the checked-in default `wasm_v1` sample unchanged, expect a slightly cooler, cleaner, more balanced full-pet read than builtin, with moderate lift/squash/drag deltas and no single action family dominating the overall style
    - if you use the checked-in `wasm_v1` agile sample unchanged, expect a narrower/agiler body read with a slightly taller torso, slightly broader muzzle, slightly tighter forehead silhouette, cooler glow/accent mood, stronger follow lift/drag lean, slightly tighter eye focus, slightly wider whisker spread, a fuller follow-tail read with slightly taller tail volume, a slightly tighter head silhouette, a broader `follow` ear spread, a more obvious `click` ear lift, and a more obvious `scroll` tail lift / `follow` head nod than the baseline builtin lane; the checked-in sample now also pushes clearer `hold` band / `drag` line / `follow` trail / `scroll` arc alpha plus a slightly cooler shadow tint and cooler body-stroke + head-fill read than builtin

@@ -133,6 +133,7 @@
 - Runtime default-lane diagnostics are surfaced directly:
   - `default_lane_candidate`, `default_lane_source`, `default_lane_rollout_status`, `default_lane_style_intent`
 - Sidecar smoke presets now also assert `default_lane_style_intent`, so runtime lane intent is no longer observation-only.
+- `renderer-sidecar-wasm-v1-smoke` now also accepts `-WasmV1Style default|agile|dreamy|charming`, so single-lane smoke can assert the selected checked-in style intent directly.
 - `default_lane_source` stable machine values currently include:
   - `runtime_builtin_default`
   - `env_builtin_forced`
