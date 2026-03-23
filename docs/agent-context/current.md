@@ -129,6 +129,7 @@
   - actual default switch still requires later manual confirmation
 - Runtime default-lane diagnostics are surfaced directly:
   - `default_lane_candidate`, `default_lane_source`, `default_lane_rollout_status`, `default_lane_style_intent`
+- Sidecar smoke presets now also assert `default_lane_style_intent`, so runtime lane intent is no longer observation-only.
 - `default_lane_source` stable machine values currently include:
   - `runtime_builtin_default`
   - `env_builtin_forced`

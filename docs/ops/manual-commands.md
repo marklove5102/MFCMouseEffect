@@ -102,7 +102,8 @@ Keep P1 concise; add details here when needed.
     - `wasm_v1`
   - temporarily swaps `<manifest>.mouse_companion_renderer.json` between the checked-in passthrough and `wasm_v1` samples
   - `-WasmV1Style` chooses which checked-in `wasm_v1` sample is used for the third lane:
-    - `agile` (default)
+    - `default` (balanced default-candidate)
+    - `agile`
     - `dreamy`
     - `charming`
   - `-AllWasmV1Styles` expands the matrix to:

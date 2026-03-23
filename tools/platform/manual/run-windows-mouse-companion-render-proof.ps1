@@ -24,6 +24,7 @@ param(
     [string]$ExpectedDefaultLaneCandidate = "",
     [string]$ExpectedDefaultLaneSource = "",
     [string]$ExpectedDefaultLaneRolloutStatus = "",
+    [string]$ExpectedDefaultLaneStyleIntent = "",
     [string]$JsonOutput = "",
     [switch]$Help
 )
@@ -60,6 +61,7 @@ Options:
   -ExpectedDefaultLaneCandidate <name> Require runtime default lane candidate to match this name
   -ExpectedDefaultLaneSource <name> Require runtime default lane source to match this name
   -ExpectedDefaultLaneRolloutStatus <name> Require runtime default lane rollout status to match this name
+  -ExpectedDefaultLaneStyleIntent <name> Require runtime default lane style intent to match this name
   -JsonOutput <path>           Save full JSON response to file
   -Help                        Show this help
 '@
@@ -130,6 +132,7 @@ function Show-RendererSidecarSmokeHint {
     - default_lane_candidate should be builtin_passthrough
     - default_lane_source should be env_wasm_candidate
     - default_lane_rollout_status should be candidate_pending_manual_confirmation
+    - default_lane_style_intent should be style_candidate:builtin_passthrough_baseline
 '@ | Write-Host
 }
 
@@ -154,6 +157,7 @@ function Show-RendererSidecarWasmV1SmokeHint {
     - default_lane_candidate should be wasm_v1
     - default_lane_source should be env_wasm_candidate
     - default_lane_rollout_status should be candidate_pending_manual_confirmation
+    - default_lane_style_intent should be one of the checked-in wasm_v1 style intents
 '@ | Write-Host
 }
 
@@ -423,6 +427,7 @@ function Test-RendererPluginExpectation(
     [string]$ExpectedDefaultLaneCandidate,
     [string]$ExpectedDefaultLaneSource,
     [string]$ExpectedDefaultLaneRolloutStatus,
+    [string]$ExpectedDefaultLaneStyleIntent,
     [string]$Label) {
     $mismatches = New-Object System.Collections.Generic.List[string]
     if ($null -eq $Node) {
@@ -457,6 +462,11 @@ function Test-RendererPluginExpectation(
         ([string]$Node.default_lane_rollout_status -ne $ExpectedDefaultLaneRolloutStatus)) {
         $mismatches.Add(("{0}:default_lane_rollout_status expected={1} actual={2}" -f
             $Label, $ExpectedDefaultLaneRolloutStatus, [string]$Node.default_lane_rollout_status))
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneStyleIntent) -and
+        ([string]$Node.default_lane_style_intent -ne $ExpectedDefaultLaneStyleIntent)) {
+        $mismatches.Add(("{0}:default_lane_style_intent expected={1} actual={2}" -f
+            $Label, $ExpectedDefaultLaneStyleIntent, [string]$Node.default_lane_style_intent))
     }
     return @{
         ok = ($mismatches.Count -eq 0)
@@ -506,6 +516,7 @@ switch ($Preset) {
         $ExpectedDefaultLaneCandidate = "builtin_passthrough"
         $ExpectedDefaultLaneSource = "env_wasm_candidate"
         $ExpectedDefaultLaneRolloutStatus = "candidate_pending_manual_confirmation"
+        $ExpectedDefaultLaneStyleIntent = "style_candidate:builtin_passthrough_baseline"
         Show-RealPreviewSmokeHint
         Show-RendererSidecarSmokeHint
     }
@@ -521,6 +532,7 @@ switch ($Preset) {
         $ExpectedDefaultLaneCandidate = "wasm_v1"
         $ExpectedDefaultLaneSource = "env_wasm_candidate"
         $ExpectedDefaultLaneRolloutStatus = "candidate_pending_manual_confirmation"
+        $ExpectedDefaultLaneStyleIntent = "style_candidate:balanced_default_candidate"
         Show-RealPreviewSmokeHint
         Show-RendererSidecarWasmV1SmokeHint
     }
@@ -698,7 +710,8 @@ if ($Route -eq "sweep") {
         (-not [string]::IsNullOrWhiteSpace($ExpectedAppearanceSemanticsMode)) -or
         (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneCandidate)) -or
         (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneSource)) -or
-        (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneRolloutStatus))) {
+        (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneRolloutStatus)) -or
+        (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneStyleIntent))) {
         foreach ($item in @($response.results)) {
             $runtimePluginCheck = Test-RendererPluginExpectation `
                 $item.proof.renderer_runtime_after `
@@ -708,6 +721,7 @@ if ($Route -eq "sweep") {
                 $ExpectedDefaultLaneCandidate `
                 $ExpectedDefaultLaneSource `
                 $ExpectedDefaultLaneRolloutStatus `
+                $ExpectedDefaultLaneStyleIntent `
                 ("{0}:renderer_runtime_after" -f $item.event)
             foreach ($failure in @($runtimePluginCheck.mismatches)) {
                 $pluginFailures.Add([string]$failure)
@@ -720,6 +734,7 @@ if ($Route -eq "sweep") {
                 $ExpectedDefaultLaneCandidate `
                 $ExpectedDefaultLaneSource `
                 $ExpectedDefaultLaneRolloutStatus `
+                $ExpectedDefaultLaneStyleIntent `
                 ("{0}:real_renderer_preview" -f $item.event)
             foreach ($failure in @($previewPluginCheck.mismatches)) {
                 $pluginFailures.Add([string]$failure)
@@ -799,7 +814,8 @@ if ((-not [string]::IsNullOrWhiteSpace($ExpectedAppearancePluginKind)) -or
     (-not [string]::IsNullOrWhiteSpace($ExpectedAppearanceSemanticsMode)) -or
     (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneCandidate)) -or
     (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneSource)) -or
-    (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneRolloutStatus))) {
+    (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneRolloutStatus)) -or
+    (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneStyleIntent))) {
     $runtimePluginCheck =
         Test-RendererPluginExpectation `
             $response.renderer_runtime_after `
@@ -809,6 +825,7 @@ if ((-not [string]::IsNullOrWhiteSpace($ExpectedAppearancePluginKind)) -or
             $ExpectedDefaultLaneCandidate `
             $ExpectedDefaultLaneSource `
             $ExpectedDefaultLaneRolloutStatus `
+            $ExpectedDefaultLaneStyleIntent `
             "renderer_runtime_after"
     $previewPluginCheck =
         Test-RendererPluginExpectation `
@@ -819,6 +836,7 @@ if ((-not [string]::IsNullOrWhiteSpace($ExpectedAppearancePluginKind)) -or
             $ExpectedDefaultLaneCandidate `
             $ExpectedDefaultLaneSource `
             $ExpectedDefaultLaneRolloutStatus `
+            $ExpectedDefaultLaneStyleIntent `
             "real_renderer_preview"
     $pluginFailures = @($runtimePluginCheck.mismatches + $previewPluginCheck.mismatches)
     $pluginExpectationMet = ($pluginFailures.Count -eq 0)
@@ -844,14 +862,16 @@ if ((-not [string]::IsNullOrWhiteSpace($ExpectedAppearancePluginKind)) -or
     (-not [string]::IsNullOrWhiteSpace($ExpectedAppearanceSemanticsMode)) -or
     (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneCandidate)) -or
     (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneSource)) -or
-    (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneRolloutStatus))) {
-    Write-Host ("  - plugin kind={0} metadata_path={1} semantics_mode={2} default_lane={3}/{4}/{5} plugin_check={6}" -f `
+    (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneRolloutStatus)) -or
+    (-not [string]::IsNullOrWhiteSpace($ExpectedDefaultLaneStyleIntent))) {
+    Write-Host ("  - plugin kind={0} metadata_path={1} semantics_mode={2} default_lane={3}/{4}/{5}/{6} plugin_check={7}" -f `
         $response.real_renderer_preview.appearance_plugin_kind, `
         $response.real_renderer_preview.appearance_plugin_metadata_path, `
         $response.real_renderer_preview.appearance_plugin_appearance_semantics_mode, `
         $response.real_renderer_preview.default_lane_candidate, `
         $response.real_renderer_preview.default_lane_source, `
         $response.real_renderer_preview.default_lane_rollout_status, `
+        $response.real_renderer_preview.default_lane_style_intent, `
         $pluginExpectationMet)
 }
 Write-Host ("  - appearance preset={0}->{1} skin={2} accessory_family={3} combo={4}" -f `
