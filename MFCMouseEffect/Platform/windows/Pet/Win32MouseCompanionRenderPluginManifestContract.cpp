@@ -312,6 +312,18 @@ bool ValidateAppearanceSemanticsPayload(
                 return false;
             }
         }
+        if (frame.contains("body_height_scale")) {
+            outPatch->hasFrameBodyHeightScale = true;
+            if (!TryReadBoundedFloat(
+                    frame,
+                    "body_height_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->frameBodyHeightScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
         if (frame.contains("head_width_scale")) {
             outPatch->hasFrameHeadWidthScale = true;
             if (!TryReadBoundedFloat(
@@ -355,6 +367,30 @@ bool ValidateAppearanceSemanticsPayload(
                     0.5f,
                     1.5f,
                     &outPatch->faceBlushWidthScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (face.contains("muzzle_width_scale")) {
+            outPatch->hasFaceMuzzleWidthScale = true;
+            if (!TryReadBoundedFloat(
+                    face,
+                    "muzzle_width_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->faceMuzzleWidthScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (face.contains("forehead_width_scale")) {
+            outPatch->hasFaceForeheadWidthScale = true;
+            if (!TryReadBoundedFloat(
+                    face,
+                    "forehead_width_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->faceForeheadWidthScale,
                     outFailureReason)) {
                 return false;
             }
@@ -430,6 +466,18 @@ bool ValidateAppearanceSemanticsPayload(
                 return false;
             }
         }
+        if (appendage.contains("tail_height_scale")) {
+            outPatch->hasAppendageTailHeightScale = true;
+            if (!TryReadBoundedFloat(
+                    appendage,
+                    "tail_height_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->appendageTailHeightScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
         if (appendage.contains("follow_tail_width_scale")) {
             outPatch->hasAppendageFollowTailWidthScale = true;
             if (!TryReadBoundedFloat(
@@ -450,6 +498,18 @@ bool ValidateAppearanceSemanticsPayload(
                     0.5f,
                     1.5f,
                     &outPatch->appendageFollowEarSpreadScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (appendage.contains("click_ear_lift_scale")) {
+            outPatch->hasAppendageClickEarLiftScale = true;
+            if (!TryReadBoundedFloat(
+                    appendage,
+                    "click_ear_lift_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->appendageClickEarLiftScale,
                     outFailureReason)) {
                 return false;
             }
@@ -572,6 +632,18 @@ bool ValidateAppearanceSemanticsPayload(
                 return false;
             }
         }
+        if (mood.contains("shadow_tint_mix_scale")) {
+            outPatch->hasMoodShadowTintMixScale = true;
+            if (!TryReadBoundedFloat(
+                    mood,
+                    "shadow_tint_mix_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->moodShadowTintMixScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
         if (mood.contains("shadow_alpha_bias")) {
             outPatch->hasMoodShadowAlphaBias = true;
             if (!TryReadBoundedFloat(
@@ -604,6 +676,30 @@ bool ValidateAppearanceSemanticsPayload(
                     0.5f,
                     1.5f,
                     &outPatch->moodScrollArcAlphaScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (mood.contains("hold_band_alpha_scale")) {
+            outPatch->hasMoodHoldBandAlphaScale = true;
+            if (!TryReadBoundedFloat(
+                    mood,
+                    "hold_band_alpha_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->moodHoldBandAlphaScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (mood.contains("drag_line_alpha_scale")) {
+            outPatch->hasMoodDragLineAlphaScale = true;
+            if (!TryReadBoundedFloat(
+                    mood,
+                    "drag_line_alpha_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->moodDragLineAlphaScale,
                     outFailureReason)) {
                 return false;
             }

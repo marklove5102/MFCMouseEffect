@@ -37,6 +37,8 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
 
     bool hasFrameBodyWidthScale{false};
     float frameBodyWidthScale{1.0f};
+    bool hasFrameBodyHeightScale{false};
+    float frameBodyHeightScale{1.0f};
     bool hasFrameHeadWidthScale{false};
     float frameHeadWidthScale{1.0f};
     bool hasFrameHeadHeightScale{false};
@@ -44,6 +46,10 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
 
     bool hasFaceBlushWidthScale{false};
     float faceBlushWidthScale{1.0f};
+    bool hasFaceMuzzleWidthScale{false};
+    float faceMuzzleWidthScale{1.0f};
+    bool hasFaceForeheadWidthScale{false};
+    float faceForeheadWidthScale{1.0f};
     bool hasFacePupilFocusScale{false};
     float facePupilFocusScale{1.0f};
     bool hasFaceHighlightAlphaScale{false};
@@ -55,10 +61,14 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
     float appendageEarScale{1.0f};
     bool hasAppendageTailWidthScale{false};
     float appendageTailWidthScale{1.0f};
+    bool hasAppendageTailHeightScale{false};
+    float appendageTailHeightScale{1.0f};
     bool hasAppendageFollowTailWidthScale{false};
     float appendageFollowTailWidthScale{1.0f};
     bool hasAppendageFollowEarSpreadScale{false};
     float appendageFollowEarSpreadScale{1.0f};
+    bool hasAppendageClickEarLiftScale{false};
+    float appendageClickEarLiftScale{1.0f};
 
     bool hasMotionFollowStateLiftScale{false};
     float motionFollowStateLiftScale{1.0f};
@@ -77,12 +87,18 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
     float moodGlowTintMixScale{1.0f};
     bool hasMoodAccentTintMixScale{false};
     float moodAccentTintMixScale{1.0f};
+    bool hasMoodShadowTintMixScale{false};
+    float moodShadowTintMixScale{1.0f};
     bool hasMoodShadowAlphaBias{false};
     float moodShadowAlphaBias{0.0f};
     bool hasMoodPedestalAlphaBias{false};
     float moodPedestalAlphaBias{0.0f};
+    bool hasMoodHoldBandAlphaScale{false};
+    float moodHoldBandAlphaScale{1.0f};
     bool hasMoodScrollArcAlphaScale{false};
     float moodScrollArcAlphaScale{1.0f};
+    bool hasMoodDragLineAlphaScale{false};
+    float moodDragLineAlphaScale{1.0f};
     bool hasMoodFollowTrailAlphaScale{false};
     float moodFollowTrailAlphaScale{1.0f};
 };

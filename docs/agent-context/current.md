@@ -32,6 +32,9 @@
 - `wasm_v1` now also controls a slightly more stable silhouette pair for Win pet readability: `frame.head_width_scale` and `appendage.follow_ear_spread_scale`, so lane deltas can read even before stronger motion pulses are obvious.
 - `wasm_v1` now also reaches two high-value overlay mood channels, `mood.scroll_arc_alpha_scale` and `mood.follow_trail_alpha_scale`, so lane differences can show up not only in body structure and motion but also in the action-atmosphere feedback Windows already draws.
 - `wasm_v1` now also reaches the first two theme-readability fields beyond glow/accent: `theme.body_stroke` and `theme.head_fill`, so lane deltas can start influencing the base creature read instead of only overlays and motion semantics.
+- `wasm_v1` now also reaches a fuller `click / drag / hold` read on Windows by adding `frame.body_height_scale`, `appendage.click_ear_lift_scale`, `mood.hold_band_alpha_scale`, and `mood.drag_line_alpha_scale`, so lane deltas no longer have to rely on `follow/scroll`-heavy cues only.
+- that same `wasm_v1` lane now also improves silhouette readability with `face.muzzle_width_scale` and `appendage.tail_height_scale`, so the Windows pet lane delta can read more clearly from muzzle/tail volume before stronger motion pulses kick in.
+- `wasm_v1` now also pushes one more compact head+mood pair, `face.forehead_width_scale` and `mood.shadow_tint_mix_scale`, so Win-pet lane deltas can read a little earlier from facial cap silhouette and cooler grounding before the stronger overlay pulses are noticed.
 - sidecar metadata can now also tune a first controlled set of Win-pet motion/expression multipliers (`follow_lift_scale`, `click_squash_scale`, `drag_lean_scale`, `highlight_alpha_scale`, each `0.5~1.5`) so Windows pet parity can keep moving forward through plugin-fed presentation inputs without waiting for a full free-form wasm semantics ABI.
 - that controlled sidecar tuning set now also reaches two more high-value motion channels for Win pet readability: `follow_tail_swing_scale` and `hold_head_nod_scale`, both still bounded to `0.5~1.5`.
 - that same sidecar tuning set now completes the main Win-pet motion lanes too by adding `scroll_tail_lift_scale` and `follow_head_nod_scale`, so `follow / hold / click / drag / scroll` all now have at least one controlled plugin-fed tuning entry.
@@ -96,6 +99,12 @@
   - Windows `AppShellCore` and POSIX `PosixCoreAppShell` no longer each own a separate `WebSettingsServer` startup sequence
   - shared `WebSettingsLaunchCoordinator` now owns lazy create + rotate-token + start result for `WebSettingsServer`
   - platform shells still keep their own `settingsLauncher->OpenUrlUtf8(...)` step, so only lifecycle policy is shared while OS URL-opening remains platform-specific
+- WebUI first-load settings hydration is now slightly less serialized too:
+  - when no schema cache exists yet, the first `reload()` path now fetches `/api/state` and `/api/schema` in parallel instead of always waiting for `/api/state` first and only then starting `/api/schema`
+  - later reloads still keep the language-aware schema reuse path, so only the first uncached load drops the extra fixed round-trip
+- Mouse Companion first-tab startup no longer blocks the whole settings load path as aggressively:
+  - the runtime WebUI entry actually uses `WebUI/settings-form.js` + `WebUI/mouse-companion-settings.svelte.js`, not the `WebUIWorkspace` source files directly
+  - when `mouse-companion` is the initially visible section and the section has not rendered yet, `settings-form.js` now defers the first Mouse Companion section render to the next animation frame instead of keeping it on the same synchronous first-snapshot render path
 - Sidebar order is fixed:
   - `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
 - Shell top-bar layout regression fix is active:

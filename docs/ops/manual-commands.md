@@ -44,12 +44,20 @@ Keep P1 concise; add details here when needed.
     - `scroll_tail_lift_scale`
     - `follow_head_nod_scale`
   - current sample structure patch now also covers:
+    - `face.muzzle_width_scale`
+    - `face.forehead_width_scale`
     - `face.whisker_spread_scale`
+    - `appendage.tail_height_scale`
     - `appendage.follow_tail_width_scale`
+    - `frame.body_height_scale`
     - `frame.head_width_scale`
     - `appendage.follow_ear_spread_scale`
+    - `appendage.click_ear_lift_scale`
   - current sample mood patch now also covers:
+    - `mood.shadow_tint_mix_scale`
+    - `mood.hold_band_alpha_scale`
     - `mood.scroll_arc_alpha_scale`
+    - `mood.drag_line_alpha_scale`
     - `mood.follow_trail_alpha_scale`
   - current sample theme patch now also covers:
     - `theme.body_stroke`

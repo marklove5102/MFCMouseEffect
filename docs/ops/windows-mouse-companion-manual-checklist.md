@@ -201,11 +201,11 @@
        - `follow_head_nod_scale`
      - when mode=`wasm_v1`, require `appearance_semantics` with bounded patch fields such as:
        - `theme.glow_color / body_stroke / head_fill / accent_fill / accessory_fill / pedestal_fill`
-       - `frame.body_width_scale / head_width_scale / head_height_scale`
-       - `face.blush_width_scale / pupil_focus_scale / highlight_alpha_scale / whisker_spread_scale`
-       - `appendage.ear_scale / tail_width_scale / follow_tail_width_scale / follow_ear_spread_scale`
+       - `frame.body_width_scale / body_height_scale / head_width_scale / head_height_scale`
+       - `face.blush_width_scale / muzzle_width_scale / forehead_width_scale / pupil_focus_scale / highlight_alpha_scale / whisker_spread_scale`
+       - `appendage.ear_scale / tail_width_scale / tail_height_scale / follow_tail_width_scale / follow_ear_spread_scale / click_ear_lift_scale`
        - `motion.follow_state_lift_scale / click_squash_scale / drag_lean_scale / hold_head_nod_scale / scroll_tail_lift_scale / follow_head_nod_scale`
-       - `mood.glow_tint_mix_scale / accent_tint_mix_scale / shadow_alpha_bias / pedestal_alpha_bias / scroll_arc_alpha_scale / follow_trail_alpha_scale`
+       - `mood.glow_tint_mix_scale / accent_tint_mix_scale / shadow_tint_mix_scale / shadow_alpha_bias / pedestal_alpha_bias / hold_band_alpha_scale / scroll_arc_alpha_scale / drag_line_alpha_scale / follow_trail_alpha_scale`
    - then call the same proof/status route and confirm the runtime reports either:
      - `appearance_plugin_kind=wasm`, or
      - builtin fallback plus a non-empty `appearance_plugin_failure_reason`
@@ -224,7 +224,7 @@
      - `default_lane_source = env_wasm_candidate`
      - `default_lane_rollout_status = candidate_pending_manual_confirmation`
    - if you use the sample sidecar unchanged, expect the effective combo persona to move toward `dreamy` and the dynamic motion to feel more lifted/elastic during `follow / click / drag / hold / scroll`
-   - if you use the checked-in `wasm_v1` sample unchanged, expect a narrower/agiler body read with cooler glow/accent mood, stronger follow lift/drag lean, slightly tighter eye focus, slightly wider whisker spread, a fuller follow-tail read, a slightly tighter head silhouette, a broader `follow` ear spread, and a more obvious `scroll` tail lift / `follow` head nod than the baseline builtin lane; the checked-in sample now also pushes a slightly clearer `follow` trail / `scroll` arc alpha and a cooler body-stroke + head-fill read than builtin
+   - if you use the checked-in `wasm_v1` sample unchanged, expect a narrower/agiler body read with a slightly taller torso, slightly broader muzzle, slightly tighter forehead silhouette, cooler glow/accent mood, stronger follow lift/drag lean, slightly tighter eye focus, slightly wider whisker spread, a fuller follow-tail read with slightly taller tail volume, a slightly tighter head silhouette, a broader `follow` ear spread, a more obvious `click` ear lift, and a more obvious `scroll` tail lift / `follow` head nod than the baseline builtin lane; the checked-in sample now also pushes clearer `hold` band / `drag` line / `follow` trail / `scroll` arc alpha plus a slightly cooler shadow tint and cooler body-stroke + head-fill read than builtin
    - if you use the dedicated lane matrix unchanged, expect:
      - `builtin`: baseline real-preview lane with no renderer sidecar contract attached
      - `builtin_passthrough`: same wasm provider attach, but still closest to builtin semantics with extra dreamy lift/elasticity from the sample tuning

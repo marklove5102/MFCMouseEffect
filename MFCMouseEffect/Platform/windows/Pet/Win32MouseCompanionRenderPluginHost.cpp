@@ -175,6 +175,9 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasFrameBodyWidthScale) {
         semantics.frame.bodyWidthScale = patch.frameBodyWidthScale;
     }
+    if (patch.hasFrameBodyHeightScale) {
+        semantics.frame.bodyHeightScale = patch.frameBodyHeightScale;
+    }
     if (patch.hasFrameHeadWidthScale) {
         semantics.frame.headWidthScale = patch.frameHeadWidthScale;
     }
@@ -183,6 +186,12 @@ void ApplyAppearanceSemanticsPatch(
     }
     if (patch.hasFaceBlushWidthScale) {
         semantics.face.blushWidthScale = patch.faceBlushWidthScale;
+    }
+    if (patch.hasFaceMuzzleWidthScale) {
+        semantics.face.muzzleWidthScale = patch.faceMuzzleWidthScale;
+    }
+    if (patch.hasFaceForeheadWidthScale) {
+        semantics.face.foreheadWidthScale = patch.faceForeheadWidthScale;
     }
     if (patch.hasFacePupilFocusScale) {
         semantics.face.pupilFocusScale = patch.facePupilFocusScale;
@@ -199,11 +208,17 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasAppendageTailWidthScale) {
         semantics.appendage.tailWidthScale = patch.appendageTailWidthScale;
     }
+    if (patch.hasAppendageTailHeightScale) {
+        semantics.appendage.tailHeightScale = patch.appendageTailHeightScale;
+    }
     if (patch.hasAppendageFollowTailWidthScale) {
         semantics.appendage.followTailWidthScale = patch.appendageFollowTailWidthScale;
     }
     if (patch.hasAppendageFollowEarSpreadScale) {
         semantics.appendage.followEarSpreadScale = patch.appendageFollowEarSpreadScale;
+    }
+    if (patch.hasAppendageClickEarLiftScale) {
+        semantics.appendage.clickEarLiftScale = patch.appendageClickEarLiftScale;
     }
     if (patch.hasMotionFollowStateLiftScale) {
         semantics.motion.followStateLiftScale = patch.motionFollowStateLiftScale;
@@ -229,6 +244,9 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasMoodAccentTintMixScale) {
         semantics.mood.accentTintMixScale = patch.moodAccentTintMixScale;
     }
+    if (patch.hasMoodShadowTintMixScale) {
+        semantics.mood.shadowTintMixScale = patch.moodShadowTintMixScale;
+    }
     if (patch.hasMoodShadowAlphaBias) {
         semantics.mood.shadowAlphaBias = patch.moodShadowAlphaBias;
     }
@@ -237,6 +255,12 @@ void ApplyAppearanceSemanticsPatch(
     }
     if (patch.hasMoodScrollArcAlphaScale) {
         semantics.mood.scrollArcAlphaScale = patch.moodScrollArcAlphaScale;
+    }
+    if (patch.hasMoodHoldBandAlphaScale) {
+        semantics.mood.holdBandAlphaScale = patch.moodHoldBandAlphaScale;
+    }
+    if (patch.hasMoodDragLineAlphaScale) {
+        semantics.mood.dragLineAlphaScale = patch.moodDragLineAlphaScale;
     }
     if (patch.hasMoodFollowTrailAlphaScale) {
         semantics.mood.followTrailAlphaScale = patch.moodFollowTrailAlphaScale;
