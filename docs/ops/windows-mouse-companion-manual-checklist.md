@@ -295,7 +295,7 @@
    - the same summary now also carries a conservative machine recommendation for `recommended_default_lane`; treat it as a triage hint first, not an automatic ship decision
    - when the matrix recommends one of the expanded `wasm_v1_*` lanes, it now also records `recommendation_style_intent`, so you can see whether the machine is currently leaning toward `agile_follow_drag`, `dreamy_follow_scroll`, or `charming_click_hold`
    - the same recommendation now also records `recommended_sample_path`, so the next checked-in sidecar candidate can be picked up directly
-   - machine recommendation priority now prefers `configured_sample_tier` first, then runtime `default_lane_style_intent`, rather than depending only on a fixed lane-name order
+  - machine recommendation priority now prefers runtime `default_lane_candidate_tier` first, then sample tier, then runtime `default_lane_style_intent`, rather than depending only on a fixed lane-name order
    - `render-proof` console output now also prints `default_lane_summary = candidate/source/rollout/style_intent` and `appearance_plugin_contract_brief = semantics_mode/style_intent/sample_tier`, so single-lane smoke and sweep logs use the same vocabulary as runtime and lane matrix
    - saved `render-proof` JSON now also carries both fields under `real_renderer_preview` and `renderer_runtime_after`, so downstream scripts do not need to recompose them
    - lane matrix summary now also carries `runtime_contract_brief`, so the same short contract string can be checked without reopening proof json

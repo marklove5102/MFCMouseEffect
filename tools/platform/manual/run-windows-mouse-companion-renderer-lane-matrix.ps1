@@ -239,6 +239,16 @@ function Get-SampleTierRecommendationRank([string]$SampleTier) {
     }
 }
 
+function Get-DefaultLaneCandidateTierRecommendationRank([string]$CandidateTier) {
+    switch ($CandidateTier) {
+    "ship_default_candidate" { return 4000 }
+    "experimental_style_candidate" { return 3000 }
+    "baseline_reference_candidate" { return 2000 }
+    "builtin_shipped_default" { return 1000 }
+    default { return 0 }
+    }
+}
+
 function New-LaneSummary(
     [string]$Label,
     [string]$JsonPath,
@@ -424,13 +434,15 @@ function New-LaneRecommendation(
             comparison = $comparison
             style_intent = $styleIntent
             sample_tier = $effectiveSampleTier
+            candidate_tier = [string]$lane.default_lane_candidate_tier
+            candidate_tier_rank = (Get-DefaultLaneCandidateTierRecommendationRank ([string]$lane.default_lane_candidate_tier))
             tier_rank = (Get-SampleTierRecommendationRank $effectiveSampleTier)
             rank = (Get-StyleIntentRecommendationRank $styleIntent)
         })
     }
 
     $bestCandidate = $candidates |
-        Sort-Object -Property @{ Expression = { $_.tier_rank }; Descending = $true }, @{ Expression = { $_.rank }; Descending = $true }, @{ Expression = { $_.comparison.diff_count }; Descending = $true } |
+        Sort-Object -Property @{ Expression = { $_.candidate_tier_rank }; Descending = $true }, @{ Expression = { $_.tier_rank }; Descending = $true }, @{ Expression = { $_.rank }; Descending = $true }, @{ Expression = { $_.comparison.diff_count }; Descending = $true } |
         Select-Object -First 1
     if ($null -ne $bestCandidate) {
         $lane = $bestCandidate.lane
@@ -438,6 +450,7 @@ function New-LaneRecommendation(
             recommended_default_lane = $lane.lane
             recommendation_reason = "machine_candidate:passed_and_differs_from_builtin"
             recommendation_style_intent = $bestCandidate.style_intent
+            recommendation_candidate_tier = $bestCandidate.candidate_tier
             runtime_default_lane_brief = [string]$lane.default_lane_brief
             recommended_sample_path = [string]$lane.configured_sample_path
             recommended_sample_tier = [string]$bestCandidate.sample_tier
@@ -451,6 +464,7 @@ function New-LaneRecommendation(
         recommended_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
         recommendation_reason = "machine_candidate:stay_on_builtin_until_manual_confirmation"
         recommendation_style_intent = "style_candidate:none"
+        recommendation_candidate_tier = "builtin_shipped_default"
         runtime_default_lane_brief = if ($null -ne $baseline) { [string]$baseline.default_lane_brief } else { "builtin/runtime_builtin_default/stay_on_builtin/style_candidate:none" }
         recommended_sample_path = ""
         recommended_sample_tier = ""
@@ -564,6 +578,7 @@ function Write-LaneMatrixSummary(
     $lines.Add(("- recommended_default_lane: `{0}`" -f $recommendation.recommended_default_lane))
     $lines.Add(("- reason: `{0}`" -f $recommendation.recommendation_reason))
     $lines.Add(("- style_intent: `{0}`" -f $recommendation.recommendation_style_intent))
+    $lines.Add(("- candidate_tier: `{0}`" -f $recommendation.recommendation_candidate_tier))
     $lines.Add(("- runtime_default_lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
     if (-not [string]::IsNullOrWhiteSpace($recommendationSamplePath)) {
         $lines.Add(("- recommended_sample_path: `{0}`" -f $recommendationSamplePath))
