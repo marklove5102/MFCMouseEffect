@@ -41,6 +41,23 @@ float PickBlushAlpha(
     return 130.0f + reactiveIntensity * 42.0f;
 }
 
+float AveragePoseAxis(
+    const MouseCompanionPetPoseSample* first,
+    const MouseCompanionPetPoseSample* second,
+    size_t axis) {
+    float sum = 0.0f;
+    float count = 0.0f;
+    if (first) {
+        sum += first->position[axis];
+        count += 1.0f;
+    }
+    if (second) {
+        sum += second->position[axis];
+        count += 1.0f;
+    }
+    return count > 0.0f ? sum / count : 0.0f;
+}
+
 } // namespace
 
 Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendererMotionProfile(
@@ -196,6 +213,27 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
         break;
     case Win32MouseCompanionRealRendererAppearanceComboPreset::None:
         break;
+    }
+
+    const float poseAdapterInfluence =
+        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    if (poseAdapterInfluence > 0.0f) {
+        const float poseEarLift =
+            AveragePoseAxis(runtime.leftEarPose, runtime.rightEarPose, 1);
+        const float poseHandLift =
+            -AveragePoseAxis(runtime.leftHandPose, runtime.rightHandPose, 1);
+        const float poseHandReach =
+            AveragePoseAxis(runtime.leftHandPose, runtime.rightHandPose, 0);
+        const float poseLegReach =
+            AveragePoseAxis(runtime.leftLegPose, runtime.rightLegPose, 0);
+        const float poseForwardBias = poseHandReach * 0.70f + poseLegReach * 0.45f;
+
+        profile.headNod -= poseEarLift * 1.2f * poseAdapterInfluence;
+        profile.headNod -= poseHandLift * 0.8f * poseAdapterInfluence;
+        profile.bodyForward += poseForwardBias * 5.0f * poseAdapterInfluence;
+        profile.pupilFocusX += poseForwardBias * 0.12f * poseAdapterInfluence;
+        profile.pupilFocusY -= poseHandLift * 0.06f * poseAdapterInfluence;
+        profile.browTilt += poseForwardBias * 1.3f * poseAdapterInfluence;
     }
 
     profile.overlayAccentColor = runtime.click ? MakeColor(230, 255, 118, 186)
