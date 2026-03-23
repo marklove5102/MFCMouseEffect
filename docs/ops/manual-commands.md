@@ -128,10 +128,14 @@ Keep P1 concise; add details here when needed.
     - `plugin_kind`
     - `semantics_mode`
     - `default_lane_candidate`
+    - `default_lane_source`
+    - `default_lane_rollout_status`
+    - `default_lane_style_intent`
     - `combo_preset`
     - `selection_reason`
     - `failure_reason`
     - `metadata_path_present`
+  - each lane summary row now also carries a compact `default_lane_brief = candidate/source/rollout/style_intent` snapshot
   - each lane summary row now also carries a compact `style` tag, so expanded `wasm_v1_*` lanes can be skimmed without inferring style only from the lane name
   - the same summary bundle now also emits a conservative machine recommendation for `recommended_default_lane`, based only on:
     - lane proof pass/fail

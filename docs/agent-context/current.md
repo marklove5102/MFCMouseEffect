@@ -119,6 +119,7 @@
 - Lane matrix now emits per-lane proof json plus `summary.json`, `summary.md`, and `observation-template.md`.
 - Lane matrix summary also emits:
   - compact lane verdicts
+  - per-lane default-lane snapshots
   - compare-vs-builtin summary
   - per-lane `style`
   - conservative `recommended_default_lane`

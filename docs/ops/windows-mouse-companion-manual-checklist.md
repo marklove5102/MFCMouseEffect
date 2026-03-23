@@ -259,10 +259,14 @@
      - `plugin_kind`
      - `appearance_semantics_mode`
      - `default_lane_candidate`
+     - `default_lane_source`
+     - `default_lane_rollout_status`
+     - `default_lane_style_intent`
      - `appearance_combo_preset`
      - `selection_reason`
      - `failure_reason`
      - whether a renderer sidecar metadata path was present
+   - each lane row now also reports `default_lane_brief = candidate/source/rollout/style_intent`, so the runtime default-lane call can be skimmed without opening the raw per-lane json
    - each lane row now also reports a short `style` field, so `wasm_v1_agile / dreamy / charming` can be skimmed directly from the summary without re-parsing the lane label
    - the same summary now also carries a conservative machine recommendation for `recommended_default_lane`; treat it as a triage hint first, not an automatic ship decision
    - when the matrix recommends one of the expanded `wasm_v1_*` lanes, it now also records `recommendation_style_intent`, so you can see whether the machine is currently leaning toward `agile_follow_drag`, `dreamy_follow_scroll`, or `charming_click_hold`

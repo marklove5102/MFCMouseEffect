@@ -175,6 +175,18 @@ function Read-JsonFile([string]$Path) {
     return Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
 }
 
+function Format-DefaultLaneBrief(
+    [string]$Candidate,
+    [string]$Source,
+    [string]$RolloutStatus,
+    [string]$StyleIntent) {
+    $candidateText = if ([string]::IsNullOrWhiteSpace($Candidate)) { "-" } else { $Candidate }
+    $sourceText = if ([string]::IsNullOrWhiteSpace($Source)) { "-" } else { $Source }
+    $rolloutText = if ([string]::IsNullOrWhiteSpace($RolloutStatus)) { "-" } else { $RolloutStatus }
+    $styleText = if ([string]::IsNullOrWhiteSpace($StyleIntent)) { "-" } else { $StyleIntent }
+    return "{0}/{1}/{2}/{3}" -f $candidateText, $sourceText, $rolloutText, $styleText
+}
+
 function New-LaneSummary(
     [string]$Label,
     [string]$JsonPath) {
@@ -207,6 +219,9 @@ function New-LaneSummary(
     $pluginKind = if ($null -ne $preview) { [string]$preview.appearance_plugin_kind } else { "" }
     $semanticsMode = if ($null -ne $preview) { [string]$preview.appearance_plugin_appearance_semantics_mode } else { "" }
     $defaultLaneCandidate = if ($null -ne $preview) { [string]$preview.default_lane_candidate } else { "" }
+    $defaultLaneSource = if ($null -ne $preview) { [string]$preview.default_lane_source } else { "" }
+    $defaultLaneRolloutStatus = if ($null -ne $preview) { [string]$preview.default_lane_rollout_status } else { "" }
+    $defaultLaneStyleIntent = if ($null -ne $preview) { [string]$preview.default_lane_style_intent } else { "" }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState
@@ -233,6 +248,14 @@ function New-LaneSummary(
         plugin_kind = $pluginKind
         semantics_mode = $semanticsMode
         default_lane_candidate = $defaultLaneCandidate
+        default_lane_source = $defaultLaneSource
+        default_lane_rollout_status = $defaultLaneRolloutStatus
+        default_lane_style_intent = $defaultLaneStyleIntent
+        default_lane_brief = (Format-DefaultLaneBrief `
+            $defaultLaneCandidate `
+            $defaultLaneSource `
+            $defaultLaneRolloutStatus `
+            $defaultLaneStyleIntent)
         combo_preset = if ($null -ne $preview) { [string]$preview.appearance_combo_preset } else { "" }
         selection_reason = if ($null -ne $preview) { [string]$preview.appearance_plugin_selection_reason } else { "" }
         failure_reason = if ($null -ne $preview) { [string]$preview.appearance_plugin_failure_reason } else { "" }
@@ -260,6 +283,9 @@ function Compare-LaneAgainstBaseline(
         @{ name = "plugin_kind"; baseline = [string]$Baseline.plugin_kind; current = [string]$Lane.plugin_kind },
         @{ name = "semantics_mode"; baseline = [string]$Baseline.semantics_mode; current = [string]$Lane.semantics_mode },
         @{ name = "default_lane_candidate"; baseline = [string]$Baseline.default_lane_candidate; current = [string]$Lane.default_lane_candidate },
+        @{ name = "default_lane_source"; baseline = [string]$Baseline.default_lane_source; current = [string]$Lane.default_lane_source },
+        @{ name = "default_lane_rollout_status"; baseline = [string]$Baseline.default_lane_rollout_status; current = [string]$Lane.default_lane_rollout_status },
+        @{ name = "default_lane_style_intent"; baseline = [string]$Baseline.default_lane_style_intent; current = [string]$Lane.default_lane_style_intent },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
         @{ name = "selection_reason"; baseline = [string]$Baseline.selection_reason; current = [string]$Lane.selection_reason },
         @{ name = "failure_reason"; baseline = [string]$Baseline.failure_reason; current = [string]$Lane.failure_reason },
@@ -317,6 +343,7 @@ function New-LaneRecommendation(
                 recommended_default_lane = $laneName
                 recommendation_reason = "machine_candidate:passed_and_differs_from_builtin"
                 recommendation_style_intent = $styleIntent
+                runtime_default_lane_brief = [string]$lane.default_lane_brief
                 fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
                 recommendation_confidence = "low"
                 rollout_contract_status = "candidate_pending_manual_confirmation"
@@ -328,6 +355,7 @@ function New-LaneRecommendation(
         recommended_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
         recommendation_reason = "machine_candidate:stay_on_builtin_until_manual_confirmation"
         recommendation_style_intent = "style_candidate:none"
+        runtime_default_lane_brief = if ($null -ne $baseline) { [string]$baseline.default_lane_brief } else { "builtin/runtime_builtin_default/stay_on_builtin/style_candidate:none" }
         fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
         recommendation_confidence = "low"
         rollout_contract_status = "stay_on_builtin"
@@ -378,6 +406,7 @@ function Write-LaneMatrixSummary(
             $lane.semantics_mode,
             $lane.default_lane_candidate,
             $lane.combo_preset))
+        $lines.Add(("  default_lane: `{0}`" -f $lane.default_lane_brief))
         $lines.Add(("  json: `{0}`" -f $lane.json_path))
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.selection_reason)) {
             $lines.Add(("  selection_reason: `{0}`" -f $lane.selection_reason))
@@ -395,6 +424,11 @@ function Write-LaneMatrixSummary(
         $lines.Add(("- `{0}`" -f $lane.lane_brief))
     }
     $lines.Add("")
+    $lines.Add("## Default Lane Snapshots")
+    foreach ($lane in $LaneSummaries) {
+        $lines.Add(("- `{0}`: `{1}`" -f $lane.lane, $lane.default_lane_brief))
+    }
+    $lines.Add("")
     $lines.Add("## Auto Compare vs builtin")
     foreach ($comparison in $comparisons) {
         $lines.Add(("- `{0}`: `{1}`" -f $comparison.lane, $comparison.compare_brief))
@@ -407,6 +441,7 @@ function Write-LaneMatrixSummary(
     $lines.Add(("- recommended_default_lane: `{0}`" -f $recommendation.recommended_default_lane))
     $lines.Add(("- reason: `{0}`" -f $recommendation.recommendation_reason))
     $lines.Add(("- style_intent: `{0}`" -f $recommendation.recommendation_style_intent))
+    $lines.Add(("- runtime_default_lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
     $lines.Add(("- confidence: `{0}`" -f $recommendation.recommendation_confidence))
     $lines.Add(("- rollout_contract_status: `{0}`" -f $recommendation.rollout_contract_status))
     $lines.Add(("- note: machine recommendation is conservative and still needs manual observation confirmation"))
