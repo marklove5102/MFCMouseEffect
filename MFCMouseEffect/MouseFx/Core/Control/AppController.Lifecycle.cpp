@@ -863,6 +863,30 @@ void AppController::SyncPetVisualHostDiagnostics(const PetVisualHostDiagnostics&
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlRigHintNameBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlRigHintValueBrief =
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlRigHintValueBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeRigChannelState =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeRigChannelEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeRigChannelResolvedEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelResolvedEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeRigChannelBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeRigChannelNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelNameBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeRigChannelValueBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelValueBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceState =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceResolvedEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceResolvedEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceNameBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceValueBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceValueBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence =
         diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias =

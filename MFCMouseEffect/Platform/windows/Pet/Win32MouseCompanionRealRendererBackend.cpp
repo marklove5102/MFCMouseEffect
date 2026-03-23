@@ -14,6 +14,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeArticulationProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeArticulationMapProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeControlRigHintProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeRigChannelProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeControlSurfaceProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeLocalJointRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseResolverProfile.h"
@@ -149,6 +151,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
             articulationMapProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeControlRigHintProfile(
         controlRigHintProfile,
+        scene);
+    const auto rigChannelProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeRigChannelProfile(
+            controlRigHintProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeRigChannelProfile(
+        rigChannelProfile,
+        scene);
+    const auto controlSurfaceProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeControlSurfaceProfile(
+            rigChannelProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeControlSurfaceProfile(
+        controlSurfaceProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
     const Win32MouseCompanionRealRendererPainter painter{};
@@ -422,6 +436,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         controlRigHintProfile.rigHintBrief;
     diagnostics.sceneRuntimeAssetNodeControlRigHintValueBrief =
         controlRigHintProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeRigChannelState =
+        rigChannelProfile.channelState;
+    diagnostics.sceneRuntimeAssetNodeRigChannelEntryCount =
+        rigChannelProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeRigChannelResolvedEntryCount =
+        rigChannelProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeRigChannelBrief =
+        rigChannelProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeRigChannelNameBrief =
+        rigChannelProfile.channelBrief;
+    diagnostics.sceneRuntimeAssetNodeRigChannelValueBrief =
+        rigChannelProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceState =
+        controlSurfaceProfile.surfaceState;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceEntryCount =
+        controlSurfaceProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceResolvedEntryCount =
+        controlSurfaceProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceBrief =
+        controlSurfaceProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceNameBrief =
+        controlSurfaceProfile.surfaceBrief;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceValueBrief =
+        controlSurfaceProfile.valueBrief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

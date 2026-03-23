@@ -301,6 +301,22 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         "body:rig.body.spine|head:rig.head.look|appendage:rig.appendage.reach|overlay:rig.overlay.fx|grounding:rig.grounding.balance";
     diagnostics.sceneRuntimeAssetNodeControlRigHintValueBrief =
         "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
+    diagnostics.sceneRuntimeAssetNodeRigChannelState = "preview_only";
+    diagnostics.sceneRuntimeAssetNodeRigChannelEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeRigChannelResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeRigChannelBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeAssetNodeRigChannelNameBrief =
+        "body:rig.channel.body.spine|head:rig.channel.head.look|appendage:rig.channel.appendage.reach|overlay:rig.channel.overlay.fx|grounding:rig.channel.grounding.balance";
+    diagnostics.sceneRuntimeAssetNodeRigChannelValueBrief =
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceState = "preview_only";
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceNameBrief =
+        "body:surface.body.spine|head:surface.head.look|appendage:surface.appendage.reach|overlay:surface.overlay.fx|grounding:surface.grounding.balance";
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceValueBrief =
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
     diagnostics.appearanceSkinVariantId = input.appearanceProfile.skinVariantId;
     diagnostics.appearanceAccessoryIds = input.appearanceProfile.enabledAccessoryIds;
     const auto accessoryFamily =

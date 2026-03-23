@@ -378,6 +378,18 @@ It should **not** own:
     - `scene_runtime_asset_node_control_rig_hint_brief = hint_state/entry_count/resolved_entry_count`
     - `scene_runtime_asset_node_control_rig_hint_name_brief = body:rig.body.spine|head:rig.head.look|appendage:rig.appendage.reach|overlay:rig.overlay.fx|grounding:rig.grounding.balance`
     - `scene_runtime_asset_node_control_rig_hint_value_brief = body:(weight,drive,damping)|...`
+    - `scene_runtime_asset_node_rig_channel_state`
+    - `scene_runtime_asset_node_rig_channel_entry_count`
+    - `scene_runtime_asset_node_rig_channel_resolved_entry_count`
+    - `scene_runtime_asset_node_rig_channel_brief = channel_state/entry_count/resolved_entry_count`
+    - `scene_runtime_asset_node_rig_channel_name_brief = body:rig.channel.body.spine|head:rig.channel.head.look|appendage:rig.channel.appendage.reach|overlay:rig.channel.overlay.fx|grounding:rig.channel.grounding.balance`
+    - `scene_runtime_asset_node_rig_channel_value_brief = body:(weight,amplitude,response)|...`
+    - `scene_runtime_asset_node_control_surface_state`
+    - `scene_runtime_asset_node_control_surface_entry_count`
+    - `scene_runtime_asset_node_control_surface_resolved_entry_count`
+    - `scene_runtime_asset_node_control_surface_brief = surface_state/entry_count/resolved_entry_count`
+    - `scene_runtime_asset_node_control_surface_name_brief = body:surface.body.spine|head:surface.head.look|appendage:surface.appendage.reach|overlay:surface.overlay.fx|grounding:surface.grounding.balance`
+    - `scene_runtime_asset_node_control_surface_value_brief = body:(weight,alpha,stroke)|...`
   - scene build/runtime diagnostics should also expose a derived `assetNodeAnchorProfile` over the same five logical lanes:
     - `scene_runtime_asset_node_anchor_state`
     - `scene_runtime_asset_node_anchor_entry_count`

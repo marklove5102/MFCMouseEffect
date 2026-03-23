@@ -329,6 +329,30 @@ export function getMouseCompanionSectionMarkup() {
         <label>Control Rig Hint Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_control_rig_hint_value_brief">-</output>
 
+        <label>Rig Channel</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_channel_brief">-</output>
+
+        <label>Resolved Rig Channels</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_channel_resolved_count">-</output>
+
+        <label>Rig Channel Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_channel_name_brief">-</output>
+
+        <label>Rig Channel Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_channel_value_brief">-</output>
+
+        <label>Control Surface</label>
+        <output id="mc_runtime_scene_runtime_asset_node_control_surface_brief">-</output>
+
+        <label>Resolved Control Surfaces</label>
+        <output id="mc_runtime_scene_runtime_asset_node_control_surface_resolved_count">-</output>
+
+        <label>Control Surface Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_control_surface_name_brief">-</output>
+
+        <label>Control Surface Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_control_surface_value_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 

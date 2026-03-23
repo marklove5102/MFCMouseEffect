@@ -814,6 +814,52 @@ function Add-AssetNodeControlRigHintSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_control_rig_hint_brief" -NotePropertyValue $brief
 }
 
+function Format-AssetNodeRigChannelSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_rig_channel_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeRigChannelSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeRigChannelSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_rig_channel_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_rig_channel_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_rig_channel_brief" -NotePropertyValue $brief
+}
+
+function Format-AssetNodeControlSurfaceSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_control_surface_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeControlSurfaceSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeControlSurfaceSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_control_surface_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_control_surface_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_control_surface_brief" -NotePropertyValue $brief
+}
+
 function Show-RealPreviewSmokeHint {
     @'
 [mfx:info] real-preview-smoke preset
@@ -1518,6 +1564,8 @@ if ($Route -eq "sweep") {
                 Add-AssetNodeLocalJointRegistrySummaryProperty $item.real_renderer_preview
                 Add-AssetNodeArticulationMapSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeControlRigHintSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeRigChannelSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeControlSurfaceSummaryProperty $item.real_renderer_preview
                 Add-PoseAdapterSummaryProperty $item.real_renderer_preview
                 if ($null -ne $item.proof) {
                     Add-DefaultLaneSummaryProperty $item.proof.renderer_runtime_after
@@ -1548,6 +1596,8 @@ if ($Route -eq "sweep") {
                     Add-AssetNodeLocalJointRegistrySummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeArticulationMapSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeControlRigHintSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeRigChannelSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeControlSurfaceSummaryProperty $item.proof.renderer_runtime_after
                     Add-PoseAdapterSummaryProperty $item.proof.renderer_runtime_after
                 }
             }
@@ -1581,6 +1631,8 @@ if ($Route -eq "sweep") {
         Add-AssetNodeLocalJointRegistrySummaryProperty $response.real_renderer_preview
         Add-AssetNodeArticulationMapSummaryProperty $response.real_renderer_preview
         Add-AssetNodeControlRigHintSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeRigChannelSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeControlSurfaceSummaryProperty $response.real_renderer_preview
         Add-PoseAdapterSummaryProperty $response.real_renderer_preview
         Add-DefaultLaneSummaryProperty $response.renderer_runtime_after
         Add-AppearancePluginContractBriefProperty $response.renderer_runtime_after
@@ -1610,6 +1662,8 @@ if ($Route -eq "sweep") {
         Add-AssetNodeLocalJointRegistrySummaryProperty $response.renderer_runtime_after
         Add-AssetNodeArticulationMapSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeControlRigHintSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeRigChannelSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeControlSurfaceSummaryProperty $response.renderer_runtime_after
         Add-PoseAdapterSummaryProperty $response.renderer_runtime_after
     }
 
@@ -1925,6 +1979,10 @@ Write-Host ("  - asset_articulation_map={0}" -f `
     (Format-AssetNodeArticulationMapSummary $response.real_renderer_preview))
 Write-Host ("  - asset_control_rig_hint={0}" -f `
     (Format-AssetNodeControlRigHintSummary $response.real_renderer_preview))
+Write-Host ("  - asset_rig_channel={0}" -f `
+    (Format-AssetNodeRigChannelSummary $response.real_renderer_preview))
+Write-Host ("  - asset_control_surface={0}" -f `
+    (Format-AssetNodeControlSurfaceSummary $response.real_renderer_preview))
 Write-Host ("  - pose_adapter={0}" -f `
     (Format-PoseAdapterSummary $response.real_renderer_preview))
 Write-Host ("  - model_scene_adapter={0}" -f `

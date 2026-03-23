@@ -587,6 +587,46 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControlRigHintValueBrief).empty()
             ? "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"
             : status.rendererRuntimeSceneRuntimeAssetNodeControlRigHintValueBrief;
+    diagnostics.sceneRuntimeAssetNodeRigChannelState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeRigChannelState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeAssetNodeRigChannelState;
+    diagnostics.sceneRuntimeAssetNodeRigChannelEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigChannelEntryCount;
+    diagnostics.sceneRuntimeAssetNodeRigChannelResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigChannelResolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeRigChannelBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeRigChannelBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeAssetNodeRigChannelBrief;
+    diagnostics.sceneRuntimeAssetNodeRigChannelNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeRigChannelNameBrief).empty()
+            ? "body:rig.channel.body.spine|head:rig.channel.head.look|appendage:rig.channel.appendage.reach|overlay:rig.channel.overlay.fx|grounding:rig.channel.grounding.balance"
+            : status.rendererRuntimeSceneRuntimeAssetNodeRigChannelNameBrief;
+    diagnostics.sceneRuntimeAssetNodeRigChannelValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeRigChannelValueBrief).empty()
+            ? "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"
+            : status.rendererRuntimeSceneRuntimeAssetNodeRigChannelValueBrief;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceState;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceEntryCount;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceResolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceBrief;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceNameBrief).empty()
+            ? "body:surface.body.spine|head:surface.head.look|appendage:surface.appendage.reach|overlay:surface.overlay.fx|grounding:surface.grounding.balance"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceNameBrief;
+    diagnostics.sceneRuntimeAssetNodeControlSurfaceValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceValueBrief).empty()
+            ? "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceValueBrief;
     diagnostics.sceneRuntimePoseAdapterInfluence =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     diagnostics.sceneRuntimePoseReadabilityBias =

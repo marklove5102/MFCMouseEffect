@@ -432,6 +432,30 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeAssetNodeControlRigHintNameBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlRigHintValueBrief =
         rendererRuntime.sceneRuntimeAssetNodeControlRigHintValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelState =
+        rendererRuntime.sceneRuntimeAssetNodeRigChannelState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeRigChannelEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeRigChannelResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelBrief =
+        rendererRuntime.sceneRuntimeAssetNodeRigChannelBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodeRigChannelNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeRigChannelValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodeRigChannelValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceState =
+        rendererRuntime.sceneRuntimeAssetNodeControlSurfaceState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeControlSurfaceEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeControlSurfaceResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceBrief =
+        rendererRuntime.sceneRuntimeAssetNodeControlSurfaceBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodeControlSurfaceNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControlSurfaceValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodeControlSurfaceValueBrief;
     diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence =
         rendererRuntime.sceneRuntimePoseAdapterInfluence;
     diagnostics.rendererRuntime.sceneRuntimePoseReadabilityBias =
