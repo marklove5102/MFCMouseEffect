@@ -49,6 +49,19 @@ Include short evidence (code path/config/runtime behavior). If user-visible beha
 - Keep Windows behavior regression-free.
 - Linux follows compile-level + contract-level unless explicitly expanded.
 
+### macOS <-> Windows source sync workflow
+- This repo currently uses `Syncthing` for automatic source sync between the macOS main workspace and the Windows validation workspace.
+- Default collaboration assumption:
+  - macOS workspace is the primary development source
+  - Windows workspace is used for build / run / visual validation
+  - do not tell the user to manually copy the latest code to Windows when the task is part of the normal sync workflow
+- Default Windows path assumption for commands and handoff:
+  - `F:\language\cpp\code\MFCMouseEffect`
+- When giving Windows manual commands, prefer the synced Windows workspace path directly instead of a generic placeholder path unless the user asks otherwise.
+- Treat sync-specific issues as workflow issues first:
+  - if Windows sees unexpected local changes, conflict files, or failed items, consider Syncthing state / ignore rules / receive-only behavior before blaming code changes
+  - do not ask the user to manually re-copy files as the first fallback when the synced workspace should already contain the latest sources
+
 ### macOS native stack evolution (Decision: 2026-02-27)
 - Do not expand `.mm` surface area for new feature modules by default.
 - Existing Objective-C++ files are maintained with SRP refactors and bug fixes only; avoid large new `.mm` subsystems.
