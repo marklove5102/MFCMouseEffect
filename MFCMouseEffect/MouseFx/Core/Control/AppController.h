@@ -444,6 +444,22 @@ public:
             "body:surface.bus.body.shell|head:surface.bus.head.mask|appendage:surface.bus.appendage.trim|overlay:surface.bus.overlay.fx|grounding:surface.bus.grounding.base"};
         std::string rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusValueBrief{
             "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeExecutionStackState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeExecutionStackEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeExecutionStackResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeAssetNodeExecutionStackBrief{"preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeExecutionStackNameBrief{
+            "body:execution.stack.body.shell|head:execution.stack.head.mask|appendage:execution.stack.appendage.trim|overlay:execution.stack.overlay.fx|grounding:execution.stack.grounding.base"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeExecutionStackValueBrief{
+            "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeCompositionRegistryState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeCompositionRegistryEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeCompositionRegistryResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeAssetNodeCompositionRegistryBrief{"preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeCompositionRegistryNameBrief{
+            "body:composition.registry.body.shell|head:composition.registry.head.mask|appendage:composition.registry.appendage.trim|overlay:composition.registry.overlay.fx|grounding:composition.registry.grounding.base"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeCompositionRegistryValueBrief{
+            "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
         float rendererRuntimeSceneRuntimePoseAdapterInfluence{0.0f};
         float rendererRuntimeSceneRuntimePoseReadabilityBias{0.0f};
         std::string rendererRuntimeSceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

@@ -1136,6 +1136,52 @@ function Add-AssetNodeSurfaceCompositionBusSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_surface_composition_bus_brief" -NotePropertyValue $brief
 }
 
+function Format-AssetNodeExecutionStackSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_execution_stack_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeExecutionStackSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeExecutionStackSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_execution_stack_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_execution_stack_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_execution_stack_brief" -NotePropertyValue $brief
+}
+
+function Format-AssetNodeCompositionRegistrySummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_composition_registry_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeCompositionRegistrySummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeCompositionRegistrySummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_composition_registry_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_composition_registry_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_composition_registry_brief" -NotePropertyValue $brief
+}
+
 function Show-RealPreviewSmokeHint {
     @'
 [mfx:info] real-preview-smoke preset
@@ -1854,6 +1900,8 @@ if ($Route -eq "sweep") {
                 Add-AssetNodeExecutionSurfaceSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeControllerPhaseRegistrySummaryProperty $item.real_renderer_preview
                 Add-AssetNodeSurfaceCompositionBusSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeExecutionStackSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeCompositionRegistrySummaryProperty $item.real_renderer_preview
                 Add-PoseAdapterSummaryProperty $item.real_renderer_preview
                 if ($null -ne $item.proof) {
                     Add-DefaultLaneSummaryProperty $item.proof.renderer_runtime_after
@@ -1898,6 +1946,8 @@ if ($Route -eq "sweep") {
                     Add-AssetNodeExecutionSurfaceSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeControllerPhaseRegistrySummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeSurfaceCompositionBusSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeExecutionStackSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeCompositionRegistrySummaryProperty $item.proof.renderer_runtime_after
                     Add-PoseAdapterSummaryProperty $item.proof.renderer_runtime_after
                 }
             }
@@ -1945,6 +1995,8 @@ if ($Route -eq "sweep") {
         Add-AssetNodeExecutionSurfaceSummaryProperty $response.real_renderer_preview
         Add-AssetNodeControllerPhaseRegistrySummaryProperty $response.real_renderer_preview
         Add-AssetNodeSurfaceCompositionBusSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeExecutionStackSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeCompositionRegistrySummaryProperty $response.real_renderer_preview
         Add-PoseAdapterSummaryProperty $response.real_renderer_preview
         Add-DefaultLaneSummaryProperty $response.renderer_runtime_after
         Add-AppearancePluginContractBriefProperty $response.renderer_runtime_after
@@ -1988,6 +2040,8 @@ if ($Route -eq "sweep") {
         Add-AssetNodeExecutionSurfaceSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeControllerPhaseRegistrySummaryProperty $response.renderer_runtime_after
         Add-AssetNodeSurfaceCompositionBusSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeExecutionStackSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeCompositionRegistrySummaryProperty $response.renderer_runtime_after
         Add-PoseAdapterSummaryProperty $response.renderer_runtime_after
     }
 
@@ -2327,6 +2381,10 @@ Write-Host ("  - asset_controller_phase_registry={0}" -f `
     (Format-AssetNodeControllerPhaseRegistrySummary $response.real_renderer_preview))
 Write-Host ("  - asset_surface_composition_bus={0}" -f `
     (Format-AssetNodeSurfaceCompositionBusSummary $response.real_renderer_preview))
+Write-Host ("  - asset_execution_stack={0}" -f `
+    (Format-AssetNodeExecutionStackSummary $response.real_renderer_preview))
+Write-Host ("  - asset_composition_registry={0}" -f `
+    (Format-AssetNodeCompositionRegistrySummary $response.real_renderer_preview))
 Write-Host ("  - pose_adapter={0}" -f `
     (Format-PoseAdapterSummary $response.real_renderer_preview))
 Write-Host ("  - model_scene_adapter={0}" -f `

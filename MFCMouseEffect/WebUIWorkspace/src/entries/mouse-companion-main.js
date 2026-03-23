@@ -1526,6 +1526,62 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_stack_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_stack_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_stack_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_stack_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_stack_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_stack_name_brief,
+      'body:execution.stack.body.shell|head:execution.stack.head.mask|appendage:execution.stack.appendage.trim|overlay:execution.stack.overlay.fx|grounding:execution.stack.grounding.base',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_stack_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_stack_value_brief,
+      'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_composition_registry_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_composition_registry_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_composition_registry_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_composition_registry_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_composition_registry_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_composition_registry_name_brief,
+      'body:composition.registry.body.shell|head:composition.registry.head.mask|appendage:composition.registry.appendage.trim|overlay:composition.registry.overlay.fx|grounding:composition.registry.grounding.base',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_composition_registry_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_composition_registry_value_brief,
+      'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );

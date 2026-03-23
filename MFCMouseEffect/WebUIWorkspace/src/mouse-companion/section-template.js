@@ -497,6 +497,30 @@ export function getMouseCompanionSectionMarkup() {
         <label>Surface Composition Bus Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_surface_composition_bus_value_brief">-</output>
 
+        <label>Execution Stack</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_brief">-</output>
+
+        <label>Resolved Execution Stack Nodes</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_resolved_count">-</output>
+
+        <label>Execution Stack Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_name_brief">-</output>
+
+        <label>Execution Stack Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_value_brief">-</output>
+
+        <label>Composition Registry</label>
+        <output id="mc_runtime_scene_runtime_asset_node_composition_registry_brief">-</output>
+
+        <label>Resolved Composition Registry Nodes</label>
+        <output id="mc_runtime_scene_runtime_asset_node_composition_registry_resolved_count">-</output>
+
+        <label>Composition Registry Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_composition_registry_name_brief">-</output>
+
+        <label>Composition Registry Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_composition_registry_value_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 

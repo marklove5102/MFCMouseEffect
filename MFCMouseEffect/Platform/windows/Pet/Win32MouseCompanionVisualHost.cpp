@@ -600,6 +600,30 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusNameBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief =
         rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionStackState =
+        rendererRuntime.sceneRuntimeAssetNodeExecutionStackState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionStackEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeExecutionStackEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionStackResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeExecutionStackResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionStackBrief =
+        rendererRuntime.sceneRuntimeAssetNodeExecutionStackBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionStackNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodeExecutionStackNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionStackValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodeExecutionStackValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryState =
+        rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryBrief =
+        rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodeCompositionRegistryValueBrief;
     diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence =
         rendererRuntime.sceneRuntimePoseAdapterInfluence;
     diagnostics.rendererRuntime.sceneRuntimePoseReadabilityBias =
