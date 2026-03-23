@@ -121,19 +121,17 @@
 - Lane matrix summary also emits:
   - compact lane verdicts
   - per-lane default-lane snapshots
+  - per-lane configured sample metadata
   - compare-vs-builtin summary
   - per-lane `style`
   - conservative `recommended_default_lane`
   - `recommendation_style_intent`
   - `recommended_sample_path`
   - `rollout_contract_status`
-- Default lane rollout contract:
-  - machine summary may nominate a candidate
-  - actual default switch still requires later manual confirmation
+- Default lane rollout contract: machine summary may nominate a candidate, but actual default switch still requires later manual confirmation.
 - Runtime default-lane diagnostics are surfaced directly:
   - `default_lane_candidate`, `default_lane_source`, `default_lane_rollout_status`, `default_lane_style_intent`
-- Sidecar smoke presets now also assert `default_lane_style_intent`, so runtime lane intent is no longer observation-only.
-- `renderer-sidecar-wasm-v1-smoke` now also accepts `-WasmV1Style default|agile|dreamy|charming`, so single-lane smoke can assert the selected checked-in style intent directly.
+- Sidecar smoke presets now also assert `default_lane_style_intent`; `renderer-sidecar-wasm-v1-smoke` additionally accepts `-WasmV1Style default|agile|dreamy|charming`, so single-lane smoke can assert the selected checked-in style intent directly.
 - `default_lane_source` stable machine values currently include:
   - `runtime_builtin_default`
   - `env_builtin_forced`
@@ -142,6 +140,7 @@
   - `runtime_plugin_candidate`
 - `default_lane_style_intent` stable machine values currently include:
   - `style_candidate:none`, `style_candidate:builtin_passthrough_baseline`, `style_candidate:balanced_default_candidate`, `style_candidate:agile_follow_drag`, `style_candidate:dreamy_follow_scroll`, `style_candidate:charming_click_hold`
+- Lane matrix recommendation now prefers runtime `default_lane_style_intent` and current sample contract over hardcoded lane-name priority.
 - Mouse Companion WebUI mirrors runtime lane state in `Runtime Diagnostics`, including a short `Lane Verdict` and `Style Intent`.
 
 #### Windows Renderer Backend / Preview

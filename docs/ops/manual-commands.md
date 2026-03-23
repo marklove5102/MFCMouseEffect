@@ -139,6 +139,7 @@ Keep P1 concise; add details here when needed.
     - `failure_reason`
     - `metadata_path_present`
   - each lane summary row now also carries a compact `default_lane_brief = candidate/source/rollout/style_intent` snapshot
+  - each lane summary row now also carries `configured_style` and `configured_sample_path`
   - each lane summary row now also carries a compact `style` tag, so expanded `wasm_v1_*` lanes can be skimmed without inferring style only from the lane name
   - the same summary bundle now also emits a conservative machine recommendation for `recommended_default_lane`, based only on:
     - lane proof pass/fail
@@ -146,6 +147,7 @@ Keep P1 concise; add details here when needed.
     - whether the lane actually differs from builtin in the machine compare
   - when a lane is recommended, the same summary now also records `recommendation_style_intent`, so the matrix can explain whether the current machine candidate is aiming for `agile_follow_drag`, `dreamy_follow_scroll`, or `charming_click_hold`
   - the same machine recommendation now also records `recommended_sample_path`, so the checked-in sidecar file can be picked up directly without re-mapping the style intent by hand
+  - machine recommendation priority now prefers runtime `default_lane_style_intent` plus the current configured sample contract, instead of only relying on fixed lane-name order
   - the same recommendation now also carries `rollout_contract_status`:
     - `candidate_pending_manual_confirmation`
     - `stay_on_builtin`

@@ -201,9 +201,23 @@ function Format-DefaultLaneBrief(
     return "{0}/{1}/{2}/{3}" -f $candidateText, $sourceText, $rolloutText, $styleText
 }
 
+function Get-StyleIntentRecommendationRank([string]$StyleIntent) {
+    switch ($StyleIntent) {
+    "style_candidate:balanced_default_candidate" { return 600 }
+    "style_candidate:agile_follow_drag" { return 500 }
+    "style_candidate:dreamy_follow_scroll" { return 400 }
+    "style_candidate:charming_click_hold" { return 300 }
+    "style_candidate:single_selected_wasm_v1" { return 250 }
+    "style_candidate:builtin_passthrough_baseline" { return 200 }
+    default { return 0 }
+    }
+}
+
 function New-LaneSummary(
     [string]$Label,
-    [string]$JsonPath) {
+    [string]$JsonPath,
+    [string]$ConfiguredStyle = "",
+    [string]$ConfiguredSamplePath = "") {
     $json = Read-JsonFile $JsonPath
     if ($null -eq $json) {
         return [ordered]@{
@@ -253,6 +267,8 @@ function New-LaneSummary(
     return [ordered]@{
         lane = $Label
         style = $laneStyle
+        configured_style = $ConfiguredStyle
+        configured_sample_path = $ConfiguredSamplePath
         json_path = $JsonPath
         summary_status = "ok"
         expectation_met = $expectationMet
@@ -331,37 +347,45 @@ function New-LaneRecommendation(
     [object[]]$LaneSummaries,
     [object[]]$Comparisons) {
     $baseline = $LaneSummaries | Where-Object { $_.lane -eq "builtin" } | Select-Object -First 1
-    $preferredOrder = @("wasm_v1_default", "wasm_v1_agile", "wasm_v1_dreamy", "wasm_v1_charming", "wasm_v1", "builtin_passthrough")
-
-    foreach ($laneName in $preferredOrder) {
-        $lane = $LaneSummaries | Where-Object { $_.lane -eq $laneName } | Select-Object -First 1
-        $comparison = $Comparisons | Where-Object { $_.lane -eq $laneName } | Select-Object -First 1
-        if ($null -eq $lane) {
+    $candidates = New-Object System.Collections.Generic.List[object]
+    foreach ($lane in $LaneSummaries) {
+        if ($lane.lane -eq "builtin") {
             continue
         }
+        $comparison = $Comparisons | Where-Object { $_.lane -eq $lane.lane } | Select-Object -First 1
         $laneOk = ($lane.summary_status -eq "ok") -and
             ($lane.expectation_met -eq $true) -and
             [string]::IsNullOrWhiteSpace([string]$lane.failure_reason)
         $hasMeaningfulDelta = ($null -ne $comparison) -and ($comparison.diff_count -gt 0)
-        if ($laneOk -and $hasMeaningfulDelta) {
-            $styleIntent = switch ($laneName) {
-                "wasm_v1_default" { "style_candidate:balanced_default_candidate" }
-                "wasm_v1_agile" { "style_candidate:agile_follow_drag" }
-                "wasm_v1_dreamy" { "style_candidate:dreamy_follow_scroll" }
-                "wasm_v1_charming" { "style_candidate:charming_click_hold" }
-                "wasm_v1" { "style_candidate:single_selected_wasm_v1" }
-                "builtin_passthrough" { "style_candidate:builtin_passthrough_baseline" }
-                default { "style_candidate:unknown" }
-            }
-            return [ordered]@{
-                recommended_default_lane = $laneName
-                recommendation_reason = "machine_candidate:passed_and_differs_from_builtin"
-                recommendation_style_intent = $styleIntent
-                runtime_default_lane_brief = [string]$lane.default_lane_brief
-                fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
-                recommendation_confidence = "low"
-                rollout_contract_status = "candidate_pending_manual_confirmation"
-            }
+        if (-not ($laneOk -and $hasMeaningfulDelta)) {
+            continue
+        }
+        $styleIntent = [string]$lane.default_lane_style_intent
+        if ([string]::IsNullOrWhiteSpace($styleIntent)) {
+            $styleIntent = "style_candidate:none"
+        }
+        $candidates.Add([ordered]@{
+            lane = $lane
+            comparison = $comparison
+            style_intent = $styleIntent
+            rank = (Get-StyleIntentRecommendationRank $styleIntent)
+        })
+    }
+
+    $bestCandidate = $candidates |
+        Sort-Object -Property @{ Expression = { $_.rank }; Descending = $true }, @{ Expression = { $_.comparison.diff_count }; Descending = $true } |
+        Select-Object -First 1
+    if ($null -ne $bestCandidate) {
+        $lane = $bestCandidate.lane
+        return [ordered]@{
+            recommended_default_lane = $lane.lane
+            recommendation_reason = "machine_candidate:passed_and_differs_from_builtin"
+            recommendation_style_intent = $bestCandidate.style_intent
+            runtime_default_lane_brief = [string]$lane.default_lane_brief
+            recommended_sample_path = [string]$lane.configured_sample_path
+            fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
+            recommendation_confidence = "low"
+            rollout_contract_status = "candidate_pending_manual_confirmation"
         }
     }
 
@@ -370,6 +394,7 @@ function New-LaneRecommendation(
         recommendation_reason = "machine_candidate:stay_on_builtin_until_manual_confirmation"
         recommendation_style_intent = "style_candidate:none"
         runtime_default_lane_brief = if ($null -ne $baseline) { [string]$baseline.default_lane_brief } else { "builtin/runtime_builtin_default/stay_on_builtin/style_candidate:none" }
+        recommended_sample_path = ""
         fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
         recommendation_confidence = "low"
         rollout_contract_status = "stay_on_builtin"
@@ -393,8 +418,11 @@ function Write-LaneMatrixSummary(
             ForEach-Object { Compare-LaneAgainstBaseline $baselineLane $_ }
     )
     $recommendation = New-LaneRecommendation $LaneSummaries $comparisons
-    $recommendationSamplePath =
-        Resolve-RecommendationSamplePath $SidecarSamples $recommendation.recommended_default_lane
+    $recommendationSamplePath = [string]$recommendation.recommended_sample_path
+    if ([string]::IsNullOrWhiteSpace($recommendationSamplePath)) {
+        $recommendationSamplePath =
+            Resolve-RecommendationSamplePath $SidecarSamples $recommendation.recommended_default_lane
+    }
 
     $payload = [ordered]@{
         generated_at = (Get-Date).ToString("s")
@@ -425,6 +453,12 @@ function Write-LaneMatrixSummary(
             $lane.default_lane_candidate,
             $lane.combo_preset))
         $lines.Add(("  default_lane: `{0}`" -f $lane.default_lane_brief))
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.configured_style)) {
+            $lines.Add(("  configured_style: `{0}`" -f $lane.configured_style))
+        }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.configured_sample_path)) {
+            $lines.Add(("  configured_sample_path: `{0}`" -f $lane.configured_sample_path))
+        }
         $lines.Add(("  json: `{0}`" -f $lane.json_path))
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.selection_reason)) {
             $lines.Add(("  selection_reason: `{0}`" -f $lane.selection_reason))
@@ -675,10 +709,10 @@ try {
 }
 
 $laneSummaries = New-Object System.Collections.Generic.List[object]
-$laneSummaries.Add((New-LaneSummary "builtin" ("{0}.builtin.json" -f $JsonOutput)))
-$laneSummaries.Add((New-LaneSummary "builtin_passthrough" ("{0}.builtin_passthrough.json" -f $JsonOutput)))
+$laneSummaries.Add((New-LaneSummary "builtin" ("{0}.builtin.json" -f $JsonOutput) "builtin" ""))
+$laneSummaries.Add((New-LaneSummary "builtin_passthrough" ("{0}.builtin_passthrough.json" -f $JsonOutput) "passthrough" ([string]$sidecarSamples.passthrough)))
 foreach ($laneSpec in $wasmV1LaneSpecs) {
-    $laneSummaries.Add((New-LaneSummary ([string]$laneSpec.label) ("{0}.{1}.json" -f $JsonOutput, [string]$laneSpec.label)))
+    $laneSummaries.Add((New-LaneSummary ([string]$laneSpec.label) ("{0}.{1}.json" -f $JsonOutput, [string]$laneSpec.label) ([string]$laneSpec.style) ([string]$laneSpec.sample_path)))
 }
 
 Write-LaneMatrixSummary $JsonOutput @($laneSummaries) $sidecarSamples $WasmV1Style $AllWasmV1Styles
