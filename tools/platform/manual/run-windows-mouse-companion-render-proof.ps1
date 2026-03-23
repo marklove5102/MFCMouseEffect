@@ -130,6 +130,10 @@ function Format-AppearancePluginContractBrief($Node) {
     if ($null -eq $Node) {
         return "-/-/-"
     }
+    $existing = [string]$Node.appearance_plugin_contract_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
     $mode = [string]$Node.appearance_plugin_appearance_semantics_mode
     $styleIntent = [string]$Node.default_lane_style_intent
     $sampleTier = [string]$Node.appearance_plugin_sample_tier

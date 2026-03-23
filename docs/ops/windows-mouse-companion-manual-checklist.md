@@ -291,6 +291,7 @@
    - machine recommendation priority now prefers `configured_sample_tier` first, then runtime `default_lane_style_intent`, rather than depending only on a fixed lane-name order
    - `render-proof` console output now also prints `default_lane_summary = candidate/source/rollout/style_intent` and `appearance_plugin_contract_brief = semantics_mode/style_intent/sample_tier`, so single-lane smoke and sweep logs use the same vocabulary as runtime and lane matrix
    - saved `render-proof` JSON now also carries both fields under `real_renderer_preview` and `renderer_runtime_after`, so downstream scripts do not need to recompose them
+   - lane matrix summary now also carries `runtime_contract_brief`, so the same short contract string can be checked without reopening proof json
    - the same run now also emits `observation-template.md`, which is the shortest place to record the human-side outcome for `follow / drag / click / hold / scroll` without losing the matching machine summary
    - current stable preflight failure codes include:
      - `renderer_plugin_manifest_io_error`

@@ -278,7 +278,19 @@ function New-LaneSummary(
     $defaultLaneRolloutStatus = if ($null -ne $preview) { [string]$preview.default_lane_rollout_status } else { "" }
     $defaultLaneStyleIntent = if ($null -ne $preview) { [string]$preview.default_lane_style_intent } else { "" }
     $runtimeSampleTier = if ($null -ne $preview) { [string]$preview.appearance_plugin_sample_tier } else { "" }
-    $runtimeContractBrief = if ($null -ne $preview) { [string]$preview.appearance_plugin_contract_brief } else { "" }
+    $runtimeContractBrief = if ($null -ne $preview) {
+        $existingContractBrief = [string]$preview.appearance_plugin_contract_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingContractBrief)) {
+            $existingContractBrief
+        } else {
+            $mode = if ([string]::IsNullOrWhiteSpace($semanticsMode)) { "-" } else { $semanticsMode }
+            $intent = if ([string]::IsNullOrWhiteSpace($defaultLaneStyleIntent)) { "-" } else { $defaultLaneStyleIntent }
+            $tier = if ([string]::IsNullOrWhiteSpace($runtimeSampleTier)) { "-" } else { $runtimeSampleTier }
+            "{0}/{1}/{2}" -f $mode, $intent, $tier
+        }
+    } else {
+        ""
+    }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState

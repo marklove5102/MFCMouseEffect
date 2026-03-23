@@ -160,12 +160,18 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         status.rendererRuntimeAppearancePluginMetadataSchemaVersion;
     diagnostics.appearancePluginAppearanceSemanticsMode =
         status.rendererRuntimeAppearancePluginAppearanceSemanticsMode;
+    diagnostics.appearancePluginSampleTier =
+        status.rendererRuntimeAppearancePluginSampleTier;
+    diagnostics.appearancePluginContractBrief =
+        status.rendererRuntimeAppearancePluginContractBrief;
     diagnostics.defaultLaneCandidate =
         status.rendererRuntimeDefaultLaneCandidate;
     diagnostics.defaultLaneSource =
         status.rendererRuntimeDefaultLaneSource;
     diagnostics.defaultLaneRolloutStatus =
         status.rendererRuntimeDefaultLaneRolloutStatus;
+    diagnostics.defaultLaneStyleIntent =
+        status.rendererRuntimeDefaultLaneStyleIntent;
     if (const auto* realEntry = FindRendererBackendCatalogEntry(status, "real")) {
         diagnostics.availabilityReason = realEntry->available ? "" : realEntry->unavailableReason;
     }
