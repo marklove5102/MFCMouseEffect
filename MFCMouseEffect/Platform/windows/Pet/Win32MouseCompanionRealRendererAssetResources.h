@@ -16,6 +16,7 @@ struct Win32MouseCompanionRealRendererAssetResources final {
     std::string appearanceRequestedPresetId;
     std::string appearanceResolvedPresetId;
     bool modelReady{false};
+    bool modelNodeSlotsReady{false};
     bool actionLibraryReady{false};
     bool appearanceProfileReady{false};
 };

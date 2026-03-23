@@ -297,6 +297,16 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeModelNodeBindingBrief},
         {"scene_runtime_model_node_binding_weight_brief",
          realRendererPreviewDiagnostics.sceneRuntimeModelNodeBindingWeightBrief},
+        {"scene_runtime_model_node_slot_state",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeSlotState},
+        {"scene_runtime_model_node_slot_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeSlotCount},
+        {"scene_runtime_model_node_ready_slot_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeReadySlotCount},
+        {"scene_runtime_model_node_slot_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeSlotBrief},
+        {"scene_runtime_model_node_slot_name_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeSlotNameBrief},
         {"scene_runtime_pose_adapter_influence",
          realRendererPreviewDiagnostics.sceneRuntimePoseAdapterInfluence},
         {"scene_runtime_pose_readability_bias",
@@ -409,6 +419,16 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeModelNodeBindingBrief;
     out["renderer_runtime_scene_runtime_model_node_binding_weight_brief"] =
         status.rendererRuntimeSceneRuntimeModelNodeBindingWeightBrief;
+    out["renderer_runtime_scene_runtime_model_node_slot_state"] =
+        status.rendererRuntimeSceneRuntimeModelNodeSlotState;
+    out["renderer_runtime_scene_runtime_model_node_slot_count"] =
+        status.rendererRuntimeSceneRuntimeModelNodeSlotCount;
+    out["renderer_runtime_scene_runtime_model_node_ready_slot_count"] =
+        status.rendererRuntimeSceneRuntimeModelNodeReadySlotCount;
+    out["renderer_runtime_scene_runtime_model_node_slot_brief"] =
+        status.rendererRuntimeSceneRuntimeModelNodeSlotBrief;
+    out["renderer_runtime_scene_runtime_model_node_slot_name_brief"] =
+        status.rendererRuntimeSceneRuntimeModelNodeSlotNameBrief;
     out["renderer_runtime_scene_runtime_pose_adapter_influence"] =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     out["renderer_runtime_scene_runtime_pose_readability_bias"] =

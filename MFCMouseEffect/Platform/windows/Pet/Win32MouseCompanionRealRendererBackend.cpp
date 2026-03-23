@@ -120,6 +120,16 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelNodeBindingProfile.brief;
     diagnostics.sceneRuntimeModelNodeBindingWeightBrief =
         sceneRuntime.modelNodeBindingProfile.weightBrief;
+    diagnostics.sceneRuntimeModelNodeSlotState =
+        sceneRuntime.modelNodeSlotProfile.slotState;
+    diagnostics.sceneRuntimeModelNodeSlotCount =
+        sceneRuntime.modelNodeSlotProfile.slotCount;
+    diagnostics.sceneRuntimeModelNodeReadySlotCount =
+        sceneRuntime.modelNodeSlotProfile.readySlotCount;
+    diagnostics.sceneRuntimeModelNodeSlotBrief =
+        sceneRuntime.modelNodeSlotProfile.brief;
+    diagnostics.sceneRuntimeModelNodeSlotNameBrief =
+        sceneRuntime.modelNodeSlotProfile.slotBrief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

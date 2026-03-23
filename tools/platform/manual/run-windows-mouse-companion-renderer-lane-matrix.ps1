@@ -395,6 +395,16 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeModelNodeSlotBrief = if ($null -ne $preview) {
+        $existingModelNodeSlotBrief = [string]$preview.scene_runtime_model_node_slot_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelNodeSlotBrief)) {
+            $existingModelNodeSlotBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState
@@ -436,6 +446,7 @@ function New-LaneSummary(
         runtime_model_node_channel_brief = $runtimeModelNodeChannelBrief
         runtime_model_node_graph_brief = $runtimeModelNodeGraphBrief
         runtime_model_node_binding_brief = $runtimeModelNodeBindingBrief
+        runtime_model_node_slot_brief = $runtimeModelNodeSlotBrief
         runtime_pose_adapter_brief = $runtimePoseAdapterBrief
         default_lane_brief = (Format-DefaultLaneBrief `
             $defaultLaneCandidate `
@@ -480,6 +491,7 @@ function Compare-LaneAgainstBaseline(
         @{ name = "runtime_model_node_channel_brief"; baseline = [string]$Baseline.runtime_model_node_channel_brief; current = [string]$Lane.runtime_model_node_channel_brief },
         @{ name = "runtime_model_node_graph_brief"; baseline = [string]$Baseline.runtime_model_node_graph_brief; current = [string]$Lane.runtime_model_node_graph_brief },
         @{ name = "runtime_model_node_binding_brief"; baseline = [string]$Baseline.runtime_model_node_binding_brief; current = [string]$Lane.runtime_model_node_binding_brief },
+        @{ name = "runtime_model_node_slot_brief"; baseline = [string]$Baseline.runtime_model_node_slot_brief; current = [string]$Lane.runtime_model_node_slot_brief },
         @{ name = "runtime_pose_adapter_brief"; baseline = [string]$Baseline.runtime_pose_adapter_brief; current = [string]$Lane.runtime_pose_adapter_brief },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
         @{ name = "selection_reason"; baseline = [string]$Baseline.selection_reason; current = [string]$Lane.selection_reason },
@@ -563,6 +575,7 @@ function New-LaneRecommendation(
             runtime_model_node_channel_brief = [string]$lane.runtime_model_node_channel_brief
             runtime_model_node_graph_brief = [string]$lane.runtime_model_node_graph_brief
             runtime_model_node_binding_brief = [string]$lane.runtime_model_node_binding_brief
+            runtime_model_node_slot_brief = [string]$lane.runtime_model_node_slot_brief
             runtime_pose_adapter_brief = [string]$lane.runtime_pose_adapter_brief
             recommended_sample_path = [string]$lane.configured_sample_path
             recommended_sample_tier = [string]$bestCandidate.sample_tier
@@ -583,6 +596,7 @@ function New-LaneRecommendation(
         runtime_model_node_channel_brief = if ($null -ne $baseline) { [string]$baseline.runtime_model_node_channel_brief } else { "body:0.00|face:0.00|appendage:0.00|overlay:0.00|grounding:0.00" }
         runtime_model_node_graph_brief = if ($null -ne $baseline) { [string]$baseline.runtime_model_node_graph_brief } else { "preview_only/0/0" }
         runtime_model_node_binding_brief = if ($null -ne $baseline) { [string]$baseline.runtime_model_node_binding_brief } else { "preview_only/0/0" }
+        runtime_model_node_slot_brief = if ($null -ne $baseline) { [string]$baseline.runtime_model_node_slot_brief } else { "preview_only/0/0" }
         runtime_pose_adapter_brief = if ($null -ne $baseline) { [string]$baseline.runtime_pose_adapter_brief } else { "runtime_only/0.00/0.00" }
         recommended_sample_path = ""
         recommended_sample_tier = ""
@@ -680,6 +694,9 @@ function Write-LaneMatrixSummary(
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_model_node_binding_brief)) {
             $lines.Add(("  runtime_model_node_binding_brief: `{0}`" -f $lane.runtime_model_node_binding_brief))
         }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_model_node_slot_brief)) {
+            $lines.Add(("  runtime_model_node_slot_brief: `{0}`" -f $lane.runtime_model_node_slot_brief))
+        }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_pose_adapter_brief)) {
             $lines.Add(("  runtime_pose_adapter_brief: `{0}`" -f $lane.runtime_pose_adapter_brief))
         }
@@ -731,6 +748,9 @@ function Write-LaneMatrixSummary(
     }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_binding_brief)) {
         $lines.Add(("- runtime_model_node_binding_brief: `{0}`" -f $recommendation.runtime_model_node_binding_brief))
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_slot_brief)) {
+        $lines.Add(("- runtime_model_node_slot_brief: `{0}`" -f $recommendation.runtime_model_node_slot_brief))
     }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_pose_adapter_brief)) {
         $lines.Add(("- runtime_pose_adapter_brief: `{0}`" -f $recommendation.runtime_pose_adapter_brief))
@@ -866,6 +886,9 @@ function Write-LaneMatrixSummary(
     }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_binding_brief)) {
         $observationLines.Add(("- machine model node binding: `{0}`" -f $recommendation.runtime_model_node_binding_brief))
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_slot_brief)) {
+        $observationLines.Add(("- machine model node slots: `{0}`" -f $recommendation.runtime_model_node_slot_brief))
     }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_pose_adapter_brief)) {
         $observationLines.Add(("- machine pose adapter: `{0}`" -f $recommendation.runtime_pose_adapter_brief))

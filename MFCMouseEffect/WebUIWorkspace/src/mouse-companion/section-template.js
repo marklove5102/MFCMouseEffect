@@ -80,6 +80,15 @@ export function getMouseCompanionSectionMarkup() {
         <label>Binding Weights</label>
         <output id="mc_runtime_scene_runtime_model_node_binding_weight_brief">-</output>
 
+        <label>Model Node Slots</label>
+        <output id="mc_runtime_scene_runtime_model_node_slot_brief">-</output>
+
+        <label>Ready Node Slots</label>
+        <output id="mc_runtime_scene_runtime_model_node_ready_slot_count">-</output>
+
+        <label>Node Slot Names</label>
+        <output id="mc_runtime_scene_runtime_model_node_slot_name_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 

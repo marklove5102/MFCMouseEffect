@@ -171,6 +171,22 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         TrimAscii(status.rendererRuntimeSceneRuntimeModelNodeBindingWeightBrief).empty()
             ? "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"
             : status.rendererRuntimeSceneRuntimeModelNodeBindingWeightBrief;
+    diagnostics.sceneRuntimeModelNodeSlotState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelNodeSlotState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeModelNodeSlotState;
+    diagnostics.sceneRuntimeModelNodeSlotCount =
+        status.rendererRuntimeSceneRuntimeModelNodeSlotCount;
+    diagnostics.sceneRuntimeModelNodeReadySlotCount =
+        status.rendererRuntimeSceneRuntimeModelNodeReadySlotCount;
+    diagnostics.sceneRuntimeModelNodeSlotBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelNodeSlotBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeModelNodeSlotBrief;
+    diagnostics.sceneRuntimeModelNodeSlotNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelNodeSlotNameBrief).empty()
+            ? "body:body_root|head:head_anchor|appendage:appendage_anchor|overlay:overlay_anchor|grounding:grounding_anchor"
+            : status.rendererRuntimeSceneRuntimeModelNodeSlotNameBrief;
     diagnostics.sceneRuntimePoseAdapterInfluence =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     diagnostics.sceneRuntimePoseReadabilityBias =

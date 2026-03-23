@@ -45,6 +45,12 @@ struct MouseCompanionRealRendererPreviewDiagnostics {
     std::string sceneRuntimeModelNodeBindingBrief{"preview_only/0/0"};
     std::string sceneRuntimeModelNodeBindingWeightBrief{
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"};
+    std::string sceneRuntimeModelNodeSlotState{"preview_only"};
+    uint32_t sceneRuntimeModelNodeSlotCount{0};
+    uint32_t sceneRuntimeModelNodeReadySlotCount{0};
+    std::string sceneRuntimeModelNodeSlotBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelNodeSlotNameBrief{
+        "body:body_root|head:head_anchor|appendage:appendage_anchor|overlay:overlay_anchor|grounding:grounding_anchor"};
     float sceneRuntimePoseAdapterInfluence{0.0f};
     float sceneRuntimePoseReadabilityBias{0.0f};
     std::string sceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

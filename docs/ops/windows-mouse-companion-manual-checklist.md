@@ -218,6 +218,12 @@
     - `binding_stub_ready/5/<mid>`
     - `binding_ready/5/<high>`
   - `scene_runtime_model_node_binding_weight_brief` should stay near all-zero in `runtime_only`, rise into sub-1.0 weights for `pose_unbound`, and approach fuller `body/head/appendage/overlay/grounding` weights once `pose_bound` is active
+  - `scene_runtime_model_node_slot_brief` should now also move through:
+    - `preview_only/0/0`
+    - `slot_scaffold/5/<low>`
+    - `slot_stub_ready/5/<mid>`
+    - `slot_binding_ready/5/<high>`
+  - `scene_runtime_model_node_slot_name_brief` should stay stable across lanes; it is the future asset-node vocabulary seam, so `body_root / head_anchor / appendage_anchor / overlay_anchor / grounding_anchor` should not drift between runtime, proof, and WebUI
    - `render-proof` can now pin pose-adapter state directly with `-ExpectedSceneRuntimeAdapterMode`, `-ExpectedSceneRuntimePoseAdapterBrief`, `-ExpectedSceneRuntimePoseAdapterInfluenceMin`, and `-ExpectedSceneRuntimePoseReadabilityBiasMin`
    - `render-proof` and lane matrix now also echo `default_lane_candidate_tier`, so `ship_default_candidate` vs `experimental_style_candidate` no longer needs to be inferred manually from raw sample metadata
    - smoke expectation now also pins that value:

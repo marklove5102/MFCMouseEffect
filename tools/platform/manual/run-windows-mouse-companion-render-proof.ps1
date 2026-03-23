@@ -331,6 +331,29 @@ function Add-ModelNodeBindingSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_model_node_binding_brief" -NotePropertyValue $brief
 }
 
+function Format-ModelNodeSlotSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_model_node_slot_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-ModelNodeSlotSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-ModelNodeSlotSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_model_node_slot_brief").Count -gt 0) {
+        $Node.scene_runtime_model_node_slot_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_model_node_slot_brief" -NotePropertyValue $brief
+}
+
 function Show-RealPreviewSmokeHint {
     @'
 [mfx:info] real-preview-smoke preset
@@ -1014,6 +1037,7 @@ if ($Route -eq "sweep") {
                 Add-ModelNodeChannelSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeGraphSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeBindingSummaryProperty $item.real_renderer_preview
+                Add-ModelNodeSlotSummaryProperty $item.real_renderer_preview
                 Add-PoseAdapterSummaryProperty $item.real_renderer_preview
                 if ($null -ne $item.proof) {
                     Add-DefaultLaneSummaryProperty $item.proof.renderer_runtime_after
@@ -1023,6 +1047,7 @@ if ($Route -eq "sweep") {
                     Add-ModelNodeChannelSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeGraphSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeBindingSummaryProperty $item.proof.renderer_runtime_after
+                    Add-ModelNodeSlotSummaryProperty $item.proof.renderer_runtime_after
                     Add-PoseAdapterSummaryProperty $item.proof.renderer_runtime_after
                 }
             }
@@ -1035,6 +1060,7 @@ if ($Route -eq "sweep") {
         Add-ModelNodeChannelSummaryProperty $response.real_renderer_preview
         Add-ModelNodeGraphSummaryProperty $response.real_renderer_preview
         Add-ModelNodeBindingSummaryProperty $response.real_renderer_preview
+        Add-ModelNodeSlotSummaryProperty $response.real_renderer_preview
         Add-PoseAdapterSummaryProperty $response.real_renderer_preview
         Add-DefaultLaneSummaryProperty $response.renderer_runtime_after
         Add-AppearancePluginContractBriefProperty $response.renderer_runtime_after
@@ -1043,6 +1069,7 @@ if ($Route -eq "sweep") {
         Add-ModelNodeChannelSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeGraphSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeBindingSummaryProperty $response.renderer_runtime_after
+        Add-ModelNodeSlotSummaryProperty $response.renderer_runtime_after
         Add-PoseAdapterSummaryProperty $response.renderer_runtime_after
     }
 
@@ -1334,6 +1361,8 @@ Write-Host ("  - model_node_graph={0}" -f `
     (Format-ModelNodeGraphSummary $response.real_renderer_preview))
 Write-Host ("  - model_node_binding={0}" -f `
     (Format-ModelNodeBindingSummary $response.real_renderer_preview))
+Write-Host ("  - model_node_slots={0}" -f `
+    (Format-ModelNodeSlotSummary $response.real_renderer_preview))
 foreach ($failure in @($appearanceFailures)) {
     Write-Host ("  - appearance_mismatch: {0}" -f $failure)
 }

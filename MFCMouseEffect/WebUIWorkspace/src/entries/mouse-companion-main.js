@@ -601,6 +601,21 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_model_node_slot_brief',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_node_slot_brief, 'preview_only/0/0'),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_node_ready_slot_count',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_node_ready_slot_count, '0'),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_node_slot_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_node_slot_name_brief,
+      'body:body_root|head:head_anchor|appendage:appendage_anchor|overlay:overlay_anchor|grounding:grounding_anchor',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );

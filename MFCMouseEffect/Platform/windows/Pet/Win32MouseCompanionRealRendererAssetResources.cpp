@@ -17,6 +17,7 @@ Win32MouseCompanionRealRendererAssetResources BuildWin32MouseCompanionRealRender
     resources.appearanceRequestedPresetId = input.appearanceProfile.requestedPresetId;
     resources.appearanceResolvedPresetId = input.appearanceProfile.resolvedPresetId;
     resources.modelReady = input.modelAssetAvailable && !resources.modelPath.empty();
+    resources.modelNodeSlotsReady = resources.modelReady;
     resources.actionLibraryReady = input.actionLibraryAvailable && !resources.actionLibraryPath.empty();
     resources.appearanceProfileReady = input.appearanceProfile.loaded;
     return resources;

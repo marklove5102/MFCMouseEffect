@@ -613,6 +613,16 @@ void AppController::SyncPetVisualHostDiagnostics(const PetVisualHostDiagnostics&
         diagnostics.rendererRuntime.sceneRuntimeModelNodeBindingBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeBindingWeightBrief =
         diagnostics.rendererRuntime.sceneRuntimeModelNodeBindingWeightBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotState =
+        diagnostics.rendererRuntime.sceneRuntimeModelNodeSlotState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotCount =
+        diagnostics.rendererRuntime.sceneRuntimeModelNodeSlotCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeReadySlotCount =
+        diagnostics.rendererRuntime.sceneRuntimeModelNodeReadySlotCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotBrief =
+        diagnostics.rendererRuntime.sceneRuntimeModelNodeSlotBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeModelNodeSlotNameBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence =
         diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias =
@@ -733,6 +743,16 @@ void AppController::ClearPetVisualHostDiagnostics() {
         "preview_only/0/0";
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeBindingWeightBrief =
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00";
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotState =
+        "preview_only";
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotCount =
+        0;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeReadySlotCount =
+        0;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotBrief =
+        "preview_only/0/0";
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelNodeSlotNameBrief =
+        "body:body_root|head:head_anchor|appendage:appendage_anchor|overlay:overlay_anchor|grounding:grounding_anchor";
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence = 0.0f;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias = 0.0f;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterBrief =
