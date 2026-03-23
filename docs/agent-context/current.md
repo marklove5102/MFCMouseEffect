@@ -110,7 +110,7 @@
   - agile sample: cooler / sharper `follow / drag`
   - dreamy sample: brighter / floatier `follow / scroll`
   - charming sample: rounder / warmer `click / hold`
-  - checked-in sidecars now also declare `style_intent`, so host/runtime no longer rely only on combo-preset inference
+  - checked-in sidecars now also declare `style_intent` and `sample_tier`, so host/runtime no longer rely only on combo-preset inference and ship-default candidates are separate from experimental styles
 
 #### Windows Bring-Up / Validation
 - Dedicated native validation entrypoints exist for combo-persona acceptance, renderer-sidecar smoke, renderer-sidecar `wasm_v1` smoke, and renderer lane matrix (`builtin -> builtin_passthrough -> wasm_v1`).
@@ -141,7 +141,7 @@
   - `runtime_plugin_candidate`
 - `default_lane_style_intent` stable machine values currently include:
   - `style_candidate:none`, `style_candidate:builtin_passthrough_baseline`, `style_candidate:balanced_default_candidate`, `style_candidate:agile_follow_drag`, `style_candidate:dreamy_follow_scroll`, `style_candidate:charming_click_hold`
-- Lane matrix recommendation now prefers runtime `default_lane_style_intent` and current sample contract over hardcoded lane-name priority.
+- Lane matrix recommendation now prefers `sample_tier` first, then runtime `default_lane_style_intent`, instead of hardcoded lane-name priority.
 - Mouse Companion WebUI mirrors runtime lane state in `Runtime Diagnostics`, including a short `Lane Verdict` and `Style Intent`.
 
 #### Windows Renderer Backend / Preview

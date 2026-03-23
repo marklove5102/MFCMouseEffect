@@ -144,10 +144,12 @@ function New-WasmV1LaneSpecs(
     foreach ($style in $styles) {
         $label = if ($AllWasmV1Styles) { "wasm_v1_{0}" -f $style } else { "wasm_v1" }
         $samplePath = Resolve-WasmV1SamplePath $SidecarSamples $style
+        $sampleMetadata = Read-SidecarSampleMetadata $samplePath
         $specs.Add([ordered]@{
             label = $label
             style = $style
             sample_path = $samplePath
+            sample_tier = [string]$sampleMetadata.sample_tier
         })
     }
     return @($specs)
@@ -189,6 +191,21 @@ function Read-JsonFile([string]$Path) {
     return Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
 }
 
+function Read-SidecarSampleMetadata([string]$Path) {
+    $fallback = [ordered]@{
+        style_intent = ""
+        sample_tier = ""
+    }
+    $json = Read-JsonFile $Path
+    if ($null -eq $json) {
+        return $fallback
+    }
+    return [ordered]@{
+        style_intent = [string]$json.style_intent
+        sample_tier = [string]$json.sample_tier
+    }
+}
+
 function Format-DefaultLaneBrief(
     [string]$Candidate,
     [string]$Source,
@@ -213,11 +230,21 @@ function Get-StyleIntentRecommendationRank([string]$StyleIntent) {
     }
 }
 
+function Get-SampleTierRecommendationRank([string]$SampleTier) {
+    switch ($SampleTier) {
+    "ship_default_candidate" { return 1000 }
+    "experimental_style_candidate" { return 500 }
+    "baseline_reference" { return 200 }
+    default { return 0 }
+    }
+}
+
 function New-LaneSummary(
     [string]$Label,
     [string]$JsonPath,
     [string]$ConfiguredStyle = "",
-    [string]$ConfiguredSamplePath = "") {
+    [string]$ConfiguredSamplePath = "",
+    [string]$ConfiguredSampleTier = "") {
     $json = Read-JsonFile $JsonPath
     if ($null -eq $json) {
         return [ordered]@{
@@ -269,6 +296,7 @@ function New-LaneSummary(
         style = $laneStyle
         configured_style = $ConfiguredStyle
         configured_sample_path = $ConfiguredSamplePath
+        configured_sample_tier = $ConfiguredSampleTier
         json_path = $JsonPath
         summary_status = "ok"
         expectation_met = $expectationMet
@@ -368,12 +396,14 @@ function New-LaneRecommendation(
             lane = $lane
             comparison = $comparison
             style_intent = $styleIntent
+            sample_tier = [string]$lane.configured_sample_tier
+            tier_rank = (Get-SampleTierRecommendationRank ([string]$lane.configured_sample_tier))
             rank = (Get-StyleIntentRecommendationRank $styleIntent)
         })
     }
 
     $bestCandidate = $candidates |
-        Sort-Object -Property @{ Expression = { $_.rank }; Descending = $true }, @{ Expression = { $_.comparison.diff_count }; Descending = $true } |
+        Sort-Object -Property @{ Expression = { $_.tier_rank }; Descending = $true }, @{ Expression = { $_.rank }; Descending = $true }, @{ Expression = { $_.comparison.diff_count }; Descending = $true } |
         Select-Object -First 1
     if ($null -ne $bestCandidate) {
         $lane = $bestCandidate.lane
@@ -383,6 +413,7 @@ function New-LaneRecommendation(
             recommendation_style_intent = $bestCandidate.style_intent
             runtime_default_lane_brief = [string]$lane.default_lane_brief
             recommended_sample_path = [string]$lane.configured_sample_path
+            recommended_sample_tier = [string]$lane.configured_sample_tier
             fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
             recommendation_confidence = "low"
             rollout_contract_status = "candidate_pending_manual_confirmation"
@@ -395,6 +426,7 @@ function New-LaneRecommendation(
         recommendation_style_intent = "style_candidate:none"
         runtime_default_lane_brief = if ($null -ne $baseline) { [string]$baseline.default_lane_brief } else { "builtin/runtime_builtin_default/stay_on_builtin/style_candidate:none" }
         recommended_sample_path = ""
+        recommended_sample_tier = ""
         fallback_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
         recommendation_confidence = "low"
         rollout_contract_status = "stay_on_builtin"
@@ -459,6 +491,9 @@ function Write-LaneMatrixSummary(
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.configured_sample_path)) {
             $lines.Add(("  configured_sample_path: `{0}`" -f $lane.configured_sample_path))
         }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.configured_sample_tier)) {
+            $lines.Add(("  configured_sample_tier: `{0}`" -f $lane.configured_sample_tier))
+        }
         $lines.Add(("  json: `{0}`" -f $lane.json_path))
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.selection_reason)) {
             $lines.Add(("  selection_reason: `{0}`" -f $lane.selection_reason))
@@ -496,6 +531,9 @@ function Write-LaneMatrixSummary(
     $lines.Add(("- runtime_default_lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
     if (-not [string]::IsNullOrWhiteSpace($recommendationSamplePath)) {
         $lines.Add(("- recommended_sample_path: `{0}`" -f $recommendationSamplePath))
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.recommended_sample_tier)) {
+        $lines.Add(("- recommended_sample_tier: `{0}`" -f $recommendation.recommended_sample_tier))
     }
     $lines.Add(("- confidence: `{0}`" -f $recommendation.recommendation_confidence))
     $lines.Add(("- rollout_contract_status: `{0}`" -f $recommendation.rollout_contract_status))
@@ -709,10 +747,10 @@ try {
 }
 
 $laneSummaries = New-Object System.Collections.Generic.List[object]
-$laneSummaries.Add((New-LaneSummary "builtin" ("{0}.builtin.json" -f $JsonOutput) "builtin" ""))
-$laneSummaries.Add((New-LaneSummary "builtin_passthrough" ("{0}.builtin_passthrough.json" -f $JsonOutput) "passthrough" ([string]$sidecarSamples.passthrough)))
+$laneSummaries.Add((New-LaneSummary "builtin" ("{0}.builtin.json" -f $JsonOutput) "builtin" "" ""))
+$laneSummaries.Add((New-LaneSummary "builtin_passthrough" ("{0}.builtin_passthrough.json" -f $JsonOutput) "passthrough" ([string]$sidecarSamples.passthrough) "baseline_reference"))
 foreach ($laneSpec in $wasmV1LaneSpecs) {
-    $laneSummaries.Add((New-LaneSummary ([string]$laneSpec.label) ("{0}.{1}.json" -f $JsonOutput, [string]$laneSpec.label) ([string]$laneSpec.style) ([string]$laneSpec.sample_path)))
+    $laneSummaries.Add((New-LaneSummary ([string]$laneSpec.label) ("{0}.{1}.json" -f $JsonOutput, [string]$laneSpec.label) ([string]$laneSpec.style) ([string]$laneSpec.sample_path) ([string]$laneSpec.sample_tier)))
 }
 
 Write-LaneMatrixSummary $JsonOutput @($laneSummaries) $sidecarSamples $WasmV1Style $AllWasmV1Styles

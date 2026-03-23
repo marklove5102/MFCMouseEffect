@@ -4,6 +4,7 @@
   "supports_appearance_semantics": true,
   "appearance_semantics_mode": "wasm_v1",
   "style_intent": "style_candidate:agile_follow_drag",
+  "sample_tier": "experimental_style_candidate",
   "combo_preset_override": "agile",
   "appearance_semantics": {
     "theme": {

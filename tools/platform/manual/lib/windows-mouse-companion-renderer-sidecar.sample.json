@@ -4,6 +4,7 @@
   "supports_appearance_semantics": true,
   "appearance_semantics_mode": "builtin_passthrough",
   "style_intent": "style_candidate:builtin_passthrough_baseline",
+  "sample_tier": "baseline_reference",
   "combo_preset_override": "dreamy",
   "follow_lift_scale": 1.12,
   "click_squash_scale": 1.06,

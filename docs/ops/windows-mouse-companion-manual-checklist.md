@@ -172,6 +172,9 @@
      - `style_candidate:dreamy_follow_scroll`
      - `style_candidate:charming_click_hold`
    - checked-in sidecars now declare `style_intent` explicitly; when a non-builtin lane is active, runtime should prefer that declared intent instead of only deriving from combo preset
+   - checked-in sidecars now also declare `sample_tier`:
+     - `ship_default_candidate`: current balanced default sample
+     - `experimental_style_candidate`: agile / dreamy / charming
    - native shortcut:
      - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -Route proof -Event status -ExpectAppearanceProfileMatch $true`
    - `run-windows-mouse-companion-combo-persona-acceptance.cmd` now enables the same appearance-profile machine check automatically and uses dedicated combo-only appearance JSON files instead of asking Win-side validation to edit the synced main profile
@@ -272,11 +275,12 @@
      - whether a renderer sidecar metadata path was present
    - each lane row now also reports `default_lane_brief = candidate/source/rollout/style_intent`, so the runtime default-lane call can be skimmed without opening the raw per-lane json
    - each lane row now also reports `configured_style` and `configured_sample_path`, so the checked-in sample contract used for that lane is visible in the summary itself
+   - each lane row now also reports `configured_sample_tier`, so ship-default candidates and experimental styles are not mixed together
    - each lane row now also reports a short `style` field, so `wasm_v1_agile / dreamy / charming` can be skimmed directly from the summary without re-parsing the lane label
    - the same summary now also carries a conservative machine recommendation for `recommended_default_lane`; treat it as a triage hint first, not an automatic ship decision
    - when the matrix recommends one of the expanded `wasm_v1_*` lanes, it now also records `recommendation_style_intent`, so you can see whether the machine is currently leaning toward `agile_follow_drag`, `dreamy_follow_scroll`, or `charming_click_hold`
    - the same recommendation now also records `recommended_sample_path`, so the next checked-in sidecar candidate can be picked up directly
-   - machine recommendation priority now prefers runtime `default_lane_style_intent` plus the current configured sample contract, rather than depending only on a fixed lane-name order
+   - machine recommendation priority now prefers `configured_sample_tier` first, then runtime `default_lane_style_intent`, rather than depending only on a fixed lane-name order
    - `render-proof` console output now also prints `default_lane_summary = candidate/source/rollout/style_intent`, so single-lane smoke and sweep logs use the same vocabulary as runtime and lane matrix
    - saved `render-proof` JSON now also carries `default_lane_summary` under `real_renderer_preview` and `renderer_runtime_after`, so downstream scripts do not need to recompose it
    - the same run now also emits `observation-template.md`, which is the shortest place to record the human-side outcome for `follow / drag / click / hold / scroll` without losing the matching machine summary
