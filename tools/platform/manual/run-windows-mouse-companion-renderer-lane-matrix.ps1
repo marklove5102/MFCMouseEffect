@@ -116,6 +116,20 @@ function Resolve-WasmV1SamplePath(
     }
 }
 
+function Resolve-RecommendationSamplePath(
+    [hashtable]$SidecarSamples,
+    [string]$LaneName) {
+    switch ($LaneName) {
+    "wasm_v1_default" { return [string]$SidecarSamples.wasm_v1_default }
+    "wasm_v1_agile" { return [string]$SidecarSamples.wasm_v1_agile }
+    "wasm_v1_dreamy" { return [string]$SidecarSamples.wasm_v1_dreamy }
+    "wasm_v1_charming" { return [string]$SidecarSamples.wasm_v1_charming }
+    "wasm_v1" { return [string]$SidecarSamples.wasm_v1_default }
+    "builtin_passthrough" { return [string]$SidecarSamples.passthrough }
+    default { return "" }
+    }
+}
+
 function New-WasmV1LaneSpecs(
     [hashtable]$SidecarSamples,
     [string]$WasmV1Style,
@@ -365,6 +379,7 @@ function New-LaneRecommendation(
 function Write-LaneMatrixSummary(
     [string]$OutputPrefix,
     [object[]]$LaneSummaries,
+    [hashtable]$SidecarSamples,
     [string]$WasmV1Style,
     [bool]$AllWasmV1Styles) {
     $summaryJsonPath = "{0}.summary.json" -f $OutputPrefix
@@ -378,12 +393,15 @@ function Write-LaneMatrixSummary(
             ForEach-Object { Compare-LaneAgainstBaseline $baselineLane $_ }
     )
     $recommendation = New-LaneRecommendation $LaneSummaries $comparisons
+    $recommendationSamplePath =
+        Resolve-RecommendationSamplePath $SidecarSamples $recommendation.recommended_default_lane
 
     $payload = [ordered]@{
         generated_at = (Get-Date).ToString("s")
         lanes = $LaneSummaries
         comparisons_vs_builtin = $comparisons
         machine_recommendation = $recommendation
+        recommended_sample_path = $recommendationSamplePath
     }
     ($payload | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $summaryJsonPath -Encoding UTF8
 
@@ -442,6 +460,9 @@ function Write-LaneMatrixSummary(
     $lines.Add(("- reason: `{0}`" -f $recommendation.recommendation_reason))
     $lines.Add(("- style_intent: `{0}`" -f $recommendation.recommendation_style_intent))
     $lines.Add(("- runtime_default_lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
+    if (-not [string]::IsNullOrWhiteSpace($recommendationSamplePath)) {
+        $lines.Add(("- recommended_sample_path: `{0}`" -f $recommendationSamplePath))
+    }
     $lines.Add(("- confidence: `{0}`" -f $recommendation.recommendation_confidence))
     $lines.Add(("- rollout_contract_status: `{0}`" -f $recommendation.rollout_contract_status))
     $lines.Add(("- note: machine recommendation is conservative and still needs manual observation confirmation"))
@@ -553,6 +574,9 @@ function Write-LaneMatrixSummary(
     $observationLines.Add(("- recommended default lane now: `{0}`" -f $recommendation.recommended_default_lane))
     $observationLines.Add(("- machine suggestion reason: `{0}`" -f $recommendation.recommendation_reason))
     $observationLines.Add(("- machine style intent: `{0}`" -f $recommendation.recommendation_style_intent))
+    if (-not [string]::IsNullOrWhiteSpace($recommendationSamplePath)) {
+        $observationLines.Add(("- machine recommended sample: `{0}`" -f $recommendationSamplePath))
+    }
     $observationLines.Add(("- rollout contract status: `{0}`" -f $recommendation.rollout_contract_status))
     $observationLines.Add("- manual confirmation result: `approve_default_switch|reject_default_switch|needs_more_tuning`")
     $observationLines.Add("- recommended next tuning target:")
@@ -657,7 +681,7 @@ foreach ($laneSpec in $wasmV1LaneSpecs) {
     $laneSummaries.Add((New-LaneSummary ([string]$laneSpec.label) ("{0}.{1}.json" -f $JsonOutput, [string]$laneSpec.label)))
 }
 
-Write-LaneMatrixSummary $JsonOutput @($laneSummaries) $WasmV1Style $AllWasmV1Styles
+Write-LaneMatrixSummary $JsonOutput @($laneSummaries) $sidecarSamples $WasmV1Style $AllWasmV1Styles
 if ($laneFailures.Count -gt 0) {
     Fail ("renderer lane matrix failed: {0}" -f (($laneFailures | ForEach-Object { [string]$_ }) -join ", "))
 }

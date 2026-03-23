@@ -124,6 +124,7 @@
   - per-lane `style`
   - conservative `recommended_default_lane`
   - `recommendation_style_intent`
+  - `recommended_sample_path`
   - `rollout_contract_status`
 - Default lane rollout contract:
   - machine summary may nominate a candidate

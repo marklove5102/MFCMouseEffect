@@ -142,6 +142,7 @@ Keep P1 concise; add details here when needed.
     - empty/non-empty failure reason
     - whether the lane actually differs from builtin in the machine compare
   - when a lane is recommended, the same summary now also records `recommendation_style_intent`, so the matrix can explain whether the current machine candidate is aiming for `agile_follow_drag`, `dreamy_follow_scroll`, or `charming_click_hold`
+  - the same machine recommendation now also records `recommended_sample_path`, so the checked-in sidecar file can be picked up directly without re-mapping the style intent by hand
   - the same recommendation now also carries `rollout_contract_status`:
     - `candidate_pending_manual_confirmation`
     - `stay_on_builtin`
