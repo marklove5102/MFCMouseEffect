@@ -639,6 +639,9 @@
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionStackRouterProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionStackRouterRegistryProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeCompositionRegistryProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
@@ -646,6 +649,9 @@
       <Filter>头文件\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteRegistryProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteRouterBusProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverTableProfile.h">
@@ -1496,6 +1502,9 @@
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionStackRouterProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionStackRouterRegistryProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeCompositionRegistryProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
@@ -1503,6 +1512,9 @@
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteRegistryProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteRouterBusProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverTableProfile.cpp">

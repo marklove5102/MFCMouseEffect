@@ -765,6 +765,16 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeAssetNodeExecutionStackRouterRegistryBrief = if ($null -ne $preview) {
+        $existingAssetNodeExecutionStackRouterRegistryBrief = [string]$preview.scene_runtime_asset_node_execution_stack_router_registry_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingAssetNodeExecutionStackRouterRegistryBrief)) {
+            $existingAssetNodeExecutionStackRouterRegistryBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
     $runtimeAssetNodeCompositionRegistryBrief = if ($null -ne $preview) {
         $existingAssetNodeCompositionRegistryBrief = [string]$preview.scene_runtime_asset_node_composition_registry_brief
         if (-not [string]::IsNullOrWhiteSpace($existingAssetNodeCompositionRegistryBrief)) {
@@ -789,6 +799,16 @@ function New-LaneSummary(
         $existingAssetNodeSurfaceRouteRegistryBrief = [string]$preview.scene_runtime_asset_node_surface_route_registry_brief
         if (-not [string]::IsNullOrWhiteSpace($existingAssetNodeSurfaceRouteRegistryBrief)) {
             $existingAssetNodeSurfaceRouteRegistryBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
+    $runtimeAssetNodeSurfaceRouteRouterBusBrief = if ($null -ne $preview) {
+        $existingAssetNodeSurfaceRouteRouterBusBrief = [string]$preview.scene_runtime_asset_node_surface_route_router_bus_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingAssetNodeSurfaceRouteRouterBusBrief)) {
+            $existingAssetNodeSurfaceRouteRouterBusBrief
         } else {
             "preview_only/0/0"
         }
@@ -883,9 +903,11 @@ function New-LaneSummary(
         runtime_asset_node_surface_composition_bus_brief = $runtimeAssetNodeSurfaceCompositionBusBrief
         runtime_asset_node_execution_stack_brief = $runtimeAssetNodeExecutionStackBrief
         runtime_asset_node_execution_stack_router_brief = $runtimeAssetNodeExecutionStackRouterBrief
+        runtime_asset_node_execution_stack_router_registry_brief = $runtimeAssetNodeExecutionStackRouterRegistryBrief
         runtime_asset_node_composition_registry_brief = $runtimeAssetNodeCompositionRegistryBrief
         runtime_asset_node_surface_route_brief = $runtimeAssetNodeSurfaceRouteBrief
         runtime_asset_node_surface_route_registry_brief = $runtimeAssetNodeSurfaceRouteRegistryBrief
+        runtime_asset_node_surface_route_router_bus_brief = $runtimeAssetNodeSurfaceRouteRouterBusBrief
         runtime_asset_node_execution_driver_table_brief = $runtimeAssetNodeExecutionDriverTableBrief
         runtime_pose_adapter_brief = $runtimePoseAdapterBrief
         default_lane_brief = (Format-DefaultLaneBrief `
@@ -962,9 +984,11 @@ function Compare-LaneAgainstBaseline(
         @{ name = "runtime_asset_node_surface_composition_bus_brief"; baseline = [string]$Baseline.runtime_asset_node_surface_composition_bus_brief; current = [string]$Lane.runtime_asset_node_surface_composition_bus_brief },
         @{ name = "runtime_asset_node_execution_stack_brief"; baseline = [string]$Baseline.runtime_asset_node_execution_stack_brief; current = [string]$Lane.runtime_asset_node_execution_stack_brief },
         @{ name = "runtime_asset_node_execution_stack_router_brief"; baseline = [string]$Baseline.runtime_asset_node_execution_stack_router_brief; current = [string]$Lane.runtime_asset_node_execution_stack_router_brief },
+        @{ name = "runtime_asset_node_execution_stack_router_registry_brief"; baseline = [string]$Baseline.runtime_asset_node_execution_stack_router_registry_brief; current = [string]$Lane.runtime_asset_node_execution_stack_router_registry_brief },
         @{ name = "runtime_asset_node_composition_registry_brief"; baseline = [string]$Baseline.runtime_asset_node_composition_registry_brief; current = [string]$Lane.runtime_asset_node_composition_registry_brief },
         @{ name = "runtime_asset_node_surface_route_brief"; baseline = [string]$Baseline.runtime_asset_node_surface_route_brief; current = [string]$Lane.runtime_asset_node_surface_route_brief },
         @{ name = "runtime_asset_node_surface_route_registry_brief"; baseline = [string]$Baseline.runtime_asset_node_surface_route_registry_brief; current = [string]$Lane.runtime_asset_node_surface_route_registry_brief },
+        @{ name = "runtime_asset_node_surface_route_router_bus_brief"; baseline = [string]$Baseline.runtime_asset_node_surface_route_router_bus_brief; current = [string]$Lane.runtime_asset_node_surface_route_router_bus_brief },
         @{ name = "runtime_asset_node_execution_driver_table_brief"; baseline = [string]$Baseline.runtime_asset_node_execution_driver_table_brief; current = [string]$Lane.runtime_asset_node_execution_driver_table_brief },
         @{ name = "runtime_pose_adapter_brief"; baseline = [string]$Baseline.runtime_pose_adapter_brief; current = [string]$Lane.runtime_pose_adapter_brief },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
@@ -1259,6 +1283,9 @@ function Write-LaneMatrixSummary(
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_execution_stack_router_brief)) {
             $lines.Add(("  runtime_asset_node_execution_stack_router_brief: `{0}`" -f $lane.runtime_asset_node_execution_stack_router_brief))
         }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_execution_stack_router_registry_brief)) {
+            $lines.Add(("  runtime_asset_node_execution_stack_router_registry_brief: `{0}`" -f $lane.runtime_asset_node_execution_stack_router_registry_brief))
+        }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_composition_registry_brief)) {
             $lines.Add(("  runtime_asset_node_composition_registry_brief: `{0}`" -f $lane.runtime_asset_node_composition_registry_brief))
         }
@@ -1267,6 +1294,9 @@ function Write-LaneMatrixSummary(
         }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_surface_route_registry_brief)) {
             $lines.Add(("  runtime_asset_node_surface_route_registry_brief: `{0}`" -f $lane.runtime_asset_node_surface_route_registry_brief))
+        }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_surface_route_router_bus_brief)) {
+            $lines.Add(("  runtime_asset_node_surface_route_router_bus_brief: `{0}`" -f $lane.runtime_asset_node_surface_route_router_bus_brief))
         }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_execution_driver_table_brief)) {
             $lines.Add(("  runtime_asset_node_execution_driver_table_brief: `{0}`" -f $lane.runtime_asset_node_execution_driver_table_brief))

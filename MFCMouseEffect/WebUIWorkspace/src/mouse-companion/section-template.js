@@ -521,6 +521,18 @@ export function getMouseCompanionSectionMarkup() {
         <label>Execution Stack Router Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_execution_stack_router_value_brief">-</output>
 
+        <label>Execution Stack Router Registry</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_router_registry_brief">-</output>
+
+        <label>Resolved Execution Stack Router Registries</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_router_registry_resolved_count">-</output>
+
+        <label>Execution Stack Router Registry Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_router_registry_name_brief">-</output>
+
+        <label>Execution Stack Router Registry Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_execution_stack_router_registry_value_brief">-</output>
+
         <label>Composition Registry</label>
         <output id="mc_runtime_scene_runtime_asset_node_composition_registry_brief">-</output>
 
@@ -556,6 +568,18 @@ export function getMouseCompanionSectionMarkup() {
 
         <label>Surface Route Registry Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_surface_route_registry_value_brief">-</output>
+
+        <label>Surface Route Router Bus</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_route_router_bus_brief">-</output>
+
+        <label>Resolved Surface Route Router Buses</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_route_router_bus_resolved_count">-</output>
+
+        <label>Surface Route Router Bus Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_route_router_bus_name_brief">-</output>
+
+        <label>Surface Route Router Bus Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_route_router_bus_value_brief">-</output>
 
         <label>Execution Driver Table</label>
         <output id="mc_runtime_scene_runtime_asset_node_execution_driver_table_brief">-</output>
