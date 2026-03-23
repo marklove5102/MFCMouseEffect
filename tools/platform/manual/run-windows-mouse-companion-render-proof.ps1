@@ -1343,6 +1343,29 @@ function Add-AssetNodeSurfaceRouteBusDriverSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_surface_route_bus_driver_brief" -NotePropertyValue $brief
 }
 
+function Format-AssetNodeSurfaceRouteBusDriverRegistrySummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_surface_route_bus_driver_registry_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeSurfaceRouteBusDriverRegistrySummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeSurfaceRouteBusDriverRegistrySummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_surface_route_bus_driver_registry_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_surface_route_bus_driver_registry_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_surface_route_bus_driver_registry_brief" -NotePropertyValue $brief
+}
+
 function Format-AssetNodeExecutionDriverTableSummary($Node) {
     if ($null -eq $Node) {
         return "preview_only/0/0"
@@ -1410,6 +1433,29 @@ function Add-AssetNodeExecutionDriverRouterRegistrySummaryProperty($Node) {
         return
     }
     $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_execution_driver_router_registry_brief" -NotePropertyValue $brief
+}
+
+function Format-AssetNodeExecutionDriverRouterRegistryBusSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_execution_driver_router_registry_bus_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeExecutionDriverRouterRegistryBusSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeExecutionDriverRouterRegistryBusSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_execution_driver_router_registry_bus_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_execution_driver_router_registry_bus_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_execution_driver_router_registry_bus_brief" -NotePropertyValue $brief
 }
 
 function Show-RealPreviewSmokeHint {
@@ -2139,9 +2185,11 @@ if ($Route -eq "sweep") {
                 Add-AssetNodeSurfaceRouteRouterBusSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeSurfaceRouteBusRegistrySummaryProperty $item.real_renderer_preview
                 Add-AssetNodeSurfaceRouteBusDriverSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeSurfaceRouteBusDriverRegistrySummaryProperty $item.real_renderer_preview
                 Add-AssetNodeExecutionDriverTableSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeExecutionDriverRouterTableSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeExecutionDriverRouterRegistrySummaryProperty $item.real_renderer_preview
+                Add-AssetNodeExecutionDriverRouterRegistryBusSummaryProperty $item.real_renderer_preview
                 Add-PoseAdapterSummaryProperty $item.real_renderer_preview
                 if ($null -ne $item.proof) {
                     Add-DefaultLaneSummaryProperty $item.proof.renderer_runtime_after
@@ -2195,9 +2243,11 @@ if ($Route -eq "sweep") {
                     Add-AssetNodeSurfaceRouteRouterBusSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeSurfaceRouteBusRegistrySummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeSurfaceRouteBusDriverSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeSurfaceRouteBusDriverRegistrySummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeExecutionDriverTableSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeExecutionDriverRouterTableSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeExecutionDriverRouterRegistrySummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeExecutionDriverRouterRegistryBusSummaryProperty $item.proof.renderer_runtime_after
                     Add-PoseAdapterSummaryProperty $item.proof.renderer_runtime_after
                 }
             }
@@ -2254,9 +2304,11 @@ if ($Route -eq "sweep") {
         Add-AssetNodeSurfaceRouteRouterBusSummaryProperty $response.real_renderer_preview
         Add-AssetNodeSurfaceRouteBusRegistrySummaryProperty $response.real_renderer_preview
         Add-AssetNodeSurfaceRouteBusDriverSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeSurfaceRouteBusDriverRegistrySummaryProperty $response.real_renderer_preview
         Add-AssetNodeExecutionDriverTableSummaryProperty $response.real_renderer_preview
         Add-AssetNodeExecutionDriverRouterTableSummaryProperty $response.real_renderer_preview
         Add-AssetNodeExecutionDriverRouterRegistrySummaryProperty $response.real_renderer_preview
+        Add-AssetNodeExecutionDriverRouterRegistryBusSummaryProperty $response.real_renderer_preview
         Add-PoseAdapterSummaryProperty $response.real_renderer_preview
         Add-DefaultLaneSummaryProperty $response.renderer_runtime_after
         Add-AppearancePluginContractBriefProperty $response.renderer_runtime_after
@@ -2309,9 +2361,11 @@ if ($Route -eq "sweep") {
         Add-AssetNodeSurfaceRouteRouterBusSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeSurfaceRouteBusRegistrySummaryProperty $response.renderer_runtime_after
         Add-AssetNodeSurfaceRouteBusDriverSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeSurfaceRouteBusDriverRegistrySummaryProperty $response.renderer_runtime_after
         Add-AssetNodeExecutionDriverTableSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeExecutionDriverRouterTableSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeExecutionDriverRouterRegistrySummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeExecutionDriverRouterRegistryBusSummaryProperty $response.renderer_runtime_after
         Add-PoseAdapterSummaryProperty $response.renderer_runtime_after
     }
 
@@ -2669,12 +2723,16 @@ Write-Host ("  - asset_surface_route_bus_registry={0}" -f `
     (Format-AssetNodeSurfaceRouteBusRegistrySummary $response.real_renderer_preview))
 Write-Host ("  - asset_surface_route_bus_driver={0}" -f `
     (Format-AssetNodeSurfaceRouteBusDriverSummary $response.real_renderer_preview))
+Write-Host ("  - asset_surface_route_bus_driver_registry={0}" -f `
+    (Format-AssetNodeSurfaceRouteBusDriverRegistrySummary $response.real_renderer_preview))
 Write-Host ("  - asset_execution_driver_table={0}" -f `
     (Format-AssetNodeExecutionDriverTableSummary $response.real_renderer_preview))
 Write-Host ("  - asset_execution_driver_router_table={0}" -f `
     (Format-AssetNodeExecutionDriverRouterTableSummary $response.real_renderer_preview))
 Write-Host ("  - asset_execution_driver_router_registry={0}" -f `
     (Format-AssetNodeExecutionDriverRouterRegistrySummary $response.real_renderer_preview))
+Write-Host ("  - asset_execution_driver_router_registry_bus={0}" -f `
+    (Format-AssetNodeExecutionDriverRouterRegistryBusSummary $response.real_renderer_preview))
 Write-Host ("  - pose_adapter={0}" -f `
     (Format-PoseAdapterSummary $response.real_renderer_preview))
 Write-Host ("  - model_scene_adapter={0}" -f `

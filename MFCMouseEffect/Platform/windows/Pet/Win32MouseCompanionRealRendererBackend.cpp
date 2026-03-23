@@ -37,9 +37,11 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeSurfaceRouteRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeSurfaceRouteRouterBusProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeExecutionDriverTableProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterTableProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryBusProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeLocalJointRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseResolverProfile.h"
@@ -314,6 +316,12 @@ void Win32MouseCompanionRealRendererBackend::Render(
     ApplyWin32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverProfile(
         surfaceRouteBusDriverProfile,
         scene);
+    const auto surfaceRouteBusDriverRegistryProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverRegistryProfile(
+            surfaceRouteBusDriverProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverRegistryProfile(
+        surfaceRouteBusDriverRegistryProfile,
+        scene);
     const auto executionDriverTableProfile =
         BuildWin32MouseCompanionRealRendererAssetNodeExecutionDriverTableProfile(
             surfaceRouteProfile);
@@ -331,6 +339,12 @@ void Win32MouseCompanionRealRendererBackend::Render(
             executionDriverRouterTableProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryProfile(
         executionDriverRouterRegistryProfile,
+        scene);
+    const auto executionDriverRouterRegistryBusProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryBusProfile(
+            executionDriverRouterRegistryProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryBusProfile(
+        executionDriverRouterRegistryBusProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
     const Win32MouseCompanionRealRendererPainter painter{};
@@ -873,6 +887,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
         surfaceRouteBusDriverProfile.driverBrief;
     diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverValueBrief =
         surfaceRouteBusDriverProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryState =
+        surfaceRouteBusDriverRegistryProfile.registryState;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryEntryCount =
+        surfaceRouteBusDriverRegistryProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryResolvedEntryCount =
+        surfaceRouteBusDriverRegistryProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryBrief =
+        surfaceRouteBusDriverRegistryProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryNameBrief =
+        surfaceRouteBusDriverRegistryProfile.registryBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryValueBrief =
+        surfaceRouteBusDriverRegistryProfile.valueBrief;
     diagnostics.sceneRuntimeAssetNodeExecutionDriverTableState =
         executionDriverTableProfile.tableState;
     diagnostics.sceneRuntimeAssetNodeExecutionDriverTableEntryCount =
@@ -909,6 +935,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
         executionDriverRouterRegistryProfile.registryBrief;
     diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryValueBrief =
         executionDriverRouterRegistryProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusState =
+        executionDriverRouterRegistryBusProfile.busState;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusEntryCount =
+        executionDriverRouterRegistryBusProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusResolvedEntryCount =
+        executionDriverRouterRegistryBusProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusBrief =
+        executionDriverRouterRegistryBusProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusNameBrief =
+        executionDriverRouterRegistryBusProfile.busBrief;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusValueBrief =
+        executionDriverRouterRegistryBusProfile.valueBrief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

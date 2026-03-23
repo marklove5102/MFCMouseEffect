@@ -1778,6 +1778,34 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_name_brief,
+      'body:surface.route.bus.driver.registry.body.shell|head:surface.route.bus.driver.registry.head.mask|appendage:surface.route.bus.driver.registry.appendage.trim|overlay:surface.route.bus.driver.registry.overlay.fx|grounding:surface.route.bus.driver.registry.grounding.base',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_route_bus_driver_registry_value_brief,
+      'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_asset_node_execution_driver_table_brief',
     normalizeRuntimeText(
       runtimeState.renderer_runtime_scene_runtime_asset_node_execution_driver_table_brief,
@@ -1858,6 +1886,34 @@ function writeRuntimeDiagnostics(runtimeState) {
     'mc_runtime_scene_runtime_asset_node_execution_driver_router_registry_value_brief',
     normalizeRuntimeText(
       runtimeState.renderer_runtime_scene_runtime_asset_node_execution_driver_router_registry_value_brief,
+      'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_name_brief,
+      'body:execution.driver.router.registry.bus.body.shell|head:execution.driver.router.registry.bus.head.mask|appendage:execution.driver.router.registry.bus.appendage.trim|overlay:execution.driver.router.registry.bus.overlay.fx|grounding:execution.driver.router.registry.bus.grounding.base',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_execution_driver_router_registry_bus_value_brief,
       'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
     ),
   );

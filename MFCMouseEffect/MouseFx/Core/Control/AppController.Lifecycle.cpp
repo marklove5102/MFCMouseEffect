@@ -1139,6 +1139,18 @@ void AppController::SyncPetVisualHostDiagnostics(const PetVisualHostDiagnostics&
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverNameBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverValueBrief =
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverValueBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryState =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryResolvedEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryResolvedEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryNameBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryValueBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceRouteBusDriverRegistryValueBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverTableState =
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverTableState;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverTableEntryCount =
@@ -1175,6 +1187,18 @@ void AppController::SyncPetVisualHostDiagnostics(const PetVisualHostDiagnostics&
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryNameBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryValueBrief =
         diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryValueBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryBusState =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryBusEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryBusResolvedEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusResolvedEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryBusBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryBusNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusNameBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodeExecutionDriverRouterRegistryBusValueBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBusValueBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence =
         diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias =
