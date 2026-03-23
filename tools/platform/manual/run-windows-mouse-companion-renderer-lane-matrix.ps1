@@ -354,6 +354,17 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeModelNodeAdapterBrief = if ($null -ne $preview) {
+        $existingModelNodeBrief = [string]$preview.scene_runtime_model_node_adapter_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelNodeBrief)) {
+            $existingModelNodeBrief
+        } else {
+            $influence = [double]([string]$preview.scene_runtime_model_node_adapter_influence)
+            "preview_only/{0}" -f $influence.ToString("0.00")
+        }
+    } else {
+        ""
+    }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState
@@ -391,6 +402,7 @@ function New-LaneSummary(
         runtime_sample_tier = $runtimeSampleTier
         runtime_contract_brief = $runtimeContractBrief
         runtime_model_scene_adapter_brief = $runtimeModelSceneAdapterBrief
+        runtime_model_node_adapter_brief = $runtimeModelNodeAdapterBrief
         runtime_pose_adapter_brief = $runtimePoseAdapterBrief
         default_lane_brief = (Format-DefaultLaneBrief `
             $defaultLaneCandidate `
@@ -431,6 +443,7 @@ function Compare-LaneAgainstBaseline(
         @{ name = "runtime_sample_tier"; baseline = [string]$Baseline.runtime_sample_tier; current = [string]$Lane.runtime_sample_tier },
         @{ name = "runtime_contract_brief"; baseline = [string]$Baseline.runtime_contract_brief; current = [string]$Lane.runtime_contract_brief },
         @{ name = "runtime_model_scene_adapter_brief"; baseline = [string]$Baseline.runtime_model_scene_adapter_brief; current = [string]$Lane.runtime_model_scene_adapter_brief },
+        @{ name = "runtime_model_node_adapter_brief"; baseline = [string]$Baseline.runtime_model_node_adapter_brief; current = [string]$Lane.runtime_model_node_adapter_brief },
         @{ name = "runtime_pose_adapter_brief"; baseline = [string]$Baseline.runtime_pose_adapter_brief; current = [string]$Lane.runtime_pose_adapter_brief },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
         @{ name = "selection_reason"; baseline = [string]$Baseline.selection_reason; current = [string]$Lane.selection_reason },
@@ -510,6 +523,7 @@ function New-LaneRecommendation(
             recommendation_style_focus_profile = [string]$lane.style_focus_profile
             recommendation_candidate_tier = $bestCandidate.candidate_tier
             runtime_default_lane_brief = [string]$lane.default_lane_brief
+            runtime_model_node_adapter_brief = [string]$lane.runtime_model_node_adapter_brief
             runtime_pose_adapter_brief = [string]$lane.runtime_pose_adapter_brief
             recommended_sample_path = [string]$lane.configured_sample_path
             recommended_sample_tier = [string]$bestCandidate.sample_tier
@@ -526,6 +540,7 @@ function New-LaneRecommendation(
         recommendation_style_focus_profile = if ($null -ne $baseline) { [string]$baseline.style_focus_profile } else { "builtin_control" }
         recommendation_candidate_tier = "builtin_shipped_default"
         runtime_default_lane_brief = if ($null -ne $baseline) { [string]$baseline.default_lane_brief } else { "builtin/runtime_builtin_default/stay_on_builtin/style_candidate:none" }
+        runtime_model_node_adapter_brief = if ($null -ne $baseline) { [string]$baseline.runtime_model_node_adapter_brief } else { "preview_only/0.00" }
         runtime_pose_adapter_brief = if ($null -ne $baseline) { [string]$baseline.runtime_pose_adapter_brief } else { "runtime_only/0.00/0.00" }
         recommended_sample_path = ""
         recommended_sample_tier = ""
@@ -608,6 +623,12 @@ function Write-LaneMatrixSummary(
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_contract_brief)) {
             $lines.Add(("  runtime_contract_brief: `{0}`" -f $lane.runtime_contract_brief))
         }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_model_scene_adapter_brief)) {
+            $lines.Add(("  runtime_model_scene_adapter_brief: `{0}`" -f $lane.runtime_model_scene_adapter_brief))
+        }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_model_node_adapter_brief)) {
+            $lines.Add(("  runtime_model_node_adapter_brief: `{0}`" -f $lane.runtime_model_node_adapter_brief))
+        }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_pose_adapter_brief)) {
             $lines.Add(("  runtime_pose_adapter_brief: `{0}`" -f $lane.runtime_pose_adapter_brief))
         }
@@ -648,6 +669,9 @@ function Write-LaneMatrixSummary(
     $lines.Add(("- style_focus_profile: `{0}`" -f $recommendation.recommendation_style_focus_profile))
     $lines.Add(("- candidate_tier: `{0}`" -f $recommendation.recommendation_candidate_tier))
     $lines.Add(("- runtime_default_lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_adapter_brief)) {
+        $lines.Add(("- runtime_model_node_adapter_brief: `{0}`" -f $recommendation.runtime_model_node_adapter_brief))
+    }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_pose_adapter_brief)) {
         $lines.Add(("- runtime_pose_adapter_brief: `{0}`" -f $recommendation.runtime_pose_adapter_brief))
     }
@@ -771,6 +795,9 @@ function Write-LaneMatrixSummary(
     $observationLines.Add(("- machine style focus: `{0}`" -f $recommendation.recommendation_style_focus_profile))
     $observationLines.Add(("- machine candidate tier: `{0}`" -f $recommendation.recommendation_candidate_tier))
     $observationLines.Add(("- machine runtime default lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_adapter_brief)) {
+        $observationLines.Add(("- machine model node adapter: `{0}`" -f $recommendation.runtime_model_node_adapter_brief))
+    }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_pose_adapter_brief)) {
         $observationLines.Add(("- machine pose adapter: `{0}`" -f $recommendation.runtime_pose_adapter_brief))
     }

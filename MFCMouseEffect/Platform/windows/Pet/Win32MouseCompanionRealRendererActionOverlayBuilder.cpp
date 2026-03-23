@@ -16,36 +16,6 @@ Gdiplus::RectF MakeCenteredRect(float centerX, float centerY, float width, float
     return Gdiplus::RectF(centerX - width * 0.5f, centerY - height * 0.5f, width, height);
 }
 
-float ResolveAveragePoseX(
-    const MouseCompanionPetPoseSample* a,
-    const MouseCompanionPetPoseSample* b) {
-    if (a && b) {
-        return (a->position[0] + b->position[0]) * 0.5f;
-    }
-    if (a) {
-        return a->position[0];
-    }
-    if (b) {
-        return b->position[0];
-    }
-    return 0.0f;
-}
-
-float ResolveAveragePoseY(
-    const MouseCompanionPetPoseSample* a,
-    const MouseCompanionPetPoseSample* b) {
-    if (a && b) {
-        return (a->position[1] + b->position[1]) * 0.5f;
-    }
-    if (a) {
-        return a->position[1];
-    }
-    if (b) {
-        return b->position[1];
-    }
-    return 0.0f;
-}
-
 } // namespace
 
 void BuildWin32MouseCompanionRealRendererActionOverlay(
@@ -55,18 +25,12 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
     const Win32MouseCompanionRealRendererLayoutMetrics& metrics,
     Win32MouseCompanionRealRendererScene& scene) {
     const auto mood = BuildWin32MouseCompanionRealRendererAppearanceSemantics(runtime, style).mood;
-    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
     const float poseReadabilityBias = runtime.poseAdapterProfile.readabilityBias;
     const float overlayAlphaScale = 1.0f + poseReadabilityBias * 0.10f;
     const float overlayStrokeScale = 1.0f + poseReadabilityBias * 0.08f;
-    const float poseHandReachX = ResolveAveragePoseX(runtime.leftHandPose, runtime.rightHandPose);
-    const float poseHandLiftY = ResolveAveragePoseY(runtime.leftHandPose, runtime.rightHandPose);
-    const float poseLegReachX = ResolveAveragePoseX(runtime.leftLegPose, runtime.rightLegPose);
-    const float poseOverlayCenterX =
-        (poseHandReachX * metrics.bodyWidth * 0.030f + poseLegReachX * metrics.bodyWidth * 0.018f) *
-        poseAdapterInfluence;
-    const float poseOverlayCenterY =
-        (-poseHandLiftY * metrics.bodyHeight * 0.030f) * poseAdapterInfluence;
+    const auto& nodeAdapter = runtime.modelNodeAdapterProfile;
+    const float poseOverlayCenterX = nodeAdapter.overlayOffsetX * metrics.bodyWidth;
+    const float poseOverlayCenterY = nodeAdapter.overlayOffsetY * metrics.bodyHeight;
     scene.actionOverlay.accentColor = profile.overlayAccentColor;
 
     if (runtime.click) {

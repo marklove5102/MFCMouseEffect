@@ -34,21 +34,11 @@ void BuildWin32MouseCompanionRealRendererFace(
     const auto appearanceSemantics =
         BuildWin32MouseCompanionRealRendererAppearanceSemantics(runtime, style);
     const auto& skinTuning = appearanceSemantics.face;
-    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
-    const float poseHandLift = runtime.leftHandPose && runtime.rightHandPose
-        ? -(runtime.leftHandPose->position[1] + runtime.rightHandPose->position[1]) * 0.5f
-        : runtime.leftHandPose ? -runtime.leftHandPose->position[1]
-        : runtime.rightHandPose ? -runtime.rightHandPose->position[1]
-                                : 0.0f;
-    const float poseHandReach = runtime.leftHandPose && runtime.rightHandPose
-        ? (runtime.leftHandPose->position[0] + runtime.rightHandPose->position[0]) * 0.5f
-        : runtime.leftHandPose ? runtime.leftHandPose->position[0]
-        : runtime.rightHandPose ? runtime.rightHandPose->position[0]
-                                : 0.0f;
-    const float poseFaceYOffset = -poseHandLift * scene.headRect.Height * 0.030f * poseAdapterInfluence;
-    const float poseFaceXOffset = poseHandReach * scene.headRect.Width * 0.022f * poseAdapterInfluence;
-    const float poseWhiskerBias = poseHandReach * 0.16f * poseAdapterInfluence;
-    const float poseBlushLift = poseHandLift * 1.2f * poseAdapterInfluence;
+    const auto& nodeAdapter = runtime.modelNodeAdapterProfile;
+    const float poseFaceYOffset = nodeAdapter.faceOffsetY * scene.headRect.Height;
+    const float poseFaceXOffset = nodeAdapter.faceOffsetX * scene.headRect.Width;
+    const float poseWhiskerBias = nodeAdapter.whiskerBias;
+    const float poseBlushLift = nodeAdapter.blushLift;
     const float eyeH = std::max(3.0f, scene.headRect.Height * style.eyeHeightRatio * profile.eyeOpen);
     const float pupilH = std::max(1.2f, eyeH * style.pupilHeightRatio);
     const float pupilOffsetX = profile.pupilFocusX * style.pupilFocusXScale * skinTuning.pupilFocusScale;

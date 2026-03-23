@@ -273,6 +273,10 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeModelSceneSeamReadiness},
         {"scene_runtime_model_scene_adapter_brief",
          realRendererPreviewDiagnostics.sceneRuntimeModelSceneAdapterBrief},
+        {"scene_runtime_model_node_adapter_influence",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeAdapterInfluence},
+        {"scene_runtime_model_node_adapter_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelNodeAdapterBrief},
         {"scene_runtime_pose_adapter_influence",
          realRendererPreviewDiagnostics.sceneRuntimePoseAdapterInfluence},
         {"scene_runtime_pose_readability_bias",
@@ -361,6 +365,10 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeModelSceneSeamReadiness;
     out["renderer_runtime_scene_runtime_model_scene_adapter_brief"] =
         status.rendererRuntimeSceneRuntimeModelSceneAdapterBrief;
+    out["renderer_runtime_scene_runtime_model_node_adapter_influence"] =
+        status.rendererRuntimeSceneRuntimeModelNodeAdapterInfluence;
+    out["renderer_runtime_scene_runtime_model_node_adapter_brief"] =
+        status.rendererRuntimeSceneRuntimeModelNodeAdapterBrief;
     out["renderer_runtime_scene_runtime_pose_adapter_influence"] =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     out["renderer_runtime_scene_runtime_pose_readability_bias"] =

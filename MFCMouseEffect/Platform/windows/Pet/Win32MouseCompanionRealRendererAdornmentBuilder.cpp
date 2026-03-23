@@ -87,36 +87,6 @@ Gdiplus::RectF ScaleRectFromCenter(
         newHeight);
 }
 
-float ResolveAveragePoseX(
-    const MouseCompanionPetPoseSample* a,
-    const MouseCompanionPetPoseSample* b) {
-    if (a && b) {
-        return (a->position[0] + b->position[0]) * 0.5f;
-    }
-    if (a) {
-        return a->position[0];
-    }
-    if (b) {
-        return b->position[0];
-    }
-    return 0.0f;
-}
-
-float ResolveAveragePoseY(
-    const MouseCompanionPetPoseSample* a,
-    const MouseCompanionPetPoseSample* b) {
-    if (a && b) {
-        return (a->position[1] + b->position[1]) * 0.5f;
-    }
-    if (a) {
-        return a->position[1];
-    }
-    if (b) {
-        return b->position[1];
-    }
-    return 0.0f;
-}
-
 } // namespace
 
 void BuildWin32MouseCompanionRealRendererAdornment(
@@ -137,18 +107,10 @@ void BuildWin32MouseCompanionRealRendererAdornment(
         runtime.assets->appearanceProfileReady,
     };
 
-    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
     const float poseReadabilityBias = runtime.poseAdapterProfile.readabilityBias;
-    const float poseHandReachX = ResolveAveragePoseX(runtime.leftHandPose, runtime.rightHandPose);
-    const float poseHandLiftY = ResolveAveragePoseY(runtime.leftHandPose, runtime.rightHandPose);
-    const float poseLegReachX = ResolveAveragePoseX(runtime.leftLegPose, runtime.rightLegPose);
-    const float poseLegLiftY = ResolveAveragePoseY(runtime.leftLegPose, runtime.rightLegPose);
-    const float poseAdornmentX =
-        (poseHandReachX * metrics.bodyWidth * 0.020f + poseLegReachX * metrics.bodyWidth * 0.015f) *
-        poseAdapterInfluence;
-    const float poseAdornmentY =
-        (-poseHandLiftY * metrics.bodyHeight * 0.018f - poseLegLiftY * metrics.bodyHeight * 0.010f) *
-        poseAdapterInfluence;
+    const auto& nodeAdapter = runtime.modelNodeAdapterProfile;
+    const float poseAdornmentX = nodeAdapter.adornmentOffsetX * metrics.bodyWidth;
+    const float poseAdornmentY = nodeAdapter.adornmentOffsetY * metrics.bodyHeight;
     scene.poseBadgeAlpha = 180.0f + poseReadabilityBias * 75.0f;
     scene.accessoryAlphaScale = 1.0f + poseReadabilityBias * 0.12f;
     scene.accessoryStrokeWidth = 1.0f + poseReadabilityBias * 0.22f;

@@ -563,6 +563,14 @@ function writeRuntimeDiagnostics(runtimeState) {
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_scene_seam_readiness, '0'),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_model_node_adapter_brief',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_node_adapter_brief, 'preview_only/0.00'),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_node_adapter_influence',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_node_adapter_influence, '0'),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );

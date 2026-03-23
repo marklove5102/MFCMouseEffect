@@ -53,6 +53,8 @@ Win32MouseCompanionRealRendererSceneRuntime BuildWin32MouseCompanionRealRenderer
         sceneRuntime.sceneRuntimeAdapterMode,
         sceneRuntime.sceneRuntimePoseSampleCount,
         sceneRuntime.sceneRuntimeBoundPoseSampleCount);
+    sceneRuntime.modelNodeAdapterProfile =
+        BuildWin32MouseCompanionRealRendererModelNodeAdapterProfile(sceneRuntime);
     return sceneRuntime;
 }
 

@@ -151,6 +151,9 @@ public:
         float rendererRuntimeSceneRuntimeModelSceneSeamReadiness{0.0f};
         std::string rendererRuntimeSceneRuntimeModelSceneAdapterBrief{
             "preview_only/unknown/runtime_only"};
+        float rendererRuntimeSceneRuntimeModelNodeAdapterInfluence{0.0f};
+        std::string rendererRuntimeSceneRuntimeModelNodeAdapterBrief{
+            "preview_only/0.00"};
         float rendererRuntimeSceneRuntimePoseAdapterInfluence{0.0f};
         float rendererRuntimeSceneRuntimePoseReadabilityBias{0.0f};
         std::string rendererRuntimeSceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

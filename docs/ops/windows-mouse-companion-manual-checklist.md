@@ -198,11 +198,16 @@
      - `runtime_only`: renderer runtime is still only consuming action/runtime lanes
      - `pose_unbound`: pose samples are present, but binding is not configured yet
      - `pose_bound`: the current frame is already on the bound-pose lane
-   - runtime / proof now also surface `scene_runtime_model_scene_adapter_state`, `scene_runtime_model_scene_seam_readiness`, and `scene_runtime_model_scene_adapter_brief`; current expected progression is:
-     - `preview_only/unknown/runtime_only` or `preview_only/phase1_placeholder/runtime_only`
-     - `asset_stub_ready/<format>/runtime_only`
-     - `pose_stub_ready/<format>/pose_unbound`
-     - `pose_bound_preview_ready/<format>/pose_bound`
+  - runtime / proof now also surface `scene_runtime_model_scene_adapter_state`, `scene_runtime_model_scene_seam_readiness`, and `scene_runtime_model_scene_adapter_brief`; current expected progression is:
+    - `preview_only/unknown/runtime_only` or `preview_only/phase1_placeholder/runtime_only`
+    - `asset_stub_ready/<format>/runtime_only`
+    - `pose_stub_ready/<format>/pose_unbound`
+    - `pose_bound_preview_ready/<format>/pose_bound`
+  - runtime / proof / lane matrix now also surface `scene_runtime_model_node_adapter_influence` and `scene_runtime_model_node_adapter_brief`; expected reading is:
+    - `preview_only/0.00` before builders consume the shared node seam
+    - `asset_stub_ready/<small>` while asset seam is present but pose influence is still reduced
+    - `pose_stub_ready/<mid>` once pose samples are feeding the shared node seam
+    - `pose_bound_preview_ready/<largest>` once frame/face/adornment/overlay/grounding are all reading the same bound node offsets
    - `render-proof` can now pin pose-adapter state directly with `-ExpectedSceneRuntimeAdapterMode`, `-ExpectedSceneRuntimePoseAdapterBrief`, `-ExpectedSceneRuntimePoseAdapterInfluenceMin`, and `-ExpectedSceneRuntimePoseReadabilityBiasMin`
    - `render-proof` and lane matrix now also echo `default_lane_candidate_tier`, so `ship_default_candidate` vs `experimental_style_candidate` no longer needs to be inferred manually from raw sample metadata
    - smoke expectation now also pins that value:

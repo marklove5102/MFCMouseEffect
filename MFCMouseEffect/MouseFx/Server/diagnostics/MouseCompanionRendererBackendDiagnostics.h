@@ -31,6 +31,8 @@ struct MouseCompanionRealRendererPreviewDiagnostics {
     std::string sceneRuntimeModelSceneAdapterState{"preview_only"};
     float sceneRuntimeModelSceneSeamReadiness{0.0f};
     std::string sceneRuntimeModelSceneAdapterBrief{"preview_only/unknown/runtime_only"};
+    float sceneRuntimeModelNodeAdapterInfluence{0.0f};
+    std::string sceneRuntimeModelNodeAdapterBrief{"preview_only/0.00"};
     float sceneRuntimePoseAdapterInfluence{0.0f};
     float sceneRuntimePoseReadabilityBias{0.0f};
     std::string sceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

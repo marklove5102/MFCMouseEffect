@@ -113,40 +113,16 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         break;
     }
 
-    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
-    const float poseHandReachX = runtime.leftHandPose && runtime.rightHandPose
-        ? (runtime.leftHandPose->position[0] + runtime.rightHandPose->position[0]) * 0.5f
-        : runtime.leftHandPose ? runtime.leftHandPose->position[0]
-        : runtime.rightHandPose ? runtime.rightHandPose->position[0]
-                                : 0.0f;
-    const float poseHandLiftY = runtime.leftHandPose && runtime.rightHandPose
-        ? (runtime.leftHandPose->position[1] + runtime.rightHandPose->position[1]) * 0.5f
-        : runtime.leftHandPose ? runtime.leftHandPose->position[1]
-        : runtime.rightHandPose ? runtime.rightHandPose->position[1]
-                                : 0.0f;
-    const float poseLegReachX = runtime.leftLegPose && runtime.rightLegPose
-        ? (runtime.leftLegPose->position[0] + runtime.rightLegPose->position[0]) * 0.5f
-        : runtime.leftLegPose ? runtime.leftLegPose->position[0]
-        : runtime.rightLegPose ? runtime.rightLegPose->position[0]
-                               : 0.0f;
-    const float poseLegLiftY = runtime.leftLegPose && runtime.rightLegPose
-        ? (runtime.leftLegPose->position[1] + runtime.rightLegPose->position[1]) * 0.5f
-        : runtime.leftLegPose ? runtime.leftLegPose->position[1]
-        : runtime.rightLegPose ? runtime.rightLegPose->position[1]
-                               : 0.0f;
-    const float poseAnchorX =
-        (poseHandReachX * metrics.bodyWidth * 0.045f + poseLegReachX * metrics.bodyWidth * 0.030f) *
-        poseAdapterInfluence;
-    const float poseAnchorY = (-poseHandLiftY * metrics.bodyHeight * 0.035f) * poseAdapterInfluence;
-    const float poseHeadX = poseHandReachX * metrics.headWidth * 0.030f * poseAdapterInfluence;
-    const float poseHeadY = -poseHandLiftY * metrics.headHeight * 0.035f * poseAdapterInfluence;
-    const float poseGroundingX =
-        (poseLegReachX * metrics.bodyWidth * 0.030f + poseHandReachX * metrics.bodyWidth * 0.012f) *
-        poseAdapterInfluence;
-    const float poseGroundingY = (-poseLegLiftY * metrics.bodyHeight * 0.020f) * poseAdapterInfluence;
-    const float poseGroundingScale = 1.0f + std::abs(poseLegReachX) * 0.030f * poseAdapterInfluence;
-    scene.shadowAlphaScale = 1.0f + poseAdapterInfluence * 0.08f;
-    scene.pedestalAlphaScale = 1.0f + poseAdapterInfluence * 0.06f;
+    const auto& nodeAdapter = runtime.modelNodeAdapterProfile;
+    const float poseAnchorX = nodeAdapter.centerOffsetX * metrics.bodyWidth;
+    const float poseAnchorY = nodeAdapter.centerOffsetY * metrics.bodyHeight;
+    const float poseHeadX = nodeAdapter.faceOffsetX * metrics.headWidth;
+    const float poseHeadY = nodeAdapter.faceOffsetY * metrics.headHeight;
+    const float poseGroundingX = nodeAdapter.groundingOffsetX * metrics.bodyWidth;
+    const float poseGroundingY = nodeAdapter.groundingOffsetY * metrics.bodyHeight;
+    const float poseGroundingScale = 1.0f + std::abs(nodeAdapter.groundingOffsetX) * 0.65f;
+    scene.shadowAlphaScale = 1.0f + nodeAdapter.influence * 0.08f;
+    scene.pedestalAlphaScale = 1.0f + nodeAdapter.influence * 0.06f;
 
     scene.centerX = static_cast<float>(width) * style.centerXRatio + facingOffset + profile.bodyForward +
         profile.idleHeadSway + poseAnchorX;

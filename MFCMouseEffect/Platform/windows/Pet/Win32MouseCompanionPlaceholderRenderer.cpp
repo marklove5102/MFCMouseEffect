@@ -120,6 +120,9 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         modelSceneAdapterProfile.seamReadiness;
     diagnostics.sceneRuntimeModelSceneAdapterBrief =
         modelSceneAdapterProfile.brief;
+    diagnostics.sceneRuntimeModelNodeAdapterInfluence = 0.0f;
+    diagnostics.sceneRuntimeModelNodeAdapterBrief =
+        modelSceneAdapterProfile.seamState + "/0.00";
     diagnostics.appearanceSkinVariantId = input.appearanceProfile.skinVariantId;
     diagnostics.appearanceAccessoryIds = input.appearanceProfile.enabledAccessoryIds;
     const auto accessoryFamily =

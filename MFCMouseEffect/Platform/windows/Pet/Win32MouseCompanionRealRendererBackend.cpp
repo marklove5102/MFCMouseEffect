@@ -96,6 +96,10 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelSceneAdapterProfile.seamReadiness;
     diagnostics.sceneRuntimeModelSceneAdapterBrief =
         sceneRuntime.modelSceneAdapterProfile.brief;
+    diagnostics.sceneRuntimeModelNodeAdapterInfluence =
+        sceneRuntime.modelNodeAdapterProfile.influence;
+    diagnostics.sceneRuntimeModelNodeAdapterBrief =
+        sceneRuntime.modelNodeAdapterProfile.brief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

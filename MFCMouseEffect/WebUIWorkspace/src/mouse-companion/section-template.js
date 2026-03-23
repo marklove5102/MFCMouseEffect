@@ -56,6 +56,12 @@ export function getMouseCompanionSectionMarkup() {
         <label>Model Scene Readiness</label>
         <output id="mc_runtime_scene_runtime_model_scene_seam_readiness">-</output>
 
+        <label>Model Node Adapter</label>
+        <output id="mc_runtime_scene_runtime_model_node_adapter_brief">-</output>
+
+        <label>Model Node Influence</label>
+        <output id="mc_runtime_scene_runtime_model_node_adapter_influence">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 
