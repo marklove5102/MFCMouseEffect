@@ -379,6 +379,18 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodeParentSpaceParentBrief},
         {"scene_runtime_asset_node_parent_space_value_brief",
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodeParentSpaceValueBrief},
+        {"scene_runtime_asset_node_target_state",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeTargetState},
+        {"scene_runtime_asset_node_target_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeTargetEntryCount},
+        {"scene_runtime_asset_node_target_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeTargetResolvedEntryCount},
+        {"scene_runtime_asset_node_target_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeTargetBrief},
+        {"scene_runtime_asset_node_target_kind_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeTargetKindBrief},
+        {"scene_runtime_asset_node_target_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeTargetValueBrief},
         {"scene_runtime_pose_adapter_influence",
          realRendererPreviewDiagnostics.sceneRuntimePoseAdapterInfluence},
         {"scene_runtime_pose_readability_bias",
@@ -573,6 +585,18 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeAssetNodeParentSpaceParentBrief;
     out["renderer_runtime_scene_runtime_asset_node_parent_space_value_brief"] =
         status.rendererRuntimeSceneRuntimeAssetNodeParentSpaceValueBrief;
+    out["renderer_runtime_scene_runtime_asset_node_target_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeTargetState;
+    out["renderer_runtime_scene_runtime_asset_node_target_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeTargetEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_target_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeTargetResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_target_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeTargetBrief;
+    out["renderer_runtime_scene_runtime_asset_node_target_kind_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeTargetKindBrief;
+    out["renderer_runtime_scene_runtime_asset_node_target_value_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeTargetValueBrief;
     out["renderer_runtime_scene_runtime_pose_adapter_influence"] =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     out["renderer_runtime_scene_runtime_pose_readability_bias"] =

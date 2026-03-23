@@ -748,6 +748,28 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_target_brief',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_asset_node_target_brief, 'preview_only/0/0'),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_target_resolved_count',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_asset_node_target_resolved_entry_count, '0'),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_target_kind_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_target_kind_brief,
+      'body:body_target|head:head_target|appendage:appendage_target|overlay:overlay_target|grounding:grounding_target',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_target_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_target_value_brief,
+      'body:(0.00,0.00,1.00)|head:(0.00,0.00,1.00)|appendage:(0.00,0.00,1.00)|overlay:(0.00,0.00,1.00)|grounding:(0.00,0.00,1.00)',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );

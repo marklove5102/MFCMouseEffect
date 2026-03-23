@@ -12,14 +12,14 @@ namespace {
 
 std::string ResolveAnchorState(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    const std::string& parentSpaceState = runtime.assetNodeParentSpaceProfile.parentSpaceState;
-    if (parentSpaceState == "parent_space_ready") {
+    const std::string& targetState = runtime.assetNodeTargetProfile.targetState;
+    if (targetState == "target_ready") {
         return "anchor_ready";
     }
-    if (parentSpaceState == "parent_space_stub_ready") {
+    if (targetState == "target_stub_ready") {
         return "anchor_stub_ready";
     }
-    if (parentSpaceState == "parent_space_scaffold") {
+    if (targetState == "target_scaffold") {
         return "anchor_scaffold";
     }
     return "preview_only";
@@ -113,27 +113,27 @@ BuildWin32MouseCompanionRealRendererAssetNodeAnchorProfile(
         "body",
         scene.bodyAnchor,
         scene.bodyAnchorScale,
-        runtime.assetNodeParentSpaceProfile.bodyEntry.resolved);
+        runtime.assetNodeTargetProfile.bodyEntry.resolved);
     profile.headEntry = BuildAnchorEntry(
         "head",
         scene.headAnchor,
         scene.headAnchorScale,
-        runtime.assetNodeParentSpaceProfile.headEntry.resolved);
+        runtime.assetNodeTargetProfile.headEntry.resolved);
     profile.appendageEntry = BuildAnchorEntry(
         "appendage",
         scene.appendageAnchor,
         scene.appendageAnchorScale,
-        runtime.assetNodeParentSpaceProfile.appendageEntry.resolved);
+        runtime.assetNodeTargetProfile.appendageEntry.resolved);
     profile.overlayEntry = BuildAnchorEntry(
         "overlay",
         scene.overlayAnchor,
         scene.overlayAnchorScale,
-        runtime.assetNodeParentSpaceProfile.overlayEntry.resolved);
+        runtime.assetNodeTargetProfile.overlayEntry.resolved);
     profile.groundingEntry = BuildAnchorEntry(
         "grounding",
         scene.groundingAnchor,
         scene.groundingAnchorScale,
-        runtime.assetNodeParentSpaceProfile.groundingEntry.resolved);
+        runtime.assetNodeTargetProfile.groundingEntry.resolved);
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief = BuildBrief(profile.anchorState, profile.entryCount, profile.resolvedEntryCount);
     profile.pointBrief = BuildPointBrief(profile);

@@ -220,6 +220,14 @@ public:
             "body:root|head:body|appendage:body|overlay:head|grounding:body"};
         std::string rendererRuntimeSceneRuntimeAssetNodeParentSpaceValueBrief{
             "body:(0.00,0.00,1.00)|head:(0.00,0.00,1.00)|appendage:(0.00,0.00,1.00)|overlay:(0.00,0.00,1.00)|grounding:(0.00,0.00,1.00)"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeTargetState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeTargetEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeTargetResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeAssetNodeTargetBrief{"preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeTargetKindBrief{
+            "body:body_target|head:head_target|appendage:appendage_target|overlay:overlay_target|grounding:grounding_target"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeTargetValueBrief{
+            "body:(0.00,0.00,1.00)|head:(0.00,0.00,1.00)|appendage:(0.00,0.00,1.00)|overlay:(0.00,0.00,1.00)|grounding:(0.00,0.00,1.00)"};
         float rendererRuntimeSceneRuntimePoseAdapterInfluence{0.0f};
         float rendererRuntimeSceneRuntimePoseReadabilityBias{0.0f};
         std::string rendererRuntimeSceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

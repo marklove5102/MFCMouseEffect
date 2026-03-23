@@ -34,10 +34,10 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
         runtime.modelNodeRegistryProfile.overlayEntry.resolved
             ? runtime.modelNodeRegistryProfile.overlayEntry.registryWeight
             : 0.0f;
-    const auto& assetParentSpace = runtime.assetNodeParentSpaceProfile;
+    const auto& assetTarget = runtime.assetNodeTargetProfile;
     const float transformOverlayWeight =
-        assetParentSpace.overlayEntry.resolved
-            ? assetParentSpace.overlayEntry.resolvedWeight
+        assetTarget.overlayEntry.resolved
+            ? assetTarget.overlayEntry.targetWeight
             : 0.0f;
     const float overlayAlphaScale =
         1.0f + poseReadabilityBias * 0.10f + registryOverlayWeight * 0.08f + assetOverlayWeight * 0.06f +
@@ -50,19 +50,19 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
     const float poseOverlayCenterY =
         runtime.modelNodeBindingProfile.overlayEntry.worldOffsetY * metrics.bodyHeight;
     const float transformOverlayCenterX =
-        assetParentSpace.overlayEntry.resolved
-            ? assetParentSpace.overlayEntry.parentSpaceOffsetX * metrics.bodyWidth
+        assetTarget.overlayEntry.resolved
+            ? assetTarget.overlayEntry.targetOffsetX * metrics.bodyWidth
             : 0.0f;
     const float transformOverlayCenterY =
-        assetParentSpace.overlayEntry.resolved
-            ? assetParentSpace.overlayEntry.parentSpaceOffsetY * metrics.bodyHeight
+        assetTarget.overlayEntry.resolved
+            ? assetTarget.overlayEntry.targetOffsetY * metrics.bodyHeight
             : 0.0f;
     scene.overlayAnchor = Gdiplus::PointF(
         scene.centerX + poseOverlayCenterX + transformOverlayCenterX,
         scene.centerY + poseOverlayCenterY + transformOverlayCenterY);
     scene.overlayAnchorScale =
-        assetParentSpace.overlayEntry.resolved
-            ? assetParentSpace.overlayEntry.parentSpaceScale
+        assetTarget.overlayEntry.resolved
+            ? assetTarget.overlayEntry.targetScale
             : 1.0f;
     scene.actionOverlay.accentColor = profile.overlayAccentColor;
 

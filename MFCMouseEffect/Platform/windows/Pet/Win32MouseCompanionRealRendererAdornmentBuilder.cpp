@@ -111,7 +111,7 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const auto& nodeBinding = runtime.modelNodeBindingProfile;
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
-    const auto& assetParentSpace = runtime.assetNodeParentSpaceProfile;
+    const auto& assetTarget = runtime.assetNodeTargetProfile;
     const float registryAppendageWeight =
         nodeRegistry.appendageEntry.resolved ? nodeRegistry.appendageEntry.registryWeight : 0.0f;
     const float assetAppendageWeight =
@@ -121,16 +121,16 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const float poseAdornmentY =
         nodeBinding.appendageEntry.worldOffsetY * metrics.bodyHeight;
     const float transformAdornmentX =
-        assetParentSpace.appendageEntry.resolved
-            ? assetParentSpace.appendageEntry.parentSpaceOffsetX * metrics.bodyWidth
+        assetTarget.appendageEntry.resolved
+            ? assetTarget.appendageEntry.targetOffsetX * metrics.bodyWidth
             : 0.0f;
     const float transformAdornmentY =
-        assetParentSpace.appendageEntry.resolved
-            ? assetParentSpace.appendageEntry.parentSpaceOffsetY * metrics.bodyHeight
+        assetTarget.appendageEntry.resolved
+            ? assetTarget.appendageEntry.targetOffsetY * metrics.bodyHeight
             : 0.0f;
     const float transformAdornmentScale =
-        assetParentSpace.appendageEntry.resolved
-            ? assetParentSpace.appendageEntry.parentSpaceScale
+        assetTarget.appendageEntry.resolved
+            ? assetTarget.appendageEntry.targetScale
             : 1.0f;
     scene.poseBadgeAlpha = 180.0f + poseReadabilityBias * 75.0f;
     scene.accessoryAlphaScale =

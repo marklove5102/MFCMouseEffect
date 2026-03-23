@@ -161,6 +161,18 @@ export function getMouseCompanionSectionMarkup() {
         <label>Parent Space Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_parent_space_value_brief">-</output>
 
+        <label>Asset Node Target</label>
+        <output id="mc_runtime_scene_runtime_asset_node_target_brief">-</output>
+
+        <label>Resolved Target Nodes</label>
+        <output id="mc_runtime_scene_runtime_asset_node_target_resolved_count">-</output>
+
+        <label>Target Kinds</label>
+        <output id="mc_runtime_scene_runtime_asset_node_target_kind_brief">-</output>
+
+        <label>Target Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_target_value_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 
