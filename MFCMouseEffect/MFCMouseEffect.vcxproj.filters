@@ -582,6 +582,12 @@
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodePoseChannelProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodePoseConstraintProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeWorldSpaceProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
@@ -1353,6 +1359,12 @@
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodePoseChannelProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodePoseConstraintProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeWorldSpaceProfile.cpp">

@@ -336,6 +336,30 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeAssetNodePoseRegistryNodeBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseRegistryWeightBrief =
         rendererRuntime.sceneRuntimeAssetNodePoseRegistryWeightBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelState =
+        rendererRuntime.sceneRuntimeAssetNodePoseChannelState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodePoseChannelEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodePoseChannelResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelBrief =
+        rendererRuntime.sceneRuntimeAssetNodePoseChannelBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodePoseChannelNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelWeightBrief =
+        rendererRuntime.sceneRuntimeAssetNodePoseChannelWeightBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintState =
+        rendererRuntime.sceneRuntimeAssetNodePoseConstraintState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodePoseConstraintEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintBrief =
+        rendererRuntime.sceneRuntimeAssetNodePoseConstraintBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodePoseConstraintNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodePoseConstraintValueBrief;
     diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence =
         rendererRuntime.sceneRuntimePoseAdapterInfluence;
     diagnostics.rendererRuntime.sceneRuntimePoseReadabilityBias =

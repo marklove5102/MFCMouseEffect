@@ -7,6 +7,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeAnchorProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeParentSpaceProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseChannelProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseConstraintProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseResolverProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeTargetProfile.h"
@@ -96,8 +98,15 @@ void Win32MouseCompanionRealRendererBackend::Render(
     const auto poseRegistryProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseRegistryProfile(
             poseResolverProfile);
-    ApplyWin32MouseCompanionRealRendererAssetNodePoseRegistryProfile(
-        poseRegistryProfile,
+    ApplyWin32MouseCompanionRealRendererAssetNodePoseRegistryProfile(poseRegistryProfile, scene);
+    const auto poseChannelProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodePoseChannelProfile(
+            poseRegistryProfile);
+    const auto poseConstraintProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodePoseConstraintProfile(
+            poseChannelProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodePoseConstraintProfile(
+        poseConstraintProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
     const Win32MouseCompanionRealRendererPainter painter{};
@@ -275,6 +284,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         poseRegistryProfile.poseNodeBrief;
     diagnostics.sceneRuntimeAssetNodePoseRegistryWeightBrief =
         poseRegistryProfile.weightBrief;
+    diagnostics.sceneRuntimeAssetNodePoseChannelState =
+        poseChannelProfile.channelState;
+    diagnostics.sceneRuntimeAssetNodePoseChannelEntryCount =
+        poseChannelProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodePoseChannelResolvedEntryCount =
+        poseChannelProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodePoseChannelBrief =
+        poseChannelProfile.brief;
+    diagnostics.sceneRuntimeAssetNodePoseChannelNameBrief =
+        poseChannelProfile.channelBrief;
+    diagnostics.sceneRuntimeAssetNodePoseChannelWeightBrief =
+        poseChannelProfile.weightBrief;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintState =
+        poseConstraintProfile.constraintState;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintEntryCount =
+        poseConstraintProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount =
+        poseConstraintProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintBrief =
+        poseConstraintProfile.brief;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintNameBrief =
+        poseConstraintProfile.constraintBrief;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintValueBrief =
+        poseConstraintProfile.valueBrief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

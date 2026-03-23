@@ -233,6 +233,30 @@ export function getMouseCompanionSectionMarkup() {
         <label>Pose Registry Weights</label>
         <output id="mc_runtime_scene_runtime_asset_node_pose_registry_weight_brief">-</output>
 
+        <label>Pose Channel</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_channel_brief">-</output>
+
+        <label>Resolved Pose Channels</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_channel_resolved_count">-</output>
+
+        <label>Pose Channel Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_channel_name_brief">-</output>
+
+        <label>Pose Channel Weights</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_channel_weight_brief">-</output>
+
+        <label>Pose Constraint</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_constraint_brief">-</output>
+
+        <label>Resolved Pose Constraints</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_constraint_resolved_count">-</output>
+
+        <label>Pose Constraint Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_constraint_name_brief">-</output>
+
+        <label>Pose Constraint Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_pose_constraint_value_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 

@@ -767,6 +767,30 @@ void AppController::SyncPetVisualHostDiagnostics(const PetVisualHostDiagnostics&
         diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseRegistryNodeBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseRegistryWeightBrief =
         diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseRegistryWeightBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseChannelState =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseChannelEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseChannelResolvedEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelResolvedEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseChannelBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseChannelNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelNameBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseChannelWeightBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseChannelWeightBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseConstraintState =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseConstraintEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseConstraintResolvedEntryCount =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseConstraintBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseConstraintNameBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintNameBrief;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAssetNodePoseConstraintValueBrief =
+        diagnostics.rendererRuntime.sceneRuntimeAssetNodePoseConstraintValueBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence =
         diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias =

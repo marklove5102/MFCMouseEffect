@@ -451,6 +451,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseRegistryNodeBrief},
         {"scene_runtime_asset_node_pose_registry_weight_brief",
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseRegistryWeightBrief},
+        {"scene_runtime_asset_node_pose_channel_state",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseChannelState},
+        {"scene_runtime_asset_node_pose_channel_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseChannelEntryCount},
+        {"scene_runtime_asset_node_pose_channel_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseChannelResolvedEntryCount},
+        {"scene_runtime_asset_node_pose_channel_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseChannelBrief},
+        {"scene_runtime_asset_node_pose_channel_name_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseChannelNameBrief},
+        {"scene_runtime_asset_node_pose_channel_weight_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseChannelWeightBrief},
+        {"scene_runtime_asset_node_pose_constraint_state",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseConstraintState},
+        {"scene_runtime_asset_node_pose_constraint_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseConstraintEntryCount},
+        {"scene_runtime_asset_node_pose_constraint_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount},
+        {"scene_runtime_asset_node_pose_constraint_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseConstraintBrief},
+        {"scene_runtime_asset_node_pose_constraint_name_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseConstraintNameBrief},
+        {"scene_runtime_asset_node_pose_constraint_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodePoseConstraintValueBrief},
         {"scene_runtime_pose_adapter_influence",
          realRendererPreviewDiagnostics.sceneRuntimePoseAdapterInfluence},
         {"scene_runtime_pose_readability_bias",
@@ -717,6 +741,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeAssetNodePoseRegistryNodeBrief;
     out["renderer_runtime_scene_runtime_asset_node_pose_registry_weight_brief"] =
         status.rendererRuntimeSceneRuntimeAssetNodePoseRegistryWeightBrief;
+    out["renderer_runtime_scene_runtime_asset_node_pose_channel_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelState;
+    out["renderer_runtime_scene_runtime_asset_node_pose_channel_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_pose_channel_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_pose_channel_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelBrief;
+    out["renderer_runtime_scene_runtime_asset_node_pose_channel_name_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelNameBrief;
+    out["renderer_runtime_scene_runtime_asset_node_pose_channel_weight_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelWeightBrief;
+    out["renderer_runtime_scene_runtime_asset_node_pose_constraint_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintState;
+    out["renderer_runtime_scene_runtime_asset_node_pose_constraint_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_pose_constraint_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_pose_constraint_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintBrief;
+    out["renderer_runtime_scene_runtime_asset_node_pose_constraint_name_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintNameBrief;
+    out["renderer_runtime_scene_runtime_asset_node_pose_constraint_value_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintValueBrief;
     out["renderer_runtime_scene_runtime_pose_adapter_influence"] =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     out["renderer_runtime_scene_runtime_pose_readability_bias"] =

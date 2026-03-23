@@ -237,6 +237,22 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         "body:pose.body.root|head:pose.head.anchor|appendage:pose.appendage.anchor|overlay:pose.overlay.anchor|grounding:pose.grounding.anchor";
     diagnostics.sceneRuntimeAssetNodePoseRegistryWeightBrief =
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00";
+    diagnostics.sceneRuntimeAssetNodePoseChannelState = "preview_only";
+    diagnostics.sceneRuntimeAssetNodePoseChannelEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodePoseChannelResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodePoseChannelBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeAssetNodePoseChannelNameBrief =
+        "body:channel.body.posture|head:channel.head.expression|appendage:channel.appendage.motion|overlay:channel.overlay.fx|grounding:channel.grounding.shadow";
+    diagnostics.sceneRuntimeAssetNodePoseChannelWeightBrief =
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00";
+    diagnostics.sceneRuntimeAssetNodePoseConstraintState = "preview_only";
+    diagnostics.sceneRuntimeAssetNodePoseConstraintEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeAssetNodePoseConstraintNameBrief =
+        "body:constraint.body.posture|head:constraint.head.expression|appendage:constraint.appendage.motion|overlay:constraint.overlay.fx|grounding:constraint.grounding.shadow";
+    diagnostics.sceneRuntimeAssetNodePoseConstraintValueBrief =
+        "body:(0.00,0.0,0.0,1.00,0.0)|head:(0.00,0.0,0.0,1.00,0.0)|appendage:(0.00,0.0,0.0,1.00,0.0)|overlay:(0.00,0.0,0.0,1.00,0.0)|grounding:(0.00,0.0,0.0,1.00,0.0)";
     diagnostics.appearanceSkinVariantId = input.appearanceProfile.skinVariantId;
     diagnostics.appearanceAccessoryIds = input.appearanceProfile.enabledAccessoryIds;
     const auto accessoryFamily =

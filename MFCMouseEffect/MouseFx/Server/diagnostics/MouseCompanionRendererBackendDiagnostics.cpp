@@ -427,6 +427,46 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseRegistryWeightBrief).empty()
             ? "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"
             : status.rendererRuntimeSceneRuntimeAssetNodePoseRegistryWeightBrief;
+    diagnostics.sceneRuntimeAssetNodePoseChannelState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseChannelState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseChannelState;
+    diagnostics.sceneRuntimeAssetNodePoseChannelEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelEntryCount;
+    diagnostics.sceneRuntimeAssetNodePoseChannelResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseChannelResolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodePoseChannelBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseChannelBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseChannelBrief;
+    diagnostics.sceneRuntimeAssetNodePoseChannelNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseChannelNameBrief).empty()
+            ? "body:channel.body.posture|head:channel.head.expression|appendage:channel.appendage.motion|overlay:channel.overlay.fx|grounding:channel.grounding.shadow"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseChannelNameBrief;
+    diagnostics.sceneRuntimeAssetNodePoseChannelWeightBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseChannelWeightBrief).empty()
+            ? "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseChannelWeightBrief;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintState;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintEntryCount;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintResolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintBrief;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintNameBrief).empty()
+            ? "body:constraint.body.posture|head:constraint.head.expression|appendage:constraint.appendage.motion|overlay:constraint.overlay.fx|grounding:constraint.grounding.shadow"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintNameBrief;
+    diagnostics.sceneRuntimeAssetNodePoseConstraintValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintValueBrief).empty()
+            ? "body:(0.00,0.0,0.0,1.00,0.0)|head:(0.00,0.0,0.0,1.00,0.0)|appendage:(0.00,0.0,0.0,1.00,0.0)|overlay:(0.00,0.0,0.0,1.00,0.0)|grounding:(0.00,0.0,0.0,1.00,0.0)"
+            : status.rendererRuntimeSceneRuntimeAssetNodePoseConstraintValueBrief;
     diagnostics.sceneRuntimePoseAdapterInfluence =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     diagnostics.sceneRuntimePoseReadabilityBias =

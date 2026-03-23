@@ -145,6 +145,22 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:pose.body.root|head:pose.head.anchor|appendage:pose.appendage.anchor|overlay:pose.overlay.anchor|grounding:pose.grounding.anchor"};
     std::string sceneRuntimeAssetNodePoseRegistryWeightBrief{
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"};
+    std::string sceneRuntimeAssetNodePoseChannelState{"preview_only"};
+    uint32_t sceneRuntimeAssetNodePoseChannelEntryCount{0};
+    uint32_t sceneRuntimeAssetNodePoseChannelResolvedEntryCount{0};
+    std::string sceneRuntimeAssetNodePoseChannelBrief{"preview_only/0/0"};
+    std::string sceneRuntimeAssetNodePoseChannelNameBrief{
+        "body:channel.body.posture|head:channel.head.expression|appendage:channel.appendage.motion|overlay:channel.overlay.fx|grounding:channel.grounding.shadow"};
+    std::string sceneRuntimeAssetNodePoseChannelWeightBrief{
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"};
+    std::string sceneRuntimeAssetNodePoseConstraintState{"preview_only"};
+    uint32_t sceneRuntimeAssetNodePoseConstraintEntryCount{0};
+    uint32_t sceneRuntimeAssetNodePoseConstraintResolvedEntryCount{0};
+    std::string sceneRuntimeAssetNodePoseConstraintBrief{"preview_only/0/0"};
+    std::string sceneRuntimeAssetNodePoseConstraintNameBrief{
+        "body:constraint.body.posture|head:constraint.head.expression|appendage:constraint.appendage.motion|overlay:constraint.overlay.fx|grounding:constraint.grounding.shadow"};
+    std::string sceneRuntimeAssetNodePoseConstraintValueBrief{
+        "body:(0.00,0.0,0.0,1.00,0.0)|head:(0.00,0.0,0.0,1.00,0.0)|appendage:(0.00,0.0,0.0,1.00,0.0)|overlay:(0.00,0.0,0.0,1.00,0.0)|grounding:(0.00,0.0,0.0,1.00,0.0)"};
     float sceneRuntimePoseAdapterInfluence{0.0f};
     float sceneRuntimePoseReadabilityBias{0.0f};
     std::string sceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

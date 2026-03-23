@@ -525,6 +525,26 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeAssetNodePoseChannelBrief = if ($null -ne $preview) {
+        $existingAssetNodePoseChannelBrief = [string]$preview.scene_runtime_asset_node_pose_channel_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingAssetNodePoseChannelBrief)) {
+            $existingAssetNodePoseChannelBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
+    $runtimeAssetNodePoseConstraintBrief = if ($null -ne $preview) {
+        $existingAssetNodePoseConstraintBrief = [string]$preview.scene_runtime_asset_node_pose_constraint_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingAssetNodePoseConstraintBrief)) {
+            $existingAssetNodePoseConstraintBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState
@@ -579,6 +599,8 @@ function New-LaneSummary(
         runtime_asset_node_pose_brief = $runtimeAssetNodePoseBrief
         runtime_asset_node_pose_resolver_brief = $runtimeAssetNodePoseResolverBrief
         runtime_asset_node_pose_registry_brief = $runtimeAssetNodePoseRegistryBrief
+        runtime_asset_node_pose_channel_brief = $runtimeAssetNodePoseChannelBrief
+        runtime_asset_node_pose_constraint_brief = $runtimeAssetNodePoseConstraintBrief
         runtime_pose_adapter_brief = $runtimePoseAdapterBrief
         default_lane_brief = (Format-DefaultLaneBrief `
             $defaultLaneCandidate `
@@ -636,6 +658,8 @@ function Compare-LaneAgainstBaseline(
         @{ name = "runtime_asset_node_pose_brief"; baseline = [string]$Baseline.runtime_asset_node_pose_brief; current = [string]$Lane.runtime_asset_node_pose_brief },
         @{ name = "runtime_asset_node_pose_resolver_brief"; baseline = [string]$Baseline.runtime_asset_node_pose_resolver_brief; current = [string]$Lane.runtime_asset_node_pose_resolver_brief },
         @{ name = "runtime_asset_node_pose_registry_brief"; baseline = [string]$Baseline.runtime_asset_node_pose_registry_brief; current = [string]$Lane.runtime_asset_node_pose_registry_brief },
+        @{ name = "runtime_asset_node_pose_channel_brief"; baseline = [string]$Baseline.runtime_asset_node_pose_channel_brief; current = [string]$Lane.runtime_asset_node_pose_channel_brief },
+        @{ name = "runtime_asset_node_pose_constraint_brief"; baseline = [string]$Baseline.runtime_asset_node_pose_constraint_brief; current = [string]$Lane.runtime_asset_node_pose_constraint_brief },
         @{ name = "runtime_pose_adapter_brief"; baseline = [string]$Baseline.runtime_pose_adapter_brief; current = [string]$Lane.runtime_pose_adapter_brief },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
         @{ name = "selection_reason"; baseline = [string]$Baseline.selection_reason; current = [string]$Lane.selection_reason },
@@ -880,6 +904,12 @@ function Write-LaneMatrixSummary(
         }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_pose_registry_brief)) {
             $lines.Add(("  runtime_asset_node_pose_registry_brief: `{0}`" -f $lane.runtime_asset_node_pose_registry_brief))
+        }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_pose_channel_brief)) {
+            $lines.Add(("  runtime_asset_node_pose_channel_brief: `{0}`" -f $lane.runtime_asset_node_pose_channel_brief))
+        }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_asset_node_pose_constraint_brief)) {
+            $lines.Add(("  runtime_asset_node_pose_constraint_brief: `{0}`" -f $lane.runtime_asset_node_pose_constraint_brief))
         }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.runtime_pose_adapter_brief)) {
             $lines.Add(("  runtime_pose_adapter_brief: `{0}`" -f $lane.runtime_pose_adapter_brief))

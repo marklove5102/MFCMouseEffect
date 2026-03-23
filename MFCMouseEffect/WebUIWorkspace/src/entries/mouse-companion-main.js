@@ -910,6 +910,62 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_channel_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_channel_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_channel_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_channel_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_channel_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_channel_name_brief,
+      'body:channel.body.posture|head:channel.head.expression|appendage:channel.appendage.motion|overlay:channel.overlay.fx|grounding:channel.grounding.shadow',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_channel_weight_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_channel_weight_brief,
+      'body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_constraint_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_constraint_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_constraint_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_constraint_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_constraint_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_constraint_name_brief,
+      'body:constraint.body.posture|head:constraint.head.expression|appendage:constraint.appendage.motion|overlay:constraint.overlay.fx|grounding:constraint.grounding.shadow',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_pose_constraint_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_pose_constraint_value_brief,
+      'body:(0.00,0.0,0.0,1.00,0.0)|head:(0.00,0.0,0.0,1.00,0.0)|appendage:(0.00,0.0,0.0,1.00,0.0)|overlay:(0.00,0.0,0.0,1.00,0.0)|grounding:(0.00,0.0,0.0,1.00,0.0)',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );
