@@ -55,10 +55,8 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
     const Win32MouseCompanionRealRendererLayoutMetrics& metrics,
     Win32MouseCompanionRealRendererScene& scene) {
     const auto mood = BuildWin32MouseCompanionRealRendererAppearanceSemantics(runtime, style).mood;
-    const float poseAdapterInfluence =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
-    const float poseReadabilityBias =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterReadabilityBias(runtime);
+    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
+    const float poseReadabilityBias = runtime.poseAdapterProfile.readabilityBias;
     const float overlayAlphaScale = 1.0f + poseReadabilityBias * 0.10f;
     const float overlayStrokeScale = 1.0f + poseReadabilityBias * 0.08f;
     const float poseHandReachX = ResolveAveragePoseX(runtime.leftHandPose, runtime.rightHandPose);

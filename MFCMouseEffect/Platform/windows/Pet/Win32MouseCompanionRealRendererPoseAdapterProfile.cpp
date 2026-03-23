@@ -75,22 +75,22 @@ BuildWin32MouseCompanionRealRendererPoseAdapterProfile(
 
 float ResolveWin32MouseCompanionRealRendererPoseSampleCoverage(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    return BuildWin32MouseCompanionRealRendererPoseAdapterProfile(runtime).sampleCoverage;
+    return runtime.poseAdapterProfile.sampleCoverage;
 }
 
 float ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    return BuildWin32MouseCompanionRealRendererPoseAdapterProfile(runtime).influence;
+    return runtime.poseAdapterProfile.influence;
 }
 
 float ResolveWin32MouseCompanionRealRendererPoseAdapterReadabilityBias(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    return BuildWin32MouseCompanionRealRendererPoseAdapterProfile(runtime).readabilityBias;
+    return runtime.poseAdapterProfile.readabilityBias;
 }
 
 std::string BuildWin32MouseCompanionRealRendererPoseAdapterBrief(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    return BuildWin32MouseCompanionRealRendererPoseAdapterProfile(runtime).brief;
+    return runtime.poseAdapterProfile.brief;
 }
 
 } // namespace mousefx::windows

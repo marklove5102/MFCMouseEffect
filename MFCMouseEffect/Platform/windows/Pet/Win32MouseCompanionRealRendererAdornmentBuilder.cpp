@@ -137,10 +137,8 @@ void BuildWin32MouseCompanionRealRendererAdornment(
         runtime.assets->appearanceProfileReady,
     };
 
-    const float poseAdapterInfluence =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
-    const float poseReadabilityBias =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterReadabilityBias(runtime);
+    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
+    const float poseReadabilityBias = runtime.poseAdapterProfile.readabilityBias;
     const float poseHandReachX = ResolveAveragePoseX(runtime.leftHandPose, runtime.rightHandPose);
     const float poseHandLiftY = ResolveAveragePoseY(runtime.leftHandPose, runtime.rightHandPose);
     const float poseLegReachX = ResolveAveragePoseX(runtime.leftLegPose, runtime.rightLegPose);

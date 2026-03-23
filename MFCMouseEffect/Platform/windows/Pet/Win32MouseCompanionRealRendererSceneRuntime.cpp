@@ -43,6 +43,10 @@ Win32MouseCompanionRealRendererSceneRuntime BuildWin32MouseCompanionRealRenderer
     sceneRuntime.sceneRuntimeAdapterMode = runtime.sceneRuntimeAdapterMode;
     sceneRuntime.sceneRuntimePoseSampleCount = runtime.sceneRuntimePoseSampleCount;
     sceneRuntime.sceneRuntimeBoundPoseSampleCount = runtime.sceneRuntimeBoundPoseSampleCount;
+    sceneRuntime.poseAdapterProfile = BuildWin32MouseCompanionRealRendererPoseAdapterProfile(
+        sceneRuntime.sceneRuntimeAdapterMode,
+        sceneRuntime.sceneRuntimePoseSampleCount,
+        sceneRuntime.sceneRuntimeBoundPoseSampleCount);
     return sceneRuntime;
 }
 

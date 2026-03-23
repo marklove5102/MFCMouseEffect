@@ -113,8 +113,7 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         break;
     }
 
-    const float poseAdapterInfluence =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
     const float poseHandReachX = runtime.leftHandPose && runtime.rightHandPose
         ? (runtime.leftHandPose->position[0] + runtime.rightHandPose->position[0]) * 0.5f
         : runtime.leftHandPose ? runtime.leftHandPose->position[0]

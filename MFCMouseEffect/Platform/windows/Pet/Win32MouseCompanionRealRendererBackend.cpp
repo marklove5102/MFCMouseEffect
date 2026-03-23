@@ -89,8 +89,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
     diagnostics.sceneRuntimePoseSampleCount = sceneRuntime.sceneRuntimePoseSampleCount;
     diagnostics.sceneRuntimeBoundPoseSampleCount =
         sceneRuntime.sceneRuntimeBoundPoseSampleCount;
-    const auto poseAdapterProfile =
-        BuildWin32MouseCompanionRealRendererPoseAdapterProfile(sceneRuntime);
+    const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;
     diagnostics.sceneRuntimePoseAdapterBrief = poseAdapterProfile.brief;

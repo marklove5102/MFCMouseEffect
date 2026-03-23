@@ -230,6 +230,7 @@ It should **not** own:
     - `experimental_style_candidate`
     - `unclassified_candidate`
   - runtime may also expose `appearance_plugin_contract_brief = semantics_mode/style_intent/sample_tier`, so higher-level tools can reuse one short summary instead of recomposing those fields
+  - `Win32MouseCompanionRealRendererSceneRuntime` now also carries a cached `poseAdapterProfile`; builder/painter/backend code should consume that shared profile instead of recomputing pose adapter influence/readability independently
   - host-side default-lane style-intent inference and metadata support lists should reuse the same helper, so `style_intent` / `sample_tier` machine vocab does not split between validation and runtime
   - runtime/preview diagnostics should also expose scene-runtime adapter state explicitly instead of only `pose_frame_available / pose_binding_configured` booleans:
     - `scene_runtime_adapter_mode = runtime_only|pose_unbound|pose_bound`

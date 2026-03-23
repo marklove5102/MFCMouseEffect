@@ -34,8 +34,7 @@ void BuildWin32MouseCompanionRealRendererFace(
     const auto appearanceSemantics =
         BuildWin32MouseCompanionRealRendererAppearanceSemantics(runtime, style);
     const auto& skinTuning = appearanceSemantics.face;
-    const float poseAdapterInfluence =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
     const float poseHandLift = runtime.leftHandPose && runtime.rightHandPose
         ? -(runtime.leftHandPose->position[1] + runtime.rightHandPose->position[1]) * 0.5f
         : runtime.leftHandPose ? -runtime.leftHandPose->position[1]

@@ -215,8 +215,7 @@ Win32MouseCompanionRealRendererMotionProfile BuildWin32MouseCompanionRealRendere
         break;
     }
 
-    const float poseAdapterInfluence =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
     if (poseAdapterInfluence > 0.0f) {
         const float poseEarLift =
             AveragePoseAxis(runtime.leftEarPose, runtime.rightEarPose, 1);

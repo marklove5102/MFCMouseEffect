@@ -5,6 +5,7 @@
 
 #include "MouseFx/Core/Control/MouseCompanionPluginV1Types.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetResources.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererPoseAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererInput.h"
 
 namespace mousefx::windows {
@@ -41,6 +42,7 @@ struct Win32MouseCompanionRealRendererSceneRuntime final {
     std::string sceneRuntimeAdapterMode{"runtime_only"};
     uint32_t sceneRuntimePoseSampleCount{0};
     uint32_t sceneRuntimeBoundPoseSampleCount{0};
+    Win32MouseCompanionRealRendererPoseAdapterProfile poseAdapterProfile{};
 };
 
 Win32MouseCompanionRealRendererSceneRuntime BuildWin32MouseCompanionRealRendererSceneRuntime(

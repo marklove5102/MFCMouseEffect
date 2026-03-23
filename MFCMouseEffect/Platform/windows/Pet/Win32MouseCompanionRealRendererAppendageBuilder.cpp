@@ -56,8 +56,7 @@ void BuildWin32MouseCompanionRealRendererAppendages(
     const Win32MouseCompanionRealRendererStyleProfile& style,
     const Win32MouseCompanionRealRendererLayoutMetrics& metrics,
     Win32MouseCompanionRealRendererScene& scene) {
-    const float poseAdapterInfluence =
-        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    const float poseAdapterInfluence = runtime.poseAdapterProfile.influence;
     const float poseEarLift = runtime.leftEarPose
         ? runtime.leftEarPose->position[1] * style.leftEarPoseLiftScale * poseAdapterInfluence
         : 0.0f;
