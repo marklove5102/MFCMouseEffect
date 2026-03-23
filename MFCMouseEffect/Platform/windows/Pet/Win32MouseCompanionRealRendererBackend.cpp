@@ -16,6 +16,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeControlRigHintProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeRigChannelProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeControlSurfaceProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeRigDriverProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeSurfaceDriverProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeLocalJointRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseResolverProfile.h"
@@ -163,6 +165,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
             rigChannelProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeControlSurfaceProfile(
         controlSurfaceProfile,
+        scene);
+    const auto rigDriverProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeRigDriverProfile(
+            controlSurfaceProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeRigDriverProfile(
+        rigDriverProfile,
+        scene);
+    const auto surfaceDriverProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeSurfaceDriverProfile(
+            rigDriverProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeSurfaceDriverProfile(
+        surfaceDriverProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
     const Win32MouseCompanionRealRendererPainter painter{};
@@ -460,6 +474,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         controlSurfaceProfile.surfaceBrief;
     diagnostics.sceneRuntimeAssetNodeControlSurfaceValueBrief =
         controlSurfaceProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeRigDriverState =
+        rigDriverProfile.driverState;
+    diagnostics.sceneRuntimeAssetNodeRigDriverEntryCount =
+        rigDriverProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeRigDriverResolvedEntryCount =
+        rigDriverProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeRigDriverBrief =
+        rigDriverProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeRigDriverNameBrief =
+        rigDriverProfile.driverBrief;
+    diagnostics.sceneRuntimeAssetNodeRigDriverValueBrief =
+        rigDriverProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceDriverState =
+        surfaceDriverProfile.driverState;
+    diagnostics.sceneRuntimeAssetNodeSurfaceDriverEntryCount =
+        surfaceDriverProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceDriverResolvedEntryCount =
+        surfaceDriverProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceDriverBrief =
+        surfaceDriverProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceDriverNameBrief =
+        surfaceDriverProfile.driverBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceDriverValueBrief =
+        surfaceDriverProfile.valueBrief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

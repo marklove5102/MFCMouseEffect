@@ -957,6 +957,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceNameBrief;
     out["renderer_runtime_scene_runtime_asset_node_control_surface_value_brief"] =
         status.rendererRuntimeSceneRuntimeAssetNodeControlSurfaceValueBrief;
+    out["renderer_runtime_scene_runtime_asset_node_rig_driver_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigDriverState;
+    out["renderer_runtime_scene_runtime_asset_node_rig_driver_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigDriverEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_rig_driver_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigDriverResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_rig_driver_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigDriverBrief;
+    out["renderer_runtime_scene_runtime_asset_node_rig_driver_name_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigDriverNameBrief;
+    out["renderer_runtime_scene_runtime_asset_node_rig_driver_value_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeRigDriverValueBrief;
+    out["renderer_runtime_scene_runtime_asset_node_surface_driver_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceDriverState;
+    out["renderer_runtime_scene_runtime_asset_node_surface_driver_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceDriverEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_surface_driver_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceDriverResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_surface_driver_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceDriverBrief;
+    out["renderer_runtime_scene_runtime_asset_node_surface_driver_name_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceDriverNameBrief;
+    out["renderer_runtime_scene_runtime_asset_node_surface_driver_value_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceDriverValueBrief;
     out["renderer_runtime_scene_runtime_pose_adapter_influence"] =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     out["renderer_runtime_scene_runtime_pose_readability_bias"] =

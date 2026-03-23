@@ -353,6 +353,30 @@ export function getMouseCompanionSectionMarkup() {
         <label>Control Surface Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_control_surface_value_brief">-</output>
 
+        <label>Rig Driver</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_driver_brief">-</output>
+
+        <label>Resolved Rig Drivers</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_driver_resolved_count">-</output>
+
+        <label>Rig Driver Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_driver_name_brief">-</output>
+
+        <label>Rig Driver Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_rig_driver_value_brief">-</output>
+
+        <label>Surface Driver</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_driver_brief">-</output>
+
+        <label>Resolved Surface Drivers</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_driver_resolved_count">-</output>
+
+        <label>Surface Driver Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_driver_name_brief">-</output>
+
+        <label>Surface Driver Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_driver_value_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 

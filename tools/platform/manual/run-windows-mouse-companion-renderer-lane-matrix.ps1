@@ -625,6 +625,26 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeAssetNodeRigDriverBrief = if ($null -ne $preview) {
+        $existingAssetNodeRigDriverBrief = [string]$preview.scene_runtime_asset_node_rig_driver_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingAssetNodeRigDriverBrief)) {
+            $existingAssetNodeRigDriverBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
+    $runtimeAssetNodeSurfaceDriverBrief = if ($null -ne $preview) {
+        $existingAssetNodeSurfaceDriverBrief = [string]$preview.scene_runtime_asset_node_surface_driver_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingAssetNodeSurfaceDriverBrief)) {
+            $existingAssetNodeSurfaceDriverBrief
+        } else {
+            "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState
@@ -689,6 +709,8 @@ function New-LaneSummary(
         runtime_asset_node_control_rig_hint_brief = $runtimeAssetNodeControlRigHintBrief
         runtime_asset_node_rig_channel_brief = $runtimeAssetNodeRigChannelBrief
         runtime_asset_node_control_surface_brief = $runtimeAssetNodeControlSurfaceBrief
+        runtime_asset_node_rig_driver_brief = $runtimeAssetNodeRigDriverBrief
+        runtime_asset_node_surface_driver_brief = $runtimeAssetNodeSurfaceDriverBrief
         runtime_pose_adapter_brief = $runtimePoseAdapterBrief
         default_lane_brief = (Format-DefaultLaneBrief `
             $defaultLaneCandidate `
@@ -756,6 +778,8 @@ function Compare-LaneAgainstBaseline(
         @{ name = "runtime_asset_node_control_rig_hint_brief"; baseline = [string]$Baseline.runtime_asset_node_control_rig_hint_brief; current = [string]$Lane.runtime_asset_node_control_rig_hint_brief },
         @{ name = "runtime_asset_node_rig_channel_brief"; baseline = [string]$Baseline.runtime_asset_node_rig_channel_brief; current = [string]$Lane.runtime_asset_node_rig_channel_brief },
         @{ name = "runtime_asset_node_control_surface_brief"; baseline = [string]$Baseline.runtime_asset_node_control_surface_brief; current = [string]$Lane.runtime_asset_node_control_surface_brief },
+        @{ name = "runtime_asset_node_rig_driver_brief"; baseline = [string]$Baseline.runtime_asset_node_rig_driver_brief; current = [string]$Lane.runtime_asset_node_rig_driver_brief },
+        @{ name = "runtime_asset_node_surface_driver_brief"; baseline = [string]$Baseline.runtime_asset_node_surface_driver_brief; current = [string]$Lane.runtime_asset_node_surface_driver_brief },
         @{ name = "runtime_pose_adapter_brief"; baseline = [string]$Baseline.runtime_pose_adapter_brief; current = [string]$Lane.runtime_pose_adapter_brief },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
         @{ name = "selection_reason"; baseline = [string]$Baseline.selection_reason; current = [string]$Lane.selection_reason },

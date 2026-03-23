@@ -860,6 +860,52 @@ function Add-AssetNodeControlSurfaceSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_control_surface_brief" -NotePropertyValue $brief
 }
 
+function Format-AssetNodeRigDriverSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_rig_driver_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeRigDriverSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeRigDriverSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_rig_driver_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_rig_driver_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_rig_driver_brief" -NotePropertyValue $brief
+}
+
+function Format-AssetNodeSurfaceDriverSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_asset_node_surface_driver_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    return "preview_only/0/0"
+}
+
+function Add-AssetNodeSurfaceDriverSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-AssetNodeSurfaceDriverSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_asset_node_surface_driver_brief").Count -gt 0) {
+        $Node.scene_runtime_asset_node_surface_driver_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_asset_node_surface_driver_brief" -NotePropertyValue $brief
+}
+
 function Show-RealPreviewSmokeHint {
     @'
 [mfx:info] real-preview-smoke preset
@@ -1566,6 +1612,8 @@ if ($Route -eq "sweep") {
                 Add-AssetNodeControlRigHintSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeRigChannelSummaryProperty $item.real_renderer_preview
                 Add-AssetNodeControlSurfaceSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeRigDriverSummaryProperty $item.real_renderer_preview
+                Add-AssetNodeSurfaceDriverSummaryProperty $item.real_renderer_preview
                 Add-PoseAdapterSummaryProperty $item.real_renderer_preview
                 if ($null -ne $item.proof) {
                     Add-DefaultLaneSummaryProperty $item.proof.renderer_runtime_after
@@ -1598,6 +1646,8 @@ if ($Route -eq "sweep") {
                     Add-AssetNodeControlRigHintSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeRigChannelSummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeControlSurfaceSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeRigDriverSummaryProperty $item.proof.renderer_runtime_after
+                    Add-AssetNodeSurfaceDriverSummaryProperty $item.proof.renderer_runtime_after
                     Add-PoseAdapterSummaryProperty $item.proof.renderer_runtime_after
                 }
             }
@@ -1633,6 +1683,8 @@ if ($Route -eq "sweep") {
         Add-AssetNodeControlRigHintSummaryProperty $response.real_renderer_preview
         Add-AssetNodeRigChannelSummaryProperty $response.real_renderer_preview
         Add-AssetNodeControlSurfaceSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeRigDriverSummaryProperty $response.real_renderer_preview
+        Add-AssetNodeSurfaceDriverSummaryProperty $response.real_renderer_preview
         Add-PoseAdapterSummaryProperty $response.real_renderer_preview
         Add-DefaultLaneSummaryProperty $response.renderer_runtime_after
         Add-AppearancePluginContractBriefProperty $response.renderer_runtime_after
@@ -1664,6 +1716,8 @@ if ($Route -eq "sweep") {
         Add-AssetNodeControlRigHintSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeRigChannelSummaryProperty $response.renderer_runtime_after
         Add-AssetNodeControlSurfaceSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeRigDriverSummaryProperty $response.renderer_runtime_after
+        Add-AssetNodeSurfaceDriverSummaryProperty $response.renderer_runtime_after
         Add-PoseAdapterSummaryProperty $response.renderer_runtime_after
     }
 

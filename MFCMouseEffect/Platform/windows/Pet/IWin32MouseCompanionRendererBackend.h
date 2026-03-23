@@ -225,6 +225,22 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:surface.body.spine|head:surface.head.look|appendage:surface.appendage.reach|overlay:surface.overlay.fx|grounding:surface.grounding.balance"};
     std::string sceneRuntimeAssetNodeControlSurfaceValueBrief{
         "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+    std::string sceneRuntimeAssetNodeRigDriverState{"preview_only"};
+    uint32_t sceneRuntimeAssetNodeRigDriverEntryCount{0};
+    uint32_t sceneRuntimeAssetNodeRigDriverResolvedEntryCount{0};
+    std::string sceneRuntimeAssetNodeRigDriverBrief{"preview_only/0/0"};
+    std::string sceneRuntimeAssetNodeRigDriverNameBrief{
+        "body:rig.driver.body.spine|head:rig.driver.head.look|appendage:rig.driver.appendage.reach|overlay:rig.driver.overlay.fx|grounding:rig.driver.grounding.balance"};
+    std::string sceneRuntimeAssetNodeRigDriverValueBrief{
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+    std::string sceneRuntimeAssetNodeSurfaceDriverState{"preview_only"};
+    uint32_t sceneRuntimeAssetNodeSurfaceDriverEntryCount{0};
+    uint32_t sceneRuntimeAssetNodeSurfaceDriverResolvedEntryCount{0};
+    std::string sceneRuntimeAssetNodeSurfaceDriverBrief{"preview_only/0/0"};
+    std::string sceneRuntimeAssetNodeSurfaceDriverNameBrief{
+        "body:surface.driver.body.spine|head:surface.driver.head.look|appendage:surface.driver.appendage.reach|overlay:surface.driver.overlay.fx|grounding:surface.driver.grounding.balance"};
+    std::string sceneRuntimeAssetNodeSurfaceDriverValueBrief{
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
     float sceneRuntimePoseAdapterInfluence{0.0f};
     float sceneRuntimePoseReadabilityBias{0.0f};
     std::string sceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};
