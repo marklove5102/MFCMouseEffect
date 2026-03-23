@@ -113,11 +113,36 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         break;
     }
 
-    scene.centerX = static_cast<float>(width) * style.centerXRatio + facingOffset + profile.bodyForward + profile.idleHeadSway;
+    const float poseAdapterInfluence =
+        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    const float poseHandReachX = runtime.leftHandPose && runtime.rightHandPose
+        ? (runtime.leftHandPose->position[0] + runtime.rightHandPose->position[0]) * 0.5f
+        : runtime.leftHandPose ? runtime.leftHandPose->position[0]
+        : runtime.rightHandPose ? runtime.rightHandPose->position[0]
+                                : 0.0f;
+    const float poseHandLiftY = runtime.leftHandPose && runtime.rightHandPose
+        ? (runtime.leftHandPose->position[1] + runtime.rightHandPose->position[1]) * 0.5f
+        : runtime.leftHandPose ? runtime.leftHandPose->position[1]
+        : runtime.rightHandPose ? runtime.rightHandPose->position[1]
+                                : 0.0f;
+    const float poseLegReachX = runtime.leftLegPose && runtime.rightLegPose
+        ? (runtime.leftLegPose->position[0] + runtime.rightLegPose->position[0]) * 0.5f
+        : runtime.leftLegPose ? runtime.leftLegPose->position[0]
+        : runtime.rightLegPose ? runtime.rightLegPose->position[0]
+                               : 0.0f;
+    const float poseAnchorX =
+        (poseHandReachX * metrics.bodyWidth * 0.045f + poseLegReachX * metrics.bodyWidth * 0.030f) *
+        poseAdapterInfluence;
+    const float poseAnchorY = (-poseHandLiftY * metrics.bodyHeight * 0.035f) * poseAdapterInfluence;
+    const float poseHeadX = poseHandReachX * metrics.headWidth * 0.030f * poseAdapterInfluence;
+    const float poseHeadY = -poseHandLiftY * metrics.headHeight * 0.035f * poseAdapterInfluence;
+
+    scene.centerX = static_cast<float>(width) * style.centerXRatio + facingOffset + profile.bodyForward +
+        profile.idleHeadSway + poseAnchorX;
     scene.centerY = static_cast<float>(height) * (runtime.hold ? style.holdCenterYRatio : style.idleCenterYRatio) -
         (runtime.follow ? static_cast<float>(height) * style.followCenterYOffsetRatio : 0.0f) -
         (runtime.drag ? static_cast<float>(height) * style.dragCenterYOffsetRatio : 0.0f) -
-        profile.stateLift - profile.breathLift + comboCenterYOffset;
+        profile.stateLift - profile.breathLift + comboCenterYOffset + poseAnchorY;
     scene.facingSign = runtime.facingSign;
     scene.bodyTiltDeg = profile.scrollLean + profile.dragLean;
     scene.glowAlpha =
@@ -169,9 +194,9 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         metrics.bodyHeight * style.chestHeightRatio);
     scene.headRect = Gdiplus::RectF(
         scene.centerX - metrics.headWidth * style.headXOffsetRatio + profile.dragLean * style.headDragLeanScale +
-            profile.bodyForward * style.headBodyForwardScale,
+            profile.bodyForward * style.headBodyForwardScale + poseHeadX,
         scene.bodyRect.Y - metrics.headHeight * style.headYOffsetRatio - profile.actionIntensity * style.headActionLiftPx +
-            profile.headNod,
+            profile.headNod + poseHeadY,
         metrics.headWidth,
         metrics.headHeight);
     scene.neckBridgeRect = Gdiplus::RectF(

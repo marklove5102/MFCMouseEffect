@@ -86,6 +86,7 @@
 5. If pose samples are flowing, confirm ear/hand/leg motion differs from pure action-label fallback.
 6. If `scene_runtime_adapter_mode=pose_bound`, confirm ear/hand/leg pose offsets read stronger than `pose_unbound`; `pose_unbound` should still move, but more softly.
 7. If `scene_runtime_adapter_mode=pose_bound`, confirm head/body expression also shifts a bit more than `pose_unbound`: slight forward attitude, head nod, and eye/brow focus should feel more pose-led instead of purely action-led.
+8. With `pose_bound`, confirm face placement details also move a little more with the pose lane: eye/nose/mouth anchor, blush height, and whisker spread/tilt should read slightly more pose-driven than `pose_unbound`, but still remain stable and not noisy.
 
 ## Appearance
 1. Keep default `pet-appearance.json` available.
