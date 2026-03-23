@@ -657,10 +657,16 @@
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteBusRegistryProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverTableProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterTableProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceCompositionBusProfile.h">
@@ -1526,10 +1532,16 @@
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteBusRegistryProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceRouteBusDriverProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverTableProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterTableProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeExecutionDriverRouterRegistryProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetNodeSurfaceCompositionBusProfile.cpp">

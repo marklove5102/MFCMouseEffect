@@ -385,6 +385,14 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:surface.route.bus.registry.body.shell|head:surface.route.bus.registry.head.mask|appendage:surface.route.bus.registry.appendage.trim|overlay:surface.route.bus.registry.overlay.fx|grounding:surface.route.bus.registry.grounding.base"};
     std::string sceneRuntimeAssetNodeSurfaceRouteBusRegistryValueBrief{
         "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+    std::string sceneRuntimeAssetNodeSurfaceRouteBusDriverState{"preview_only"};
+    uint32_t sceneRuntimeAssetNodeSurfaceRouteBusDriverEntryCount{0};
+    uint32_t sceneRuntimeAssetNodeSurfaceRouteBusDriverResolvedEntryCount{0};
+    std::string sceneRuntimeAssetNodeSurfaceRouteBusDriverBrief{"preview_only/0/0"};
+    std::string sceneRuntimeAssetNodeSurfaceRouteBusDriverNameBrief{
+        "body:surface.route.bus.driver.body.shell|head:surface.route.bus.driver.head.mask|appendage:surface.route.bus.driver.appendage.trim|overlay:surface.route.bus.driver.overlay.fx|grounding:surface.route.bus.driver.grounding.base"};
+    std::string sceneRuntimeAssetNodeSurfaceRouteBusDriverValueBrief{
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
     std::string sceneRuntimeAssetNodeExecutionDriverTableState{"preview_only"};
     uint32_t sceneRuntimeAssetNodeExecutionDriverTableEntryCount{0};
     uint32_t sceneRuntimeAssetNodeExecutionDriverTableResolvedEntryCount{0};
@@ -400,6 +408,14 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
     std::string sceneRuntimeAssetNodeExecutionDriverRouterTableNameBrief{
         "body:execution.driver.router.body.shell|head:execution.driver.router.head.mask|appendage:execution.driver.router.appendage.trim|overlay:execution.driver.router.overlay.fx|grounding:execution.driver.router.grounding.base"};
     std::string sceneRuntimeAssetNodeExecutionDriverRouterTableValueBrief{
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+    std::string sceneRuntimeAssetNodeExecutionDriverRouterRegistryState{"preview_only"};
+    uint32_t sceneRuntimeAssetNodeExecutionDriverRouterRegistryEntryCount{0};
+    uint32_t sceneRuntimeAssetNodeExecutionDriverRouterRegistryResolvedEntryCount{0};
+    std::string sceneRuntimeAssetNodeExecutionDriverRouterRegistryBrief{"preview_only/0/0"};
+    std::string sceneRuntimeAssetNodeExecutionDriverRouterRegistryNameBrief{
+        "body:execution.driver.router.registry.body.shell|head:execution.driver.router.registry.head.mask|appendage:execution.driver.router.registry.appendage.trim|overlay:execution.driver.router.registry.overlay.fx|grounding:execution.driver.router.registry.grounding.base"};
+    std::string sceneRuntimeAssetNodeExecutionDriverRouterRegistryValueBrief{
         "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
     float sceneRuntimePoseAdapterInfluence{0.0f};
     float sceneRuntimePoseReadabilityBias{0.0f};

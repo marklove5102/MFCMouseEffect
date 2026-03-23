@@ -461,6 +461,14 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         "body:surface.route.bus.registry.body.shell|head:surface.route.bus.registry.head.mask|appendage:surface.route.bus.registry.appendage.trim|overlay:surface.route.bus.registry.overlay.fx|grounding:surface.route.bus.registry.grounding.base";
     diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusRegistryValueBrief =
         "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverState = "preview_only";
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverNameBrief =
+        "body:surface.route.bus.driver.body.shell|head:surface.route.bus.driver.head.mask|appendage:surface.route.bus.driver.appendage.trim|overlay:surface.route.bus.driver.overlay.fx|grounding:surface.route.bus.driver.grounding.base";
+    diagnostics.sceneRuntimeAssetNodeSurfaceRouteBusDriverValueBrief =
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
     diagnostics.sceneRuntimeAssetNodeExecutionDriverTableState = "preview_only";
     diagnostics.sceneRuntimeAssetNodeExecutionDriverTableEntryCount = 0;
     diagnostics.sceneRuntimeAssetNodeExecutionDriverTableResolvedEntryCount = 0;
@@ -476,6 +484,14 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
     diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterTableNameBrief =
         "body:execution.driver.router.body.shell|head:execution.driver.router.head.mask|appendage:execution.driver.router.appendage.trim|overlay:execution.driver.router.overlay.fx|grounding:execution.driver.router.grounding.base";
     diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterTableValueBrief =
+        "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryState = "preview_only";
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryNameBrief =
+        "body:execution.driver.router.registry.body.shell|head:execution.driver.router.registry.head.mask|appendage:execution.driver.router.registry.appendage.trim|overlay:execution.driver.router.registry.overlay.fx|grounding:execution.driver.router.registry.grounding.base";
+    diagnostics.sceneRuntimeAssetNodeExecutionDriverRouterRegistryValueBrief =
         "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)";
     diagnostics.appearanceSkinVariantId = input.appearanceProfile.skinVariantId;
     diagnostics.appearanceAccessoryIds = input.appearanceProfile.enabledAccessoryIds;
