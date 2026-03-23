@@ -226,6 +226,11 @@ It should **not** own:
   - 在人工确认前，machine recommendation 的 `rollout_contract_status` 必须视为：
     - `candidate_pending_manual_confirmation`
     - 或 `stay_on_builtin`
+- checked-in `wasm_v1` sidecar samples may now be curated by readability intent instead of only by raw field coverage:
+  - `agile`-leaning sample for sharper `follow / drag`
+  - `dreamy`-leaning sample for floatier `follow / scroll`
+  - `charming`-leaning sample for rounder `click / hold`
+  - future sample additions should stay bounded and contract-compatible rather than introducing new ad-hoc metadata keys
 
 ## Recommended Internal Interface Split
 The future Windows real renderer can be implemented behind three narrow concepts.

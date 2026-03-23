@@ -28,14 +28,24 @@ Keep P1 concise; add details here when needed.
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-renderer-sidecar-wasm-v1-smoke.cmd`
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -Preset renderer-sidecar-wasm-v1-smoke`
 - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-renderer-lane-matrix.cmd`
+  - optional style switch:
+    - `-WasmV1Style agile|dreamy|charming`
+  - optional full style matrix:
+    - `-AllWasmV1Styles`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -Route proof -Event status -ExpectAppearanceProfileMatch $true`
 - renderer sidecar sample for Win pet tuning:
   - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\lib\windows-mouse-companion-renderer-sidecar.sample.json`
   - copy/rename it next to the wasm manifest as `<manifest>.mouse_companion_renderer.json`
 - renderer sidecar sample for the first structured wasm semantics patch:
   - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\lib\windows-mouse-companion-renderer-sidecar.wasm-v1.sample.json`
+  - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\lib\windows-mouse-companion-renderer-sidecar.wasm-v1.dreamy.sample.json`
+  - `F:\language\cpp\code\MFCMouseEffect\tools\platform\manual\lib\windows-mouse-companion-renderer-sidecar.wasm-v1.charming.sample.json`
   - this sample expects `appearance_semantics_mode=wasm_v1`
   - it drives a bounded `appearance_semantics` patch instead of only passthrough tuning
+  - recommended curated variants:
+    - default `wasm-v1.sample.json`: agile-leaning, cooler, sharper `follow / drag`
+    - `wasm-v1.dreamy.sample.json`: softer, floatier, brighter `follow / scroll`
+    - `wasm-v1.charming.sample.json`: rounder, warmer, stronger `click / hold`
   - current sample motion patch now covers:
     - `follow_state_lift_scale`
     - `click_squash_scale`
@@ -87,12 +97,22 @@ Keep P1 concise; add details here when needed.
     - `builtin_passthrough`
     - `wasm_v1`
   - temporarily swaps `<manifest>.mouse_companion_renderer.json` between the checked-in passthrough and `wasm_v1` samples
+  - `-WasmV1Style` chooses which checked-in `wasm_v1` sample is used for the third lane:
+    - `agile` (default)
+    - `dreamy`
+    - `charming`
+  - `-AllWasmV1Styles` expands the matrix to:
+    - `builtin`
+    - `builtin_passthrough`
+    - `wasm_v1_agile`
+    - `wasm_v1_dreamy`
+    - `wasm_v1_charming`
   - restores the original sidecar file and env vars after the run
   - prints a short compare checklist for `follow / drag / click / hold / scroll`, so the operator can judge lane deltas immediately after the automated smoke
   - now also writes:
     - `<prefix>.builtin.json`
     - `<prefix>.builtin_passthrough.json`
-    - `<prefix>.wasm_v1.json`
+    - `<prefix>.wasm_v1*.json`
     - `<prefix>.summary.json`
     - `<prefix>.summary.md`
     - `<prefix>.observation-template.md`
@@ -101,14 +121,17 @@ Keep P1 concise; add details here when needed.
   - `summary.json` and `summary.md` now also include an auto-compare section against `builtin`, so you can immediately see lane-level drift in:
     - `plugin_kind`
     - `semantics_mode`
+    - `default_lane_candidate`
     - `combo_preset`
     - `selection_reason`
     - `failure_reason`
     - `metadata_path_present`
+  - each lane summary row now also carries a compact `style` tag, so expanded `wasm_v1_*` lanes can be skimmed without inferring style only from the lane name
   - the same summary bundle now also emits a conservative machine recommendation for `recommended_default_lane`, based only on:
     - lane proof pass/fail
     - empty/non-empty failure reason
     - whether the lane actually differs from builtin in the machine compare
+  - when a lane is recommended, the same summary now also records `recommendation_style_intent`, so the matrix can explain whether the current machine candidate is aiming for `agile_follow_drag`, `dreamy_follow_scroll`, or `charming_click_hold`
   - the same recommendation now also carries `rollout_contract_status`:
     - `candidate_pending_manual_confirmation`
     - `stay_on_builtin`

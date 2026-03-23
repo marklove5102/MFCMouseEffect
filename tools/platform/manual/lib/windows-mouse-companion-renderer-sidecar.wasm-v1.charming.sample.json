@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "renderer_lane": "mouse_companion_renderer",
+  "supports_appearance_semantics": true,
+  "appearance_semantics_mode": "wasm_v1",
+  "combo_preset_override": "charming",
+  "appearance_semantics": {
+    "theme": {
+      "glow_color": "#FFC4DA",
+      "body_stroke": "#F3A1BE",
+      "head_fill": "#FFF2F6",
+      "accent_fill": "#FF8EB8",
+      "accessory_fill": "#FFD968",
+      "pedestal_fill": "#7A5E4C66"
+    },
+    "frame": {
+      "body_width_scale": 1.04,
+      "body_height_scale": 1.00,
+      "head_width_scale": 1.06,
+      "head_height_scale": 1.04
+    },
+    "face": {
+      "blush_width_scale": 1.14,
+      "muzzle_width_scale": 1.10,
+      "forehead_width_scale": 1.02,
+      "pupil_focus_scale": 1.00,
+      "highlight_alpha_scale": 1.12,
+      "whisker_spread_scale": 1.02
+    },
+    "appendage": {
+      "ear_scale": 1.02,
+      "tail_width_scale": 1.08,
+      "tail_height_scale": 1.02,
+      "follow_tail_width_scale": 1.06,
+      "follow_ear_spread_scale": 1.08,
+      "click_ear_lift_scale": 1.16
+    },
+    "motion": {
+      "follow_state_lift_scale": 1.04,
+      "click_squash_scale": 1.12,
+      "drag_lean_scale": 0.98,
+      "hold_head_nod_scale": 0.92,
+      "scroll_tail_lift_scale": 1.04,
+      "follow_head_nod_scale": 1.02
+    },
+    "mood": {
+      "glow_tint_mix_scale": 1.10,
+      "accent_tint_mix_scale": 1.18,
+      "shadow_tint_mix_scale": 0.98,
+      "shadow_alpha_bias": -2.0,
+      "pedestal_alpha_bias": -1.0,
+      "hold_band_alpha_scale": 1.14,
+      "scroll_arc_alpha_scale": 1.06,
+      "drag_line_alpha_scale": 0.94,
+      "follow_trail_alpha_scale": 1.04
+    }
+  }
+}

@@ -105,15 +105,23 @@
   - keep the lane bounded and host-owned
   - prefer adding high-value fields over reopening builder-local hardcoding
   - do not turn `wasm_v1` into an unrestricted free-form renderer ABI yet
+- Checked-in `wasm_v1` sidecar samples are now also curated by readability intent:
+  - default sample: agile-leaning baseline
+  - dreamy sample: brighter / floatier `follow / scroll`
+  - charming sample: rounder / warmer `click / hold`
 
 #### Windows Bring-Up / Validation
 - Dedicated native validation entrypoints exist for combo-persona acceptance, renderer-sidecar smoke, renderer-sidecar `wasm_v1` smoke, and renderer lane matrix (`builtin -> builtin_passthrough -> wasm_v1`).
+- Renderer lane matrix now also accepts `-WasmV1Style agile|dreamy|charming`, so the third lane can switch between the checked-in curated `wasm_v1` samples without manual sidecar replacement.
+- Renderer lane matrix now also accepts `-AllWasmV1Styles`, which expands the third lane into `wasm_v1_agile / wasm_v1_dreamy / wasm_v1_charming` and emits separate proof artifacts for each style.
 - Checked-in samples exist at `tools/platform/manual/lib/windows-mouse-companion-renderer-sidecar.sample.json` and `tools/platform/manual/lib/windows-mouse-companion-renderer-sidecar.wasm-v1.sample.json`.
 - Lane matrix now emits per-lane proof json plus `summary.json`, `summary.md`, and `observation-template.md`.
 - Lane matrix summary also emits:
   - compact lane verdicts
   - compare-vs-builtin summary
+  - per-lane `style`
   - conservative `recommended_default_lane`
+  - `recommendation_style_intent`
   - `rollout_contract_status`
 - Default lane rollout contract:
   - machine summary may nominate a candidate
