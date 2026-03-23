@@ -210,6 +210,9 @@ void ApplyShapeAppearanceSemanticsPatch(
     if (patch.hasFaceForeheadWidthScale) {
         semantics.face.foreheadWidthScale = patch.faceForeheadWidthScale;
     }
+    if (patch.hasFaceBrowTiltScale) {
+        semantics.face.browTiltScale = patch.faceBrowTiltScale;
+    }
     if (patch.hasFacePupilFocusScale) {
         semantics.face.pupilFocusScale = patch.facePupilFocusScale;
     }
@@ -233,6 +236,14 @@ void ApplyShapeAppearanceSemanticsPatch(
     }
     if (patch.hasAppendageFollowEarSpreadScale) {
         semantics.appendage.followEarSpreadScale = patch.appendageFollowEarSpreadScale;
+    }
+    if (patch.hasAppendageFollowLegStanceScale) {
+        semantics.appendage.followLegStanceScale =
+            patch.appendageFollowLegStanceScale;
+    }
+    if (patch.hasAppendageHoldLegStanceScale) {
+        semantics.appendage.holdLegStanceScale =
+            patch.appendageHoldLegStanceScale;
     }
     if (patch.hasAppendageClickEarLiftScale) {
         semantics.appendage.clickEarLiftScale = patch.appendageClickEarLiftScale;
@@ -273,6 +284,9 @@ void ApplyMoodAppearanceSemanticsPatch(
     }
     if (patch.hasMoodShadowTintMixScale) {
         semantics.mood.shadowTintMixScale = patch.moodShadowTintMixScale;
+    }
+    if (patch.hasMoodPedestalTintMixScale) {
+        semantics.mood.pedestalTintMixScale = patch.moodPedestalTintMixScale;
     }
     if (patch.hasMoodShadowAlphaBias) {
         semantics.mood.shadowAlphaBias = patch.moodShadowAlphaBias;

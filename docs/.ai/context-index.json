@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-23T03:45:55.831Z",
+  "generated_at": "2026-03-23T03:51:06.106Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -86,13 +86,13 @@
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
       "line_count": 220,
-      "size_bytes": 15950,
-      "estimated_tokens": 3988,
+      "size_bytes": 16115,
+      "estimated_tokens": 4029,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "46f6a04622025edcb30a367985ab5ed27b44efb4",
-      "updated_at": "2026-03-23T03:45:37.432Z"
+      "hash_sha1": "60257ee05800902d102c5c6722f6fc04131c55f4",
+      "updated_at": "2026-03-23T03:50:47.863Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -955,13 +955,13 @@
       "summary": "This contract does **not** choose the final Windows rendering technology yet.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
       "line_count": 491,
-      "size_bytes": 40617,
-      "estimated_tokens": 10155,
+      "size_bytes": 40711,
+      "estimated_tokens": 10178,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "1296dab87992daeabe194eaaf31195e0e5f7d395",
-      "updated_at": "2026-03-23T03:35:12.088Z"
+      "hash_sha1": "b61f51a2c30c83ec1b63f9e69f34aece756fcad7",
+      "updated_at": "2026-03-23T03:50:05.410Z"
     },
     {
       "id": "docs/archive/architecture/README.md",

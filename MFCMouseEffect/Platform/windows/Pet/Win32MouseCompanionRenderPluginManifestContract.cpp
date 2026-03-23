@@ -396,6 +396,18 @@ bool ValidateAppearanceSemanticsPayload(
                 return false;
             }
         }
+        if (face.contains("brow_tilt_scale")) {
+            outPatch->hasFaceBrowTiltScale = true;
+            if (!TryReadBoundedFloat(
+                    face,
+                    "brow_tilt_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->faceBrowTiltScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
         if (face.contains("pupil_focus_scale")) {
             outPatch->hasFacePupilFocusScale = true;
             if (!TryReadBoundedFloat(
@@ -499,6 +511,30 @@ bool ValidateAppearanceSemanticsPayload(
                     0.5f,
                     1.5f,
                     &outPatch->appendageFollowEarSpreadScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (appendage.contains("follow_leg_stance_scale")) {
+            outPatch->hasAppendageFollowLegStanceScale = true;
+            if (!TryReadBoundedFloat(
+                    appendage,
+                    "follow_leg_stance_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->appendageFollowLegStanceScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (appendage.contains("hold_leg_stance_scale")) {
+            outPatch->hasAppendageHoldLegStanceScale = true;
+            if (!TryReadBoundedFloat(
+                    appendage,
+                    "hold_leg_stance_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->appendageHoldLegStanceScale,
                     outFailureReason)) {
                 return false;
             }
@@ -641,6 +677,18 @@ bool ValidateAppearanceSemanticsPayload(
                     0.5f,
                     1.5f,
                     &outPatch->moodShadowTintMixScale,
+                    outFailureReason)) {
+                return false;
+            }
+        }
+        if (mood.contains("pedestal_tint_mix_scale")) {
+            outPatch->hasMoodPedestalTintMixScale = true;
+            if (!TryReadBoundedFloat(
+                    mood,
+                    "pedestal_tint_mix_scale",
+                    0.5f,
+                    1.5f,
+                    &outPatch->moodPedestalTintMixScale,
                     outFailureReason)) {
                 return false;
             }

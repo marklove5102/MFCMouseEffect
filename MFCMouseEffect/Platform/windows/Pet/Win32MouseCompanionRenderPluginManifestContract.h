@@ -50,6 +50,8 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
     float faceMuzzleWidthScale{1.0f};
     bool hasFaceForeheadWidthScale{false};
     float faceForeheadWidthScale{1.0f};
+    bool hasFaceBrowTiltScale{false};
+    float faceBrowTiltScale{1.0f};
     bool hasFacePupilFocusScale{false};
     float facePupilFocusScale{1.0f};
     bool hasFaceHighlightAlphaScale{false};
@@ -67,6 +69,10 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
     float appendageFollowTailWidthScale{1.0f};
     bool hasAppendageFollowEarSpreadScale{false};
     float appendageFollowEarSpreadScale{1.0f};
+    bool hasAppendageFollowLegStanceScale{false};
+    float appendageFollowLegStanceScale{1.0f};
+    bool hasAppendageHoldLegStanceScale{false};
+    float appendageHoldLegStanceScale{1.0f};
     bool hasAppendageClickEarLiftScale{false};
     float appendageClickEarLiftScale{1.0f};
 
@@ -89,6 +95,8 @@ struct Win32MouseCompanionRendererPluginAppearanceSemanticsPatch final {
     float moodAccentTintMixScale{1.0f};
     bool hasMoodShadowTintMixScale{false};
     float moodShadowTintMixScale{1.0f};
+    bool hasMoodPedestalTintMixScale{false};
+    float moodPedestalTintMixScale{1.0f};
     bool hasMoodShadowAlphaBias{false};
     float moodShadowAlphaBias{0.0f};
     bool hasMoodPedestalAlphaBias{false};
