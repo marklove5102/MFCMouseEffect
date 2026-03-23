@@ -249,6 +249,28 @@ function Get-DefaultLaneCandidateTierRecommendationRank([string]$CandidateTier) 
     }
 }
 
+function Resolve-StyleFocusProfile(
+    [string]$StyleIntent,
+    [string]$LaneStyle) {
+    switch ($StyleIntent) {
+    "style_candidate:agile_follow_drag" { return "follow_drag_tension" }
+    "style_candidate:dreamy_follow_scroll" { return "follow_scroll_float" }
+    "style_candidate:charming_click_hold" { return "click_hold_warmth" }
+    "style_candidate:balanced_default_candidate" { return "balanced_all_rounder" }
+    "style_candidate:builtin_passthrough_baseline" { return "baseline_passthrough_reference" }
+    }
+
+    switch ($LaneStyle) {
+    "builtin" { return "builtin_control" }
+    "passthrough" { return "baseline_passthrough_reference" }
+    "default" { return "balanced_all_rounder" }
+    "agile" { return "follow_drag_tension" }
+    "dreamy" { return "follow_scroll_float" }
+    "charming" { return "click_hold_warmth" }
+    default { return "unclassified_focus" }
+    }
+}
+
 function New-LaneSummary(
     [string]$Label,
     [string]$JsonPath,
@@ -319,6 +341,7 @@ function New-LaneSummary(
     return [ordered]@{
         lane = $Label
         style = $laneStyle
+        style_focus_profile = (Resolve-StyleFocusProfile $defaultLaneStyleIntent $laneStyle)
         configured_style = $ConfiguredStyle
         configured_sample_path = $ConfiguredSamplePath
         configured_sample_tier = $ConfiguredSampleTier
@@ -450,6 +473,7 @@ function New-LaneRecommendation(
             recommended_default_lane = $lane.lane
             recommendation_reason = "machine_candidate:passed_and_differs_from_builtin"
             recommendation_style_intent = $bestCandidate.style_intent
+            recommendation_style_focus_profile = [string]$lane.style_focus_profile
             recommendation_candidate_tier = $bestCandidate.candidate_tier
             runtime_default_lane_brief = [string]$lane.default_lane_brief
             recommended_sample_path = [string]$lane.configured_sample_path
@@ -464,6 +488,7 @@ function New-LaneRecommendation(
         recommended_default_lane = if ($null -ne $baseline) { $baseline.lane } else { "builtin" }
         recommendation_reason = "machine_candidate:stay_on_builtin_until_manual_confirmation"
         recommendation_style_intent = "style_candidate:none"
+        recommendation_style_focus_profile = if ($null -ne $baseline) { [string]$baseline.style_focus_profile } else { "builtin_control" }
         recommendation_candidate_tier = "builtin_shipped_default"
         runtime_default_lane_brief = if ($null -ne $baseline) { [string]$baseline.default_lane_brief } else { "builtin/runtime_builtin_default/stay_on_builtin/style_candidate:none" }
         recommended_sample_path = ""
@@ -529,6 +554,9 @@ function Write-LaneMatrixSummary(
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.configured_style)) {
             $lines.Add(("  configured_style: `{0}`" -f $lane.configured_style))
         }
+        if (-not [string]::IsNullOrWhiteSpace([string]$lane.style_focus_profile)) {
+            $lines.Add(("  style_focus_profile: `{0}`" -f $lane.style_focus_profile))
+        }
         if (-not [string]::IsNullOrWhiteSpace([string]$lane.configured_sample_path)) {
             $lines.Add(("  configured_sample_path: `{0}`" -f $lane.configured_sample_path))
         }
@@ -578,6 +606,7 @@ function Write-LaneMatrixSummary(
     $lines.Add(("- recommended_default_lane: `{0}`" -f $recommendation.recommended_default_lane))
     $lines.Add(("- reason: `{0}`" -f $recommendation.recommendation_reason))
     $lines.Add(("- style_intent: `{0}`" -f $recommendation.recommendation_style_intent))
+    $lines.Add(("- style_focus_profile: `{0}`" -f $recommendation.recommendation_style_focus_profile))
     $lines.Add(("- candidate_tier: `{0}`" -f $recommendation.recommendation_candidate_tier))
     $lines.Add(("- runtime_default_lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
     if (-not [string]::IsNullOrWhiteSpace($recommendationSamplePath)) {
@@ -697,6 +726,7 @@ function Write-LaneMatrixSummary(
     $observationLines.Add(("- recommended default lane now: `{0}`" -f $recommendation.recommended_default_lane))
     $observationLines.Add(("- machine suggestion reason: `{0}`" -f $recommendation.recommendation_reason))
     $observationLines.Add(("- machine style intent: `{0}`" -f $recommendation.recommendation_style_intent))
+    $observationLines.Add(("- machine style focus: `{0}`" -f $recommendation.recommendation_style_focus_profile))
     $observationLines.Add(("- machine candidate tier: `{0}`" -f $recommendation.recommendation_candidate_tier))
     $observationLines.Add(("- machine runtime default lane: `{0}`" -f $recommendation.runtime_default_lane_brief))
     if (-not [string]::IsNullOrWhiteSpace($recommendationSamplePath)) {

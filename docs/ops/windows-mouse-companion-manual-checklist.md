@@ -289,6 +289,7 @@
      - whether a renderer sidecar metadata path was present
    - each lane row now also reports `default_lane_brief = candidate/source/rollout/style_intent`, so the runtime default-lane call can be skimmed without opening the raw per-lane json
    - each lane row now also reports `configured_style` and `configured_sample_path`, so the checked-in sample contract used for that lane is visible in the summary itself
+   - each lane row now also reports `style_focus_profile`, so the intended motion emphasis is visible without reopening the sidecar
    - each lane row now also reports `configured_sample_tier`, so ship-default candidates and experimental styles are not mixed together
    - each lane row now also reports `runtime_sample_tier` and `runtime_contract_brief`, so summary can confirm whether runtime diagnostics still match the checked-in sample contract
    - each lane row now also reports a short `style` field, so `wasm_v1_agile / dreamy / charming` can be skimmed directly from the summary without re-parsing the lane label
@@ -359,6 +360,7 @@
    - that same template now also has final decision fields for:
      - `best lane for current Win pet`
      - `recommended default lane now`
+     - `machine style focus`
      - `machine candidate tier`
      - `machine runtime default lane`
      - `machine recommended sample tier`

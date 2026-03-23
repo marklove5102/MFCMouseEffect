@@ -175,12 +175,14 @@ Keep P1 concise; add details here when needed.
   - saved `render-proof` JSON now also carries both fields under `real_renderer_preview` and `renderer_runtime_after`
   - lane matrix summary now also records `runtime_contract_brief` and `default_lane_candidate_tier`, so proof/runtime/WebUI/matrix all share the same contract/tier vocabulary
   - machine recommendation priority now prefers runtime `default_lane_candidate_tier` first, then `recommended_sample_tier`, then style intent
+  - lane matrix now also records `style_focus_profile`, so each lane summary and the final recommendation can state whether the current style is biased toward `follow_drag_tension`, `follow_scroll_float`, `click_hold_warmth`, or `balanced_all_rounder`
   - the Mouse Companion WebUI section now also mirrors those runtime values in a dedicated `Runtime Diagnostics` block, together with `appearance_plugin_kind`, `appearance_plugin_appearance_semantics_mode`, `appearance_plugin_sample_tier`, `appearance_plugin_contract_brief`, and `appearance_plugin_selection_reason`
   - that same block now also derives a short `Lane Verdict`, so Win bring-up can read `stay on builtin` vs `candidate pending manual confirmation` without manually interpreting the three machine-coded default-lane fields first
   - `observation-template.md` is the operator-facing follow-up note sheet for `follow / drag / click / hold / scroll`, so manual visual conclusions can be stored next to the machine summary instead of in ad-hoc chat notes
   - the same template now also carries final decision slots for:
     - `best lane for current Win pet`
     - `recommended default lane now`
+    - `machine style focus`
     - `machine candidate tier`
     - `machine runtime default lane`
     - `machine recommended sample tier`

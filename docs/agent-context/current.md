@@ -123,9 +123,9 @@
   - per-lane configured sample metadata
   - per-lane runtime sample-tier snapshot
   - compare-vs-builtin summary
-  - per-lane `style`
+  - per-lane `style` + `style_focus_profile`
   - conservative `recommended_default_lane`
-  - `recommendation_style_intent`, `recommended_sample_path`
+  - `recommendation_style_intent` / `recommendation_style_focus_profile` / `recommended_sample_path`
   - `rollout_contract_status`
 - Default lane rollout contract: machine summary may nominate a candidate, but actual default switch still requires later manual confirmation.
 - Runtime default-lane diagnostics are surfaced directly: `default_lane_candidate`, `default_lane_source`, `default_lane_rollout_status`, `default_lane_style_intent`, `default_lane_candidate_tier`, `appearance_plugin_sample_tier`, `appearance_plugin_contract_brief`
@@ -138,10 +138,10 @@
   - `env_wasm_candidate`
   - `env_wasm_fallback_builtin`
   - `runtime_plugin_candidate`
-- `default_lane_style_intent` stable machine values currently include:
-  - `style_candidate:none`, `style_candidate:builtin_passthrough_baseline`, `style_candidate:balanced_default_candidate`, `style_candidate:agile_follow_drag`, `style_candidate:dreamy_follow_scroll`, `style_candidate:charming_click_hold`
+- `default_lane_style_intent` currently includes `style_candidate:none`, `style_candidate:builtin_passthrough_baseline`, `style_candidate:balanced_default_candidate`, `style_candidate:agile_follow_drag`, `style_candidate:dreamy_follow_scroll`, `style_candidate:charming_click_hold`.
 - Lane matrix recommendation now prefers runtime `default_lane_candidate_tier` first, then `sample_tier`, then runtime `default_lane_style_intent`; `observation-template.md` also pre-fills `candidate_tier`, `runtime_default_lane_brief`, and `recommended_sample_tier`, so final manual decisions stay on the same contract vocabulary as runtime and summary.
 - `default_lane_candidate_tier` currently uses short machine values to distinguish runtime recommendation semantics: `builtin_shipped_default`, `baseline_reference_candidate`, `ship_default_candidate`, `experimental_style_candidate`, `unclassified_candidate`.
+- Lane matrix also derives `style_focus_profile` to summarize the intended motion emphasis: `builtin_control`, `baseline_passthrough_reference`, `balanced_all_rounder`, `follow_drag_tension`, `follow_scroll_float`, `click_hold_warmth`, `unclassified_focus`.
 - Mouse Companion WebUI mirrors runtime lane state in `Runtime Diagnostics`, including a short `Lane Verdict`, `Style Intent`, `Candidate Tier`, `Sample Tier`, and `Contract Brief`.
 
 #### Windows Renderer Backend / Preview
