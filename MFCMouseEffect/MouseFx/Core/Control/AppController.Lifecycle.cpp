@@ -583,6 +583,12 @@ void AppController::SyncPetVisualHostDiagnostics(const PetVisualHostDiagnostics&
         diagnostics.rendererRuntime.sceneRuntimePoseSampleCount;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeBoundPoseSampleCount =
         diagnostics.rendererRuntime.sceneRuntimeBoundPoseSampleCount;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelSceneAdapterState =
+        diagnostics.rendererRuntime.sceneRuntimeModelSceneAdapterState;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelSceneSeamReadiness =
+        diagnostics.rendererRuntime.sceneRuntimeModelSceneSeamReadiness;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelSceneAdapterBrief =
+        diagnostics.rendererRuntime.sceneRuntimeModelSceneAdapterBrief;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence =
         diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias =
@@ -673,6 +679,12 @@ void AppController::ClearPetVisualHostDiagnostics() {
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeAdapterMode = "runtime_only";
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseSampleCount = 0;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeBoundPoseSampleCount = 0;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelSceneAdapterState =
+        "preview_only";
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelSceneSeamReadiness =
+        0.0f;
+    mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimeModelSceneAdapterBrief =
+        "preview_only/unknown/runtime_only";
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterInfluence = 0.0f;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseReadabilityBias = 0.0f;
     mouseCompanionRuntimeStatus_.rendererRuntimeSceneRuntimePoseAdapterBrief =

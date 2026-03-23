@@ -552,6 +552,17 @@ function writeRuntimeDiagnostics(runtimeState) {
     runtimeState.renderer_runtime_scene_runtime_adapter_mode,
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_model_scene_adapter_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_scene_adapter_brief,
+      'preview_only/unknown/runtime_only',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_scene_seam_readiness',
+    normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_scene_seam_readiness, '0'),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );

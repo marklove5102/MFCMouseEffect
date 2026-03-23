@@ -147,6 +147,10 @@ public:
         std::string rendererRuntimeSceneRuntimeAdapterMode{"runtime_only"};
         uint32_t rendererRuntimeSceneRuntimePoseSampleCount{0};
         uint32_t rendererRuntimeSceneRuntimeBoundPoseSampleCount{0};
+        std::string rendererRuntimeSceneRuntimeModelSceneAdapterState{"preview_only"};
+        float rendererRuntimeSceneRuntimeModelSceneSeamReadiness{0.0f};
+        std::string rendererRuntimeSceneRuntimeModelSceneAdapterBrief{
+            "preview_only/unknown/runtime_only"};
         float rendererRuntimeSceneRuntimePoseAdapterInfluence{0.0f};
         float rendererRuntimeSceneRuntimePoseReadabilityBias{0.0f};
         std::string rendererRuntimeSceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

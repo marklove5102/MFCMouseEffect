@@ -338,6 +338,22 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeModelSceneAdapterBrief = if ($null -ne $preview) {
+        $existingModelSceneBrief = [string]$preview.scene_runtime_model_scene_adapter_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelSceneBrief)) {
+            $existingModelSceneBrief
+        } else {
+            $state = [string]$preview.scene_runtime_model_scene_adapter_state
+            if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+            $format = [string]$preview.model_source_format
+            if ([string]::IsNullOrWhiteSpace($format)) { $format = "unknown" }
+            $mode = [string]$preview.scene_runtime_adapter_mode
+            if ([string]::IsNullOrWhiteSpace($mode)) { $mode = "runtime_only" }
+            "{0}/{1}/{2}" -f $state, $format, $mode
+        }
+    } else {
+        ""
+    }
     $selectedBackend = [string]$json.selected_renderer_backend
     $expectationState = if ($expectationMet) { "pass" } else { "fail" }
     $laneVerdict = "{0}/{1}/{2}/{3}" -f $selectedBackend, $pluginKind, $semanticsMode, $expectationState
@@ -374,6 +390,7 @@ function New-LaneSummary(
         default_lane_candidate_tier = $defaultLaneCandidateTier
         runtime_sample_tier = $runtimeSampleTier
         runtime_contract_brief = $runtimeContractBrief
+        runtime_model_scene_adapter_brief = $runtimeModelSceneAdapterBrief
         runtime_pose_adapter_brief = $runtimePoseAdapterBrief
         default_lane_brief = (Format-DefaultLaneBrief `
             $defaultLaneCandidate `
@@ -413,6 +430,7 @@ function Compare-LaneAgainstBaseline(
         @{ name = "default_lane_candidate_tier"; baseline = [string]$Baseline.default_lane_candidate_tier; current = [string]$Lane.default_lane_candidate_tier },
         @{ name = "runtime_sample_tier"; baseline = [string]$Baseline.runtime_sample_tier; current = [string]$Lane.runtime_sample_tier },
         @{ name = "runtime_contract_brief"; baseline = [string]$Baseline.runtime_contract_brief; current = [string]$Lane.runtime_contract_brief },
+        @{ name = "runtime_model_scene_adapter_brief"; baseline = [string]$Baseline.runtime_model_scene_adapter_brief; current = [string]$Lane.runtime_model_scene_adapter_brief },
         @{ name = "runtime_pose_adapter_brief"; baseline = [string]$Baseline.runtime_pose_adapter_brief; current = [string]$Lane.runtime_pose_adapter_brief },
         @{ name = "combo_preset"; baseline = [string]$Baseline.combo_preset; current = [string]$Lane.combo_preset },
         @{ name = "selection_reason"; baseline = [string]$Baseline.selection_reason; current = [string]$Lane.selection_reason },

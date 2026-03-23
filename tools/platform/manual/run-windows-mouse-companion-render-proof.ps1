@@ -207,6 +207,35 @@ function Add-PoseAdapterSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_pose_adapter_brief" -NotePropertyValue $brief
 }
 
+function Format-ModelSceneAdapterSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/unknown/runtime_only"
+    }
+    $existing = [string]$Node.scene_runtime_model_scene_adapter_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    $state = [string]$Node.scene_runtime_model_scene_adapter_state
+    if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+    $format = [string]$Node.model_source_format
+    if ([string]::IsNullOrWhiteSpace($format)) { $format = "unknown" }
+    $adapterMode = [string]$Node.scene_runtime_adapter_mode
+    if ([string]::IsNullOrWhiteSpace($adapterMode)) { $adapterMode = "runtime_only" }
+    return "{0}/{1}/{2}" -f $state, $format, $adapterMode
+}
+
+function Add-ModelSceneAdapterSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-ModelSceneAdapterSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_model_scene_adapter_brief").Count -gt 0) {
+        $Node.scene_runtime_model_scene_adapter_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_model_scene_adapter_brief" -NotePropertyValue $brief
+}
+
 function Show-RealPreviewSmokeHint {
     @'
 [mfx:info] real-preview-smoke preset
@@ -885,10 +914,12 @@ if ($Route -eq "sweep") {
             if ($null -ne $item) {
                 Add-DefaultLaneSummaryProperty $item.real_renderer_preview
                 Add-AppearancePluginContractBriefProperty $item.real_renderer_preview
+                Add-ModelSceneAdapterSummaryProperty $item.real_renderer_preview
                 Add-PoseAdapterSummaryProperty $item.real_renderer_preview
                 if ($null -ne $item.proof) {
                     Add-DefaultLaneSummaryProperty $item.proof.renderer_runtime_after
                     Add-AppearancePluginContractBriefProperty $item.proof.renderer_runtime_after
+                    Add-ModelSceneAdapterSummaryProperty $item.proof.renderer_runtime_after
                     Add-PoseAdapterSummaryProperty $item.proof.renderer_runtime_after
                 }
             }
@@ -896,9 +927,11 @@ if ($Route -eq "sweep") {
     } else {
         Add-DefaultLaneSummaryProperty $response.real_renderer_preview
         Add-AppearancePluginContractBriefProperty $response.real_renderer_preview
+        Add-ModelSceneAdapterSummaryProperty $response.real_renderer_preview
         Add-PoseAdapterSummaryProperty $response.real_renderer_preview
         Add-DefaultLaneSummaryProperty $response.renderer_runtime_after
         Add-AppearancePluginContractBriefProperty $response.renderer_runtime_after
+        Add-ModelSceneAdapterSummaryProperty $response.renderer_runtime_after
         Add-PoseAdapterSummaryProperty $response.renderer_runtime_after
     }
 
@@ -1032,7 +1065,7 @@ if ($Route -eq "sweep") {
             $preview.preview_active, `
             (Format-DefaultLaneSummary $preview), `
             (Format-AppearancePluginContractBrief $preview), `
-            (Format-PoseAdapterSummary $preview), `
+            ((Format-ModelSceneAdapterSummary $preview) + " | " + (Format-PoseAdapterSummary $preview)), `
             $preview.appearance_requested_preset_id, `
             $preview.appearance_resolved_preset_id, `
             $preview.appearance_combo_preset)
@@ -1180,6 +1213,8 @@ Write-Host ("  - appearance preset={0}->{1} skin={2} accessory_family={3} combo=
     $response.real_renderer_preview.appearance_combo_preset)
 Write-Host ("  - pose_adapter={0}" -f `
     (Format-PoseAdapterSummary $response.real_renderer_preview))
+Write-Host ("  - model_scene_adapter={0}" -f `
+    (Format-ModelSceneAdapterSummary $response.real_renderer_preview))
 foreach ($failure in @($appearanceFailures)) {
     Write-Host ("  - appearance_mismatch: {0}" -f $failure)
 }

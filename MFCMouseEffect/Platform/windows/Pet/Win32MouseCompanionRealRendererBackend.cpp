@@ -6,6 +6,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetResources.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppearanceSemantics.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererCapabilities.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPainter.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPoseAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRenderPluginHost.h"
@@ -89,6 +90,12 @@ void Win32MouseCompanionRealRendererBackend::Render(
     diagnostics.sceneRuntimePoseSampleCount = sceneRuntime.sceneRuntimePoseSampleCount;
     diagnostics.sceneRuntimeBoundPoseSampleCount =
         sceneRuntime.sceneRuntimeBoundPoseSampleCount;
+    diagnostics.sceneRuntimeModelSceneAdapterState =
+        sceneRuntime.modelSceneAdapterProfile.seamState;
+    diagnostics.sceneRuntimeModelSceneSeamReadiness =
+        sceneRuntime.modelSceneAdapterProfile.seamReadiness;
+    diagnostics.sceneRuntimeModelSceneAdapterBrief =
+        sceneRuntime.modelSceneAdapterProfile.brief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

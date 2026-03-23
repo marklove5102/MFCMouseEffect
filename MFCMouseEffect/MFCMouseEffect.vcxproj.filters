@@ -546,6 +546,9 @@
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererMotionProfile.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelSceneAdapterProfile.h">
+      <Filter>头文件\Platform</Filter>
+    </ClInclude>
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererPaletteBuilder.h">
       <Filter>头文件\Platform</Filter>
     </ClInclude>
@@ -1266,6 +1269,9 @@
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererMotionProfile.cpp">
+      <Filter>源文件\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelSceneAdapterProfile.cpp">
       <Filter>源文件\Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererPaletteBuilder.cpp">

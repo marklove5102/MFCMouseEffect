@@ -5,6 +5,8 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionPlaceholderPainter.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendRegistry.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetResources.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPoseAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererRuntime.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRenderPluginHost.h"
@@ -100,7 +102,24 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
     diagnostics.facingDirection = input.facingDirection;
     diagnostics.surfaceWidth = width;
     diagnostics.surfaceHeight = height;
-    diagnostics.modelSourceFormat = "phase1_placeholder";
+    diagnostics.modelSourceFormat =
+        input.modelAssetAvailable && !input.modelPath.empty() ? "phase1_placeholder" : "unknown";
+    Win32MouseCompanionRealRendererAssetResources modelResources{};
+    modelResources.modelPath = input.modelPath;
+    modelResources.modelSourceFormat = diagnostics.modelSourceFormat;
+    modelResources.modelReady = input.modelAssetAvailable && !input.modelPath.empty();
+    const auto modelSceneAdapterProfile =
+        BuildWin32MouseCompanionRealRendererModelSceneAdapterProfile(
+            modelResources,
+            runtime.sceneRuntimeAdapterMode,
+            runtime.poseFrameAvailable,
+            runtime.poseBindingConfigured);
+    diagnostics.sceneRuntimeModelSceneAdapterState =
+        modelSceneAdapterProfile.seamState;
+    diagnostics.sceneRuntimeModelSceneSeamReadiness =
+        modelSceneAdapterProfile.seamReadiness;
+    diagnostics.sceneRuntimeModelSceneAdapterBrief =
+        modelSceneAdapterProfile.brief;
     diagnostics.appearanceSkinVariantId = input.appearanceProfile.skinVariantId;
     diagnostics.appearanceAccessoryIds = input.appearanceProfile.enabledAccessoryIds;
     const auto accessoryFamily =
