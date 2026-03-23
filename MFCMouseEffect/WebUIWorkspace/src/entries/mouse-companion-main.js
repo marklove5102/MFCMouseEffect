@@ -1470,6 +1470,62 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_controller_phase_registry_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_controller_phase_registry_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_controller_phase_registry_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_controller_phase_registry_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_controller_phase_registry_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_controller_phase_registry_name_brief,
+      'body:phase.registry.body.spine|head:phase.registry.head.look|appendage:phase.registry.appendage.reach|overlay:phase.registry.overlay.fx|grounding:phase.registry.grounding.balance',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_controller_phase_registry_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_controller_phase_registry_value_brief,
+      'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_composition_bus_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_composition_bus_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_composition_bus_resolved_count',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_composition_bus_resolved_entry_count,
+      '0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_composition_bus_name_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_composition_bus_name_brief,
+      'body:surface.bus.body.shell|head:surface.bus.head.mask|appendage:surface.bus.appendage.trim|overlay:surface.bus.overlay.fx|grounding:surface.bus.grounding.base',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_asset_node_surface_composition_bus_value_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_asset_node_surface_composition_bus_value_brief,
+      'body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_pose_adapter_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_pose_adapter_brief, 'runtime_only/0.00/0.00'),
   );

@@ -428,6 +428,22 @@ public:
             "body:execution.surface.body.shell|head:execution.surface.head.mask|appendage:execution.surface.appendage.trim|overlay:execution.surface.overlay.fx|grounding:execution.surface.grounding.base"};
         std::string rendererRuntimeSceneRuntimeAssetNodeExecutionSurfaceValueBrief{
             "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryBrief{"preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryNameBrief{
+            "body:phase.registry.body.spine|head:phase.registry.head.look|appendage:phase.registry.appendage.reach|overlay:phase.registry.overlay.fx|grounding:phase.registry.grounding.balance"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryValueBrief{
+            "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusBrief{"preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusNameBrief{
+            "body:surface.bus.body.shell|head:surface.bus.head.mask|appendage:surface.bus.appendage.trim|overlay:surface.bus.overlay.fx|grounding:surface.bus.grounding.base"};
+        std::string rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusValueBrief{
+            "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"};
         float rendererRuntimeSceneRuntimePoseAdapterInfluence{0.0f};
         float rendererRuntimeSceneRuntimePoseReadabilityBias{0.0f};
         std::string rendererRuntimeSceneRuntimePoseAdapterBrief{"runtime_only/0.00/0.00"};

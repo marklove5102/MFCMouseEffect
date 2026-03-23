@@ -827,6 +827,46 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeExecutionSurfaceValueBrief).empty()
             ? "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"
             : status.rendererRuntimeSceneRuntimeAssetNodeExecutionSurfaceValueBrief;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryState;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryEntryCount;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryBrief;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryNameBrief).empty()
+            ? "body:phase.registry.body.spine|head:phase.registry.head.look|appendage:phase.registry.appendage.reach|overlay:phase.registry.overlay.fx|grounding:phase.registry.grounding.balance"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryNameBrief;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryValueBrief).empty()
+            ? "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"
+            : status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryValueBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusState;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusEntryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusNameBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusNameBrief).empty()
+            ? "body:surface.bus.body.shell|head:surface.bus.head.mask|appendage:surface.bus.appendage.trim|overlay:surface.bus.overlay.fx|grounding:surface.bus.grounding.base"
+            : status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusNameBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusValueBrief).empty()
+            ? "body:(0.00,0.00,0.00)|head:(0.00,0.00,0.00)|appendage:(0.00,0.00,0.00)|overlay:(0.00,0.00,0.00)|grounding:(0.00,0.00,0.00)"
+            : status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusValueBrief;
     diagnostics.sceneRuntimePoseAdapterInfluence =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     diagnostics.sceneRuntimePoseReadabilityBias =

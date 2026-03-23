@@ -26,6 +26,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeExecutionLaneProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeControllerPhaseProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeExecutionSurfaceProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeControllerPhaseRegistryProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeSurfaceCompositionBusProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeLocalJointRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseResolverProfile.h"
@@ -233,6 +235,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
             controllerPhaseProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeExecutionSurfaceProfile(
         executionSurfaceProfile,
+        scene);
+    const auto controllerPhaseRegistryProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeControllerPhaseRegistryProfile(
+            controllerPhaseProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeControllerPhaseRegistryProfile(
+        controllerPhaseRegistryProfile,
+        scene);
+    const auto surfaceCompositionBusProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeSurfaceCompositionBusProfile(
+            executionSurfaceProfile);
+    ApplyWin32MouseCompanionRealRendererAssetNodeSurfaceCompositionBusProfile(
+        surfaceCompositionBusProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
     const Win32MouseCompanionRealRendererPainter painter{};
@@ -643,6 +657,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         executionSurfaceProfile.surfaceBrief;
     diagnostics.sceneRuntimeAssetNodeExecutionSurfaceValueBrief =
         executionSurfaceProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryState =
+        controllerPhaseRegistryProfile.registryState;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryEntryCount =
+        controllerPhaseRegistryProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount =
+        controllerPhaseRegistryProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryBrief =
+        controllerPhaseRegistryProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryNameBrief =
+        controllerPhaseRegistryProfile.registryBrief;
+    diagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryValueBrief =
+        controllerPhaseRegistryProfile.valueBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusState =
+        surfaceCompositionBusProfile.busState;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusEntryCount =
+        surfaceCompositionBusProfile.entryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount =
+        surfaceCompositionBusProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusBrief =
+        surfaceCompositionBusProfile.brief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusNameBrief =
+        surfaceCompositionBusProfile.busBrief;
+    diagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief =
+        surfaceCompositionBusProfile.valueBrief;
     const auto& poseAdapterProfile = sceneRuntime.poseAdapterProfile;
     diagnostics.sceneRuntimePoseAdapterInfluence = poseAdapterProfile.influence;
     diagnostics.sceneRuntimePoseReadabilityBias = poseAdapterProfile.readabilityBias;

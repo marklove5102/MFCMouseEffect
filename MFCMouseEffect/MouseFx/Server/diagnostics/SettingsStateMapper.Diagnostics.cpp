@@ -667,6 +667,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodeExecutionSurfaceNameBrief},
         {"scene_runtime_asset_node_execution_surface_value_brief",
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodeExecutionSurfaceValueBrief},
+        {"scene_runtime_asset_node_controller_phase_registry_state",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryState},
+        {"scene_runtime_asset_node_controller_phase_registry_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryEntryCount},
+        {"scene_runtime_asset_node_controller_phase_registry_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount},
+        {"scene_runtime_asset_node_controller_phase_registry_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryBrief},
+        {"scene_runtime_asset_node_controller_phase_registry_name_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryNameBrief},
+        {"scene_runtime_asset_node_controller_phase_registry_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeControllerPhaseRegistryValueBrief},
+        {"scene_runtime_asset_node_surface_composition_bus_state",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusState},
+        {"scene_runtime_asset_node_surface_composition_bus_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusEntryCount},
+        {"scene_runtime_asset_node_surface_composition_bus_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount},
+        {"scene_runtime_asset_node_surface_composition_bus_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusBrief},
+        {"scene_runtime_asset_node_surface_composition_bus_name_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusNameBrief},
+        {"scene_runtime_asset_node_surface_composition_bus_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief},
         {"scene_runtime_pose_adapter_influence",
          realRendererPreviewDiagnostics.sceneRuntimePoseAdapterInfluence},
         {"scene_runtime_pose_readability_bias",
@@ -1173,6 +1197,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeAssetNodeExecutionSurfaceNameBrief;
     out["renderer_runtime_scene_runtime_asset_node_execution_surface_value_brief"] =
         status.rendererRuntimeSceneRuntimeAssetNodeExecutionSurfaceValueBrief;
+    out["renderer_runtime_scene_runtime_asset_node_controller_phase_registry_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryState;
+    out["renderer_runtime_scene_runtime_asset_node_controller_phase_registry_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_controller_phase_registry_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_controller_phase_registry_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryBrief;
+    out["renderer_runtime_scene_runtime_asset_node_controller_phase_registry_name_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryNameBrief;
+    out["renderer_runtime_scene_runtime_asset_node_controller_phase_registry_value_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeControllerPhaseRegistryValueBrief;
+    out["renderer_runtime_scene_runtime_asset_node_surface_composition_bus_state"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusState;
+    out["renderer_runtime_scene_runtime_asset_node_surface_composition_bus_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_surface_composition_bus_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_asset_node_surface_composition_bus_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusBrief;
+    out["renderer_runtime_scene_runtime_asset_node_surface_composition_bus_name_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusNameBrief;
+    out["renderer_runtime_scene_runtime_asset_node_surface_composition_bus_value_brief"] =
+        status.rendererRuntimeSceneRuntimeAssetNodeSurfaceCompositionBusValueBrief;
     out["renderer_runtime_scene_runtime_pose_adapter_influence"] =
         status.rendererRuntimeSceneRuntimePoseAdapterInfluence;
     out["renderer_runtime_scene_runtime_pose_readability_bias"] =

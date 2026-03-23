@@ -473,6 +473,30 @@ export function getMouseCompanionSectionMarkup() {
         <label>Execution Surface Values</label>
         <output id="mc_runtime_scene_runtime_asset_node_execution_surface_value_brief">-</output>
 
+        <label>Controller Phase Registry</label>
+        <output id="mc_runtime_scene_runtime_asset_node_controller_phase_registry_brief">-</output>
+
+        <label>Resolved Phase Registry Entries</label>
+        <output id="mc_runtime_scene_runtime_asset_node_controller_phase_registry_resolved_count">-</output>
+
+        <label>Controller Phase Registry Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_controller_phase_registry_name_brief">-</output>
+
+        <label>Controller Phase Registry Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_controller_phase_registry_value_brief">-</output>
+
+        <label>Surface Composition Bus</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_composition_bus_brief">-</output>
+
+        <label>Resolved Surface Bus Entries</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_composition_bus_resolved_count">-</output>
+
+        <label>Surface Composition Bus Names</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_composition_bus_name_brief">-</output>
+
+        <label>Surface Composition Bus Values</label>
+        <output id="mc_runtime_scene_runtime_asset_node_surface_composition_bus_value_brief">-</output>
+
         <label>Pose Adapter Brief</label>
         <output id="mc_runtime_scene_runtime_pose_adapter_brief">-</output>
 

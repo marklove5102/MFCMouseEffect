@@ -576,6 +576,30 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeAssetNodeExecutionSurfaceNameBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeExecutionSurfaceValueBrief =
         rendererRuntime.sceneRuntimeAssetNodeExecutionSurfaceValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryState =
+        rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryBrief =
+        rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodeControllerPhaseRegistryValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusState =
+        rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusState;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount =
+        rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusBrief =
+        rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusNameBrief =
+        rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusNameBrief;
+    diagnostics.rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief =
+        rendererRuntime.sceneRuntimeAssetNodeSurfaceCompositionBusValueBrief;
     diagnostics.rendererRuntime.sceneRuntimePoseAdapterInfluence =
         rendererRuntime.sceneRuntimePoseAdapterInfluence;
     diagnostics.rendererRuntime.sceneRuntimePoseReadabilityBias =
