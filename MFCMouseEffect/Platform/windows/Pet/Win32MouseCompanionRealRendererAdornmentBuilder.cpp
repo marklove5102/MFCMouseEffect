@@ -87,6 +87,36 @@ Gdiplus::RectF ScaleRectFromCenter(
         newHeight);
 }
 
+float ResolveAveragePoseX(
+    const MouseCompanionPetPoseSample* a,
+    const MouseCompanionPetPoseSample* b) {
+    if (a && b) {
+        return (a->position[0] + b->position[0]) * 0.5f;
+    }
+    if (a) {
+        return a->position[0];
+    }
+    if (b) {
+        return b->position[0];
+    }
+    return 0.0f;
+}
+
+float ResolveAveragePoseY(
+    const MouseCompanionPetPoseSample* a,
+    const MouseCompanionPetPoseSample* b) {
+    if (a && b) {
+        return (a->position[1] + b->position[1]) * 0.5f;
+    }
+    if (a) {
+        return a->position[1];
+    }
+    if (b) {
+        return b->position[1];
+    }
+    return 0.0f;
+}
+
 } // namespace
 
 void BuildWin32MouseCompanionRealRendererAdornment(
@@ -107,10 +137,26 @@ void BuildWin32MouseCompanionRealRendererAdornment(
         runtime.assets->appearanceProfileReady,
     };
 
-    scene.poseBadgeVisible = runtime.poseFrameAvailable || runtime.poseBindingConfigured;
+    const float poseAdapterInfluence =
+        ResolveWin32MouseCompanionRealRendererPoseAdapterInfluence(runtime);
+    const float poseHandReachX = ResolveAveragePoseX(runtime.leftHandPose, runtime.rightHandPose);
+    const float poseHandLiftY = ResolveAveragePoseY(runtime.leftHandPose, runtime.rightHandPose);
+    const float poseLegReachX = ResolveAveragePoseX(runtime.leftLegPose, runtime.rightLegPose);
+    const float poseLegLiftY = ResolveAveragePoseY(runtime.leftLegPose, runtime.rightLegPose);
+    const float poseAdornmentX =
+        (poseHandReachX * metrics.bodyWidth * 0.020f + poseLegReachX * metrics.bodyWidth * 0.015f) *
+        poseAdapterInfluence;
+    const float poseAdornmentY =
+        (-poseHandLiftY * metrics.bodyHeight * 0.018f - poseLegLiftY * metrics.bodyHeight * 0.010f) *
+        poseAdapterInfluence;
+
+    scene.poseBadgeVisible =
+        runtime.poseBindingConfigured ||
+        runtime.sceneRuntimeAdapterMode != "runtime_only" ||
+        runtime.sceneRuntimePoseSampleCount > 0;
     scene.poseBadgeRect = Gdiplus::RectF(
         scene.headRect.GetRight() - scene.headRect.Width * style.poseBadgeXRatio,
-        scene.headRect.Y - scene.headRect.Height * style.poseBadgeYRatio,
+        scene.headRect.Y - scene.headRect.Height * style.poseBadgeYRatio + poseAdornmentY * 0.35f,
         scene.headRect.Width * style.poseBadgeSizeRatio,
         scene.headRect.Width * style.poseBadgeSizeRatio);
 
@@ -123,8 +169,10 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const auto& adornment = semantics.adornment;
 
     float centerX =
-        scene.headRect.GetRight() - scene.headRect.Width * (style.accessoryXRatio - adornment.xOffsetRatio);
-    float centerY = scene.headRect.Y + scene.headRect.Height * (style.accessoryYRatio + adornment.yOffsetRatio);
+        scene.headRect.GetRight() - scene.headRect.Width * (style.accessoryXRatio - adornment.xOffsetRatio) +
+        poseAdornmentX;
+    float centerY =
+        scene.headRect.Y + scene.headRect.Height * (style.accessoryYRatio + adornment.yOffsetRatio) + poseAdornmentY;
     const float baseWidth = scene.headRect.Width * style.accessoryOuterRatio * 2.0f * adornment.widthScale;
     const float baseHeight = scene.headRect.Width * style.accessoryOuterRatio * 2.0f * adornment.heightScale;
     const float actionIntensity = std::clamp(runtime.actionIntensity + runtime.reactiveActionIntensity * 0.6f, 0.0f, 1.0f);

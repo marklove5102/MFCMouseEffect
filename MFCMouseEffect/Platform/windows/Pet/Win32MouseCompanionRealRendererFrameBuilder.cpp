@@ -130,12 +130,22 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         : runtime.leftLegPose ? runtime.leftLegPose->position[0]
         : runtime.rightLegPose ? runtime.rightLegPose->position[0]
                                : 0.0f;
+    const float poseLegLiftY = runtime.leftLegPose && runtime.rightLegPose
+        ? (runtime.leftLegPose->position[1] + runtime.rightLegPose->position[1]) * 0.5f
+        : runtime.leftLegPose ? runtime.leftLegPose->position[1]
+        : runtime.rightLegPose ? runtime.rightLegPose->position[1]
+                               : 0.0f;
     const float poseAnchorX =
         (poseHandReachX * metrics.bodyWidth * 0.045f + poseLegReachX * metrics.bodyWidth * 0.030f) *
         poseAdapterInfluence;
     const float poseAnchorY = (-poseHandLiftY * metrics.bodyHeight * 0.035f) * poseAdapterInfluence;
     const float poseHeadX = poseHandReachX * metrics.headWidth * 0.030f * poseAdapterInfluence;
     const float poseHeadY = -poseHandLiftY * metrics.headHeight * 0.035f * poseAdapterInfluence;
+    const float poseGroundingX =
+        (poseLegReachX * metrics.bodyWidth * 0.030f + poseHandReachX * metrics.bodyWidth * 0.012f) *
+        poseAdapterInfluence;
+    const float poseGroundingY = (-poseLegLiftY * metrics.bodyHeight * 0.020f) * poseAdapterInfluence;
+    const float poseGroundingScale = 1.0f + std::abs(poseLegReachX) * 0.030f * poseAdapterInfluence;
 
     scene.centerX = static_cast<float>(width) * style.centerXRatio + facingOffset + profile.bodyForward +
         profile.idleHeadSway + poseAnchorX;
@@ -177,9 +187,10 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         metrics.bodyHeight * style.glowHeightScale * glowScale * comboGlowStateScale);
     scene.shadowRect = Gdiplus::RectF(
         scene.centerX - metrics.bodyWidth * style.shadowXOffsetRatio * profile.shadowScale * shadowStateScale * comboShadowStateScale +
-            shadowStateXOffset * runtime.facingSign,
-        scene.centerY + metrics.bodyHeight * style.shadowYRatio + shadowStateYOffset,
+            shadowStateXOffset * runtime.facingSign + poseGroundingX,
+        scene.centerY + metrics.bodyHeight * style.shadowYRatio + shadowStateYOffset + poseGroundingY,
         metrics.bodyWidth * style.shadowWidthScale * profile.shadowScale * shadowStateScale * comboShadowStateScale *
+            poseGroundingScale *
             (1.0f - (profile.breathScale - 1.0f) * style.shadowBreathScale),
         metrics.bodyHeight * style.shadowHeightScale * shadowStateScale * comboShadowStateScale);
     scene.bodyRect = Gdiplus::RectF(
@@ -303,9 +314,11 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         metrics.bodyHeight * style.tailHaunchBridgeHeightRatio);
     scene.pedestalRect = Gdiplus::RectF(
         scene.centerX - metrics.bodyWidth * style.pedestalXOffsetRatio * pedestalStateScale * comboPedestalStateScale +
-            pedestalStateXOffset * runtime.facingSign,
-        scene.shadowRect.GetBottom() - metrics.bodyHeight * style.pedestalYOffsetRatio + pedestalStateYOffset,
-        metrics.bodyWidth * style.pedestalWidthScale * pedestalStateScale * comboPedestalStateScale,
+            pedestalStateXOffset * runtime.facingSign + poseGroundingX * 0.8f,
+        scene.shadowRect.GetBottom() - metrics.bodyHeight * style.pedestalYOffsetRatio + pedestalStateYOffset +
+            poseGroundingY * 0.6f,
+        metrics.bodyWidth * style.pedestalWidthScale * pedestalStateScale * comboPedestalStateScale *
+            poseGroundingScale,
         metrics.bodyHeight * style.pedestalHeightScale * pedestalStateScale * comboPedestalStateScale);
 
     return metrics;
