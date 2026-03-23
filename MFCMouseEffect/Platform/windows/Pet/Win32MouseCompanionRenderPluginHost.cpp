@@ -151,7 +151,7 @@ void ApplyAppearanceSemanticsTuning(
     semantics.face.highlightAlphaScale *= tuning.highlightAlphaScale;
 }
 
-void ApplyAppearanceSemanticsPatch(
+void ApplyThemeAppearanceSemanticsPatch(
     Win32MouseCompanionRealRendererAppearanceSemantics& semantics,
     const Win32MouseCompanionRendererPluginAppearanceSemanticsPatch& patch) {
     if (patch.hasThemeGlowColor) {
@@ -172,6 +172,11 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasThemePedestalFill) {
         semantics.theme.pedestalFill = patch.themePedestalFill;
     }
+}
+
+void ApplyShapeAppearanceSemanticsPatch(
+    Win32MouseCompanionRealRendererAppearanceSemantics& semantics,
+    const Win32MouseCompanionRendererPluginAppearanceSemanticsPatch& patch) {
     if (patch.hasFrameBodyWidthScale) {
         semantics.frame.bodyWidthScale = patch.frameBodyWidthScale;
     }
@@ -220,6 +225,11 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasAppendageClickEarLiftScale) {
         semantics.appendage.clickEarLiftScale = patch.appendageClickEarLiftScale;
     }
+}
+
+void ApplyMotionAppearanceSemanticsPatch(
+    Win32MouseCompanionRealRendererAppearanceSemantics& semantics,
+    const Win32MouseCompanionRendererPluginAppearanceSemanticsPatch& patch) {
     if (patch.hasMotionFollowStateLiftScale) {
         semantics.motion.followStateLiftScale = patch.motionFollowStateLiftScale;
     }
@@ -238,6 +248,11 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasMotionFollowHeadNodScale) {
         semantics.motion.followHeadNodScale = patch.motionFollowHeadNodScale;
     }
+}
+
+void ApplyMoodAppearanceSemanticsPatch(
+    Win32MouseCompanionRealRendererAppearanceSemantics& semantics,
+    const Win32MouseCompanionRendererPluginAppearanceSemanticsPatch& patch) {
     if (patch.hasMoodGlowTintMixScale) {
         semantics.mood.glowTintMixScale = patch.moodGlowTintMixScale;
     }
@@ -265,6 +280,15 @@ void ApplyAppearanceSemanticsPatch(
     if (patch.hasMoodFollowTrailAlphaScale) {
         semantics.mood.followTrailAlphaScale = patch.moodFollowTrailAlphaScale;
     }
+}
+
+void ApplyAppearanceSemanticsPatch(
+    Win32MouseCompanionRealRendererAppearanceSemantics& semantics,
+    const Win32MouseCompanionRendererPluginAppearanceSemanticsPatch& patch) {
+    ApplyThemeAppearanceSemanticsPatch(semantics, patch);
+    ApplyShapeAppearanceSemanticsPatch(semantics, patch);
+    ApplyMotionAppearanceSemanticsPatch(semantics, patch);
+    ApplyMoodAppearanceSemanticsPatch(semantics, patch);
 }
 
 Win32MouseCompanionRealRendererAppearanceSemantics BuildBuiltinAppearanceSemantics(

@@ -180,6 +180,12 @@ It should **not** own:
         - `mood.glow_tint_mix_scale / accent_tint_mix_scale / shadow_tint_mix_scale / shadow_alpha_bias / pedestal_alpha_bias / hold_band_alpha_scale / scroll_arc_alpha_scale / drag_line_alpha_scale / follow_trail_alpha_scale`
       - scale 类字段当前受控范围默认仍为 `0.5 ~ 1.5`
       - `shadow_alpha_bias / pedestal_alpha_bias` 当前受控范围为 `-24 ~ 24`
+      - host 当前应按固定层次应用这些 patch：
+        - `theme`
+        - `shape`（`frame / face / appendage`）
+        - `motion`
+        - `mood`
+      - 目标是让 `wasm_v1` 继续保持 bounded semantics patch，而不是把 host 重新退化成一大段无序字段覆盖代码
   - 任何预检失败都按 provider attach 失败处理，并通过统一 fallback diagnostics 暴露给 `/api/state` / render-proof
   - 这组预检与失败归因应集中维护在独立 contract/helper 文件中，而不是继续散落在 renderer host 与 builder 内部
   - failure reason 应优先输出稳定 code，例如 `renderer_plugin_manifest_io_error / renderer_plugin_manifest_json_parse_error / renderer_plugin_manifest_invalid / renderer_plugin_metadata_io_error / renderer_plugin_metadata_json_parse_error / renderer_plugin_metadata_invalid / renderer_plugin_metadata_lane_mismatch / renderer_plugin_metadata_missing_appearance_semantics / renderer_plugin_metadata_appearance_mode_unsupported / renderer_plugin_metadata_combo_preset_unsupported / renderer_plugin_metadata_tuning_out_of_range / renderer_plugin_metadata_missing_appearance_semantics_payload / renderer_plugin_metadata_appearance_payload_invalid / renderer_plugin_metadata_appearance_payload_out_of_range / renderer_plugin_manifest_missing_effects_surface / renderer_plugin_manifest_requires_frame_tick`
