@@ -1127,9 +1127,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.MouseCompanionRenderProof.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestApiRoutes.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestApiRoutes.cpp" />
     <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsApiRoutes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
     </ClCompile>
