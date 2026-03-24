@@ -273,6 +273,7 @@ struct Win32MouseCompanionRealRendererScene final {
     bool modelProxyVisible{false};
     std::vector<Win32MouseCompanionRealRendererModelProxyNode> modelProxyNodes{};
     std::vector<Win32MouseCompanionRealRendererModelProxyLink> modelProxyLinks{};
+    std::vector<Gdiplus::PointF> modelProxyHull{};
 };
 
 } // namespace mousefx::windows

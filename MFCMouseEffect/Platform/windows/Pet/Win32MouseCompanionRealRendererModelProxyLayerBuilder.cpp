@@ -78,6 +78,15 @@ void AppendProxyLink(
     });
 }
 
+void AppendHullPoint(
+    const Win32MouseCompanionRealRendererAssetNodeWorldSpaceEntry& entry,
+    std::vector<Gdiplus::PointF>* hull) {
+    if (hull == nullptr || !entry.resolved) {
+        return;
+    }
+    hull->push_back(Gdiplus::PointF(entry.worldX, entry.worldY));
+}
+
 } // namespace
 
 void BuildWin32MouseCompanionRealRendererModelProxyLayer(
@@ -86,6 +95,7 @@ void BuildWin32MouseCompanionRealRendererModelProxyLayer(
     scene.modelProxyVisible = false;
     scene.modelProxyNodes.clear();
     scene.modelProxyLinks.clear();
+    scene.modelProxyHull.clear();
 
     scene.modelProxyNodes.reserve(5);
     AppendProxyNode(worldSpaceProfile.bodyEntry, scene, &scene.modelProxyNodes);
@@ -99,6 +109,13 @@ void BuildWin32MouseCompanionRealRendererModelProxyLayer(
     AppendProxyLink(worldSpaceProfile.bodyEntry, worldSpaceProfile.appendageEntry, &scene.modelProxyLinks);
     AppendProxyLink(worldSpaceProfile.bodyEntry, worldSpaceProfile.overlayEntry, &scene.modelProxyLinks);
     AppendProxyLink(worldSpaceProfile.bodyEntry, worldSpaceProfile.groundingEntry, &scene.modelProxyLinks);
+
+    scene.modelProxyHull.reserve(5);
+    AppendHullPoint(worldSpaceProfile.headEntry, &scene.modelProxyHull);
+    AppendHullPoint(worldSpaceProfile.overlayEntry, &scene.modelProxyHull);
+    AppendHullPoint(worldSpaceProfile.groundingEntry, &scene.modelProxyHull);
+    AppendHullPoint(worldSpaceProfile.appendageEntry, &scene.modelProxyHull);
+    AppendHullPoint(worldSpaceProfile.bodyEntry, &scene.modelProxyHull);
 
     scene.modelProxyVisible = !scene.modelProxyNodes.empty();
 }

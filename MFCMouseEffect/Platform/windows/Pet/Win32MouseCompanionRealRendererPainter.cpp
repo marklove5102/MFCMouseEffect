@@ -220,6 +220,19 @@ void DrawModelProxyLayer(
         return;
     }
 
+    if (scene.modelProxyHull.size() >= 3) {
+        Gdiplus::GraphicsPath hullPath;
+        hullPath.AddClosedCurve(
+            scene.modelProxyHull.data(),
+            static_cast<INT>(scene.modelProxyHull.size()),
+            0.45f);
+        Gdiplus::SolidBrush hullBrush(Gdiplus::Color(44, 170, 214, 255));
+        Gdiplus::Pen hullPen(Gdiplus::Color(92, 170, 214, 255), 1.0f);
+        hullPen.SetLineJoin(Gdiplus::LineJoinRound);
+        graphics->FillPath(&hullBrush, &hullPath);
+        graphics->DrawPath(&hullPen, &hullPath);
+    }
+
     Gdiplus::Pen linkPen(Gdiplus::Color(144, 146, 214, 255), 2.0f);
     linkPen.SetStartCap(Gdiplus::LineCapRound);
     linkPen.SetEndCap(Gdiplus::LineCapRound);
