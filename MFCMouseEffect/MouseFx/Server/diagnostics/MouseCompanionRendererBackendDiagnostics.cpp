@@ -885,6 +885,52 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeRealizationRegistryValueBrief).empty()
             ? "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"
             : status.rendererRuntimeSceneRuntimeModelAssetNodeRealizationRegistryValueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationState;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationResolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationMaterializationBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationMaterializationBrief)
+                .empty()
+            ? "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationMaterializationBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationValueBrief).empty()
+            ? "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationValueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryState)
+                .empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryState;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryResolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryBrief)
+                .empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief =
+        TrimAscii(
+            status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief)
+                .empty()
+            ? "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryValueBrief)
+                .empty()
+            ? "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"
+            : status.rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryValueBrief;
     diagnostics.sceneRuntimeAssetNodeBindingState =
         TrimAscii(status.rendererRuntimeSceneRuntimeAssetNodeBindingState).empty()
             ? "preview_only"

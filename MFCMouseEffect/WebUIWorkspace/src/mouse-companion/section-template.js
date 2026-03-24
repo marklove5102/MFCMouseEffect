@@ -305,6 +305,18 @@ export function getMouseCompanionSectionMarkup() {
         <label>Model Node Realization Registry</label>
         <output id="mc_runtime_scene_runtime_model_asset_node_realization_registry_registry_brief">-</output>
 
+        <label>Model Asset Node Materialization</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_materialization_brief">-</output>
+
+        <label>Model Node Materialization</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_materialization_materialization_brief">-</output>
+
+        <label>Model Asset Node Materialization Registry</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_materialization_registry_brief">-</output>
+
+        <label>Model Node Materialization Registry</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_materialization_registry_registry_brief">-</output>
+
         <label>Asset Node Binding</label>
         <output id="mc_runtime_scene_runtime_asset_node_binding_brief">-</output>
 
