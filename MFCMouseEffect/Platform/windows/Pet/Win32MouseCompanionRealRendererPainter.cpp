@@ -556,6 +556,93 @@ void DrawModelProxyAdornmentLayer(
     }
 }
 
+void DrawModelProxyDetailLayer(
+    Gdiplus::Graphics* graphics,
+    const Win32MouseCompanionRealRendererScene& scene) {
+    if (!graphics || !scene.modelProxyDetailLayer.visible) {
+        return;
+    }
+
+    const auto& layer = scene.modelProxyDetailLayer;
+    FillEllipse(
+        graphics,
+        layer.leftEyeRect,
+        WithScaledAlpha(scene.eyeFill, scene.eyeFill.GetA(), layer.eyeAlphaScale),
+        WithScaledAlpha(scene.eyeFill, scene.eyeFill.GetA(), layer.eyeAlphaScale),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.rightEyeRect,
+        WithScaledAlpha(scene.eyeFill, scene.eyeFill.GetA(), layer.eyeAlphaScale),
+        WithScaledAlpha(scene.eyeFill, scene.eyeFill.GetA(), layer.eyeAlphaScale),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.leftPupilRect,
+        WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.eyeAlphaScale),
+        WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.eyeAlphaScale),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.rightPupilRect,
+        WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.eyeAlphaScale),
+        WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.eyeAlphaScale),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.leftHighlightRect,
+        WithScaledAlpha(scene.eyeFill, scene.eyeHighlightAlpha, layer.highlightAlphaScale),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.rightHighlightRect,
+        WithScaledAlpha(scene.eyeFill, scene.eyeHighlightAlpha, layer.highlightAlphaScale),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.noseRect,
+        WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.mouthAlphaScale),
+        WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.mouthAlphaScale),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.leftBlushRect,
+        WithScaledAlpha(scene.blushFill, scene.blushFill.GetA(), layer.blushAlphaScale),
+        WithScaledAlpha(scene.blushFill, scene.blushFill.GetA(), layer.blushAlphaScale),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.rightBlushRect,
+        WithScaledAlpha(scene.blushFill, scene.blushFill.GetA(), layer.blushAlphaScale),
+        WithScaledAlpha(scene.blushFill, scene.blushFill.GetA(), layer.blushAlphaScale),
+        0.0f);
+    {
+        Gdiplus::Pen whiskerPen(
+            WithScaledAlpha(scene.mouthFill, 210.0f, layer.mouthAlphaScale),
+            scene.whiskerStrokeWidth * layer.whiskerStrokeScale);
+        whiskerPen.SetStartCap(Gdiplus::LineCapRound);
+        whiskerPen.SetEndCap(Gdiplus::LineCapRound);
+        for (size_t i = 0; i < layer.leftWhiskerStart.size(); ++i) {
+            graphics->DrawLine(&whiskerPen, layer.leftWhiskerStart[i], layer.leftWhiskerEnd[i]);
+            graphics->DrawLine(&whiskerPen, layer.rightWhiskerStart[i], layer.rightWhiskerEnd[i]);
+        }
+    }
+    {
+        Gdiplus::Pen mouthPen(
+            WithScaledAlpha(scene.mouthFill, scene.mouthFill.GetA(), layer.mouthAlphaScale),
+            scene.mouthStrokeWidth);
+        mouthPen.SetStartCap(Gdiplus::LineCapRound);
+        mouthPen.SetEndCap(Gdiplus::LineCapRound);
+        graphics->DrawArc(
+            &mouthPen,
+            layer.mouthRect,
+            layer.mouthStartDeg,
+            layer.mouthSweepDeg);
+    }
+}
+
 } // namespace
 
 void Win32MouseCompanionRealRendererPainter::Paint(
@@ -578,6 +665,7 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     graphics->FillEllipse(&shadowBrush, scene.shadowRect);
     DrawModelSceneGraph(graphics, scene);
     DrawModelProxyLayer(graphics, scene);
+    DrawModelProxyDetailLayer(graphics, scene);
     DrawModelProxyAdornmentLayer(graphics, scene);
     DrawModelProxyActionLayer(graphics, scene.modelProxyActionLayer);
     DrawActionOverlay(graphics, scene.actionOverlay, scene.bodyStroke);
