@@ -297,6 +297,9 @@ struct Win32MouseCompanionRealRendererScene final {
     float previewBodyAlphaScale{1.0f};
     float previewHeadAlphaScale{1.0f};
     float previewAppendageAlphaScale{1.0f};
+    float previewTailAlphaScale{1.0f};
+    float previewHandAlphaScale{1.0f};
+    float previewLegAlphaScale{1.0f};
     float previewDetailAlphaScale{1.0f};
     float previewAdornmentAlphaScale{1.0f};
     float proxyDominance{0.0f};

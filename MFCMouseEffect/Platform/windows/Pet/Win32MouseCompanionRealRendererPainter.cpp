@@ -945,36 +945,41 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         WithAlpha(scene.pedestalFill, scene.pedestalFill.GetA() * scene.pedestalAlphaScale),
         WithAlpha(scene.pedestalFill, scene.pedestalFill.GetA() * scene.pedestalAlphaScale),
         0.0f);
-    FillEllipse(graphics, scene.tailRect, scene.tailFill, scene.bodyStroke, scene.tailStrokeWidth);
+    FillEllipse(
+        graphics,
+        scene.tailRect,
+        WithScaledAlpha(scene.tailFill, scene.tailFill.GetA(), scene.previewTailAlphaScale),
+        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewTailAlphaScale),
+        scene.tailStrokeWidth);
     FillEllipse(
         graphics,
         scene.tailRootCuffRect,
-        scene.tailFillRear,
+        WithScaledAlpha(scene.tailFillRear, scene.tailFillRear.GetA(), scene.previewTailAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.tailBridgeRect,
-        scene.tailMidFill,
+        WithScaledAlpha(scene.tailMidFill, scene.tailMidFill.GetA(), scene.previewTailAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.tailMidContourRect,
-        scene.tailMidFill,
+        WithScaledAlpha(scene.tailMidFill, scene.tailMidFill.GetA(), scene.previewTailAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.tailTipBridgeRect,
-        scene.tailTipFill,
+        WithScaledAlpha(scene.tailTipFill, scene.tailTipFill.GetA(), scene.previewTailAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.tailTipRect,
-        scene.tailTipFill,
-        scene.tailStroke,
+        WithScaledAlpha(scene.tailTipFill, scene.tailTipFill.GetA(), scene.previewTailAlphaScale),
+        WithScaledAlpha(scene.tailStroke, scene.tailStroke.GetA(), scene.previewTailAlphaScale),
         std::max(0.9f, scene.tailStrokeWidth - 0.2f));
     FillEllipse(
         graphics,
@@ -1048,61 +1053,61 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     FillRoundedRect(
         graphics,
         scene.leftLegRect,
-        WithScaledAlpha(scene.bodyFillRear, scene.bodyFillRear.GetA(), scene.previewAppendageAlphaScale),
-        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, scene.bodyFillRear.GetA(), scene.previewLegAlphaScale),
+        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewLegAlphaScale),
         scene.limbStrokeWidth);
     FillRoundedRect(
         graphics,
         scene.rightLegRect,
-        WithScaledAlpha(scene.bodyFillRear, scene.bodyFillRear.GetA(), scene.previewAppendageAlphaScale),
-        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, scene.bodyFillRear.GetA(), scene.previewLegAlphaScale),
+        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewLegAlphaScale),
         scene.limbStrokeWidth);
     FillEllipse(
         graphics,
         scene.leftLegSilhouetteBridgeRect,
-        WithScaledAlpha(scene.bodyFillRear, 144.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, 144.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightLegSilhouetteBridgeRect,
-        WithScaledAlpha(scene.bodyFillRear, 144.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, 144.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.leftLegCadenceBridgeRect,
-        WithScaledAlpha(scene.bodyFillRear, 150.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, 150.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightLegCadenceBridgeRect,
-        WithScaledAlpha(scene.bodyFillRear, 150.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, 150.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.leftLegRootCuffRect,
-        WithScaledAlpha(scene.bodyFillRear, 156.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, 156.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightLegRootCuffRect,
-        WithScaledAlpha(scene.bodyFillRear, 156.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.bodyFillRear, 156.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.leftLegPadRect,
-        WithScaledAlpha(scene.blushFill, 196.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.blushFill, 196.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightLegPadRect,
-        WithScaledAlpha(scene.blushFill, 196.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.blushFill, 196.0f, scene.previewLegAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
 
@@ -1234,54 +1239,64 @@ void Win32MouseCompanionRealRendererPainter::Paint(
         0.0f);
     graphics->Restore(saved);
 
-    FillRoundedRect(graphics, scene.leftHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
-    FillRoundedRect(graphics, scene.rightHandRect, scene.headFillRear, scene.bodyStroke, scene.limbStrokeWidth);
+    FillRoundedRect(
+        graphics,
+        scene.leftHandRect,
+        WithScaledAlpha(scene.headFillRear, scene.headFillRear.GetA(), scene.previewHandAlphaScale),
+        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewHandAlphaScale),
+        scene.limbStrokeWidth);
+    FillRoundedRect(
+        graphics,
+        scene.rightHandRect,
+        WithScaledAlpha(scene.headFillRear, scene.headFillRear.GetA(), scene.previewHandAlphaScale),
+        WithScaledAlpha(scene.bodyStroke, scene.bodyStroke.GetA(), scene.previewHandAlphaScale),
+        scene.limbStrokeWidth);
     FillEllipse(
         graphics,
         scene.leftHandSilhouetteBridgeRect,
-        WithAlpha(scene.headFillRear, 150.0f),
+        WithScaledAlpha(scene.headFillRear, 150.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightHandSilhouetteBridgeRect,
-        WithAlpha(scene.headFillRear, 150.0f),
+        WithScaledAlpha(scene.headFillRear, 150.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.leftHandCadenceBridgeRect,
-        WithAlpha(scene.headFillRear, 158.0f),
+        WithScaledAlpha(scene.headFillRear, 158.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightHandCadenceBridgeRect,
-        WithAlpha(scene.headFillRear, 158.0f),
+        WithScaledAlpha(scene.headFillRear, 158.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.leftHandRootCuffRect,
-        WithAlpha(scene.headFillRear, 166.0f),
+        WithScaledAlpha(scene.headFillRear, 166.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightHandRootCuffRect,
-        WithAlpha(scene.headFillRear, 166.0f),
+        WithScaledAlpha(scene.headFillRear, 166.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.leftHandPadRect,
-        WithScaledAlpha(scene.blushFill, 206.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.blushFill, 206.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
         graphics,
         scene.rightHandPadRect,
-        WithScaledAlpha(scene.blushFill, 206.0f, scene.previewAppendageAlphaScale),
+        WithScaledAlpha(scene.blushFill, 206.0f, scene.previewHandAlphaScale),
         Gdiplus::Color(0, 0, 0, 0),
         0.0f);
     FillEllipse(
