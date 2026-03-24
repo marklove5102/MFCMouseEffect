@@ -5,6 +5,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererScene.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace mousefx::windows {
 namespace {

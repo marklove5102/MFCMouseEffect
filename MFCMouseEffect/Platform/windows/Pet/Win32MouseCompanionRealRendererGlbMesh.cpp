@@ -8,7 +8,8 @@
 #include <cstring>
 #include <fstream>
 #include <limits>
-#include <nlohmann/json.hpp>
+
+#include "MouseFx/ThirdParty/json.hpp"
 
 namespace mousefx::windows {
 namespace {
