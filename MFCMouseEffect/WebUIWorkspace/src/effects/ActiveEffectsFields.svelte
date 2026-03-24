@@ -6,6 +6,8 @@
   export let scrollOptions = [];
   export let holdOptions = [];
   export let hoverOptions = [];
+  export let cursorDecorationOptions = [];
+  export let cursorDecoration = {};
   export let effectCapabilities = {};
   export let active = {};
   export let effectsProfile = {};
@@ -35,15 +37,35 @@
     };
   }
 
+  function normalizeCursorDecoration(input) {
+    const value = input || {};
+    return {
+      enabled: value.enabled === true,
+      plugin_id: `${value.plugin_id || 'ring'}`.trim() || 'ring',
+      color_hex: `${value.color_hex || '#ff5a5a'}`.trim() || '#ff5a5a',
+      size_px: Number.isFinite(Number(value.size_px)) ? Number(value.size_px) : 22,
+      alpha_percent: Number.isFinite(Number(value.alpha_percent)) ? Number(value.alpha_percent) : 82,
+    };
+  }
+
+  function normalizeCursorDecorationChannelValue(input) {
+    const value = normalizeCursorDecoration(input);
+    return value.enabled ? value.plugin_id : '__disabled__';
+  }
+
   function isSupported(key) {
     const value = effectCapabilities || {};
     return value[key] !== false;
   }
 
   const effectKeys = ['click', 'trail', 'scroll', 'hold', 'hover'];
+  const cursorDecorationDisabledOption = { value: '__disabled__', label: 'Disabled' };
   $: unsupportedEffects = effectKeys.filter((key) => !isSupported(key));
   $: hasEffectsProfile = !!effectsProfile && typeof effectsProfile === 'object' && Object.keys(effectsProfile).length > 0;
   $: effectsProfileText = hasEffectsProfile ? JSON.stringify(effectsProfile, null, 2) : '';
+  $: normalizedCursorDecoration = normalizeCursorDecoration(cursorDecoration);
+  $: decorationChannelValue = normalizeCursorDecorationChannelValue(normalizedCursorDecoration);
+  $: decorationChannelOptions = [cursorDecorationDisabledOption, ...(cursorDecorationOptions || [])];
 
   async function copyEffectsProfile() {
     if (!effectsProfileText) {
@@ -60,13 +82,41 @@
 
   let form = normalizeActive(active);
   let lastActiveRef = active;
+  let lastCursorDecorationRef = cursorDecoration;
 
   $: if (active !== lastActiveRef) {
     lastActiveRef = active;
     form = normalizeActive(active);
   }
 
-  $: dispatch('change', toSnapshot(form));
+  $: if (cursorDecoration !== lastCursorDecorationRef) {
+    lastCursorDecorationRef = cursorDecoration;
+    decorationChannelValue = normalizeCursorDecorationChannelValue(cursorDecoration);
+  }
+
+  function handleDecorationChannelChange(nextValue) {
+    const normalizedValue = `${nextValue || ''}`.trim();
+    const nextDecoration =
+      normalizedValue && normalizedValue !== '__disabled__'
+        ? {
+            ...normalizedCursorDecoration,
+            enabled: true,
+            plugin_id: normalizedValue,
+          }
+        : {
+            ...normalizedCursorDecoration,
+            enabled: false,
+          };
+    dispatch('change', {
+      active: toSnapshot(form),
+      cursor_decoration: nextDecoration,
+    });
+  }
+
+  $: dispatch('change', {
+    active: toSnapshot(form),
+    cursor_decoration: normalizedCursorDecoration,
+  });
 </script>
 
 <div class="grid">
@@ -105,11 +155,25 @@
     {/each}
   </select>
 
+  <label for="cursor_decoration_channel" data-i18n="section_cursor_decoration">Cursor Decoration</label>
+  <select
+    id="cursor_decoration_channel"
+    bind:value={decorationChannelValue}
+    on:change={(event) => handleDecorationChannelChange(event.currentTarget?.value)}>
+    {#each decorationChannelOptions as option}
+      <option value={option.value}>{option.label}</option>
+    {/each}
+  </select>
+
   {#if unsupportedEffects.length > 0}
     <div class="hint span2" data-i18n="hint_effect_capability_limited">
       Some effect categories are unavailable on this platform and have been disabled.
     </div>
   {/if}
+
+  <div class="hint span2" data-i18n="hint_cursor_decoration_channel">
+    Cursor decoration is the sixth additive built-in lane. Use the plugin tab below for color, size, and opacity.
+  </div>
 </div>
 
 {#if showEffectsProfile && hasEffectsProfile}

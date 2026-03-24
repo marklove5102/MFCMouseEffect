@@ -27,6 +27,7 @@ public:
     void OnClick(const ClickEvent& ev) override;
     void OnScroll(const ScrollEvent& ev) override;
     void OnKey(const KeyEvent& ev) override;
+    void OnMove(const ScreenPoint& pt) override;
     bool ReadDebugState(InputIndicatorDebugState* outState) const override;
     bool RunMouseLabelProbe(std::vector<std::string>* outAppliedLabels) override;
     bool RunKeyboardLabelProbe(std::vector<std::string>* outAppliedLabels) override;
@@ -53,6 +54,9 @@ private:
     InputIndicatorKeyStreakState keyStreakState_{};
 
     void* panel_ = nullptr;
+    void* decorationPanel_ = nullptr;
+    ScreenPoint cursorPoint_{};
+    bool hasCursorPoint_ = false;
 };
 
 } // namespace mousefx

@@ -29,8 +29,13 @@
   - uses the existing `Win32InputIndicatorOverlay`
   - keeps event indicator and cursor decoration as separate layered windows inside the same overlay implementation
   - built-in decoration rendering lives in `MouseFx/Renderers/Indicator/CursorDecorationRenderer.*`
+- macOS:
+  - uses the existing `MacosInputIndicatorOverlay`
+  - keeps event indicator and cursor decoration as separate retained Swift panels inside the same overlay implementation
+  - built-in decoration rendering lives in `Platform/macos/Overlay/MacosCursorDecorationBridge.swift`
 - Web settings:
-  - separate top-level card: `Cursor Decoration`
+  - `Cursor Effects -> Effect Channel` now exposes `cursor_decoration` as the sixth built-in lane
+  - `Cursor Effects -> Effect Plugins` now includes a `Cursor Decoration` card for color/size/opacity and plugin selection
   - read/write path still merges back into `input_indicator.cursor_decoration`
 
 ## Guardrails

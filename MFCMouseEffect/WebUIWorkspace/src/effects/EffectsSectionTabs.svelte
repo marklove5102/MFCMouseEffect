@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import ActiveEffectsFields from "./ActiveEffectsFields.svelte";
+  import CursorDecorationFields from "../cursor-decoration/CursorDecorationFields.svelte";
   import EffectSizeFields from "./EffectSizeFields.svelte";
   import EffectConflictPolicyFields from "./EffectConflictPolicyFields.svelte";
   import EffectsBlacklistFields from "./EffectsBlacklistFields.svelte";
@@ -42,6 +43,8 @@
 
   let selectedTab = normalizeTab(activeTab);
   let lastActiveTabProp = activeTab;
+  let localCursorDecoration = {};
+  let lastCursorDecorationProp = null;
 
   // Sync local UI state only when parent prop actually changes.
   $: if (activeTab !== lastActiveTabProp) {
@@ -65,7 +68,19 @@
   $: isPluginTab = selectedTab === TAB_PLUGIN;
 
   function handleActiveEffectChange(event) {
-    dispatch("activeChange", event?.detail || {});
+    const detail = event?.detail || {};
+    if (detail.cursor_decoration) {
+      localCursorDecoration = detail.cursor_decoration;
+    }
+    dispatch("activeChange", {
+      ...detail,
+      cursor_decoration: localCursorDecoration,
+    });
+  }
+
+  function handleCursorDecorationChange(event) {
+    localCursorDecoration = event?.detail || {};
+    dispatch("cursorDecorationChange", localCursorDecoration);
   }
 
   function handleSizeScaleChange(event) {
@@ -88,6 +103,8 @@
       scrollOptions: value.scrollOptions || [],
       holdOptions: value.holdOptions || [],
       hoverOptions: value.hoverOptions || [],
+      cursorDecorationOptions: value.cursorDecorationOptions || [],
+      cursorDecoration: value.cursorDecoration || {},
       effectCapabilities: value.effectCapabilities || {},
       active: value.active || {},
       effectsProfile: value.effectsProfile || {},
@@ -101,6 +118,10 @@
   }
 
   $: normalizedEffectProps = normalizeEffectProps(effectProps);
+  $: if (normalizedEffectProps.cursorDecoration !== lastCursorDecorationProp) {
+    lastCursorDecorationProp = normalizedEffectProps.cursorDecoration;
+    localCursorDecoration = normalizedEffectProps.cursorDecoration || {};
+  }
 </script>
 
 <div class="effects-subtabs">
@@ -200,6 +221,8 @@
       scrollOptions={normalizedEffectProps.scrollOptions}
       holdOptions={normalizedEffectProps.holdOptions}
       hoverOptions={normalizedEffectProps.hoverOptions}
+      cursorDecorationOptions={normalizedEffectProps.cursorDecorationOptions}
+      cursorDecoration={localCursorDecoration}
       effectCapabilities={normalizedEffectProps.effectCapabilities}
       active={normalizedEffectProps.active}
       effectsProfile={normalizedEffectProps.effectsProfile}
@@ -270,7 +293,22 @@
     style:display={isPluginTab ? "" : "none"}
     aria-label="effect-plugin"
   >
-    <div id="wasm_settings_mount"></div>
+    <div class="effects-plugin-stack">
+      <section class="effects-plugin-card">
+        <div class="effects-plugin-title" data-i18n="section_cursor_decoration">Cursor Decoration</div>
+        <div class="effects-plugin-desc" data-i18n="desc_cursor_decoration">
+          Attach a persistent cursor decorator plugin such as a ring, orb, or meteor head.
+        </div>
+        <CursorDecorationFields
+          pluginOptions={normalizedEffectProps.cursorDecorationOptions}
+          decoration={localCursorDecoration}
+          on:change={handleCursorDecorationChange}
+        />
+      </section>
+      <section class="effects-plugin-card">
+        <div id="wasm_settings_mount"></div>
+      </section>
+    </div>
   </div>
 </div>
 
@@ -278,6 +316,32 @@
   .effects-subtabs {
     display: grid;
     gap: 14px;
+  }
+
+  .effects-plugin-stack {
+    display: grid;
+    gap: 16px;
+  }
+
+  .effects-plugin-card {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid rgba(160, 185, 215, 0.3);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .effects-plugin-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(20, 42, 72, 0.92);
+  }
+
+  .effects-plugin-desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(46, 68, 98, 0.74);
   }
 
   .effects-subtabs-bar {

@@ -40,10 +40,6 @@
     return window.MfxSettingsInputIndicator || null;
   }
 
-  function cursorDecorationSection() {
-    return window.MfxCursorDecorationSection || null;
-  }
-
   function clearMouseCompanionRenderTimer() {
     if (!state.mouseCompanionRenderTimer) {
       return;
@@ -425,18 +421,11 @@
     renderText(appState);
     renderTrail(appState);
     const indicator = inputIndicatorModule();
-    const cursorDecoration = cursorDecorationSection();
     if (indicator && typeof indicator.renderInputIndicator === 'function') {
       indicator.renderInputIndicator(schema, appState, texts, wasmAction, {
         fillSelect,
         setChecked,
         setNum,
-      });
-    }
-    if (cursorDecoration && typeof cursorDecoration.render === 'function') {
-      cursorDecoration.render({
-        schema,
-        decoration: appState.cursor_decoration || {},
       });
     }
     renderWasm(schema, appState, texts, wasmAction, wasmStatus);
@@ -524,7 +513,6 @@
       };
 
     const indicator = inputIndicatorModule();
-    const cursorDecoration = cursorDecorationSection();
     const indicatorState = (indicator && typeof indicator.readInputIndicatorState === 'function')
       ? indicator.readInputIndicatorState(schema, {
         getChecked,
@@ -549,16 +537,13 @@
         size_px: getNum('ii_size_px'),
         duration_ms: getNum('ii_duration_ms'),
       };
-    const cursorDecorationState = (cursorDecoration && typeof cursorDecoration.read === 'function')
-      ? cursorDecoration.read()
-      : {
-        enabled: false,
-        plugin_id: 'ring',
-        color_hex: '#ff5a5a',
-        size_px: 22,
-        alpha_percent: 82,
-      };
-    indicatorState.cursor_decoration = cursorDecorationState;
+    indicatorState.cursor_decoration = effectsState?.cursor_decoration || {
+      enabled: false,
+      plugin_id: 'ring',
+      color_hex: '#ff5a5a',
+      size_px: 22,
+      alpha_percent: 82,
+    };
     const mouseCompanionState = (companion && typeof companion.read === 'function')
       ? companion.read()
       : {

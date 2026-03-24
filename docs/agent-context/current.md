@@ -8,7 +8,6 @@
 - Primary host: macOS.
 - Delivery order: macOS first, Windows regression-free, Linux compile/contract-level.
 - macOS stack rule: new capability modules are Swift-first; avoid expanding `.mm` for large new modules.
-- Windows VS2026 direct project build should stay healthy; any remaining `MFCMouseEffect.slnx` `ValidateSolutionConfiguration` issue is solution-metadata work, not a C++ compile regression.
 - Cross-machine workflow: macOS is the development source, Windows is the synced validation workspace via `Syncthing`, and Windows handoff should default to `F:\language\cpp\code\MFCMouseEffect`.
 
 ## Active Product Goals
@@ -21,7 +20,7 @@
 
 ### Visual Effects / WASM
 - `click / trail / scroll / hold / hover` are active in `core`.
-- New additive lane `cursor_decoration` is active through the existing input-indicator overlay seam; current built-in decoration plugin ids are `ring`, `orb`, and `meteor_head`, and the lane is configured from the dedicated `Cursor Decoration` WebUI card while persisting under `input_indicator.cursor_decoration`.
+- New additive lane `cursor_decoration` is active through the existing input-indicator overlay seam; current built-in decoration plugin ids are `ring`, `orb`, and `meteor_head`, and the lane now appears under `Cursor Effects` as the sixth built-in channel plus an `Effect Plugins -> Cursor Decoration` card while still persisting under `input_indicator.cursor_decoration`.
 - Shared command tail (`blend_mode / sort_key / group_id`) is active.
 - Group-retained model is active; transform/material/pass remain host-owned.
 - Windows blacklist routing root fix is active: pointer suppression resolves the process at the current screen point first, and trail synthetic-follow is limited to a short post-input smoothing window.
@@ -29,9 +28,10 @@
 
 ### Input Indicator
 - macOS/Windows label and streak semantics are aligned (`L xN`, `W+ xN`); indicator wasm dispatch has dedicated lanes, auto-inferred surface loading, immediate runtime sync on apply, and clean native fallback on missing/stale manifests.
+- macOS cursor-decoration visibility is now native too: `MacosInputIndicatorOverlay::OnMove(...)` drives a retained Swift decoration panel, so `ring / orb / meteor_head` now visibly follow the cursor head on mac instead of being Windows-only.
 
 ### Plugin Management / WebUI
-- Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Cursor Decoration -> Automation Mapping -> Plugin Management`
+- Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
 - WebUI apply flow is backend-state-driven (`post-apply reconcile + refresh`).
 - Settings launch lifecycle is shared through `WebSettingsLaunchCoordinator`; platform shells still keep their own `OpenUrlUtf8(...)`.
 - `WebSettingsLaunchCoordinator` destructor must stay out-of-line while `WebSettingsServer` is forward-declared, otherwise libc++/clang host builds can fail on incomplete-type `unique_ptr` destruction.
