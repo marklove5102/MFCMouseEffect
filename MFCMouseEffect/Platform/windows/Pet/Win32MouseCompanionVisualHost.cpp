@@ -420,6 +420,18 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeModelAssetNodeDriveDriveBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeDriveValueBrief =
         rendererRuntime.sceneRuntimeModelAssetNodeDriveValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMountState =
+        rendererRuntime.sceneRuntimeModelAssetNodeMountState;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMountEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeMountEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMountResolvedEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeMountResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMountBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeMountBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMountMountBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeMountMountBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMountValueBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeMountValueBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelNodeSlotState =
         rendererRuntime.sceneRuntimeModelNodeSlotState;
     diagnostics.rendererRuntime.sceneRuntimeModelNodeSlotCount =
@@ -442,6 +454,18 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeModelNodeRegistryAssetNodeBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelNodeRegistryWeightBrief =
         rendererRuntime.sceneRuntimeModelNodeRegistryWeightBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRouteState =
+        rendererRuntime.sceneRuntimeModelAssetNodeRouteState;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRouteEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeRouteEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRouteResolvedEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeRouteResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRouteBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeRouteBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRouteRouteBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeRouteRouteBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRouteValueBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeRouteValueBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeBindingState =
         rendererRuntime.sceneRuntimeAssetNodeBindingState;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeBindingEntryCount =

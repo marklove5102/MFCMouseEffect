@@ -658,6 +658,20 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeModelAssetNodeMountBrief = if ($null -ne $preview) {
+        $existingModelAssetNodeMountBrief = [string]$preview.scene_runtime_model_asset_node_mount_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelAssetNodeMountBrief)) {
+            $existingModelAssetNodeMountBrief
+        } else {
+            $state = [string]$preview.scene_runtime_model_asset_node_mount_state
+            if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+            $entryCount = [int]([string]$preview.scene_runtime_model_asset_node_mount_entry_count)
+            $resolved = [int]([string]$preview.scene_runtime_model_asset_node_mount_resolved_entry_count)
+            "{0}/{1}/{2}" -f $state, $entryCount, $resolved
+        }
+    } else {
+        ""
+    }
     $runtimeModelNodeGraphBrief = if ($null -ne $preview) {
         $existingModelNodeGraphBrief = [string]$preview.scene_runtime_model_node_graph_brief
         if (-not [string]::IsNullOrWhiteSpace($existingModelNodeGraphBrief)) {
@@ -694,6 +708,20 @@ function New-LaneSummary(
             $existingModelNodeRegistryBrief
         } else {
             "preview_only/0/0"
+        }
+    } else {
+        ""
+    }
+    $runtimeModelAssetNodeRouteBrief = if ($null -ne $preview) {
+        $existingModelAssetNodeRouteBrief = [string]$preview.scene_runtime_model_asset_node_route_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelAssetNodeRouteBrief)) {
+            $existingModelAssetNodeRouteBrief
+        } else {
+            $state = [string]$preview.scene_runtime_model_asset_node_route_state
+            if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+            $entryCount = [int]([string]$preview.scene_runtime_model_asset_node_route_entry_count)
+            $resolved = [int]([string]$preview.scene_runtime_model_asset_node_route_resolved_entry_count)
+            "{0}/{1}/{2}" -f $state, $entryCount, $resolved
         }
     } else {
         ""
@@ -1247,8 +1275,10 @@ function New-LaneSummary(
         runtime_model_asset_node_bind_brief = $runtimeModelAssetNodeBindBrief
         runtime_model_asset_node_resolve_brief = $runtimeModelAssetNodeResolveBrief
         runtime_model_asset_node_drive_brief = $runtimeModelAssetNodeDriveBrief
+        runtime_model_asset_node_mount_brief = $runtimeModelAssetNodeMountBrief
         runtime_model_node_graph_brief = $runtimeModelNodeGraphBrief
         runtime_model_node_binding_brief = $runtimeModelNodeBindingBrief
+        runtime_model_asset_node_route_brief = $runtimeModelAssetNodeRouteBrief
         runtime_model_node_slot_brief = $runtimeModelNodeSlotBrief
         runtime_model_node_registry_brief = $runtimeModelNodeRegistryBrief
         runtime_asset_node_binding_brief = $runtimeAssetNodeBindingBrief

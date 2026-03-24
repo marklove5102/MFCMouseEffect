@@ -345,6 +345,15 @@ public:
             "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
         std::string rendererRuntimeSceneRuntimeModelAssetNodeDriveValueBrief{
             "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeMountState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeMountEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeMountResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeMountBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeMountMountBrief{
+            "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeMountValueBrief{
+            "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeModelNodeSlotState{"preview_only"};
         uint32_t rendererRuntimeSceneRuntimeModelNodeSlotCount{0};
         uint32_t rendererRuntimeSceneRuntimeModelNodeReadySlotCount{0};
@@ -359,6 +368,15 @@ public:
             "body:asset.body.root|head:asset.head.anchor|appendage:asset.appendage.anchor|overlay:asset.overlay.anchor|grounding:asset.grounding.anchor"};
         std::string rendererRuntimeSceneRuntimeModelNodeRegistryWeightBrief{
             "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeRouteState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeRouteEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeRouteResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeRouteBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeRouteRouteBrief{
+            "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeRouteValueBrief{
+            "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeAssetNodeBindingState{"preview_only"};
         uint32_t rendererRuntimeSceneRuntimeAssetNodeBindingEntryCount{0};
         uint32_t rendererRuntimeSceneRuntimeAssetNodeBindingResolvedEntryCount{0};

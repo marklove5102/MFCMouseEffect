@@ -200,6 +200,12 @@ export function getMouseCompanionSectionMarkup() {
         <label>Model Node Drive</label>
         <output id="mc_runtime_scene_runtime_model_asset_node_drive_drive_brief">-</output>
 
+        <label>Model Asset Node Mount</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_mount_brief">-</output>
+
+        <label>Model Node Mount</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_mount_mount_brief">-</output>
+
         <label>Model Node Slots</label>
         <output id="mc_runtime_scene_runtime_model_node_slot_brief">-</output>
 
@@ -220,6 +226,12 @@ export function getMouseCompanionSectionMarkup() {
 
         <label>Registry Weights</label>
         <output id="mc_runtime_scene_runtime_model_node_registry_weight_brief">-</output>
+
+        <label>Model Asset Node Route</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_route_brief">-</output>
+
+        <label>Model Node Route</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_route_route_brief">-</output>
 
         <label>Asset Node Binding</label>
         <output id="mc_runtime_scene_runtime_asset_node_binding_brief">-</output>

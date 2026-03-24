@@ -881,6 +881,20 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_mount_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_mount_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_mount_mount_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_mount_mount_brief,
+      'body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_model_node_slot_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_node_slot_brief, 'preview_only/0/0'),
   );
@@ -915,6 +929,20 @@ function writeRuntimeDiagnostics(runtimeState) {
     normalizeRuntimeText(
       runtimeState.renderer_runtime_scene_runtime_model_node_registry_weight_brief,
       'body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_route_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_route_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_route_route_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_route_route_brief,
+      'body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only',
     ),
   );
   writeTextValue(

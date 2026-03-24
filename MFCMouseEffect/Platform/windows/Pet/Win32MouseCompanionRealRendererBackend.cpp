@@ -68,7 +68,9 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeBindProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeDriveProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeLiftProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeMountProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeResolveProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeRouteProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneBindingProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneHookProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSourceProfile.h"
@@ -244,6 +246,16 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeDriveProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetNodeDriveProfile(
         modelAssetNodeDriveProfile,
+        scene);
+    const auto modelAssetNodeMountProfile =
+        sceneRuntime.modelAssetNodeMountProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetNodeMountProfile(
+        modelAssetNodeMountProfile,
+        scene);
+    const auto modelAssetNodeRouteProfile =
+        sceneRuntime.modelAssetNodeRouteProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetNodeRouteProfile(
+        modelAssetNodeRouteProfile,
         scene);
     const auto poseResolverProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseResolverProfile(
@@ -768,6 +780,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
         modelAssetNodeDriveProfile.driveBrief;
     diagnostics.sceneRuntimeModelAssetNodeDriveValueBrief =
         modelAssetNodeDriveProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMountState =
+        modelAssetNodeMountProfile.mountState;
+    diagnostics.sceneRuntimeModelAssetNodeMountEntryCount =
+        modelAssetNodeMountProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetNodeMountResolvedEntryCount =
+        modelAssetNodeMountProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeMountBrief =
+        modelAssetNodeMountProfile.brief;
+    diagnostics.sceneRuntimeModelAssetNodeMountMountBrief =
+        modelAssetNodeMountProfile.mountBrief;
+    diagnostics.sceneRuntimeModelAssetNodeMountValueBrief =
+        modelAssetNodeMountProfile.valueBrief;
     diagnostics.sceneRuntimeModelNodeSlotState =
         sceneRuntime.modelNodeSlotProfile.slotState;
     diagnostics.sceneRuntimeModelNodeSlotCount =
@@ -790,6 +814,18 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelNodeRegistryProfile.assetNodeBrief;
     diagnostics.sceneRuntimeModelNodeRegistryWeightBrief =
         sceneRuntime.modelNodeRegistryProfile.weightBrief;
+    diagnostics.sceneRuntimeModelAssetNodeRouteState =
+        modelAssetNodeRouteProfile.routeState;
+    diagnostics.sceneRuntimeModelAssetNodeRouteEntryCount =
+        modelAssetNodeRouteProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetNodeRouteResolvedEntryCount =
+        modelAssetNodeRouteProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeRouteBrief =
+        modelAssetNodeRouteProfile.brief;
+    diagnostics.sceneRuntimeModelAssetNodeRouteRouteBrief =
+        modelAssetNodeRouteProfile.routeBrief;
+    diagnostics.sceneRuntimeModelAssetNodeRouteValueBrief =
+        modelAssetNodeRouteProfile.valueBrief;
     diagnostics.sceneRuntimeAssetNodeBindingState =
         sceneRuntime.assetNodeBindingProfile.bindingState;
     diagnostics.sceneRuntimeAssetNodeBindingEntryCount =

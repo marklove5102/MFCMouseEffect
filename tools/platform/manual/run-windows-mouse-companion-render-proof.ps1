@@ -767,6 +767,48 @@ function Add-ModelAssetNodeDriveSummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_model_asset_node_drive_brief" -NotePropertyValue $brief
 }
 
+function Format-ModelAssetNodeMountSummary($Node) {
+    if ($null -eq $Node) { return "" }
+    $existing = [string]$Node.scene_runtime_model_asset_node_mount_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) { return $existing }
+    $state = [string]$Node.scene_runtime_model_asset_node_mount_state
+    if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+    $entryCount = [int]([string]$Node.scene_runtime_model_asset_node_mount_entry_count)
+    $resolved = [int]([string]$Node.scene_runtime_model_asset_node_mount_resolved_entry_count)
+    return ("{0}/{1}/{2}" -f $state, $entryCount, $resolved)
+}
+
+function Add-ModelAssetNodeMountSummaryProperty($Node) {
+    if ($null -eq $Node) { return }
+    $brief = Format-ModelAssetNodeMountSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_model_asset_node_mount_brief").Count -gt 0) {
+        $Node.scene_runtime_model_asset_node_mount_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_model_asset_node_mount_brief" -NotePropertyValue $brief
+}
+
+function Format-ModelAssetNodeRouteSummary($Node) {
+    if ($null -eq $Node) { return "" }
+    $existing = [string]$Node.scene_runtime_model_asset_node_route_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) { return $existing }
+    $state = [string]$Node.scene_runtime_model_asset_node_route_state
+    if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+    $entryCount = [int]([string]$Node.scene_runtime_model_asset_node_route_entry_count)
+    $resolved = [int]([string]$Node.scene_runtime_model_asset_node_route_resolved_entry_count)
+    return ("{0}/{1}/{2}" -f $state, $entryCount, $resolved)
+}
+
+function Add-ModelAssetNodeRouteSummaryProperty($Node) {
+    if ($null -eq $Node) { return }
+    $brief = Format-ModelAssetNodeRouteSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_model_asset_node_route_brief").Count -gt 0) {
+        $Node.scene_runtime_model_asset_node_route_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_model_asset_node_route_brief" -NotePropertyValue $brief
+}
+
 function Format-ModelNodeAdapterSummary($Node) {
     if ($null -eq $Node) {
         return "preview_only/0.00"
@@ -2736,8 +2778,10 @@ if ($Route -eq "sweep") {
                 Add-ModelAssetNodeBindSummaryProperty $item.real_renderer_preview
                 Add-ModelAssetNodeResolveSummaryProperty $item.real_renderer_preview
                 Add-ModelAssetNodeDriveSummaryProperty $item.real_renderer_preview
+                Add-ModelAssetNodeMountSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeGraphSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeBindingSummaryProperty $item.real_renderer_preview
+                Add-ModelAssetNodeRouteSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeSlotSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeRegistrySummaryProperty $item.real_renderer_preview
                 Add-AssetNodeBindingSummaryProperty $item.real_renderer_preview
@@ -2816,8 +2860,10 @@ if ($Route -eq "sweep") {
                     Add-ModelAssetNodeBindSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelAssetNodeResolveSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelAssetNodeDriveSummaryProperty $item.proof.renderer_runtime_after
+                    Add-ModelAssetNodeMountSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeGraphSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeBindingSummaryProperty $item.proof.renderer_runtime_after
+                    Add-ModelAssetNodeRouteSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeSlotSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeRegistrySummaryProperty $item.proof.renderer_runtime_after
                     Add-AssetNodeBindingSummaryProperty $item.proof.renderer_runtime_after
@@ -2899,8 +2945,10 @@ if ($Route -eq "sweep") {
         Add-ModelAssetNodeBindSummaryProperty $response.real_renderer_preview
         Add-ModelAssetNodeResolveSummaryProperty $response.real_renderer_preview
         Add-ModelAssetNodeDriveSummaryProperty $response.real_renderer_preview
+        Add-ModelAssetNodeMountSummaryProperty $response.real_renderer_preview
         Add-ModelNodeGraphSummaryProperty $response.real_renderer_preview
         Add-ModelNodeBindingSummaryProperty $response.real_renderer_preview
+        Add-ModelAssetNodeRouteSummaryProperty $response.real_renderer_preview
         Add-ModelNodeSlotSummaryProperty $response.real_renderer_preview
         Add-ModelNodeRegistrySummaryProperty $response.real_renderer_preview
         Add-AssetNodeBindingSummaryProperty $response.real_renderer_preview
@@ -2978,8 +3026,10 @@ if ($Route -eq "sweep") {
         Add-ModelAssetNodeBindSummaryProperty $response.renderer_runtime_after
         Add-ModelAssetNodeResolveSummaryProperty $response.renderer_runtime_after
         Add-ModelAssetNodeDriveSummaryProperty $response.renderer_runtime_after
+        Add-ModelAssetNodeMountSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeGraphSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeBindingSummaryProperty $response.renderer_runtime_after
+        Add-ModelAssetNodeRouteSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeSlotSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeRegistrySummaryProperty $response.renderer_runtime_after
         Add-AssetNodeBindingSummaryProperty $response.renderer_runtime_after

@@ -190,6 +190,14 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
     std::string sceneRuntimeModelAssetNodeDriveValueBrief{
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
+    std::string sceneRuntimeModelAssetNodeMountState{"preview_only"};
+    uint32_t sceneRuntimeModelAssetNodeMountEntryCount{0};
+    uint32_t sceneRuntimeModelAssetNodeMountResolvedEntryCount{0};
+    std::string sceneRuntimeModelAssetNodeMountBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelAssetNodeMountMountBrief{
+        "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
+    std::string sceneRuntimeModelAssetNodeMountValueBrief{
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
     std::string sceneRuntimeModelNodeSlotState{"preview_only"};
     uint32_t sceneRuntimeModelNodeSlotCount{0};
     uint32_t sceneRuntimeModelNodeReadySlotCount{0};
@@ -204,6 +212,14 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:asset.body.root|head:asset.head.anchor|appendage:asset.appendage.anchor|overlay:asset.overlay.anchor|grounding:asset.grounding.anchor"};
     std::string sceneRuntimeModelNodeRegistryWeightBrief{
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00"};
+    std::string sceneRuntimeModelAssetNodeRouteState{"preview_only"};
+    uint32_t sceneRuntimeModelAssetNodeRouteEntryCount{0};
+    uint32_t sceneRuntimeModelAssetNodeRouteResolvedEntryCount{0};
+    std::string sceneRuntimeModelAssetNodeRouteBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelAssetNodeRouteRouteBrief{
+        "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only"};
+    std::string sceneRuntimeModelAssetNodeRouteValueBrief{
+        "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00"};
     std::string sceneRuntimeAssetNodeBindingState{"preview_only"};
     uint32_t sceneRuntimeAssetNodeBindingEntryCount{0};
     uint32_t sceneRuntimeAssetNodeBindingResolvedEntryCount{0};

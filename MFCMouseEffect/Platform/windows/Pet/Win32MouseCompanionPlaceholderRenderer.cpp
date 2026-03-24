@@ -295,6 +295,14 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only";
     diagnostics.sceneRuntimeModelAssetNodeDriveValueBrief =
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00";
+    diagnostics.sceneRuntimeModelAssetNodeMountState = "preview_only";
+    diagnostics.sceneRuntimeModelAssetNodeMountEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeMountResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeMountBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeModelAssetNodeMountMountBrief =
+        "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only";
+    diagnostics.sceneRuntimeModelAssetNodeMountValueBrief =
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00";
     diagnostics.sceneRuntimeModelNodeSlotState = "preview_only";
     diagnostics.sceneRuntimeModelNodeSlotCount = 0;
     diagnostics.sceneRuntimeModelNodeReadySlotCount = 0;
@@ -309,6 +317,14 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         "body:asset.body.root|head:asset.head.anchor|appendage:asset.appendage.anchor|overlay:asset.overlay.anchor|grounding:asset.grounding.anchor";
     diagnostics.sceneRuntimeModelNodeRegistryWeightBrief =
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00";
+    diagnostics.sceneRuntimeModelAssetNodeRouteState = "preview_only";
+    diagnostics.sceneRuntimeModelAssetNodeRouteEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeRouteResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeRouteBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeModelAssetNodeRouteRouteBrief =
+        "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only";
+    diagnostics.sceneRuntimeModelAssetNodeRouteValueBrief =
+        "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00";
     diagnostics.sceneRuntimeAssetNodeBindingState = "preview_only";
     diagnostics.sceneRuntimeAssetNodeBindingEntryCount = 0;
     diagnostics.sceneRuntimeAssetNodeBindingResolvedEntryCount = 0;
