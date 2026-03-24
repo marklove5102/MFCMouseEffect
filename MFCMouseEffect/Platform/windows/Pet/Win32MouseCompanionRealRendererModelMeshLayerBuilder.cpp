@@ -7,6 +7,11 @@
 namespace mousefx::windows {
 namespace {
 
+struct ProjectedMeshTriangle final {
+    Win32MouseCompanionRealRendererModelMeshTriangle triangle{};
+    float depth{0.0f};
+};
+
 Gdiplus::Color ResolveMeshFillColor(uint32_t materialIndex) {
     switch (materialIndex % 5U) {
     case 0U:
@@ -20,6 +25,19 @@ Gdiplus::Color ResolveMeshFillColor(uint32_t materialIndex) {
     default:
         return Gdiplus::Color(98, 255, 214, 168);
     }
+}
+
+Gdiplus::Color ScaleMeshColor(
+    const Gdiplus::Color& color,
+    float scale) {
+    const auto scaleChannel = [scale](BYTE value) -> BYTE {
+        return static_cast<BYTE>(std::clamp(static_cast<float>(value) * scale, 0.0f, 255.0f));
+    };
+    return Gdiplus::Color(
+        color.GetA(),
+        scaleChannel(color.GetR()),
+        scaleChannel(color.GetG()),
+        scaleChannel(color.GetB()));
 }
 
 Gdiplus::PointF ProjectMeshVertex(
@@ -62,17 +80,36 @@ void BuildWin32MouseCompanionRealRendererModelMeshLayer(
         fitWidth / (extentX + extentZ * 0.20f),
         fitHeight / (extentY + extentZ * 0.12f));
 
-    scene.modelMeshTriangles.reserve(mesh.triangles.size());
+    std::vector<ProjectedMeshTriangle> projectedTriangles;
+    projectedTriangles.reserve(mesh.triangles.size());
     for (const auto& triangle : mesh.triangles) {
-        scene.modelMeshTriangles.push_back(Win32MouseCompanionRealRendererModelMeshTriangle{
-            std::array<Gdiplus::PointF, 3>{
-                ProjectMeshVertex(triangle.vertices[0], mesh, scene, scale),
-                ProjectMeshVertex(triangle.vertices[1], mesh, scene, scale),
-                ProjectMeshVertex(triangle.vertices[2], mesh, scene, scale),
+        const float avgZ = (triangle.vertices[0].z + triangle.vertices[1].z + triangle.vertices[2].z) / 3.0f;
+        const float depthNorm = extentZ <= 1.0f ? 0.5f : std::clamp((avgZ - mesh.minZ) / extentZ, 0.0f, 1.0f);
+        const float shade = 0.70f + depthNorm * 0.42f;
+        projectedTriangles.push_back(ProjectedMeshTriangle{
+            Win32MouseCompanionRealRendererModelMeshTriangle{
+                std::array<Gdiplus::PointF, 3>{
+                    ProjectMeshVertex(triangle.vertices[0], mesh, scene, scale),
+                    ProjectMeshVertex(triangle.vertices[1], mesh, scene, scale),
+                    ProjectMeshVertex(triangle.vertices[2], mesh, scene, scale),
+                },
+                ScaleMeshColor(ResolveMeshFillColor(triangle.materialIndex), shade),
+                std::clamp(116.0f + depthNorm * 72.0f + scene.proxyDominance * 28.0f, 112.0f, 210.0f),
             },
-            ResolveMeshFillColor(triangle.materialIndex),
-            std::clamp(82.0f + scene.proxyDominance * 64.0f, 96.0f, 196.0f),
+            avgZ,
         });
+    }
+
+    std::sort(
+        projectedTriangles.begin(),
+        projectedTriangles.end(),
+        [](const ProjectedMeshTriangle& lhs, const ProjectedMeshTriangle& rhs) {
+            return lhs.depth < rhs.depth;
+        });
+
+    scene.modelMeshTriangles.reserve(projectedTriangles.size());
+    for (const auto& triangle : projectedTriangles) {
+        scene.modelMeshTriangles.push_back(triangle.triangle);
     }
 
     scene.modelMeshVisible = !scene.modelMeshTriangles.empty();

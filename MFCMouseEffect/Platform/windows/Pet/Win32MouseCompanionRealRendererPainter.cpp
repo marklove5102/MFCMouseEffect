@@ -949,7 +949,6 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     graphics->FillEllipse(&glowBrush, scene.glowRect);
     graphics->FillEllipse(&shadowBrush, scene.shadowRect);
     DrawModelSceneGraph(graphics, scene);
-    DrawModelMeshLayer(graphics, scene);
     DrawModelProxyLayer(graphics, scene);
     DrawModelProxyFrameLayer(graphics, scene);
     DrawModelProxyContourLayer(graphics, scene);
@@ -957,6 +956,7 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     DrawModelProxyDetailLayer(graphics, scene);
     DrawModelProxyAdornmentLayer(graphics, scene);
     DrawModelProxyActionLayer(graphics, scene.modelProxyActionLayer);
+    DrawModelMeshLayer(graphics, scene);
     DrawActionOverlay(graphics, scene.actionOverlay, scene.bodyStroke);
     FillRoundedRect(
         graphics,
