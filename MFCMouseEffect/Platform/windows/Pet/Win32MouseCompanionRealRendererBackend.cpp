@@ -60,7 +60,9 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetManifestProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetResidencyProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSessionProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetActivationProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetBindReadyProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSourceProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPainter.h"
@@ -169,6 +171,16 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetActivationProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetActivationProfile(
         modelAssetActivationProfile,
+        scene);
+    const auto modelAssetSessionProfile =
+        sceneRuntime.modelAssetSessionProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetSessionProfile(
+        modelAssetSessionProfile,
+        scene);
+    const auto modelAssetBindReadyProfile =
+        sceneRuntime.modelAssetBindReadyProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetBindReadyProfile(
+        modelAssetBindReadyProfile,
         scene);
     const auto resolverProfile = sceneRuntime.assetNodeResolverProfile;
     const auto parentSpaceProfile = sceneRuntime.assetNodeParentSpaceProfile;
@@ -558,6 +570,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         modelAssetActivationProfile.routeBrief;
     diagnostics.sceneRuntimeModelAssetActivationValueBrief =
         modelAssetActivationProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetSessionState =
+        modelAssetSessionProfile.sessionState;
+    diagnostics.sceneRuntimeModelAssetSessionEntryCount =
+        modelAssetSessionProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetSessionResolvedEntryCount =
+        modelAssetSessionProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetSessionBrief =
+        modelAssetSessionProfile.brief;
+    diagnostics.sceneRuntimeModelAssetSessionSessionBrief =
+        modelAssetSessionProfile.sessionBrief;
+    diagnostics.sceneRuntimeModelAssetSessionValueBrief =
+        modelAssetSessionProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetBindReadyState =
+        modelAssetBindReadyProfile.bindReadyState;
+    diagnostics.sceneRuntimeModelAssetBindReadyEntryCount =
+        modelAssetBindReadyProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetBindReadyResolvedEntryCount =
+        modelAssetBindReadyProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetBindReadyBrief =
+        modelAssetBindReadyProfile.brief;
+    diagnostics.sceneRuntimeModelAssetBindReadyBindingBrief =
+        modelAssetBindReadyProfile.bindingBrief;
+    diagnostics.sceneRuntimeModelAssetBindReadyValueBrief =
+        modelAssetBindReadyProfile.valueBrief;
     diagnostics.sceneRuntimeModelSceneAdapterState =
         sceneRuntime.modelSceneAdapterProfile.seamState;
     diagnostics.sceneRuntimeModelSceneSeamReadiness =

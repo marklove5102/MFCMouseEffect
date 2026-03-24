@@ -236,6 +236,24 @@ public:
             "action:idle|reactive:idle|follow:0|drag:0|hold:0|scroll:0|adapter:runtime_only"};
         std::string rendererRuntimeSceneRuntimeModelAssetActivationValueBrief{
             "action:0.00|reactive:0.00|motion:0.00|pose:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetSessionState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetSessionEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetSessionResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetSessionBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetSessionSessionBrief{
+            "action:idle|reactive:idle|follow:0|drag:0|hold:0|scroll:0|pose:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetSessionValueBrief{
+            "session:0.00|motion:0.00|pose:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetBindReadyState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetBindReadyEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetBindReadyResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetBindReadyBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetBindReadyBindingBrief{
+            "binding:stub|pose:runtime_only|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetBindReadyValueBrief{
+            "bind:0.00|pose:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeModelSceneAdapterState{"preview_only"};
         float rendererRuntimeSceneRuntimeModelSceneSeamReadiness{0.0f};
         std::string rendererRuntimeSceneRuntimeModelSceneAdapterBrief{

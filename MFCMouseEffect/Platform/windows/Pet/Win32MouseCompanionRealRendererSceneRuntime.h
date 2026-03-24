@@ -22,7 +22,9 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetLoadProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetResidencyProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSessionProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetActivationProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetBindReadyProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetManifestProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSourceProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelNodeGraphProfile.h"
@@ -80,6 +82,10 @@ struct Win32MouseCompanionRealRendererSceneRuntime final {
         modelAssetInstanceProfile{};
     Win32MouseCompanionRealRendererModelAssetActivationProfile
         modelAssetActivationProfile{};
+    Win32MouseCompanionRealRendererModelAssetSessionProfile
+        modelAssetSessionProfile{};
+    Win32MouseCompanionRealRendererModelAssetBindReadyProfile
+        modelAssetBindReadyProfile{};
     Win32MouseCompanionRealRendererModelSceneAdapterProfile modelSceneAdapterProfile{};
     Win32MouseCompanionRealRendererModelNodeAdapterProfile modelNodeAdapterProfile{};
     Win32MouseCompanionRealRendererModelNodeGraphProfile modelNodeGraphProfile{};

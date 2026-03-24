@@ -497,6 +497,34 @@ function New-LaneSummary(
     } else {
         ""
     }
+    $runtimeModelAssetSessionBrief = if ($null -ne $preview) {
+        $existingModelAssetSessionBrief = [string]$preview.scene_runtime_model_asset_session_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelAssetSessionBrief)) {
+            $existingModelAssetSessionBrief
+        } else {
+            $state = [string]$preview.scene_runtime_model_asset_session_state
+            if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+            $entryCount = [int]([string]$preview.scene_runtime_model_asset_session_entry_count)
+            $resolved = [int]([string]$preview.scene_runtime_model_asset_session_resolved_entry_count)
+            "{0}/{1}/{2}" -f $state, $entryCount, $resolved
+        }
+    } else {
+        ""
+    }
+    $runtimeModelAssetBindReadyBrief = if ($null -ne $preview) {
+        $existingModelAssetBindReadyBrief = [string]$preview.scene_runtime_model_asset_bind_ready_brief
+        if (-not [string]::IsNullOrWhiteSpace($existingModelAssetBindReadyBrief)) {
+            $existingModelAssetBindReadyBrief
+        } else {
+            $state = [string]$preview.scene_runtime_model_asset_bind_ready_state
+            if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+            $entryCount = [int]([string]$preview.scene_runtime_model_asset_bind_ready_entry_count)
+            $resolved = [int]([string]$preview.scene_runtime_model_asset_bind_ready_resolved_entry_count)
+            "{0}/{1}/{2}" -f $state, $entryCount, $resolved
+        }
+    } else {
+        ""
+    }
     $runtimeModelNodeAdapterBrief = if ($null -ne $preview) {
         $existingModelNodeBrief = [string]$preview.scene_runtime_model_node_adapter_brief
         if (-not [string]::IsNullOrWhiteSpace($existingModelNodeBrief)) {
@@ -1094,6 +1122,8 @@ function New-LaneSummary(
         runtime_model_asset_residency_brief = $runtimeModelAssetResidencyBrief
         runtime_model_asset_instance_brief = $runtimeModelAssetInstanceBrief
         runtime_model_asset_activation_brief = $runtimeModelAssetActivationBrief
+        runtime_model_asset_session_brief = $runtimeModelAssetSessionBrief
+        runtime_model_asset_bind_ready_brief = $runtimeModelAssetBindReadyBrief
         runtime_model_scene_adapter_brief = $runtimeModelSceneAdapterBrief
         runtime_model_node_adapter_brief = $runtimeModelNodeAdapterBrief
         runtime_model_node_channel_brief = $runtimeModelNodeChannelBrief
@@ -1199,6 +1229,8 @@ function Compare-LaneAgainstBaseline(
         @{ name = "runtime_model_asset_residency_brief"; baseline = [string]$Baseline.runtime_model_asset_residency_brief; current = [string]$Lane.runtime_model_asset_residency_brief },
         @{ name = "runtime_model_asset_instance_brief"; baseline = [string]$Baseline.runtime_model_asset_instance_brief; current = [string]$Lane.runtime_model_asset_instance_brief },
         @{ name = "runtime_model_asset_activation_brief"; baseline = [string]$Baseline.runtime_model_asset_activation_brief; current = [string]$Lane.runtime_model_asset_activation_brief },
+        @{ name = "runtime_model_asset_session_brief"; baseline = [string]$Baseline.runtime_model_asset_session_brief; current = [string]$Lane.runtime_model_asset_session_brief },
+        @{ name = "runtime_model_asset_bind_ready_brief"; baseline = [string]$Baseline.runtime_model_asset_bind_ready_brief; current = [string]$Lane.runtime_model_asset_bind_ready_brief },
         @{ name = "runtime_model_scene_adapter_brief"; baseline = [string]$Baseline.runtime_model_scene_adapter_brief; current = [string]$Lane.runtime_model_scene_adapter_brief },
         @{ name = "runtime_model_node_adapter_brief"; baseline = [string]$Baseline.runtime_model_node_adapter_brief; current = [string]$Lane.runtime_model_node_adapter_brief },
         @{ name = "runtime_model_node_channel_brief"; baseline = [string]$Baseline.runtime_model_node_channel_brief; current = [string]$Lane.runtime_model_node_channel_brief },
@@ -1338,6 +1370,8 @@ function New-LaneRecommendation(
             runtime_model_asset_residency_brief = [string]$lane.runtime_model_asset_residency_brief
             runtime_model_asset_instance_brief = [string]$lane.runtime_model_asset_instance_brief
             runtime_model_asset_activation_brief = [string]$lane.runtime_model_asset_activation_brief
+            runtime_model_asset_session_brief = [string]$lane.runtime_model_asset_session_brief
+            runtime_model_asset_bind_ready_brief = [string]$lane.runtime_model_asset_bind_ready_brief
             runtime_model_node_adapter_brief = [string]$lane.runtime_model_node_adapter_brief
             runtime_model_node_channel_brief = [string]$lane.runtime_model_node_channel_brief
             runtime_model_node_graph_brief = [string]$lane.runtime_model_node_graph_brief
@@ -1863,6 +1897,12 @@ function Write-LaneMatrixSummary(
     }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_asset_activation_brief)) {
         $observationLines.Add(("- machine model asset activation: `{0}`" -f $recommendation.runtime_model_asset_activation_brief))
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_asset_session_brief)) {
+        $observationLines.Add(("- machine model asset session: `{0}`" -f $recommendation.runtime_model_asset_session_brief))
+    }
+    if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_asset_bind_ready_brief)) {
+        $observationLines.Add(("- machine model asset bind-ready: `{0}`" -f $recommendation.runtime_model_asset_bind_ready_brief))
     }
     if (-not [string]::IsNullOrWhiteSpace([string]$recommendation.runtime_model_node_adapter_brief)) {
         $observationLines.Add(("- machine model node adapter: `{0}`" -f $recommendation.runtime_model_node_adapter_brief))
