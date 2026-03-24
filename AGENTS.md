@@ -61,6 +61,12 @@ Include short evidence (code path/config/runtime behavior). If user-visible beha
 - Treat sync-specific issues as workflow issues first:
   - if Windows sees unexpected local changes, conflict files, or failed items, consider Syncthing state / ignore rules / receive-only behavior before blaming code changes
   - do not ask the user to manually re-copy files as the first fallback when the synced workspace should already contain the latest sources
+- Windows command handoff:
+  - The synced user-facing handoff file is:
+    - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/windows-manual-handoff.md`
+  - The local-only scratch file remains:
+    - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/windows-manual-handoff.tmp`
+  - If I need the user to do any Windows-side manual step, I must write the final short step into the synced `.md` file instead of leaving it only in the local `.tmp`.
 
 ### macOS native stack evolution (Decision: 2026-02-27)
 - Do not expand `.mm` surface area for new feature modules by default.
