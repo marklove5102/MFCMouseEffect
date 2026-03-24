@@ -283,6 +283,57 @@ void DrawModelProxyLayer(
     }
 }
 
+Gdiplus::Color ResolveImprintColor(
+    const Win32MouseCompanionRealRendererScene& scene,
+    const std::string& logicalNode) {
+    if (logicalNode == "body") {
+        return scene.bodyFillRear;
+    }
+    if (logicalNode == "head") {
+        return scene.headFillRear;
+    }
+    if (logicalNode == "appendage") {
+        return scene.tailMidFill;
+    }
+    if (logicalNode == "overlay") {
+        return scene.accentFill;
+    }
+    if (logicalNode == "grounding") {
+        return scene.pedestalFill;
+    }
+    return scene.headFillRear;
+}
+
+void DrawModelProxyImprint(
+    Gdiplus::Graphics* graphics,
+    const Win32MouseCompanionRealRendererScene& scene) {
+    if (!graphics || !scene.modelProxyVisible) {
+        return;
+    }
+
+    for (const auto& silhouette : scene.modelProxySilhouettes) {
+        FillEllipse(
+            graphics,
+            silhouette.bounds,
+            WithAlpha(ResolveImprintColor(scene, silhouette.logicalNode), silhouette.alpha * 0.46f),
+            Gdiplus::Color(0, 0, 0, 0),
+            0.0f);
+    }
+
+    for (const auto& surface : scene.modelProxySurfaces) {
+        if (surface.polygon.size() < 3) {
+            continue;
+        }
+        const Gdiplus::Color imprintColor =
+            surface.surfaceKey == "core_shell" ? scene.headFillRear : scene.accentFill;
+        Gdiplus::SolidBrush brush(WithAlpha(imprintColor, surface.alpha * 0.34f));
+        graphics->FillPolygon(
+            &brush,
+            surface.polygon.data(),
+            static_cast<INT>(surface.polygon.size()));
+    }
+}
+
 void DrawActionOverlay(
     Gdiplus::Graphics* graphics,
     const Win32MouseCompanionRealRendererActionOverlay& overlay,
@@ -914,6 +965,8 @@ void Win32MouseCompanionRealRendererPainter::Paint(
             break;
         }
     }
+
+    DrawModelProxyImprint(graphics, scene);
 }
 
 } // namespace mousefx::windows
