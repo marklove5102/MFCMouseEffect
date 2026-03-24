@@ -61,11 +61,14 @@ Include short evidence (code path/config/runtime behavior). If user-visible beha
 - Treat sync-specific issues as workflow issues first:
   - if Windows sees unexpected local changes, conflict files, or failed items, consider Syncthing state / ignore rules / receive-only behavior before blaming code changes
   - do not ask the user to manually re-copy files as the first fallback when the synced workspace should already contain the latest sources
-- Windows manual handoff file:
-  - When I need the user to do manual steps on Windows, I should write them into:
+- Windows manual handoff files:
+  - Synced handoff doc for the user to open on Windows:
+    - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/windows-manual-handoff.md`
+  - Optional local-only scratch file for the agent:
     - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/windows-manual-handoff.tmp`
-  - This file is local-only, ignored by git, and intended as a short-lived mac-side handoff note rather than a committed doc.
-  - I should overwrite it in each active Windows handoff instead of appending long history.
+  - When I need the user to do manual steps on Windows, I should update the synced `.md` file first.
+  - The local `.tmp` file may be used as a mac-side scratchpad, but it must not be the only place containing required Windows steps.
+  - I should overwrite the active handoff instead of appending long history.
   - Structure should stay concise and task-oriented:
     - purpose
     - exact Windows path/command

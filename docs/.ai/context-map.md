@@ -1,6 +1,6 @@
 # AI Context Map
 
-Generated: 2026-03-24T04:12:39.479Z
+Generated: 2026-03-24T04:15:17.398Z
 
 ## Goal
 Load minimal docs by task keyword while keeping AGENTS + current context as mandatory baseline.
@@ -39,10 +39,10 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 - `docs/architecture/windows-mouse-companion-phase15-exit-contract.md` (P2, 750 tok)
 
 ### general
+- `docs/agent-context/windows-manual-handoff.md` (P2, 471 tok)
 - `docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md` (P2, 750 tok)
 - `docs/architecture/mouse-companion-click-parity-tauri-contract.zh-CN.md` (P2, 750 tok)
 - `docs/architecture/mouse-companion-model-import-pipeline-contract.zh-CN.md` (P2, 750 tok)
-- `docs/architecture/windows-launch-at-startup-contract.md` (P2, 619 tok)
 
 ## Commands
 ```bash
