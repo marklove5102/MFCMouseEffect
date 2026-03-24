@@ -140,7 +140,7 @@ BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
 
     const auto& targetResolver = runtime.assetNodeTargetResolverProfile;
     const auto& matchCatalog = runtime.assetNodeMatchCatalogProfile;
-    const auto& matchPlan = runtime.assetNodeMatchPlanProfile;
+    const auto& matchResolve = runtime.assetNodeMatchResolveProfile;
     profile.bodyEntry = BuildWorldSpaceEntry(
         "body",
         scene.bodyAnchor,
@@ -172,17 +172,23 @@ BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
         targetResolver.groundingEntry,
         matchCatalog.groundingEntry);
 
-    profile.bodyEntry.resolvedNodeLabel = matchPlan.bodyEntry.probeLabel;
-    profile.headEntry.resolvedNodeLabel = matchPlan.headEntry.probeLabel;
-    profile.appendageEntry.resolvedNodeLabel = matchPlan.appendageEntry.probeLabel;
-    profile.overlayEntry.resolvedNodeLabel = matchPlan.overlayEntry.probeLabel;
-    profile.groundingEntry.resolvedNodeLabel = matchPlan.groundingEntry.probeLabel;
+    profile.bodyEntry.resolvedNodeKey = matchResolve.bodyEntry.finalNodeKey;
+    profile.headEntry.resolvedNodeKey = matchResolve.headEntry.finalNodeKey;
+    profile.appendageEntry.resolvedNodeKey = matchResolve.appendageEntry.finalNodeKey;
+    profile.overlayEntry.resolvedNodeKey = matchResolve.overlayEntry.finalNodeKey;
+    profile.groundingEntry.resolvedNodeKey = matchResolve.groundingEntry.finalNodeKey;
 
-    profile.bodyEntry.matchConfidence = matchPlan.bodyEntry.planConfidence;
-    profile.headEntry.matchConfidence = matchPlan.headEntry.planConfidence;
-    profile.appendageEntry.matchConfidence = matchPlan.appendageEntry.planConfidence;
-    profile.overlayEntry.matchConfidence = matchPlan.overlayEntry.planConfidence;
-    profile.groundingEntry.matchConfidence = matchPlan.groundingEntry.planConfidence;
+    profile.bodyEntry.resolvedNodeLabel = matchResolve.bodyEntry.finalNodeLabel;
+    profile.headEntry.resolvedNodeLabel = matchResolve.headEntry.finalNodeLabel;
+    profile.appendageEntry.resolvedNodeLabel = matchResolve.appendageEntry.finalNodeLabel;
+    profile.overlayEntry.resolvedNodeLabel = matchResolve.overlayEntry.finalNodeLabel;
+    profile.groundingEntry.resolvedNodeLabel = matchResolve.groundingEntry.finalNodeLabel;
+
+    profile.bodyEntry.matchConfidence = matchResolve.bodyEntry.resolveConfidence;
+    profile.headEntry.matchConfidence = matchResolve.headEntry.resolveConfidence;
+    profile.appendageEntry.matchConfidence = matchResolve.appendageEntry.resolveConfidence;
+    profile.overlayEntry.matchConfidence = matchResolve.overlayEntry.resolveConfidence;
+    profile.groundingEntry.matchConfidence = matchResolve.groundingEntry.resolveConfidence;
 
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief = BuildBrief(

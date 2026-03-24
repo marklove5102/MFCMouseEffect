@@ -178,7 +178,7 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const auto& matchPlan = runtime.assetNodeMatchPlanProfile;
+    const auto& matchResolve = runtime.assetNodeMatchResolveProfile;
     const float registryAppendageWeight =
         nodeRegistry.appendageEntry.resolved ? nodeRegistry.appendageEntry.registryWeight : 0.0f;
     const float assetAppendageWeight =
@@ -195,9 +195,9 @@ void BuildWin32MouseCompanionRealRendererAdornment(
                     finalTargetResolver.appendageEntry.selectorKey,
                     finalTargetResolver.appendageEntry.candidateNodeName) +
                 ResolvePlanSignal(
-                    matchPlan.appendageEntry.parserLocator,
-                    matchPlan.appendageEntry.probeLabel,
-                    matchPlan.appendageEntry.planConfidence));
+                    matchResolve.appendageEntry.parserLocator,
+                    matchResolve.appendageEntry.finalNodeLabel,
+                    matchResolve.appendageEntry.resolveConfidence));
     const float poseAdornmentX =
         nodeBinding.appendageEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAdornmentY =

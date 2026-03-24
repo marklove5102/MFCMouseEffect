@@ -415,7 +415,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
         BuildWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
             poseSolveProfile,
             sceneRuntime.assetNodeMatchCatalogProfile,
-            sceneRuntime.assetNodeMatchPlanProfile);
+            sceneRuntime.assetNodeMatchResolveProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
         jointHintProfile,
         scene);

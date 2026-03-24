@@ -173,6 +173,8 @@ Win32MouseCompanionRealRendererSceneRuntime BuildWin32MouseCompanionRealRenderer
         BuildWin32MouseCompanionRealRendererAssetNodeMatchEnumerationProfile(sceneRuntime);
     sceneRuntime.assetNodeMatchPlanProfile =
         BuildWin32MouseCompanionRealRendererAssetNodeMatchPlanProfile(sceneRuntime);
+    sceneRuntime.assetNodeMatchResolveProfile =
+        BuildWin32MouseCompanionRealRendererAssetNodeMatchResolveProfile(sceneRuntime);
     return sceneRuntime;
 }
 

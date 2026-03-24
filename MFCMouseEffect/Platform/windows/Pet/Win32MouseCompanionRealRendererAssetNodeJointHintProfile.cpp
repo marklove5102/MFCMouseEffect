@@ -3,7 +3,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeJointHintProfile.h"
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchCatalogProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchPlanProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchResolveProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodePoseSolveProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererScene.h"
 
@@ -55,18 +55,18 @@ const char* ResolveJointHintName(const std::string& logicalNode) {
 Win32MouseCompanionRealRendererAssetNodeJointHintEntry BuildJointHintEntry(
     const Win32MouseCompanionRealRendererAssetNodePoseSolveEntry& solveEntry,
     const Win32MouseCompanionRealRendererAssetNodeMatchCatalogEntry& matchCatalogEntry,
-    const Win32MouseCompanionRealRendererAssetNodeMatchPlanEntry& matchPlanEntry) {
+    const Win32MouseCompanionRealRendererAssetNodeMatchResolveEntry& matchResolveEntry) {
     Win32MouseCompanionRealRendererAssetNodeJointHintEntry entry{};
     entry.logicalNode = solveEntry.logicalNode;
     entry.assetNodePath = solveEntry.assetNodePath;
     entry.resolvedNodeKey = matchCatalogEntry.canonicalNodeKey;
-    entry.resolvedNodeLabel = matchPlanEntry.probeLabel;
+    entry.resolvedNodeLabel = matchResolveEntry.finalNodeLabel;
     entry.jointHintName = ResolveJointHintName(solveEntry.logicalNode);
     entry.matchConfidence =
         solveEntry.resolved
             ? std::clamp(
                   solveEntry.solvedPoseWeight * 0.82f +
-                      matchPlanEntry.planConfidence * 0.18f,
+                      matchResolveEntry.resolveConfidence * 0.18f,
                   0.0f,
                   1.0f)
             : 0.0f;
@@ -159,30 +159,30 @@ Win32MouseCompanionRealRendererAssetNodeJointHintProfile
 BuildWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
     const Win32MouseCompanionRealRendererAssetNodePoseSolveProfile& solveProfile,
     const Win32MouseCompanionRealRendererAssetNodeMatchCatalogProfile& matchCatalogProfile,
-    const Win32MouseCompanionRealRendererAssetNodeMatchPlanProfile& matchPlanProfile) {
+    const Win32MouseCompanionRealRendererAssetNodeMatchResolveProfile& matchResolveProfile) {
     Win32MouseCompanionRealRendererAssetNodeJointHintProfile profile{};
     profile.hintState = ResolveJointHintState(solveProfile);
     profile.entryCount = 5;
     profile.bodyEntry = BuildJointHintEntry(
         solveProfile.bodyEntry,
         matchCatalogProfile.bodyEntry,
-        matchPlanProfile.bodyEntry);
+        matchResolveProfile.bodyEntry);
     profile.headEntry = BuildJointHintEntry(
         solveProfile.headEntry,
         matchCatalogProfile.headEntry,
-        matchPlanProfile.headEntry);
+        matchResolveProfile.headEntry);
     profile.appendageEntry = BuildJointHintEntry(
         solveProfile.appendageEntry,
         matchCatalogProfile.appendageEntry,
-        matchPlanProfile.appendageEntry);
+        matchResolveProfile.appendageEntry);
     profile.overlayEntry = BuildJointHintEntry(
         solveProfile.overlayEntry,
         matchCatalogProfile.overlayEntry,
-        matchPlanProfile.overlayEntry);
+        matchResolveProfile.overlayEntry);
     profile.groundingEntry = BuildJointHintEntry(
         solveProfile.groundingEntry,
         matchCatalogProfile.groundingEntry,
-        matchPlanProfile.groundingEntry);
+        matchResolveProfile.groundingEntry);
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief = BuildBrief(profile.hintState, profile.entryCount, profile.resolvedEntryCount);
     profile.jointHintBrief = BuildJointHintBrief(profile);
