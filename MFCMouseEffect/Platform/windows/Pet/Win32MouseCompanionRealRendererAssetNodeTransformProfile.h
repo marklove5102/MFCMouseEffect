@@ -9,7 +9,9 @@ struct Win32MouseCompanionRealRendererSceneRuntime;
 
 struct Win32MouseCompanionRealRendererAssetNodeTransformEntry final {
     std::string logicalNode;
+    std::string modelNodePath;
     std::string assetNodePath;
+    std::string sourceTag;
     float transformWeight{0.0f};
     float offsetX{0.0f};
     float offsetY{0.0f};

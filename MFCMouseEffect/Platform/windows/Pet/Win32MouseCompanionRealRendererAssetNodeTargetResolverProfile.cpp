@@ -50,8 +50,10 @@ Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry BuildTargetResolverE
     Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry entry{};
     entry.logicalNode = targetEntry.logicalNode;
     entry.parentLogicalNode = resolverEntry.parentLogicalNode;
+    entry.modelNodePath = targetEntry.modelNodePath;
     entry.assetNodePath = resolverEntry.assetNodePath;
     entry.targetKind = targetEntry.targetKind;
+    entry.sourceTag = targetEntry.sourceTag;
     entry.resolvedWeight = ResolveTargetResolverWeight(
         targetEntry.logicalNode,
         targetEntry.targetWeight,

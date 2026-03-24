@@ -152,11 +152,12 @@ void BuildWin32MouseCompanionRealRendererAdornment(
         nodeRegistry.appendageEntry.resolved ? nodeRegistry.appendageEntry.registryWeight : 0.0f;
     const float assetAppendageWeight =
         assetBinding.appendageEntry.resolved ? assetBinding.appendageEntry.bindingWeight : 0.0f;
+    const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float appendageIdentitySignal =
-        ResolveNodeSourceConfidence(assetBinding.appendageEntry.sourceTag) *
+        ResolveNodeSourceConfidence(finalTargetResolver.appendageEntry.sourceTag) *
         std::max(
-            ResolveNodePathSignal(assetBinding.appendageEntry.modelNodePath),
-            ResolveNodePathSignal(assetBinding.appendageEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.appendageEntry.modelNodePath),
+            ResolveNodePathSignal(finalTargetResolver.appendageEntry.assetNodePath));
     const float poseAdornmentX =
         nodeBinding.appendageEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAdornmentY =

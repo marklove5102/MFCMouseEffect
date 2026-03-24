@@ -67,11 +67,12 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
         runtime.modelNodeRegistryProfile.overlayEntry.resolved
             ? runtime.modelNodeRegistryProfile.overlayEntry.registryWeight
             : 0.0f;
+    const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float overlayIdentitySignal =
-        ResolveNodeSourceConfidence(runtime.assetNodeBindingProfile.overlayEntry.sourceTag) *
+        ResolveNodeSourceConfidence(finalTargetResolver.overlayEntry.sourceTag) *
         std::max(
-            ResolveNodePathSignal(runtime.assetNodeBindingProfile.overlayEntry.modelNodePath),
-            ResolveNodePathSignal(runtime.assetNodeBindingProfile.overlayEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.overlayEntry.modelNodePath),
+            ResolveNodePathSignal(finalTargetResolver.overlayEntry.assetNodePath));
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float transformOverlayWeight = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedWeight

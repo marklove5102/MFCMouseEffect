@@ -182,7 +182,6 @@
 ### Tray Menus
 - macOS tray menu intentionally exposes only `Star Project`, `Settings`, and `Exit`.
 - Windows tray menu now follows the same product rule.
-
 ### Launch At Startup
 - macOS: LaunchAgent uses `tray` mode, explicit toggle rewrites plist and applies `launchctl`, normal startup repairs plist only.
 - Windows: uses `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`, and current executable path is rewritten idempotently so relocation can self-heal.
@@ -201,6 +200,7 @@
 - Windows package naming now reflects both configuration and GPU variant: `Release` keeps `MFCMouseEffect-windows-x64-setup-<version>.exe`, `Release --gpu` switches to `...-gpu-setup-...`, `Shipping` uses `...-shipping-setup-...`, and `Shipping --gpu` uses `...-gpu-shipping-setup-...`.
 - Windows pet model-node runtime now carries internal node identity metadata (`modelNodePath` + `sourceTag`) through `modelNodeSlotProfile -> modelNodeRegistryProfile -> assetNodeBindingProfile`, and `FrameBuilder` / `AdornmentBuilder` / `ActionOverlayBuilder` already consume those signals to bias layout, accessory placement, and overlay anchoring toward real asset-backed nodes.
 - Windows pet asset resources now also derive `modelFileName`, `modelRootNodeKey`, and `modelNodeSelectorPrefix` from the incoming model path/format, so slot/registry/binding paths already point at asset-rooted selector prefixes instead of fixed preview-only paths.
+- That same node identity metadata now flows through `assetNodeTransformProfile -> assetNodeResolverProfile -> assetNodeParentSpaceProfile -> assetNodeTargetProfile -> assetNodeTargetResolverProfile`, and the final frame/adornment/overlay builders now prefer the terminal target-resolver selector signal over the earlier binding-only signal.
 - macOS package output remains `MFCMouseEffect.app`, `Install/macos`, folder + `.zip` + unsigned `.dmg`.
 - Current package policy: minimal pet runtime assets only, wasm demo plugin ships runtime files only, packaged host binary is stripped in-bundle, `Install/macos/` is git-ignored, and Gatekeeper/notarization is still deferred.
 ### Local Dev Sync

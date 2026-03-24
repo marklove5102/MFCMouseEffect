@@ -168,15 +168,22 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         assetBinding.headEntry.resolved ? assetBinding.headEntry.bindingWeight : 0.0f;
     const float groundingAssetBindingWeight =
         assetBinding.groundingEntry.resolved ? assetBinding.groundingEntry.bindingWeight : 0.0f;
+    const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float bodyIdentitySignal =
-        ResolveNodeSourceConfidence(assetBinding.bodyEntry.sourceTag) *
-        ResolveNodePathSignal(assetBinding.bodyEntry.modelNodePath);
+        ResolveNodeSourceConfidence(finalTargetResolver.bodyEntry.sourceTag) *
+        std::max(
+            ResolveNodePathSignal(finalTargetResolver.bodyEntry.modelNodePath),
+            ResolveNodePathSignal(finalTargetResolver.bodyEntry.assetNodePath));
     const float headIdentitySignal =
-        ResolveNodeSourceConfidence(assetBinding.headEntry.sourceTag) *
-        ResolveNodePathSignal(assetBinding.headEntry.modelNodePath);
+        ResolveNodeSourceConfidence(finalTargetResolver.headEntry.sourceTag) *
+        std::max(
+            ResolveNodePathSignal(finalTargetResolver.headEntry.modelNodePath),
+            ResolveNodePathSignal(finalTargetResolver.headEntry.assetNodePath));
     const float groundingIdentitySignal =
-        ResolveNodeSourceConfidence(assetBinding.groundingEntry.sourceTag) *
-        ResolveNodePathSignal(assetBinding.groundingEntry.assetNodePath);
+        ResolveNodeSourceConfidence(finalTargetResolver.groundingEntry.sourceTag) *
+        std::max(
+            ResolveNodePathSignal(finalTargetResolver.groundingEntry.modelNodePath),
+            ResolveNodePathSignal(finalTargetResolver.groundingEntry.assetNodePath));
     const float poseAnchorX = nodeBinding.bodyEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAnchorY = nodeBinding.bodyEntry.worldOffsetY * metrics.bodyHeight;
     const float poseHeadX = nodeBinding.headEntry.worldOffsetX * metrics.headWidth;
