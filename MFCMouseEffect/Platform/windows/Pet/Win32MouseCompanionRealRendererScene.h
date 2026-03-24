@@ -143,6 +143,12 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::Color accessoryStroke{};
     float shadowAlphaScale{1.0f};
     float pedestalAlphaScale{1.0f};
+    float previewBodyAlphaScale{1.0f};
+    float previewHeadAlphaScale{1.0f};
+    float previewAppendageAlphaScale{1.0f};
+    float previewDetailAlphaScale{1.0f};
+    float previewAdornmentAlphaScale{1.0f};
+    float proxyDominance{0.0f};
     float poseBadgeAlpha{255.0f};
     float accessoryAlphaScale{1.0f};
     float accessoryStrokeWidth{1.0f};

@@ -100,6 +100,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyLayerBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFootprintProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionOverlayProjector.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyPresenceProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAdornmentProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyEarProjector.h"
@@ -286,6 +287,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
     ApplyWin32MouseCompanionRealRendererModelProxyAdornmentProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyActionOverlayProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyPaletteProjector(scene);
+    ApplyWin32MouseCompanionRealRendererModelProxyPresenceProjector(scene);
     const auto poseProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseProfile(
             sceneRuntime,
