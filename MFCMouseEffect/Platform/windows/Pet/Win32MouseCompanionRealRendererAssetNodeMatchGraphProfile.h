@@ -14,6 +14,8 @@ struct Win32MouseCompanionRealRendererAssetNodeMatchGraphEntry final {
     std::string graphNodeLabel;
     std::string graphAlias;
     std::string graphTokenSeed;
+    std::string matchBasis;
+    uint32_t matchedNodeIndex{0};
     float graphConfidence{0.0f};
     bool resolved{false};
 };

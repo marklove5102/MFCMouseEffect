@@ -83,7 +83,7 @@
 - Windows real renderer 现在也已接入最小 `glb` 节点树摘要链路：
   - 解析 `pet-main.glb` 的 header + JSON chunk
   - 产出 `node index / parent / children / path`
-  - 首轮节点匹配从 `assetNodeMatchGraphProfile` 开始优先消费这组真实节点摘要，失败时仍回退 preview
+  - 首轮节点匹配从 `assetNodeMatchGraphProfile` 开始优先消费这组真实节点摘要，并通过独立的 naming/matcher 小组件做 token 标准化和候选命中，失败时仍回退 preview
 - `AppController::Start()` 现在会尝试加载默认模型路径：
   - `Assets/Pet3D/source/pet-main.glb`
   - `MFCMouseEffect/Assets/Pet3D/source/pet-main.glb`

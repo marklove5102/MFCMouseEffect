@@ -2,10 +2,11 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchGraphProfile.h"
 
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGlbNodeMatcher.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererNodeMatchNaming.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererSceneRuntime.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cstdio>
 
 namespace mousefx::windows {
@@ -36,86 +37,6 @@ std::string ResolveGraphAlias(
     return queryEntry.logicalNode + "_graph";
 }
 
-std::string NormalizeNodeToken(const std::string& value) {
-    std::string normalized;
-    normalized.reserve(value.size());
-    for (unsigned char ch : value) {
-        if (std::isalnum(ch) != 0) {
-            normalized.push_back(static_cast<char>(std::tolower(ch)));
-        }
-    }
-    return normalized;
-}
-
-bool ContainsToken(const std::string& normalizedName, const char* token) {
-    if (token == nullptr || *token == '\0') {
-        return false;
-    }
-    return normalizedName.find(token) != std::string::npos;
-}
-
-const Win32MouseCompanionRealRendererGlbNodeEntry* ResolveMatchedNode(
-    const Win32MouseCompanionRealRendererSceneRuntime& runtime,
-    const Win32MouseCompanionRealRendererAssetNodeMatchQueryEntry& queryEntry) {
-    if (runtime.assets == nullptr || !runtime.assets->modelNodeTreeLoaded) {
-        return nullptr;
-    }
-
-    const auto& nodes = runtime.assets->modelNodeTree.nodes;
-    auto scoreNode = [&](const Win32MouseCompanionRealRendererGlbNodeEntry& node) {
-        const std::string normalizedName = NormalizeNodeToken(node.nodeName);
-        int score = 0;
-
-        if (queryEntry.logicalNode == "body") {
-            if (ContainsToken(normalizedName, "spine")) { score += 10; }
-            if (ContainsToken(normalizedName, "hips")) { score += 8; }
-            if (ContainsToken(normalizedName, "rootjoint")) { score += 7; }
-            if (ContainsToken(normalizedName, "torso")) { score += 6; }
-        } else if (queryEntry.logicalNode == "head") {
-            if (ContainsToken(normalizedName, "head")) { score += 12; }
-            if (ContainsToken(normalizedName, "neck")) { score += 8; }
-        } else if (queryEntry.logicalNode == "appendage") {
-            if (ContainsToken(normalizedName, "arm")) { score += 10; }
-            if (ContainsToken(normalizedName, "ear")) { score += 8; }
-            if (ContainsToken(normalizedName, "leg")) { score += 6; }
-            if (ContainsToken(normalizedName, "tail")) { score += 5; }
-        } else if (queryEntry.logicalNode == "overlay") {
-            if (ContainsToken(normalizedName, "object")) { score += 8; }
-            if (ContainsToken(normalizedName, "effect")) { score += 8; }
-            if (ContainsToken(normalizedName, "overlay")) { score += 8; }
-        } else if (queryEntry.logicalNode == "grounding") {
-            if (ContainsToken(normalizedName, "root")) { score += 10; }
-            if (ContainsToken(normalizedName, "leg")) { score += 7; }
-            if (ContainsToken(normalizedName, "spine")) { score += 4; }
-        }
-
-        const std::string aliasToken = NormalizeNodeToken(queryEntry.queryAlias);
-        const std::string labelToken = NormalizeNodeToken(queryEntry.queryNodeLabel);
-        if (!aliasToken.empty() && normalizedName.find(aliasToken) != std::string::npos) {
-            score += 4;
-        }
-        if (!labelToken.empty() && normalizedName.find(labelToken) != std::string::npos) {
-            score += 3;
-        }
-        if (!queryEntry.queryTokenSeed.empty() &&
-            normalizedName.find(NormalizeNodeToken(queryEntry.queryTokenSeed)) != std::string::npos) {
-            score += 2;
-        }
-        return score;
-    };
-
-    const Win32MouseCompanionRealRendererGlbNodeEntry* bestNode = nullptr;
-    int bestScore = 0;
-    for (const auto& node : nodes) {
-        const int score = scoreNode(node);
-        if (score > bestScore) {
-            bestScore = score;
-            bestNode = &node;
-        }
-    }
-    return bestScore > 0 ? bestNode : nullptr;
-}
-
 Win32MouseCompanionRealRendererAssetNodeMatchGraphEntry BuildGraphEntry(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime,
     const Win32MouseCompanionRealRendererAssetNodeMatchQueryEntry& queryEntry) {
@@ -134,16 +55,34 @@ Win32MouseCompanionRealRendererAssetNodeMatchGraphEntry BuildGraphEntry(
         1.0f);
     entry.resolved = queryEntry.resolved;
 
-    const auto* matchedNode = ResolveMatchedNode(runtime, queryEntry);
-    if (matchedNode != nullptr && runtime.assets != nullptr) {
-        entry.graphLocator = matchedNode->nodePath;
-        entry.graphNodeKey = runtime.assets->modelRootNodeKey + "#" +
-            std::to_string(matchedNode->nodeIndex);
-        entry.graphNodeLabel = matchedNode->nodeName;
-        entry.graphAlias = matchedNode->nodeName;
-        entry.graphTokenSeed = matchedNode->nodePath;
-        entry.graphConfidence = std::clamp(entry.graphConfidence + 0.2f, 0.0f, 1.0f);
-        entry.resolved = true;
+    if (runtime.assets != nullptr && runtime.assets->modelNodeTreeLoaded) {
+        const auto match = ResolveWin32MouseCompanionRealRendererGlbNodeMatch(
+            runtime.assets->modelNodeTree,
+            queryEntry.logicalNode,
+            queryEntry.queryLocator,
+            queryEntry.queryNodeLabel,
+            queryEntry.queryAlias,
+            queryEntry.queryNodeLabel,
+            queryEntry.queryTokenSeed);
+        if (match.matched) {
+            entry.graphLocator = match.nodePath;
+            entry.graphNodeKey = runtime.assets->modelRootNodeKey + "#" +
+                std::to_string(match.nodeIndex);
+            entry.graphNodeLabel = match.nodeName;
+            entry.graphAlias = match.nodeName;
+            entry.graphTokenSeed = match.nodePath;
+            entry.matchBasis = match.matchBasis;
+            entry.matchedNodeIndex = match.nodeIndex;
+            entry.graphConfidence = std::max(entry.graphConfidence, match.confidence);
+            entry.resolved = true;
+        }
+    }
+
+    if (entry.matchBasis.empty()) {
+        entry.matchBasis =
+            NormalizeWin32MouseCompanionNodeMatchToken(entry.graphAlias).empty()
+                ? "query"
+                : "alias";
     }
     return entry;
 }
@@ -196,11 +135,11 @@ std::string BuildValueBrief(
         buffer,
         sizeof(buffer),
         "body:%s|head:%s|appendage:%s|overlay:%s|grounding:%s",
-        profile.bodyEntry.graphNodeLabel.c_str(),
-        profile.headEntry.graphNodeLabel.c_str(),
-        profile.appendageEntry.graphNodeLabel.c_str(),
-        profile.overlayEntry.graphNodeLabel.c_str(),
-        profile.groundingEntry.graphNodeLabel.c_str());
+        (profile.bodyEntry.graphNodeLabel + "@" + profile.bodyEntry.matchBasis).c_str(),
+        (profile.headEntry.graphNodeLabel + "@" + profile.headEntry.matchBasis).c_str(),
+        (profile.appendageEntry.graphNodeLabel + "@" + profile.appendageEntry.matchBasis).c_str(),
+        (profile.overlayEntry.graphNodeLabel + "@" + profile.overlayEntry.matchBasis).c_str(),
+        (profile.groundingEntry.graphNodeLabel + "@" + profile.groundingEntry.matchBasis).c_str());
     return std::string(buffer);
 }
 
