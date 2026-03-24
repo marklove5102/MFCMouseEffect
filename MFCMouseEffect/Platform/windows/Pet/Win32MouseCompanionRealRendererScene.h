@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <string>
+#include <vector>
 
 #include <gdiplus.h>
 
@@ -37,6 +39,31 @@ struct Win32MouseCompanionRealRendererActionOverlay final {
     bool followTrailVisible{false};
     std::array<Gdiplus::RectF, 3> followTrailRects{};
     float followTrailBaseAlpha{150.0f};
+};
+
+struct Win32MouseCompanionRealRendererSceneGraphNode final {
+    uint32_t nodeIndex{0};
+    std::string nodeName;
+    std::string nodePath;
+    Gdiplus::RectF bounds{};
+    Gdiplus::Color fill{};
+    bool highlighted{false};
+};
+
+struct Win32MouseCompanionRealRendererSceneGraphEdge final {
+    uint32_t fromNodeIndex{0};
+    uint32_t toNodeIndex{0};
+    Gdiplus::PointF start{};
+    Gdiplus::PointF end{};
+    float alpha{96.0f};
+};
+
+struct Win32MouseCompanionRealRendererSceneGraphLink final {
+    std::string logicalNode;
+    Gdiplus::PointF start{};
+    Gdiplus::PointF end{};
+    Gdiplus::Color color{};
+    float alpha{168.0f};
 };
 
 struct Win32MouseCompanionRealRendererScene final {
@@ -222,6 +249,11 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::PointF accessoryRibbonRightFoldStart{};
     Gdiplus::PointF accessoryRibbonRightFoldEnd{};
     Win32MouseCompanionRealRendererActionOverlay actionOverlay{};
+    bool modelSceneGraphVisible{false};
+    Gdiplus::RectF modelSceneGraphBounds{};
+    std::vector<Win32MouseCompanionRealRendererSceneGraphNode> modelSceneGraphNodes{};
+    std::vector<Win32MouseCompanionRealRendererSceneGraphEdge> modelSceneGraphEdges{};
+    std::vector<Win32MouseCompanionRealRendererSceneGraphLink> modelSceneGraphLinks{};
 };
 
 } // namespace mousefx::windows

@@ -5,6 +5,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppendageBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererFaceBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererFrameBuilder.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneGraphBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPaletteBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPaletteProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererSceneBuilder.h"
@@ -31,6 +32,7 @@ Win32MouseCompanionRealRendererScene BuildWin32MouseCompanionRealRendererScene(
     BuildWin32MouseCompanionRealRendererFace(runtime, profile, style, scene);
     BuildWin32MouseCompanionRealRendererAdornment(runtime, style, metrics, scene);
     BuildWin32MouseCompanionRealRendererActionOverlay(runtime, profile, style, metrics, scene);
+    BuildWin32MouseCompanionRealRendererModelSceneGraph(runtime, scene);
 
     return scene;
 }

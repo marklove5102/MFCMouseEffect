@@ -152,6 +152,67 @@ void DrawAdornmentLine(
     graphics->DrawLine(&pen, start, end);
 }
 
+void DrawModelSceneGraph(
+    Gdiplus::Graphics* graphics,
+    const Win32MouseCompanionRealRendererScene& scene) {
+    if (!graphics || !scene.modelSceneGraphVisible) {
+        return;
+    }
+
+    Gdiplus::Pen edgePen(Gdiplus::Color(96, 132, 176, 255), 1.0f);
+    edgePen.SetStartCap(Gdiplus::LineCapRound);
+    edgePen.SetEndCap(Gdiplus::LineCapRound);
+
+    for (const auto& edge : scene.modelSceneGraphEdges) {
+        edgePen.SetColor(Gdiplus::Color(
+            static_cast<BYTE>(std::clamp(edge.alpha, 0.0f, 255.0f)),
+            132,
+            176,
+            255));
+        graphics->DrawLine(&edgePen, edge.start, edge.end);
+    }
+
+    Gdiplus::Pen linkPen(Gdiplus::Color(160, 255, 255, 255), 1.3f);
+    linkPen.SetStartCap(Gdiplus::LineCapRound);
+    linkPen.SetEndCap(Gdiplus::LineCapRound);
+    const Gdiplus::REAL dashPattern[2] = {3.0f, 3.0f};
+    linkPen.SetDashPattern(dashPattern, 2);
+    for (const auto& link : scene.modelSceneGraphLinks) {
+        linkPen.SetColor(Gdiplus::Color(
+            static_cast<BYTE>(std::clamp(link.alpha, 0.0f, 255.0f)),
+            link.color.GetR(),
+            link.color.GetG(),
+            link.color.GetB()));
+        graphics->DrawLine(&linkPen, link.start, link.end);
+    }
+
+    Gdiplus::FontFamily fontFamily(L"Segoe UI");
+    Gdiplus::Font font(&fontFamily, 8.0f, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+    Gdiplus::SolidBrush textBrush(Gdiplus::Color(196, 235, 242, 255));
+
+    for (const auto& node : scene.modelSceneGraphNodes) {
+        FillEllipse(
+            graphics,
+            node.bounds,
+            node.fill,
+            Gdiplus::Color(0, 0, 0, 0),
+            0.0f);
+        if (!node.highlighted) {
+            continue;
+        }
+        const Gdiplus::PointF labelOrigin(
+            node.bounds.GetRight() + 4.0f,
+            node.bounds.Y - 2.0f);
+        const std::wstring label(node.nodeName.begin(), node.nodeName.end());
+        graphics->DrawString(
+            label.c_str(),
+            -1,
+            &font,
+            labelOrigin,
+            &textBrush);
+    }
+}
+
 void DrawActionOverlay(
     Gdiplus::Graphics* graphics,
     const Win32MouseCompanionRealRendererActionOverlay& overlay,
@@ -228,6 +289,7 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     Gdiplus::SolidBrush shadowBrush(WithAlpha(scene.shadowFill, scene.shadowFill.GetA() * scene.shadowAlphaScale));
     graphics->FillEllipse(&glowBrush, scene.glowRect);
     graphics->FillEllipse(&shadowBrush, scene.shadowRect);
+    DrawModelSceneGraph(graphics, scene);
     DrawActionOverlay(graphics, scene.actionOverlay, scene.bodyStroke);
     FillRoundedRect(
         graphics,
