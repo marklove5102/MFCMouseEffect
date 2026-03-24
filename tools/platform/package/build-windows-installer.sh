@@ -13,7 +13,10 @@ Usage:
 Options:
   --output-dir <path>     Output directory for installer (default: Install/windows)
   --package-name <name>   Installer base filename without .exe (default: script default)
-  --skip-build            Skip rebuilding Windows Release|x64 project
+  --configuration <Release|Shipping>  Windows build/package configuration (default: Release)
+  --release               Alias for --configuration Release
+  --shipping              Alias for --configuration Shipping
+  --skip-build            Skip rebuilding the selected Windows x64 project
   --skip-webui-build      Accepted for CLI parity; currently no-op on Windows
   --gpu                   Build/package the Windows GPU runtime
   --no-gpu                Exclude Windows GPU runtime and do not package webgpu_dawn.dll
@@ -65,6 +68,7 @@ find_iscc() {
 
 output_dir="$repo_root/Install/windows"
 package_name=""
+configuration="Release"
 skip_build=0
 skip_webui_build=0
 enable_windows_gpu_effects=false
@@ -80,6 +84,19 @@ while [[ $# -gt 0 ]]; do
         [[ $# -ge 2 ]] || { echo "missing value for --package-name" >&2; exit 1; }
         package_name="$2"
         shift 2
+        ;;
+    --configuration)
+        [[ $# -ge 2 ]] || { echo "missing value for --configuration" >&2; exit 1; }
+        configuration="$2"
+        shift 2
+        ;;
+    --release)
+        configuration="Release"
+        shift
+        ;;
+    --shipping)
+        configuration="Shipping"
+        shift
         ;;
     --skip-build)
         skip_build=1
@@ -108,10 +125,25 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+case "$configuration" in
+Release|Shipping)
+    ;;
+*)
+    echo "unsupported Windows packaging configuration: $configuration" >&2
+    exit 1
+    ;;
+esac
+
 require_windows_host
 
 if [[ -z "$package_name" && "$enable_windows_gpu_effects" == "true" ]]; then
-    package_name="MFCMouseEffect-windows-x64-gpu-setup-1.3.1"
+    if [[ "$configuration" == "Shipping" ]]; then
+        package_name="MFCMouseEffect-windows-x64-gpu-shipping-setup-1.3.1"
+    else
+        package_name="MFCMouseEffect-windows-x64-gpu-setup-1.3.1"
+    fi
+elif [[ -z "$package_name" && "$configuration" == "Shipping" ]]; then
+    package_name="MFCMouseEffect-windows-x64-shipping-setup-1.3.1"
 fi
 
 if [[ "$skip_webui_build" == "1" ]]; then
@@ -139,7 +171,7 @@ mkdir -p "$output_dir"
 
 if [[ "$skip_build" != "1" ]]; then
     "$build_script_path" \
-        --configuration Release \
+        --configuration "$configuration" \
         "--$([[ "$enable_windows_gpu_effects" == "true" ]] && echo gpu || echo no-gpu)"
 fi
 
@@ -147,6 +179,7 @@ iscc_exe="$(find_iscc)"
 
 iscc_args=(
     "/O$(cygpath -w "$output_dir")"
+    "/DBuildConfiguration=$configuration"
     "/DMfxEnableWindowsGpuEffects=$enable_windows_gpu_effects"
 )
 if [[ -n "$package_name" ]]; then

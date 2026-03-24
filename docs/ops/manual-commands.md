@@ -22,10 +22,14 @@ Keep P1 concise; add details here when needed.
   - `F:\language\cpp\code\MFCMouseEffect\mfx build`
   - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping`
   - `F:\language\cpp\code\MFCMouseEffect\mfx build --gpu`
+  - `F:\language\cpp\code\MFCMouseEffect\mfx package`
+  - `F:\language\cpp\code\MFCMouseEffect\mfx package --shipping`
   - PowerShell / cmd wrapper:
     - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd build`
     - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd build --shipping`
     - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd build --gpu`
+    - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd package`
+    - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd package --shipping`
 - Release without GPU:
   - `F:\language\cpp\code\MFCMouseEffect\mfx build`
   - behavior:
@@ -45,6 +49,12 @@ Keep P1 concise; add details here when needed.
   - GPU selection also applies here:
     - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping --gpu`
     - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping --no-gpu`
+- shipping package commands:
+  - `F:\language\cpp\code\MFCMouseEffect\mfx package --shipping`
+  - reuse existing Shipping output:
+    - `F:\language\cpp\code\MFCMouseEffect\mfx package --shipping --skip-build`
+  - GPU variant:
+    - `F:\language\cpp\code\MFCMouseEffect\mfx package --shipping --gpu`
 - Low-level fallback only when `mfx` wrapper is unavailable:
   - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\amd64\MSBuild.exe F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect\MFCMouseEffect.vcxproj /t:Build /p:Configuration=Release;Platform=x64 /p:MfxEnableWindowsGpuEffects=false`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route sweep`

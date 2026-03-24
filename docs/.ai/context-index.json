@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-24T07:58:40.084Z",
+  "generated_at": "2026-03-24T08:08:06.175Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -86,13 +86,13 @@
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
       "line_count": 220,
-      "size_bytes": 25725,
-      "estimated_tokens": 6432,
+      "size_bytes": 25871,
+      "estimated_tokens": 6468,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "ca2fccfb340f99bc83d9e10d3da0931a18a01398",
-      "updated_at": "2026-03-24T07:58:10.416Z"
+      "hash_sha1": "6dd33602819fd186ec382d1f5d418dd12498fc98",
+      "updated_at": "2026-03-24T08:07:49.733Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -1187,14 +1187,14 @@
       ],
       "summary": "Common manual commands for local iteration and debugging.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 268,
-      "size_bytes": 28662,
-      "estimated_tokens": 7166,
+      "line_count": 278,
+      "size_bytes": 29212,
+      "estimated_tokens": 7303,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "3e6759c44e76e0d09e7e69e1bf03dc6fe51b6f16",
-      "updated_at": "2026-03-24T04:37:08.861Z"
+      "hash_sha1": "92ea5a9350f638859e2c219a9c95f317176441b6",
+      "updated_at": "2026-03-24T08:06:55.536Z"
     },
     {
       "id": "docs/ops/windows-installer-packaging.md",
@@ -1215,14 +1215,14 @@
       ],
       "summary": "1. Build Windows release:",
       "when_to_read": "Read when executing manual/regression workflows.",
-      "line_count": 67,
-      "size_bytes": 2938,
-      "estimated_tokens": 735,
+      "line_count": 76,
+      "size_bytes": 3454,
+      "estimated_tokens": 864,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "23420859d4eb48b32b90d2330f5e2e66e44f16de",
-      "updated_at": "2026-03-24T05:02:33.280Z"
+      "hash_sha1": "e76d78c0b1a0978cda678bcdf53f4a901451dd7a",
+      "updated_at": "2026-03-24T08:05:55.222Z"
     },
     {
       "id": "docs/ops/windows-mouse-companion-manual-checklist.md",

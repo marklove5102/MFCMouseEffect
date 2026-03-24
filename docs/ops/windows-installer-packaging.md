@@ -8,6 +8,7 @@
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/Install/MFCMouseEffect.iss`
 - Runtime source payload is taken from:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/x64/Release`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/x64/Shipping` when `--shipping` is used
 
 ## Current Policy
 - Deliver runtime-focused payload only:
@@ -20,10 +21,12 @@
   - `./mfx build --gpu`
   - `./mfx build --shipping`
   - `./mfx package`
+  - `./mfx package --shipping`
   - `./mfx package --gpu`
   - `./mfx package --no-gpu`
   - default is now `--no-gpu`
   - `./mfx package` now reuses the same Windows build contract as `./mfx build`
+  - `--shipping` now forwards `BuildConfiguration=Shipping` into Inno Setup and packages from `x64/Shipping`
   - `--no-gpu` forwards `MfxEnableWindowsGpuEffects=false`, excludes Windows GPU hold compile units from the Release build, and removes `webgpu_dawn.dll` from the installer payload
 - Do not copy optional repo docs like `README.md` or `LICENSE` into the install directory.
 - Do not expose installer-side launch-at-startup configuration.
@@ -32,8 +35,12 @@
 ## Artifact Naming
 - Current setup artifact name:
   - `MFCMouseEffect-windows-x64-setup-<version>.exe`
+- Current shipping setup artifact name:
+  - `MFCMouseEffect-windows-x64-shipping-setup-<version>.exe`
 - GPU package setup artifact name:
   - `MFCMouseEffect-windows-x64-gpu-setup-<version>.exe`
+- GPU shipping package setup artifact name:
+  - `MFCMouseEffect-windows-x64-gpu-shipping-setup-<version>.exe`
 - If `--package-name` is explicitly provided, it still overrides both defaults.
 - Output root stays:
   - `Install/windows/`
@@ -45,10 +52,12 @@
      - default: no GPU
    - `./mfx build --gpu`
    - `./mfx build --shipping`
-   - or `./mfx package-no-build` when reusing the current `Release|x64` output
+   - `./mfx package --shipping`
+   - or `./mfx package-no-build` when reusing the current selected output
   - GPU-selectable examples:
     - `./mfx package --gpu`
     - `./mfx package --no-gpu`
+    - `./mfx package --shipping --gpu`
 2. Compile Inno Setup script:
    - internal implementation still uses Inno Setup, but `ISCC.exe` is no longer the user-facing workflow entry
 3. Verify installer contents:
