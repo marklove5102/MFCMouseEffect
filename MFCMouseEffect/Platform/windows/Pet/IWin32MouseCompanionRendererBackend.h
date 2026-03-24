@@ -148,6 +148,22 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
     std::string sceneRuntimeModelAssetNodeAttachValueBrief{
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
+    std::string sceneRuntimeModelAssetNodeLiftState{"preview_only"};
+    uint32_t sceneRuntimeModelAssetNodeLiftEntryCount{0};
+    uint32_t sceneRuntimeModelAssetNodeLiftResolvedEntryCount{0};
+    std::string sceneRuntimeModelAssetNodeLiftBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelAssetNodeLiftLiftBrief{
+        "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
+    std::string sceneRuntimeModelAssetNodeLiftValueBrief{
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
+    std::string sceneRuntimeModelAssetNodeBindState{"preview_only"};
+    uint32_t sceneRuntimeModelAssetNodeBindEntryCount{0};
+    uint32_t sceneRuntimeModelAssetNodeBindResolvedEntryCount{0};
+    std::string sceneRuntimeModelAssetNodeBindBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelAssetNodeBindBindBrief{
+        "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only"};
+    std::string sceneRuntimeModelAssetNodeBindValueBrief{
+        "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00"};
     std::string sceneRuntimeModelNodeGraphState{"preview_only"};
     uint32_t sceneRuntimeModelNodeGraphNodeCount{0};
     uint32_t sceneRuntimeModelNodeGraphBoundNodeCount{0};

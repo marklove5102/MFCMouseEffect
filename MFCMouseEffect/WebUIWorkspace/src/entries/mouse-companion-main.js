@@ -802,6 +802,34 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_lift_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_lift_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_lift_lift_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_lift_lift_brief,
+      'body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_bind_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_bind_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_bind_bind_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_bind_bind_brief,
+      'body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_model_node_graph_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_model_node_graph_brief, 'preview_only/0/0'),
   );

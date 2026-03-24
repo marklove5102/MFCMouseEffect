@@ -47,7 +47,7 @@
 
 #### Windows Pet
 - Current stage: `Phase1.5`.
-- Current gap vs macOS: Windows still renders a stylized preview contract, not the real 3D model path, though the asset chain now reaches `scene-hook -> scene-binding -> node-attach`.
+- Current gap vs macOS: Windows still renders a stylized preview contract, not the real 3D model path, though the asset chain now reaches `scene-hook -> scene-binding -> node-attach -> node-lift -> node-bind`.
 - Shared placement contract is active: `relative`, `absolute`, legacy `fixed_bottom_left`, `strict / soft / free`, and target-monitor resolution.
 - Active backend path: `window -> backend factory/registry -> renderer input -> renderer runtime -> scene builder -> painter`.
 - Windows appearance validation supports:

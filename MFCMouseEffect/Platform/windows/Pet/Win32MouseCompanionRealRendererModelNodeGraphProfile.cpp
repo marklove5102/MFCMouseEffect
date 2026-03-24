@@ -11,15 +11,14 @@ namespace {
 
 std::string ResolveGraphState(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    if (runtime.modelSceneAdapterProfile.seamState == "pose_bound_preview_ready" &&
-        runtime.modelNodeAdapterProfile.influence > 0.0f) {
+    if (runtime.modelAssetNodeLiftProfile.liftState == "model_asset_node_lift_bound") {
         return "channel_bound_preview";
     }
-    if (runtime.modelSceneAdapterProfile.seamState == "pose_stub_ready" &&
-        runtime.modelNodeAdapterProfile.influence > 0.0f) {
+    if (runtime.modelAssetNodeLiftProfile.liftState == "model_asset_node_lift_pose_ready") {
         return "channel_stub_ready";
     }
-    if (runtime.modelSceneAdapterProfile.seamState == "asset_stub_ready") {
+    if (runtime.modelAssetNodeLiftProfile.liftState == "model_asset_node_lift_ready" ||
+        runtime.modelAssetNodeLiftProfile.liftState == "model_asset_node_lift_partial") {
         return "scaffold_ready";
     }
     return "preview_only";
@@ -61,44 +60,45 @@ BuildWin32MouseCompanionRealRendererModelNodeGraphProfile(
     profile.nodeCount = 5;
 
     const auto& adapter = runtime.modelNodeAdapterProfile;
+    const float liftWeight = runtime.modelAssetNodeLiftProfile.liftWeight;
 
-    profile.bodyNode.influence = adapter.bodyChannel.influence;
+    profile.bodyNode.influence = adapter.bodyChannel.influence * liftWeight;
     profile.bodyNode.localOffsetX = adapter.bodyChannel.offsetX;
     profile.bodyNode.localOffsetY = adapter.bodyChannel.offsetY;
-    profile.bodyNode.worldOffsetX = adapter.bodyChannel.offsetX * adapter.bodyChannel.influence;
-    profile.bodyNode.worldOffsetY = adapter.bodyChannel.offsetY * adapter.bodyChannel.influence;
+    profile.bodyNode.worldOffsetX = adapter.bodyChannel.offsetX * profile.bodyNode.influence;
+    profile.bodyNode.worldOffsetY = adapter.bodyChannel.offsetY * profile.bodyNode.influence;
 
-    profile.headNode.influence = adapter.faceChannel.influence;
+    profile.headNode.influence = adapter.faceChannel.influence * liftWeight;
     profile.headNode.localOffsetX = adapter.faceChannel.offsetX;
     profile.headNode.localOffsetY = adapter.faceChannel.offsetY;
     profile.headNode.worldOffsetX =
-        profile.bodyNode.worldOffsetX + adapter.faceChannel.offsetX * adapter.faceChannel.influence;
+        profile.bodyNode.worldOffsetX + adapter.faceChannel.offsetX * profile.headNode.influence;
     profile.headNode.worldOffsetY =
-        profile.bodyNode.worldOffsetY + adapter.faceChannel.offsetY * adapter.faceChannel.influence;
+        profile.bodyNode.worldOffsetY + adapter.faceChannel.offsetY * profile.headNode.influence;
 
-    profile.appendageNode.influence = adapter.appendageChannel.influence;
+    profile.appendageNode.influence = adapter.appendageChannel.influence * liftWeight;
     profile.appendageNode.localOffsetX = adapter.appendageChannel.offsetX;
     profile.appendageNode.localOffsetY = adapter.appendageChannel.offsetY;
     profile.appendageNode.worldOffsetX =
-        profile.bodyNode.worldOffsetX + adapter.appendageChannel.offsetX * adapter.appendageChannel.influence;
+        profile.bodyNode.worldOffsetX + adapter.appendageChannel.offsetX * profile.appendageNode.influence;
     profile.appendageNode.worldOffsetY =
-        profile.bodyNode.worldOffsetY + adapter.appendageChannel.offsetY * adapter.appendageChannel.influence;
+        profile.bodyNode.worldOffsetY + adapter.appendageChannel.offsetY * profile.appendageNode.influence;
 
-    profile.overlayNode.influence = adapter.overlayChannel.influence;
+    profile.overlayNode.influence = adapter.overlayChannel.influence * liftWeight;
     profile.overlayNode.localOffsetX = adapter.overlayChannel.offsetX;
     profile.overlayNode.localOffsetY = adapter.overlayChannel.offsetY;
     profile.overlayNode.worldOffsetX =
-        profile.bodyNode.worldOffsetX + adapter.overlayChannel.offsetX * adapter.overlayChannel.influence;
+        profile.bodyNode.worldOffsetX + adapter.overlayChannel.offsetX * profile.overlayNode.influence;
     profile.overlayNode.worldOffsetY =
-        profile.bodyNode.worldOffsetY + adapter.overlayChannel.offsetY * adapter.overlayChannel.influence;
+        profile.bodyNode.worldOffsetY + adapter.overlayChannel.offsetY * profile.overlayNode.influence;
 
-    profile.groundingNode.influence = adapter.groundingChannel.influence;
+    profile.groundingNode.influence = adapter.groundingChannel.influence * liftWeight;
     profile.groundingNode.localOffsetX = adapter.groundingChannel.offsetX;
     profile.groundingNode.localOffsetY = adapter.groundingChannel.offsetY;
     profile.groundingNode.worldOffsetX =
-        profile.bodyNode.worldOffsetX + adapter.groundingChannel.offsetX * adapter.groundingChannel.influence;
+        profile.bodyNode.worldOffsetX + adapter.groundingChannel.offsetX * profile.groundingNode.influence;
     profile.groundingNode.worldOffsetY =
-        profile.bodyNode.worldOffsetY + adapter.groundingChannel.offsetY * adapter.groundingChannel.influence;
+        profile.bodyNode.worldOffsetY + adapter.groundingChannel.offsetY * profile.groundingNode.influence;
 
     profile.boundNodeCount = CountBoundNodes(profile);
     profile.brief = BuildGraphBrief(

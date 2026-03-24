@@ -161,6 +161,18 @@ export function getMouseCompanionSectionMarkup() {
         <label>Model Node Attach</label>
         <output id="mc_runtime_scene_runtime_model_asset_node_attach_attach_brief">-</output>
 
+        <label>Model Asset Node Lift</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_lift_brief">-</output>
+
+        <label>Model Node Lift</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_lift_lift_brief">-</output>
+
+        <label>Model Asset Node Bind</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_bind_brief">-</output>
+
+        <label>Model Node Bind</label>
+        <output id="mc_runtime_scene_runtime_model_asset_node_bind_bind_brief">-</output>
+
         <label>Model Node Graph</label>
         <output id="mc_runtime_scene_runtime_model_node_graph_brief">-</output>
 

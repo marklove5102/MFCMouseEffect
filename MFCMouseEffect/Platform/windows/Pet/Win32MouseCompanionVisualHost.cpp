@@ -354,6 +354,30 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeModelAssetNodeAttachAttachBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeAttachValueBrief =
         rendererRuntime.sceneRuntimeModelAssetNodeAttachValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeLiftState =
+        rendererRuntime.sceneRuntimeModelAssetNodeLiftState;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeLiftEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeLiftEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeLiftResolvedEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeLiftResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeLiftBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeLiftBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeLiftLiftBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeLiftLiftBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeLiftValueBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeLiftValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeBindState =
+        rendererRuntime.sceneRuntimeModelAssetNodeBindState;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeBindEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeBindEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeBindResolvedEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetNodeBindResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeBindBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeBindBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeBindBindBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeBindBindBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeBindValueBrief =
+        rendererRuntime.sceneRuntimeModelAssetNodeBindValueBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelNodeGraphState =
         rendererRuntime.sceneRuntimeModelNodeGraphState;
     diagnostics.rendererRuntime.sceneRuntimeModelNodeGraphNodeCount =

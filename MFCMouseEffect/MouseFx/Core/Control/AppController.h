@@ -299,6 +299,24 @@ public:
             "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
         std::string rendererRuntimeSceneRuntimeModelAssetNodeAttachValueBrief{
             "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeLiftState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeLiftEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeLiftResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeLiftBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeLiftLiftBrief{
+            "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeLiftValueBrief{
+            "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeBindState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeBindEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeBindResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeBindBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeBindBindBrief{
+            "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetNodeBindValueBrief{
+            "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeModelNodeGraphState{"preview_only"};
         uint32_t rendererRuntimeSceneRuntimeModelNodeGraphNodeCount{0};
         uint32_t rendererRuntimeSceneRuntimeModelNodeGraphBoundNodeCount{0};

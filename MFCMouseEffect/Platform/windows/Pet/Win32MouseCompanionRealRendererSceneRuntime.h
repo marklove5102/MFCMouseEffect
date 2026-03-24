@@ -26,6 +26,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetActivationProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetBindReadyProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetHandleProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeBindProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeLiftProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneBindingProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneHookProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeAttachProfile.h"
@@ -100,6 +102,10 @@ struct Win32MouseCompanionRealRendererSceneRuntime final {
     Win32MouseCompanionRealRendererModelNodeAdapterProfile modelNodeAdapterProfile{};
     Win32MouseCompanionRealRendererModelAssetNodeAttachProfile
         modelAssetNodeAttachProfile{};
+    Win32MouseCompanionRealRendererModelAssetNodeLiftProfile
+        modelAssetNodeLiftProfile{};
+    Win32MouseCompanionRealRendererModelAssetNodeBindProfile
+        modelAssetNodeBindProfile{};
     Win32MouseCompanionRealRendererModelNodeGraphProfile modelNodeGraphProfile{};
     Win32MouseCompanionRealRendererModelNodeBindingProfile modelNodeBindingProfile{};
     Win32MouseCompanionRealRendererModelNodeSlotProfile modelNodeSlotProfile{};

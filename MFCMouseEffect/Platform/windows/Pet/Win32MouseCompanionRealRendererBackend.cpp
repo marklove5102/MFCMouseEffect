@@ -65,6 +65,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetBindReadyProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetHandleProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeAttachProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeBindProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeLiftProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneBindingProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneHookProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSourceProfile.h"
@@ -205,6 +207,16 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeAttachProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetNodeAttachProfile(
         modelAssetNodeAttachProfile,
+        scene);
+    const auto modelAssetNodeLiftProfile =
+        sceneRuntime.modelAssetNodeLiftProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetNodeLiftProfile(
+        modelAssetNodeLiftProfile,
+        scene);
+    const auto modelAssetNodeBindProfile =
+        sceneRuntime.modelAssetNodeBindProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetNodeBindProfile(
+        modelAssetNodeBindProfile,
         scene);
     const auto resolverProfile = sceneRuntime.assetNodeResolverProfile;
     const auto parentSpaceProfile = sceneRuntime.assetNodeParentSpaceProfile;
@@ -678,6 +690,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         modelAssetNodeAttachProfile.attachBrief;
     diagnostics.sceneRuntimeModelAssetNodeAttachValueBrief =
         modelAssetNodeAttachProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeLiftState =
+        modelAssetNodeLiftProfile.liftState;
+    diagnostics.sceneRuntimeModelAssetNodeLiftEntryCount =
+        modelAssetNodeLiftProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetNodeLiftResolvedEntryCount =
+        modelAssetNodeLiftProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeLiftBrief =
+        modelAssetNodeLiftProfile.brief;
+    diagnostics.sceneRuntimeModelAssetNodeLiftLiftBrief =
+        modelAssetNodeLiftProfile.liftBrief;
+    diagnostics.sceneRuntimeModelAssetNodeLiftValueBrief =
+        modelAssetNodeLiftProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeBindState =
+        modelAssetNodeBindProfile.bindState;
+    diagnostics.sceneRuntimeModelAssetNodeBindEntryCount =
+        modelAssetNodeBindProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetNodeBindResolvedEntryCount =
+        modelAssetNodeBindProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeBindBrief =
+        modelAssetNodeBindProfile.brief;
+    diagnostics.sceneRuntimeModelAssetNodeBindBindBrief =
+        modelAssetNodeBindProfile.bindBrief;
+    diagnostics.sceneRuntimeModelAssetNodeBindValueBrief =
+        modelAssetNodeBindProfile.valueBrief;
     diagnostics.sceneRuntimeModelNodeGraphState =
         sceneRuntime.modelNodeGraphProfile.graphState;
     diagnostics.sceneRuntimeModelNodeGraphNodeCount =

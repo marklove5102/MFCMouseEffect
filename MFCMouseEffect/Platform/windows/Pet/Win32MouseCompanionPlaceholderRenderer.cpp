@@ -253,6 +253,22 @@ void Win32MouseCompanionPlaceholderRenderer::Render(
         "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only";
     diagnostics.sceneRuntimeModelAssetNodeAttachValueBrief =
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00";
+    diagnostics.sceneRuntimeModelAssetNodeLiftState = "preview_only";
+    diagnostics.sceneRuntimeModelAssetNodeLiftEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeLiftResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeLiftBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeModelAssetNodeLiftLiftBrief =
+        "body:stub|head:stub|appendage:stub|overlay:stub|adapter:runtime_only";
+    diagnostics.sceneRuntimeModelAssetNodeLiftValueBrief =
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|adapter:0.00";
+    diagnostics.sceneRuntimeModelAssetNodeBindState = "preview_only";
+    diagnostics.sceneRuntimeModelAssetNodeBindEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeBindResolvedEntryCount = 0;
+    diagnostics.sceneRuntimeModelAssetNodeBindBrief = "preview_only/0/0";
+    diagnostics.sceneRuntimeModelAssetNodeBindBindBrief =
+        "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only";
+    diagnostics.sceneRuntimeModelAssetNodeBindValueBrief =
+        "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00";
     diagnostics.sceneRuntimeModelNodeGraphState = "preview_only";
     diagnostics.sceneRuntimeModelNodeGraphNodeCount = 0;
     diagnostics.sceneRuntimeModelNodeGraphBoundNodeCount = 0;
