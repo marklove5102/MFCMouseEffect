@@ -82,6 +82,13 @@ struct Win32MouseCompanionRealRendererModelProxyLink final {
     float alpha{136.0f};
 };
 
+struct Win32MouseCompanionRealRendererModelProxySurface final {
+    std::string surfaceKey;
+    std::vector<Gdiplus::PointF> polygon{};
+    Gdiplus::Color fill{};
+    float alpha{112.0f};
+};
+
 struct Win32MouseCompanionRealRendererScene final {
     float centerX{0.0f};
     float centerY{0.0f};
@@ -271,6 +278,7 @@ struct Win32MouseCompanionRealRendererScene final {
     std::vector<Win32MouseCompanionRealRendererSceneGraphEdge> modelSceneGraphEdges{};
     std::vector<Win32MouseCompanionRealRendererSceneGraphLink> modelSceneGraphLinks{};
     bool modelProxyVisible{false};
+    std::vector<Win32MouseCompanionRealRendererModelProxySurface> modelProxySurfaces{};
     std::vector<Win32MouseCompanionRealRendererModelProxyNode> modelProxyNodes{};
     std::vector<Win32MouseCompanionRealRendererModelProxyLink> modelProxyLinks{};
     std::vector<Gdiplus::PointF> modelProxyHull{};

@@ -220,6 +220,25 @@ void DrawModelProxyLayer(
         return;
     }
 
+    for (const auto& surface : scene.modelProxySurfaces) {
+        if (surface.polygon.size() < 3) {
+            continue;
+        }
+        Gdiplus::SolidBrush surfaceBrush(WithAlpha(surface.fill, surface.alpha));
+        Gdiplus::Pen surfacePen(
+            WithAlpha(surface.fill, std::min(255.0f, surface.alpha + 26.0f)),
+            1.0f);
+        surfacePen.SetLineJoin(Gdiplus::LineJoinRound);
+        graphics->FillPolygon(
+            &surfaceBrush,
+            surface.polygon.data(),
+            static_cast<INT>(surface.polygon.size()));
+        graphics->DrawPolygon(
+            &surfacePen,
+            surface.polygon.data(),
+            static_cast<INT>(surface.polygon.size()));
+    }
+
     if (scene.modelProxyHull.size() >= 3) {
         Gdiplus::GraphicsPath hullPath;
         hullPath.AddClosedCurve(
