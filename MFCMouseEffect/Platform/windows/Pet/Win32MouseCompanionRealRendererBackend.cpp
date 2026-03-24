@@ -77,8 +77,6 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeDriverRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeConsumerProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeConsumerRegistryProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeProjectionProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeProjectionRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeResolveProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeRouteProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneBindingProfile.h"
@@ -306,16 +304,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeConsumerRegistryProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetNodeConsumerRegistryProfile(
         modelAssetNodeConsumerRegistryProfile,
-        scene);
-    const auto modelAssetNodeProjectionProfile =
-        sceneRuntime.modelAssetNodeProjectionProfile;
-    ApplyWin32MouseCompanionRealRendererModelAssetNodeProjectionProfile(
-        modelAssetNodeProjectionProfile,
-        scene);
-    const auto modelAssetNodeProjectionRegistryProfile =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile;
-    ApplyWin32MouseCompanionRealRendererModelAssetNodeProjectionRegistryProfile(
-        modelAssetNodeProjectionRegistryProfile,
         scene);
     const auto poseResolverProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseResolverProfile(
@@ -983,30 +971,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeConsumerRegistryProfile.registryBrief;
     diagnostics.sceneRuntimeModelAssetNodeConsumerRegistryValueBrief =
         sceneRuntime.modelAssetNodeConsumerRegistryProfile.valueBrief;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionState =
-        sceneRuntime.modelAssetNodeProjectionProfile.projectionState;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionEntryCount =
-        sceneRuntime.modelAssetNodeProjectionProfile.entryCount;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionResolvedEntryCount =
-        sceneRuntime.modelAssetNodeProjectionProfile.resolvedEntryCount;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionBrief =
-        sceneRuntime.modelAssetNodeProjectionProfile.brief;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionProjectionBrief =
-        sceneRuntime.modelAssetNodeProjectionProfile.projectionBrief;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionValueBrief =
-        sceneRuntime.modelAssetNodeProjectionProfile.valueBrief;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionRegistryState =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile.projectionRegistryState;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionRegistryEntryCount =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile.entryCount;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionRegistryResolvedEntryCount =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile.resolvedEntryCount;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionRegistryBrief =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile.brief;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionRegistryRegistryBrief =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile.registryBrief;
-    diagnostics.sceneRuntimeModelAssetNodeProjectionRegistryValueBrief =
-        sceneRuntime.modelAssetNodeProjectionRegistryProfile.valueBrief;
     diagnostics.sceneRuntimeAssetNodeBindingState =
         sceneRuntime.assetNodeBindingProfile.bindingState;
     diagnostics.sceneRuntimeAssetNodeBindingEntryCount =
