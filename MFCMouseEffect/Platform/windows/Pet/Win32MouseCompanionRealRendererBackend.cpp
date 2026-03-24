@@ -81,8 +81,6 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeMaterializationRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodePresentationProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodePresentationRegistryProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeVisibilityProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeVisibilityRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeProjectionProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeProjectionRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeRealizationProfile.h"
@@ -354,16 +352,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodePresentationRegistryProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetNodePresentationRegistryProfile(
         modelAssetNodePresentationRegistryProfile,
-        scene);
-    const auto modelAssetNodeVisibilityProfile =
-        sceneRuntime.modelAssetNodeVisibilityProfile;
-    ApplyWin32MouseCompanionRealRendererModelAssetNodeVisibilityProfile(
-        modelAssetNodeVisibilityProfile,
-        scene);
-    const auto modelAssetNodeVisibilityRegistryProfile =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile;
-    ApplyWin32MouseCompanionRealRendererModelAssetNodeVisibilityRegistryProfile(
-        modelAssetNodeVisibilityRegistryProfile,
         scene);
     const auto poseResolverProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseResolverProfile(
@@ -1128,30 +1116,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodePresentationRegistryProfile.registryBrief;
     diagnostics.sceneRuntimeModelAssetNodePresentationRegistryValueBrief =
         sceneRuntime.modelAssetNodePresentationRegistryProfile.valueBrief;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityState =
-        sceneRuntime.modelAssetNodeVisibilityProfile.visibilityState;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityEntryCount =
-        sceneRuntime.modelAssetNodeVisibilityProfile.entryCount;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityResolvedEntryCount =
-        sceneRuntime.modelAssetNodeVisibilityProfile.resolvedEntryCount;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityBrief =
-        sceneRuntime.modelAssetNodeVisibilityProfile.brief;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityVisibilityBrief =
-        sceneRuntime.modelAssetNodeVisibilityProfile.visibilityBrief;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityValueBrief =
-        sceneRuntime.modelAssetNodeVisibilityProfile.valueBrief;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityRegistryState =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile.visibilityRegistryState;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityRegistryEntryCount =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile.entryCount;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityRegistryResolvedEntryCount =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile.resolvedEntryCount;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityRegistryBrief =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile.brief;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityRegistryRegistryBrief =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile.registryBrief;
-    diagnostics.sceneRuntimeModelAssetNodeVisibilityRegistryValueBrief =
-        sceneRuntime.modelAssetNodeVisibilityRegistryProfile.valueBrief;
     diagnostics.sceneRuntimeAssetNodeBindingState =
         sceneRuntime.assetNodeBindingProfile.bindingState;
     diagnostics.sceneRuntimeAssetNodeBindingEntryCount =

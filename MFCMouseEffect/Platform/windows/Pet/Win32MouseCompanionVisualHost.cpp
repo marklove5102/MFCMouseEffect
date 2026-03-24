@@ -662,31 +662,6 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeModelAssetNodePresentationRegistryRegistryBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelAssetNodePresentationRegistryValueBrief =
         rendererRuntime.sceneRuntimeModelAssetNodePresentationRegistryValueBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityState =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityState;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityResolvedEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityResolvedEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityVisibilityBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityVisibilityBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityValueBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityValueBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryState =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryState;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryResolvedEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryResolvedEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryBrief;
-    diagnostics.rendererRuntime
-        .sceneRuntimeModelAssetNodeVisibilityRegistryRegistryBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryRegistryBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryValueBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeVisibilityRegistryValueBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeBindingState =
         rendererRuntime.sceneRuntimeAssetNodeBindingState;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeBindingEntryCount =
