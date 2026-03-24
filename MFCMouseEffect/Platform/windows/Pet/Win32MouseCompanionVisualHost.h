@@ -40,6 +40,7 @@ private:
     Win32MouseCompanionWindow window_{};
     Win32MouseCompanionActionLibrary actionLibrary_{};
     Win32MouseCompanionActionRuntimeState actionRuntime_{};
+    Win32MouseCompanionRendererBackendPreferenceRequest configuredRendererBackendPreferenceRequest_{};
     std::vector<std::string> configuredBoneNames_{};
 };
 

@@ -32,6 +32,7 @@ Expected long-term stack:
 ## Current Rollout Rule
 - Windows real renderer is now default-on when its availability probes pass.
 - `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE=0|false|off|no` is the explicit opt-out switch for forcing fallback/placeholder validation.
+- When backend preference is still `auto`, a successful Windows `LoadModel()` call should now reselect the backend toward `real`; only explicit pinned backend preferences are allowed to keep placeholder active after a real model asset is present.
 
 Conceptually:
 - `asset coordinator -> presenter/runtime -> renderer backend`

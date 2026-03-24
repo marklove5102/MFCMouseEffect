@@ -10,11 +10,33 @@
 #include "Platform/windows/Pet/Win32MouseCompanionVisualRuntime.h"
 
 namespace mousefx::windows {
+namespace {
+
+Win32MouseCompanionRendererBackendPreferenceRequest ResolveRendererBackendPreferenceRequestForModel(
+    const Win32MouseCompanionRendererBackendPreferenceRequest& configuredRequest,
+    bool modelAssetAvailable) {
+    if (!modelAssetAvailable) {
+        return configuredRequest;
+    }
+    if (!TrimAscii(configuredRequest.preferredBackendName).empty() &&
+        !IsAutoWin32MouseCompanionRendererBackendName(configuredRequest.preferredBackendName)) {
+        return configuredRequest;
+    }
+
+    Win32MouseCompanionRendererBackendPreferenceRequest request = configuredRequest;
+    request.preferredBackendSource = "auto_model_asset";
+    request.preferredBackendName = "real";
+    return request;
+}
+
+} // namespace
 
 bool Win32MouseCompanionVisualHost::Start(const MouseCompanionPetRuntimeConfig& config) {
     actionLibrary_ = {};
     actionRuntime_ = {};
-    window_.SetRendererBackendPreferenceRequest(BuildWin32MouseCompanionRendererBackendPreferenceRequest(config));
+    configuredRendererBackendPreferenceRequest_ =
+        BuildWin32MouseCompanionRendererBackendPreferenceRequest(config);
+    window_.SetRendererBackendPreferenceRequest(configuredRendererBackendPreferenceRequest_);
     ResetWin32MouseCompanionVisualState(&state_, config, config.enabled && window_.Create());
     return state_.active;
 }
@@ -28,7 +50,12 @@ void Win32MouseCompanionVisualHost::Shutdown() {
 }
 
 bool Win32MouseCompanionVisualHost::Configure(const MouseCompanionPetRuntimeConfig& config) {
-    window_.SetRendererBackendPreferenceRequest(BuildWin32MouseCompanionRendererBackendPreferenceRequest(config));
+    configuredRendererBackendPreferenceRequest_ =
+        BuildWin32MouseCompanionRendererBackendPreferenceRequest(config);
+    window_.SetRendererBackendPreferenceRequest(
+        ResolveRendererBackendPreferenceRequestForModel(
+            configuredRendererBackendPreferenceRequest_,
+            state_.modelAssetAvailable));
     ApplyWin32MouseCompanionVisualConfig(&state_, config);
     if (!state_.active) {
         state_.visible = false;
@@ -58,9 +85,13 @@ bool Win32MouseCompanionVisualHost::LoadModel(const std::string& modelPath) {
     if (!state_.active || trimmed.empty()) {
         return false;
     }
-    ApplyWin32MouseCompanionModelAssetState(&state_, trimmed);
+    const bool loaded = ApplyWin32MouseCompanionModelAssetState(&state_, trimmed);
+    window_.SetRendererBackendPreferenceRequest(
+        ResolveRendererBackendPreferenceRequestForModel(
+            configuredRendererBackendPreferenceRequest_,
+            loaded));
     SyncWindow();
-    return false;
+    return loaded;
 }
 
 bool Win32MouseCompanionVisualHost::LoadActionLibrary(const std::string& actionLibraryPath) {
