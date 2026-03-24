@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-24T03:30:25.551Z",
+  "generated_at": "2026-03-24T04:12:39.479Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -46,14 +46,14 @@
       ],
       "summary": "Repository-level collaboration and engineering rules for AI agents and developers.",
       "when_to_read": "Always read first.",
-      "line_count": 156,
-      "size_bytes": 9062,
-      "estimated_tokens": 2266,
+      "line_count": 167,
+      "size_bytes": 9667,
+      "estimated_tokens": 2417,
       "max_read_tokens": 1500,
       "line_limit": 260,
       "line_limit_exceeded": false,
-      "hash_sha1": "28d2ca6b7f76babf08302ac300f5159e3bcc1f81",
-      "updated_at": "2026-03-22T07:30:09.144Z"
+      "hash_sha1": "8cfd689249c301066e15122d27cea76835e8c02d",
+      "updated_at": "2026-03-24T04:12:21.806Z"
     },
     {
       "id": "docs/agent-context/current.md",
