@@ -2,66 +2,10 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppearanceSemantics.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererFrameBuilder.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGraphSignal.h"
 
 #include <algorithm>
 
 namespace mousefx::windows {
-namespace {
-
-float ResolveNodeSourceConfidence(const std::string& sourceTag) {
-    if (sourceTag.rfind("bound:", 0) == 0) {
-        return 1.0f;
-    }
-    if (sourceTag.rfind("pose:", 0) == 0) {
-        return 0.92f;
-    }
-    if (sourceTag.rfind("manifest:", 0) == 0) {
-        return 0.84f;
-    }
-    if (sourceTag.rfind("source:", 0) == 0) {
-        return 0.72f;
-    }
-    if (sourceTag.rfind("stub:", 0) == 0) {
-        return 0.38f;
-    }
-    return 0.0f;
-}
-
-float ResolveNodePathSignal(const std::string& path) {
-    if (path.empty()) {
-        return 0.0f;
-    }
-    float signal = 0.25f;
-    if (path.find("/body/") != std::string::npos) {
-        signal += 0.35f;
-    }
-    if (path.find("/fx/") != std::string::npos) {
-        signal += 0.20f;
-    }
-    if (path.find("/root") != std::string::npos || path.find("/head") != std::string::npos) {
-        signal += 0.20f;
-    }
-    return std::min(signal, 1.0f);
-}
-
-float ResolveSelectorSignal(const std::string& selectorKey, const std::string& candidateNodeName) {
-    float signal = 0.0f;
-    if (!selectorKey.empty() && selectorKey.find('|') != std::string::npos) {
-        signal += 0.45f;
-    }
-    if (selectorKey.find("vrm_root:") != std::string::npos ||
-        selectorKey.find("scene_root:") != std::string::npos ||
-        selectorKey.find("fbx_root:") != std::string::npos) {
-        signal += 0.25f;
-    }
-    if (!candidateNodeName.empty() && candidateNodeName != "unknown") {
-        signal += 0.20f;
-    }
-    return std::min(signal, 1.0f);
-}
-
-} // namespace
 
 Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendererFrame(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime,
@@ -173,7 +117,6 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const auto& matchGraph = runtime.assetNodeMatchGraphProfile;
     const float bodyRegistryWeight =
         nodeRegistry.bodyEntry.resolved ? nodeRegistry.bodyEntry.registryWeight : 0.0f;
     const float headRegistryWeight =
@@ -186,52 +129,6 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         assetBinding.headEntry.resolved ? assetBinding.headEntry.bindingWeight : 0.0f;
     const float groundingAssetBindingWeight =
         assetBinding.groundingEntry.resolved ? assetBinding.groundingEntry.bindingWeight : 0.0f;
-    const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const float bodyIdentitySignal =
-        ResolveNodeSourceConfidence(finalTargetResolver.bodyEntry.sourceTag) *
-        std::min(
-            1.0f,
-            std::max(
-                ResolveNodePathSignal(finalTargetResolver.bodyEntry.modelNodePath),
-                ResolveNodePathSignal(finalTargetResolver.bodyEntry.assetNodePath)) +
-                ResolveSelectorSignal(
-                    finalTargetResolver.bodyEntry.selectorKey,
-                    finalTargetResolver.bodyEntry.candidateNodeName) +
-                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
-                    matchGraph.bodyEntry) *
-                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
-                                         matchGraph.bodyEntry,
-                                         "body")));
-    const float headIdentitySignal =
-        ResolveNodeSourceConfidence(finalTargetResolver.headEntry.sourceTag) *
-        std::min(
-            1.0f,
-            std::max(
-                ResolveNodePathSignal(finalTargetResolver.headEntry.modelNodePath),
-                ResolveNodePathSignal(finalTargetResolver.headEntry.assetNodePath)) +
-                ResolveSelectorSignal(
-                    finalTargetResolver.headEntry.selectorKey,
-                    finalTargetResolver.headEntry.candidateNodeName) +
-                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
-                    matchGraph.headEntry) *
-                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
-                                         matchGraph.headEntry,
-                                         "head")));
-    const float groundingIdentitySignal =
-        ResolveNodeSourceConfidence(finalTargetResolver.groundingEntry.sourceTag) *
-        std::min(
-            1.0f,
-            std::max(
-                ResolveNodePathSignal(finalTargetResolver.groundingEntry.modelNodePath),
-                ResolveNodePathSignal(finalTargetResolver.groundingEntry.assetNodePath)) +
-                ResolveSelectorSignal(
-                    finalTargetResolver.groundingEntry.selectorKey,
-                    finalTargetResolver.groundingEntry.candidateNodeName) +
-                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
-                    matchGraph.groundingEntry) *
-                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
-                                         matchGraph.groundingEntry,
-                                         "grounding")));
     const float poseAnchorX = nodeBinding.bodyEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAnchorY = nodeBinding.bodyEntry.worldOffsetY * metrics.bodyHeight;
     const float poseHeadX = nodeBinding.headEntry.worldOffsetX * metrics.headWidth;
@@ -269,28 +166,23 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         1.0f + std::abs(nodeBinding.groundingEntry.worldOffsetX) * nodeBinding.groundingEntry.bindWeight * 0.65f;
     scene.shadowAlphaScale =
         1.0f + nodeBinding.groundingEntry.bindWeight * 0.08f + groundingRegistryWeight * 0.06f +
-        groundingAssetBindingWeight * 0.05f + groundingIdentitySignal * 0.04f +
-        (groundingTransformScale - 1.0f) * 0.80f;
+        groundingAssetBindingWeight * 0.05f + (groundingTransformScale - 1.0f) * 0.80f;
     scene.pedestalAlphaScale =
         1.0f + nodeBinding.groundingEntry.bindWeight * 0.06f + groundingRegistryWeight * 0.05f +
-        groundingAssetBindingWeight * 0.04f + groundingIdentitySignal * 0.03f +
-        (groundingTransformScale - 1.0f) * 0.70f;
+        groundingAssetBindingWeight * 0.04f + (groundingTransformScale - 1.0f) * 0.70f;
 
     scene.centerX = static_cast<float>(width) * style.centerXRatio + facingOffset + profile.bodyForward +
-        profile.idleHeadSway + poseAnchorX + bodyTransformX * 0.55f +
-        metrics.bodyWidth * bodyIdentitySignal * 0.006f * runtime.facingSign;
+        profile.idleHeadSway + poseAnchorX + bodyTransformX * 0.55f;
     scene.centerY = static_cast<float>(height) * (runtime.hold ? style.holdCenterYRatio : style.idleCenterYRatio) -
         (runtime.follow ? static_cast<float>(height) * style.followCenterYOffsetRatio : 0.0f) -
         (runtime.drag ? static_cast<float>(height) * style.dragCenterYOffsetRatio : 0.0f) -
         profile.stateLift - profile.breathLift + comboCenterYOffset + poseAnchorY + bodyTransformY * 0.55f -
-        metrics.bodyHeight *
-            (bodyRegistryWeight * 0.005f + bodyAssetBindingWeight * 0.004f +
-             bodyIdentitySignal * 0.0025f);
+        metrics.bodyHeight * (bodyRegistryWeight * 0.005f + bodyAssetBindingWeight * 0.004f);
     scene.facingSign = runtime.facingSign;
     scene.bodyTiltDeg = profile.scrollLean + profile.dragLean;
     scene.glowAlpha =
         style.glowBaseAlpha + glowBoost * style.glowActionAlphaScale + runtime.headTintAmount * style.glowHeadTintAlphaScale +
-        glowAlphaBias + (bodyIdentitySignal + headIdentitySignal) * 6.0f;
+        glowAlphaBias;
     scene.bodyStrokeWidth = runtime.click ? (1.9f + profile.actionIntensity * 1.0f)
         : runtime.hold      ? (1.8f + profile.actionIntensity * 0.9f)
         : runtime.scroll    ? (1.8f + profile.scrollIntensity * 0.8f)
@@ -342,14 +234,10 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     scene.headRect = Gdiplus::RectF(
         scene.centerX - metrics.headWidth * style.headXOffsetRatio + profile.dragLean * style.headDragLeanScale +
             profile.bodyForward * style.headBodyForwardScale + poseHeadX + headTransformX +
-            metrics.headWidth *
-                (headRegistryWeight * 0.01f + headAssetBindingWeight * 0.008f +
-                 headIdentitySignal * 0.004f),
+            metrics.headWidth * (headRegistryWeight * 0.01f + headAssetBindingWeight * 0.008f),
         scene.bodyRect.Y - metrics.headHeight * style.headYOffsetRatio - profile.actionIntensity * style.headActionLiftPx +
             profile.headNod + poseHeadY + headTransformY -
-            metrics.headHeight *
-                (headRegistryWeight * 0.008f + headAssetBindingWeight * 0.006f +
-                 headIdentitySignal * 0.0035f),
+            metrics.headHeight * (headRegistryWeight * 0.008f + headAssetBindingWeight * 0.006f),
         metrics.headWidth * headTransformScale,
         metrics.headHeight * std::max(0.95f, headTransformScale - 0.01f));
     scene.neckBridgeRect = Gdiplus::RectF(

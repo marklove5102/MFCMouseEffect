@@ -97,38 +97,6 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneHookProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSourceProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneAdapterProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelMeshLayerBuilder.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelMeshPresenceProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyLayerBuilder.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFootprintProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionOverlayProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionLayerProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionAnchorProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionPresenceProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageActionProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageGeometryProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyMotionProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendagePresenceProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageStrokeProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAdornmentLayerProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyDetailLayerProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyContourLayerProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyOverlaySuppressionProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyPresenceProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAdornmentProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageLayerProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyEarProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyExpressionProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFaceProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFrameLayerProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFrameProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyPaletteProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxySurfaceBuilder.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxySilhouetteLayerBuilder.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneTopologyProjector.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelScenePoseProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPainter.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererPoseAdapterProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRenderPluginHost.h"
@@ -290,37 +258,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
     const auto worldSpaceProfile =
         BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(sceneRuntime, scene);
     ApplyWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(worldSpaceProfile, scene);
-    ApplyWin32MouseCompanionRealRendererModelScenePoseProjector(worldSpaceProfile, scene);
-    ApplyWin32MouseCompanionRealRendererModelSceneTopologyProjector(worldSpaceProfile, scene);
-    BuildWin32MouseCompanionRealRendererModelProxyLayer(worldSpaceProfile, scene);
-    BuildWin32MouseCompanionRealRendererModelMeshLayer(sceneRuntime, scene);
-    BuildWin32MouseCompanionRealRendererModelProxySilhouetteLayer(worldSpaceProfile, scene);
-    BuildWin32MouseCompanionRealRendererModelProxySurfaces(worldSpaceProfile, scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyFrameProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyFaceProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyEarProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyExpressionProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyFrameLayerProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyContourLayerProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyDetailLayerProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAppendageLayerProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAppendageGeometryProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAppendageProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyFootprintProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAdornmentProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAdornmentLayerProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyActionOverlayProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyActionLayerProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyPaletteProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyPresenceProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyActionProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyActionAnchorProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyActionPresenceProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAppendageActionProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAppendagePresenceProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyAppendageStrokeProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelProxyMotionProjector(scene);
-    ApplyWin32MouseCompanionRealRendererModelMeshPresenceProjector(scene);
     const auto poseProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseProfile(
             sceneRuntime,
@@ -476,9 +413,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
         scene);
     const auto jointHintProfile =
         BuildWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
-            poseSolveProfile,
-            sceneRuntime.assetNodeMatchCatalogProfile,
-            sceneRuntime.assetNodeMatchGraphProfile);
+            poseSolveProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
         jointHintProfile,
         scene);
@@ -687,7 +622,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         executionDriverRouterRegistryBusRegistryProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
-    ApplyWin32MouseCompanionRealRendererModelProxyOverlaySuppressionProjector(scene);
     const Win32MouseCompanionRealRendererPainter painter{};
     painter.Paint(scene, graphics, width, height);
 

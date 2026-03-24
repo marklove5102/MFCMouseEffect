@@ -4,7 +4,6 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererSceneRuntime.h"
 
-#include <algorithm>
 #include <cstdio>
 
 namespace mousefx::windows {
@@ -45,71 +44,18 @@ float ResolveTargetResolverWeight(
     return combined;
 }
 
-float ResolveMatchConfidence(
-    const Win32MouseCompanionRealRendererAssetNodeTargetEntry& targetEntry,
-    const Win32MouseCompanionRealRendererAssetNodeResolverEntry& resolverEntry,
-    float resolvedWeight) {
-    float confidence = resolvedWeight;
-    if (!targetEntry.selectorKey.empty() && targetEntry.selectorKey.find('|') != std::string::npos) {
-        confidence += 0.10f;
-    }
-    if (!targetEntry.candidateNodeName.empty() && targetEntry.candidateNodeName != "unknown") {
-        confidence += 0.08f;
-    }
-    if (!resolverEntry.assetNodePath.empty() && resolverEntry.assetNodePath.find("/asset/") != std::string::npos) {
-        confidence += 0.06f;
-    }
-    return std::clamp(confidence, 0.0f, 1.0f);
-}
-
-std::string ResolveResolvedNodeKey(
-    const Win32MouseCompanionRealRendererAssetNodeTargetEntry& targetEntry) {
-    if (!targetEntry.selectorKey.empty()) {
-        return targetEntry.selectorKey;
-    }
-    if (!targetEntry.candidateNodeName.empty()) {
-        return targetEntry.logicalNode + "|" + targetEntry.candidateNodeName;
-    }
-    return targetEntry.logicalNode + "|unknown";
-}
-
-std::string ResolveResolvedNodeLabel(
-    const Win32MouseCompanionRealRendererAssetNodeTargetEntry& targetEntry,
-    float matchConfidence) {
-    const std::string name =
-        targetEntry.candidateNodeName.empty() ? "unknown" : targetEntry.candidateNodeName;
-    char buffer[160];
-    std::snprintf(
-        buffer,
-        sizeof(buffer),
-        "%s@%s#%.2f",
-        targetEntry.logicalNode.c_str(),
-        name.c_str(),
-        matchConfidence);
-    return std::string(buffer);
-}
-
 Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry BuildTargetResolverEntry(
     const Win32MouseCompanionRealRendererAssetNodeTargetEntry& targetEntry,
     const Win32MouseCompanionRealRendererAssetNodeResolverEntry& resolverEntry) {
     Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry entry{};
     entry.logicalNode = targetEntry.logicalNode;
     entry.parentLogicalNode = resolverEntry.parentLogicalNode;
-    entry.modelNodePath = targetEntry.modelNodePath;
     entry.assetNodePath = resolverEntry.assetNodePath;
     entry.targetKind = targetEntry.targetKind;
-    entry.sourceTag = targetEntry.sourceTag;
-    entry.selectorKey = targetEntry.selectorKey;
-    entry.candidateNodeName = targetEntry.candidateNodeName;
     entry.resolvedWeight = ResolveTargetResolverWeight(
         targetEntry.logicalNode,
         targetEntry.targetWeight,
         resolverEntry.resolvedWeight);
-    entry.matchConfidence =
-        ResolveMatchConfidence(targetEntry, resolverEntry, entry.resolvedWeight);
-    entry.resolvedNodeKey = ResolveResolvedNodeKey(targetEntry);
-    entry.resolvedNodeLabel =
-        ResolveResolvedNodeLabel(targetEntry, entry.matchConfidence);
     entry.resolvedOffsetX =
         targetEntry.targetOffsetX * (0.68f + entry.resolvedWeight * 0.22f);
     entry.resolvedOffsetY =

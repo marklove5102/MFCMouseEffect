@@ -9,53 +9,6 @@
 namespace mousefx::windows {
 namespace {
 
-const char* ResolveModelNodePath(const char* logicalNode) {
-    if (logicalNode == nullptr) {
-        return "unknown";
-    }
-    const std::string node = logicalNode;
-    if (node == "body") {
-        return "body/root";
-    }
-    if (node == "head") {
-        return "body/head";
-    }
-    if (node == "appendage") {
-        return "body/appendage";
-    }
-    if (node == "overlay") {
-        return "fx/overlay";
-    }
-    if (node == "grounding") {
-        return "fx/grounding";
-    }
-    return "unknown";
-}
-
-std::string ResolveSourceTag(
-    const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    const auto& sourceProfile = runtime.modelAssetSourceProfile;
-    const std::string format = runtime.assets == nullptr || runtime.assets->modelSourceFormat.empty()
-        ? "unknown"
-        : runtime.assets->modelSourceFormat;
-    if (!sourceProfile.modelSourceReady) {
-        return "preview:" + format;
-    }
-    if (!sourceProfile.sourceFormatSupported) {
-        return "stub:" + format;
-    }
-    if (sourceProfile.sourceState == "model_asset_bound_ready") {
-        return "bound:" + format;
-    }
-    if (sourceProfile.sourceState == "model_asset_pose_ready") {
-        return "pose:" + format;
-    }
-    if (sourceProfile.sourceState == "model_asset_manifest_ready") {
-        return "manifest:" + format;
-    }
-    return "source:" + format;
-}
-
 std::string ResolveSlotState(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
     const std::string& driveState = runtime.modelAssetNodeDriveProfile.driveState;
@@ -76,15 +29,11 @@ std::string ResolveSlotState(
 Win32MouseCompanionRealRendererModelNodeSlotEntry BuildSlotEntry(
     const char* logicalNode,
     const char* slotName,
-    const std::string& modelNodeSelectorPrefix,
-    const std::string& sourceTag,
     float bindWeight,
     bool slotsReady) {
     Win32MouseCompanionRealRendererModelNodeSlotEntry entry{};
     entry.logicalNode = logicalNode ? logicalNode : "";
     entry.slotName = slotName ? slotName : "";
-    entry.modelNodePath = modelNodeSelectorPrefix + "/" + ResolveModelNodePath(logicalNode);
-    entry.sourceTag = sourceTag;
     entry.bindWeight = bindWeight;
     entry.slotReady = slotsReady && bindWeight > 0.0f;
     return entry;
@@ -142,43 +91,30 @@ BuildWin32MouseCompanionRealRendererModelNodeSlotProfile(
 
     const bool slotsReady = runtime.assets && runtime.assets->modelNodeSlotsReady;
     const auto& binding = runtime.modelNodeBindingProfile;
-    const std::string modelNodeSelectorPrefix =
-        runtime.assets == nullptr ? "/preview/model" : runtime.assets->modelNodeSelectorPrefix;
-    const std::string sourceTag = ResolveSourceTag(runtime);
     const float driveWeight = runtime.modelAssetNodeDriveProfile.driveWeight;
     profile.bodySlot = BuildSlotEntry(
         "body",
         "body_root",
-        modelNodeSelectorPrefix,
-        sourceTag,
         binding.bodyEntry.bindWeight * driveWeight,
         slotsReady);
     profile.headSlot = BuildSlotEntry(
         "head",
         "head_anchor",
-        modelNodeSelectorPrefix,
-        sourceTag,
         binding.headEntry.bindWeight * driveWeight,
         slotsReady);
     profile.appendageSlot = BuildSlotEntry(
         "appendage",
         "appendage_anchor",
-        modelNodeSelectorPrefix,
-        sourceTag,
         binding.appendageEntry.bindWeight * driveWeight,
         slotsReady);
     profile.overlaySlot = BuildSlotEntry(
         "overlay",
         "overlay_anchor",
-        modelNodeSelectorPrefix,
-        sourceTag,
         binding.overlayEntry.bindWeight * driveWeight,
         slotsReady);
     profile.groundingSlot = BuildSlotEntry(
         "grounding",
         "grounding_anchor",
-        modelNodeSelectorPrefix,
-        sourceTag,
         binding.groundingEntry.bindWeight * driveWeight,
         slotsReady);
 

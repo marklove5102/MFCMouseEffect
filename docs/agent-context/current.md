@@ -8,6 +8,7 @@
 - Primary host: macOS.
 - Delivery order: macOS first, Windows regression-free, Linux compile/contract-level.
 - macOS stack rule: new capability modules are Swift-first; avoid expanding `.mm` for large new modules.
+- Windows VS2026 direct project build should stay healthy; any remaining `MFCMouseEffect.slnx` `ValidateSolutionConfiguration` issue is solution-metadata work, not a C++ compile regression.
 - Cross-machine workflow: macOS is the development source, Windows is the synced validation workspace via `Syncthing`, and Windows handoff should default to `F:\language\cpp\code\MFCMouseEffect`.
 
 ## Active Product Goals
@@ -141,8 +142,7 @@
 - Backend selection diagnostics are active for preference source/name, selected backend, selection/failure reasons, available/unavailable backends, backend catalog, `real_renderer_preview`, and `renderer_runtime_*`.
 - Backend lifecycle seam treats `Start() / IsReady() / LastErrorReason()` as first-class fallback signals.
 - Placeholder backend remains the always-ready reference implementation.
-- `real` backend now defaults to enabled when available; `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE=0|false|off|no` is the explicit opt-out gate, and Windows visual host now auto-promotes `auto` backend preference to `real` after `LoadModel()` succeeds unless the user explicitly pinned another backend.
-- Default Windows renderer backend preference now resolves directly to `real` instead of `auto`, and once `modelMeshVisible` is true the real-renderer painter short-circuits into a mesh-first path so the old full 2D preview stack no longer visually masks the first GLB triangle layer.
+- `real` backend has a complete internal preview pipeline, but default selection still keeps it behind rollout gate `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE`.
 - Real-preview dynamic readability is already stronger:
   - `dreamy` biases `follow` toward lighter lift and softer grounding
   - `agile` biases `drag/follow` toward sharper lean and reach
@@ -178,10 +178,13 @@
 ## Regression Gates
 - Canonical regression entry: `./tools/platform/regression/run-posix-regression-suite.sh --platform auto`
 - macOS daily shortcut: `./mfx run-no-build` / `./mfx fast` skip both core and WebUI rebuilds; `./mfx run` / `./mfx start` perform fresh build preparation.
+
 ## Packaging / Startup Truth
+
 ### Tray Menus
 - macOS tray menu intentionally exposes only `Star Project`, `Settings`, and `Exit`.
 - Windows tray menu now follows the same product rule.
+
 ### Launch At Startup
 - macOS: LaunchAgent uses `tray` mode, explicit toggle rewrites plist and applies `launchctl`, normal startup repairs plist only.
 - Windows: uses `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`, and current executable path is rewritten idempotently so relocation can self-heal.
@@ -191,16 +194,13 @@
   - `./mfx build`
   - `./mfx build --shipping`
   - `./mfx build --gpu`
+- Preferred packaging entrypoint is `./mfx package`.
 - Windows installer remains Inno Setup based.
 - `./mfx package` now reuses the same Windows build contract as `./mfx build`, and `--shipping` forwards `BuildConfiguration=Shipping` into Inno Setup so Windows compile/package no longer depend on raw MSBuild as the primary user-facing entrypoint.
 - Windows Release/Shipping now supports build-time GPU selection through `MfxEnableWindowsGpuEffects=true|false`, and the default is now `false`:
   - `true`: compile/package the current GPU hold runtime and bundle `webgpu_dawn.dll`
   - `false` (default): exclude Windows GPU hold compile units, hide GPU-only hold choices, normalize old GPU hold configs to compatible non-GPU routes, and omit `webgpu_dawn.dll` from build output + installer payload
 - Windows package naming now reflects both configuration and GPU variant: `Release` keeps `MFCMouseEffect-windows-x64-setup-<version>.exe`, `Release --gpu` switches to `...-gpu-setup-...`, `Shipping` uses `...-shipping-setup-...`, and `Shipping --gpu` uses `...-gpu-shipping-setup-...`.
-- Windows pet model-node runtime now carries internal node identity metadata (`modelNodePath` + `sourceTag`) through `modelNodeSlotProfile -> modelNodeRegistryProfile -> assetNodeBindingProfile`, and `FrameBuilder` / `AdornmentBuilder` / `ActionOverlayBuilder` already consume those signals to bias layout, accessory placement, and overlay anchoring toward real asset-backed nodes.
-- Windows pet asset resources now also derive `modelFileName`, `modelRootNodeKey`, and `modelNodeSelectorPrefix` from the incoming model path/format, and `glb` inputs now load a minimal node-tree summary (`node index / parent / children / path`) into runtime state, so slot/registry/binding paths already point at asset-rooted selector prefixes instead of fixed preview-only paths.
-- That same node identity metadata now flows through `assetNodeTransformProfile -> assetNodeResolverProfile -> assetNodeParentSpaceProfile -> assetNodeTargetProfile -> assetNodeTargetResolverProfile`; the terminal chain now carries `selectorKey` + `candidateNodeName`, and frame/adornment/overlay builders prefer that end-stage selector signal over the earlier binding-only signal.
-- `assetNodeTargetResolverProfile` now feeds `assetNodeMatchCandidateProfile -> assetNodeMatchCatalogProfile -> assetNodeMatchEnumerationProfile -> assetNodeMatchPlanProfile -> assetNodeMatchResolveProfile -> assetNodeMatchQueryProfile -> assetNodeMatchGraphProfile`: candidate entries derive selector prefixes and candidate paths, catalog normalizes canonical keys/labels plus `matchConfidence`, enumeration emits parser-style locators, plan assembles probe/fallback intent, resolve exposes final node keys/labels plus `resolveConfidence`, query carries parser-facing locators/labels/confidence, and the graph layer now upgrades `glb` inputs from placeholder query results to first-pass real node hits through a dedicated `node-match naming + glb matcher` helper; graph entries now also carry `parent/depth/semanticTag`, `assetNodeWorldSpaceProfile` / `assetNodeJointHintProfile` consume that metadata directly, `FrameBuilder` / `AdornmentBuilder` / `ActionOverlayBuilder` now share a dedicated graph-signal helper instead of each re-deriving parser/query-style confidence on their own, the Windows real renderer paints that parsed `glb` node tree as a first-pass scene-graph overlay with dashed logical-anchor links to matched nodes, projects matched entries onto graph-node centers, and now also loads minimal `glb` POSITION/indices data into a first-pass real mesh-triangle layer that is depth-sorted, shaded by Z, painted above the proxy shell, and allowed to suppress the older scene-graph/proxy/preview fallback layers so the screen can finally prioritize actual geometry from `pet-main.glb`.
 - macOS package output remains `MFCMouseEffect.app`, `Install/macos`, folder + `.zip` + unsigned `.dmg`.
 - Current package policy: minimal pet runtime assets only, wasm demo plugin ships runtime files only, packaged host binary is stripped in-bundle, `Install/macos/` is git-ignored, and Gatekeeper/notarization is still deferred.
 ### Local Dev Sync

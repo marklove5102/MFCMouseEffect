@@ -10,14 +10,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelNodeBindingProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeBindingProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeAnchorProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchCandidateProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeParentSpaceProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchCatalogProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchEnumerationProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchPlanProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchResolveProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchQueryProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeMatchGraphProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeResolverProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeTargetProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAssetNodeTargetResolverProfile.h"
@@ -103,8 +96,6 @@ struct Win32MouseCompanionRealRendererSceneRuntime final {
     bool click{false};
     bool poseFrameAvailable{false};
     bool poseBindingConfigured{false};
-    bool realModelNodeTreeLoaded{false};
-    uint32_t realModelNodeCount{0};
     std::string sceneRuntimeAdapterMode{"runtime_only"};
     uint32_t sceneRuntimePoseSampleCount{0};
     uint32_t sceneRuntimeBoundPoseSampleCount{0};
@@ -204,20 +195,6 @@ struct Win32MouseCompanionRealRendererSceneRuntime final {
     Win32MouseCompanionRealRendererAssetNodeTargetProfile assetNodeTargetProfile{};
     Win32MouseCompanionRealRendererAssetNodeTargetResolverProfile
         assetNodeTargetResolverProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchCandidateProfile
-        assetNodeMatchCandidateProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchCatalogProfile
-        assetNodeMatchCatalogProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchEnumerationProfile
-        assetNodeMatchEnumerationProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchPlanProfile
-        assetNodeMatchPlanProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchResolveProfile
-        assetNodeMatchResolveProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchQueryProfile
-        assetNodeMatchQueryProfile{};
-    Win32MouseCompanionRealRendererAssetNodeMatchGraphProfile
-        assetNodeMatchGraphProfile{};
     Win32MouseCompanionRealRendererAssetNodeAnchorProfile assetNodeAnchorProfile{};
     Win32MouseCompanionRealRendererPoseAdapterProfile poseAdapterProfile{};
 };

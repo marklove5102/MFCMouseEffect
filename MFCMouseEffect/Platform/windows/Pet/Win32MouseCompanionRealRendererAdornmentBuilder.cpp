@@ -2,65 +2,12 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppearanceSemantics.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAdornmentBuilder.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGraphSignal.h"
 
 #include <algorithm>
 #include <cmath>
 
 namespace mousefx::windows {
 namespace {
-
-float ResolveNodeSourceConfidence(const std::string& sourceTag) {
-    if (sourceTag.rfind("bound:", 0) == 0) {
-        return 1.0f;
-    }
-    if (sourceTag.rfind("pose:", 0) == 0) {
-        return 0.92f;
-    }
-    if (sourceTag.rfind("manifest:", 0) == 0) {
-        return 0.84f;
-    }
-    if (sourceTag.rfind("source:", 0) == 0) {
-        return 0.72f;
-    }
-    if (sourceTag.rfind("stub:", 0) == 0) {
-        return 0.38f;
-    }
-    return 0.0f;
-}
-
-float ResolveNodePathSignal(const std::string& path) {
-    if (path.empty()) {
-        return 0.0f;
-    }
-    float signal = 0.25f;
-    if (path.find("/appendage") != std::string::npos) {
-        signal += 0.40f;
-    }
-    if (path.find("/fx/") != std::string::npos) {
-        signal += 0.20f;
-    }
-    if (path.find("/model/") != std::string::npos) {
-        signal += 0.15f;
-    }
-    return std::min(signal, 1.0f);
-}
-
-float ResolveSelectorSignal(const std::string& selectorKey, const std::string& candidateNodeName) {
-    float signal = 0.0f;
-    if (!selectorKey.empty() && selectorKey.find('|') != std::string::npos) {
-        signal += 0.45f;
-    }
-    if (!candidateNodeName.empty() && candidateNodeName != "unknown") {
-        signal += 0.25f;
-    }
-    if (selectorKey.find("vrm_root:") != std::string::npos ||
-        selectorKey.find("scene_root:") != std::string::npos ||
-        selectorKey.find("fbx_root:") != std::string::npos) {
-        signal += 0.20f;
-    }
-    return std::min(signal, 1.0f);
-}
 
 std::array<Gdiplus::PointF, 5> BuildStarPoints(
     float centerX,
@@ -165,27 +112,10 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const auto& matchGraph = runtime.assetNodeMatchGraphProfile;
     const float registryAppendageWeight =
         nodeRegistry.appendageEntry.resolved ? nodeRegistry.appendageEntry.registryWeight : 0.0f;
     const float assetAppendageWeight =
         assetBinding.appendageEntry.resolved ? assetBinding.appendageEntry.bindingWeight : 0.0f;
-    const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const float appendageIdentitySignal =
-        ResolveNodeSourceConfidence(finalTargetResolver.appendageEntry.sourceTag) *
-        std::min(
-            1.0f,
-            std::max(
-                ResolveNodePathSignal(finalTargetResolver.appendageEntry.modelNodePath),
-                ResolveNodePathSignal(finalTargetResolver.appendageEntry.assetNodePath)) +
-                ResolveSelectorSignal(
-                    finalTargetResolver.appendageEntry.selectorKey,
-                    finalTargetResolver.appendageEntry.candidateNodeName) +
-                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
-                    matchGraph.appendageEntry) *
-                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
-                                         matchGraph.appendageEntry,
-                                         "appendage")));
     const float poseAdornmentX =
         nodeBinding.appendageEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAdornmentY =
@@ -202,12 +132,10 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     scene.poseBadgeAlpha = 180.0f + poseReadabilityBias * 75.0f;
     scene.accessoryAlphaScale =
         1.0f + poseReadabilityBias * 0.12f + nodeBinding.appendageEntry.bindWeight * 0.05f +
-        registryAppendageWeight * 0.08f + assetAppendageWeight * 0.07f +
-        appendageIdentitySignal * 0.06f + (transformAdornmentScale - 1.0f) * 0.45f;
+        registryAppendageWeight * 0.08f + assetAppendageWeight * 0.07f + (transformAdornmentScale - 1.0f) * 0.45f;
     scene.accessoryStrokeWidth =
         1.0f + poseReadabilityBias * 0.22f + nodeBinding.appendageEntry.bindWeight * 0.08f +
-        registryAppendageWeight * 0.12f + assetAppendageWeight * 0.10f +
-        appendageIdentitySignal * 0.08f + (transformAdornmentScale - 1.0f) * 0.60f;
+        registryAppendageWeight * 0.12f + assetAppendageWeight * 0.10f + (transformAdornmentScale - 1.0f) * 0.60f;
 
     scene.poseBadgeVisible =
         runtime.poseBindingConfigured ||
@@ -230,12 +158,10 @@ void BuildWin32MouseCompanionRealRendererAdornment(
 
     float centerX =
         scene.appendageAnchor.X + scene.headRect.Width * (0.42f - style.accessoryXRatio + adornment.xOffsetRatio) +
-        poseAdornmentX * 0.25f + transformAdornmentX +
-        metrics.headWidth * appendageIdentitySignal * 0.015f * runtime.facingSign;
+        poseAdornmentX * 0.25f + transformAdornmentX;
     float centerY =
         scene.headAnchor.Y - scene.headRect.Height * (0.5f - style.accessoryYRatio - adornment.yOffsetRatio) +
-        poseAdornmentY * 0.20f + transformAdornmentY -
-        metrics.headHeight * appendageIdentitySignal * 0.010f;
+        poseAdornmentY * 0.20f + transformAdornmentY;
     const float baseWidth = scene.headRect.Width * style.accessoryOuterRatio * 2.0f * adornment.widthScale;
     const float baseHeight = scene.headRect.Width * style.accessoryOuterRatio * 2.0f * adornment.heightScale;
     const float actionIntensity = std::clamp(runtime.actionIntensity + runtime.reactiveActionIntensity * 0.6f, 0.0f, 1.0f);

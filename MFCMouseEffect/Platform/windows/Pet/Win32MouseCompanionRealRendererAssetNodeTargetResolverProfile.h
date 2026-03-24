@@ -10,15 +10,8 @@ struct Win32MouseCompanionRealRendererSceneRuntime;
 struct Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry final {
     std::string logicalNode;
     std::string parentLogicalNode;
-    std::string modelNodePath;
     std::string assetNodePath;
     std::string targetKind;
-    std::string sourceTag;
-    std::string selectorKey;
-    std::string candidateNodeName;
-    std::string resolvedNodeKey;
-    std::string resolvedNodeLabel;
-    float matchConfidence{0.0f};
     float resolvedOffsetX{0.0f};
     float resolvedOffsetY{0.0f};
     float resolvedScale{1.0f};

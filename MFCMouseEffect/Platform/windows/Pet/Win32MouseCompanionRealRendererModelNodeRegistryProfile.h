@@ -10,10 +10,7 @@ struct Win32MouseCompanionRealRendererSceneRuntime;
 struct Win32MouseCompanionRealRendererModelNodeRegistryEntry final {
     std::string logicalNode;
     std::string slotName;
-    std::string modelNodePath;
     std::string assetNodeName;
-    std::string assetNodePath;
-    std::string sourceTag;
     float registryWeight{0.0f};
     bool resolved{false};
 };

@@ -9,13 +9,8 @@ struct Win32MouseCompanionRealRendererSceneRuntime;
 
 struct Win32MouseCompanionRealRendererAssetNodeBindingEntry final {
     std::string logicalNode;
-    std::string slotName;
-    std::string modelNodePath;
     std::string assetNodeName;
     std::string assetNodePath;
-    std::string sourceTag;
-    std::string selectorKey;
-    std::string candidateNodeName;
     float bindingWeight{0.0f};
     bool resolved{false};
 };

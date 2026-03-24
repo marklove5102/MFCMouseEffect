@@ -1,8 +1,6 @@
 #pragma once
 
 #include <array>
-#include <string>
-#include <vector>
 
 #include <gdiplus.h>
 
@@ -39,218 +37,6 @@ struct Win32MouseCompanionRealRendererActionOverlay final {
     bool followTrailVisible{false};
     std::array<Gdiplus::RectF, 3> followTrailRects{};
     float followTrailBaseAlpha{150.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyActionLayer final {
-    Gdiplus::Color accentColor{};
-    bool clickShellVisible{false};
-    Gdiplus::RectF clickShellRect{};
-    float clickShellStrokeWidth{2.6f};
-    float clickShellAlpha{188.0f};
-    bool holdShellVisible{false};
-    Gdiplus::RectF holdShellRect{};
-    float holdShellAlpha{144.0f};
-    bool scrollShellVisible{false};
-    Gdiplus::RectF scrollShellRect{};
-    float scrollShellStartDeg{0.0f};
-    float scrollShellSweepDeg{0.0f};
-    float scrollShellStrokeWidth{3.4f};
-    float scrollShellAlpha{204.0f};
-    bool dragShellVisible{false};
-    Gdiplus::PointF dragShellStart{};
-    Gdiplus::PointF dragShellEnd{};
-    float dragShellStrokeWidth{2.8f};
-    float dragShellAlpha{196.0f};
-    bool followShellVisible{false};
-    std::array<Gdiplus::RectF, 3> followShellRects{};
-    float followShellBaseAlpha{138.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyAdornmentLayer final {
-    bool visible{false};
-    std::array<Gdiplus::RectF, 3> laneBadgeRects{};
-    std::array<bool, 3> laneReady{};
-    float laneAlphaScale{1.0f};
-    bool poseBadgeVisible{false};
-    Gdiplus::RectF poseBadgeRect{};
-    float poseBadgeAlphaScale{1.0f};
-    bool accessoryVisible{false};
-    Win32MouseCompanionRealRendererAccessoryShape accessoryShape{
-        Win32MouseCompanionRealRendererAccessoryShape::None};
-    Gdiplus::RectF accessoryBounds{};
-    std::array<Gdiplus::PointF, 5> accessoryStar{};
-    std::array<Gdiplus::PointF, 6> accessoryMoon{};
-    Gdiplus::RectF accessoryMoonInsetRect{};
-    std::array<Gdiplus::PointF, 4> accessoryLeaf{};
-    Gdiplus::PointF accessoryLeafVeinStart{};
-    Gdiplus::PointF accessoryLeafVeinEnd{};
-    std::array<Gdiplus::PointF, 4> accessoryRibbonLeft{};
-    std::array<Gdiplus::PointF, 4> accessoryRibbonRight{};
-    Gdiplus::RectF accessoryRibbonCenter{};
-    Gdiplus::PointF accessoryRibbonLeftFoldStart{};
-    Gdiplus::PointF accessoryRibbonLeftFoldEnd{};
-    Gdiplus::PointF accessoryRibbonRightFoldStart{};
-    Gdiplus::PointF accessoryRibbonRightFoldEnd{};
-    float accessoryAlphaScale{1.0f};
-    float accessoryStrokeScale{1.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyDetailLayer final {
-    bool visible{false};
-    Gdiplus::RectF leftEyeRect{};
-    Gdiplus::RectF rightEyeRect{};
-    Gdiplus::RectF leftPupilRect{};
-    Gdiplus::RectF rightPupilRect{};
-    Gdiplus::RectF leftHighlightRect{};
-    Gdiplus::RectF rightHighlightRect{};
-    Gdiplus::RectF noseRect{};
-    Gdiplus::RectF mouthRect{};
-    float mouthStartDeg{10.0f};
-    float mouthSweepDeg{160.0f};
-    Gdiplus::RectF leftBlushRect{};
-    Gdiplus::RectF rightBlushRect{};
-    std::array<Gdiplus::PointF, 3> leftWhiskerStart{};
-    std::array<Gdiplus::PointF, 3> leftWhiskerEnd{};
-    std::array<Gdiplus::PointF, 3> rightWhiskerStart{};
-    std::array<Gdiplus::PointF, 3> rightWhiskerEnd{};
-    float eyeAlphaScale{1.0f};
-    float mouthAlphaScale{1.0f};
-    float blushAlphaScale{1.0f};
-    float whiskerStrokeScale{1.0f};
-    float highlightAlphaScale{1.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyFrameLayer final {
-    bool visible{false};
-    Gdiplus::RectF bodyRect{};
-    Gdiplus::RectF headRect{};
-    Gdiplus::RectF tailRect{};
-    Gdiplus::RectF leftHandRect{};
-    Gdiplus::RectF rightHandRect{};
-    Gdiplus::RectF leftLegRect{};
-    Gdiplus::RectF rightLegRect{};
-    Gdiplus::RectF chestRect{};
-    Gdiplus::RectF neckBridgeRect{};
-    float fillAlphaScale{1.0f};
-    float strokeAlphaScale{1.0f};
-    float appendageAlphaScale{1.0f};
-    float strokeWidthScale{1.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyContourLayer final {
-    bool visible{false};
-    std::array<Gdiplus::PointF, 4> leftEar{};
-    std::array<Gdiplus::PointF, 4> rightEar{};
-    Gdiplus::RectF leftEarRootCuffRect{};
-    Gdiplus::RectF rightEarRootCuffRect{};
-    Gdiplus::RectF leftEarOcclusionCapRect{};
-    Gdiplus::RectF rightEarOcclusionCapRect{};
-    Gdiplus::RectF leftShoulderPatchRect{};
-    Gdiplus::RectF rightShoulderPatchRect{};
-    Gdiplus::RectF leftHipPatchRect{};
-    Gdiplus::RectF rightHipPatchRect{};
-    Gdiplus::RectF bellyContourRect{};
-    Gdiplus::RectF sternumContourRect{};
-    Gdiplus::RectF upperTorsoContourRect{};
-    Gdiplus::RectF leftTorsoCadenceBridgeRect{};
-    Gdiplus::RectF rightTorsoCadenceBridgeRect{};
-    Gdiplus::RectF leftBackContourRect{};
-    Gdiplus::RectF rightBackContourRect{};
-    Gdiplus::RectF leftFlankContourRect{};
-    Gdiplus::RectF rightFlankContourRect{};
-    Gdiplus::RectF leftHeadShoulderBridgeRect{};
-    Gdiplus::RectF rightHeadShoulderBridgeRect{};
-    float rearAlphaScale{1.0f};
-    float strokeAlphaScale{1.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyAppendageLayer final {
-    bool visible{false};
-    Gdiplus::RectF tailRootCuffRect{};
-    Gdiplus::RectF tailBridgeRect{};
-    Gdiplus::RectF tailMidContourRect{};
-    Gdiplus::RectF tailTipBridgeRect{};
-    Gdiplus::RectF tailTipRect{};
-    Gdiplus::RectF leftLegSilhouetteBridgeRect{};
-    Gdiplus::RectF rightLegSilhouetteBridgeRect{};
-    Gdiplus::RectF leftLegCadenceBridgeRect{};
-    Gdiplus::RectF rightLegCadenceBridgeRect{};
-    Gdiplus::RectF leftLegRootCuffRect{};
-    Gdiplus::RectF rightLegRootCuffRect{};
-    Gdiplus::RectF leftLegPadRect{};
-    Gdiplus::RectF rightLegPadRect{};
-    Gdiplus::RectF leftHandSilhouetteBridgeRect{};
-    Gdiplus::RectF rightHandSilhouetteBridgeRect{};
-    Gdiplus::RectF leftHandCadenceBridgeRect{};
-    Gdiplus::RectF rightHandCadenceBridgeRect{};
-    Gdiplus::RectF leftHandRootCuffRect{};
-    Gdiplus::RectF rightHandRootCuffRect{};
-    Gdiplus::RectF leftHandPadRect{};
-    Gdiplus::RectF rightHandPadRect{};
-    float rearAlphaScale{1.0f};
-    float accentAlphaScale{1.0f};
-    float strokeAlphaScale{1.0f};
-};
-
-struct Win32MouseCompanionRealRendererSceneGraphNode final {
-    uint32_t nodeIndex{0};
-    std::string nodeName;
-    std::string nodePath;
-    Gdiplus::RectF bounds{};
-    Gdiplus::Color fill{};
-    bool highlighted{false};
-};
-
-struct Win32MouseCompanionRealRendererSceneGraphEdge final {
-    uint32_t fromNodeIndex{0};
-    uint32_t toNodeIndex{0};
-    Gdiplus::PointF start{};
-    Gdiplus::PointF end{};
-    float alpha{96.0f};
-};
-
-struct Win32MouseCompanionRealRendererSceneGraphLink final {
-    std::string logicalNode;
-    Gdiplus::PointF start{};
-    Gdiplus::PointF end{};
-    Gdiplus::Color color{};
-    float alpha{168.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyNode final {
-    std::string logicalNode;
-    Gdiplus::RectF bounds{};
-    Gdiplus::Color fill{};
-    float alpha{164.0f};
-    bool resolved{false};
-};
-
-struct Win32MouseCompanionRealRendererModelProxyLink final {
-    std::string logicalNode;
-    Gdiplus::PointF start{};
-    Gdiplus::PointF end{};
-    Gdiplus::Color color{};
-    float alpha{136.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxySurface final {
-    std::string surfaceKey;
-    std::vector<Gdiplus::PointF> polygon{};
-    Gdiplus::Color fill{};
-    float alpha{112.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelProxySilhouette final {
-    std::string logicalNode;
-    Gdiplus::RectF bounds{};
-    Gdiplus::Color fill{};
-    float alpha{104.0f};
-};
-
-struct Win32MouseCompanionRealRendererModelMeshTriangle final {
-    std::array<Gdiplus::PointF, 3> points{};
-    Gdiplus::Color fill{};
-    float alpha{128.0f};
 };
 
 struct Win32MouseCompanionRealRendererScene final {
@@ -300,18 +86,6 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::Color accessoryStroke{};
     float shadowAlphaScale{1.0f};
     float pedestalAlphaScale{1.0f};
-    float previewBodyAlphaScale{1.0f};
-    float previewHeadAlphaScale{1.0f};
-    float previewAppendageAlphaScale{1.0f};
-    float previewTailAlphaScale{1.0f};
-    float previewHandAlphaScale{1.0f};
-    float previewLegAlphaScale{1.0f};
-    float previewTailStrokeScale{1.0f};
-    float previewHandStrokeScale{1.0f};
-    float previewLegStrokeScale{1.0f};
-    float previewDetailAlphaScale{1.0f};
-    float previewAdornmentAlphaScale{1.0f};
-    float proxyDominance{0.0f};
     float poseBadgeAlpha{255.0f};
     float accessoryAlphaScale{1.0f};
     float accessoryStrokeWidth{1.0f};
@@ -448,25 +222,6 @@ struct Win32MouseCompanionRealRendererScene final {
     Gdiplus::PointF accessoryRibbonRightFoldStart{};
     Gdiplus::PointF accessoryRibbonRightFoldEnd{};
     Win32MouseCompanionRealRendererActionOverlay actionOverlay{};
-    Win32MouseCompanionRealRendererModelProxyAppendageLayer modelProxyAppendageLayer{};
-    Win32MouseCompanionRealRendererModelProxyContourLayer modelProxyContourLayer{};
-    Win32MouseCompanionRealRendererModelProxyFrameLayer modelProxyFrameLayer{};
-    Win32MouseCompanionRealRendererModelProxyDetailLayer modelProxyDetailLayer{};
-    Win32MouseCompanionRealRendererModelProxyAdornmentLayer modelProxyAdornmentLayer{};
-    Win32MouseCompanionRealRendererModelProxyActionLayer modelProxyActionLayer{};
-    bool modelSceneGraphVisible{false};
-    Gdiplus::RectF modelSceneGraphBounds{};
-    std::vector<Win32MouseCompanionRealRendererSceneGraphNode> modelSceneGraphNodes{};
-    std::vector<Win32MouseCompanionRealRendererSceneGraphEdge> modelSceneGraphEdges{};
-    std::vector<Win32MouseCompanionRealRendererSceneGraphLink> modelSceneGraphLinks{};
-    bool modelProxyVisible{false};
-    bool modelMeshVisible{false};
-    std::vector<Win32MouseCompanionRealRendererModelProxySilhouette> modelProxySilhouettes{};
-    std::vector<Win32MouseCompanionRealRendererModelProxySurface> modelProxySurfaces{};
-    std::vector<Win32MouseCompanionRealRendererModelProxyNode> modelProxyNodes{};
-    std::vector<Win32MouseCompanionRealRendererModelProxyLink> modelProxyLinks{};
-    std::vector<Gdiplus::PointF> modelProxyHull{};
-    std::vector<Win32MouseCompanionRealRendererModelMeshTriangle> modelMeshTriangles{};
 };
 
 } // namespace mousefx::windows

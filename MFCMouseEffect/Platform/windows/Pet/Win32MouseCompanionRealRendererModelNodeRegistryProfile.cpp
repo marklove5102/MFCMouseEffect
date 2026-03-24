@@ -9,25 +9,6 @@
 namespace mousefx::windows {
 namespace {
 
-const char* ResolveAssetNodePathSuffix(const std::string& assetNodeName) {
-    if (assetNodeName == "asset.body.root") {
-        return "body/root";
-    }
-    if (assetNodeName == "asset.head.anchor") {
-        return "body/head";
-    }
-    if (assetNodeName == "asset.appendage.anchor") {
-        return "body/appendage";
-    }
-    if (assetNodeName == "asset.overlay.anchor") {
-        return "fx/overlay";
-    }
-    if (assetNodeName == "asset.grounding.anchor") {
-        return "fx/grounding";
-    }
-    return "unknown";
-}
-
 std::string ResolveRegistryState(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
     const std::string& slotState = runtime.modelNodeSlotProfile.slotState;
@@ -81,15 +62,11 @@ const char* ResolveAssetNodeName(const std::string& slotName) {
 
 Win32MouseCompanionRealRendererModelNodeRegistryEntry BuildRegistryEntry(
     const Win32MouseCompanionRealRendererModelNodeSlotEntry& slotEntry,
-    const std::string& assetNodeSelectorPrefix,
     bool registryReady) {
     Win32MouseCompanionRealRendererModelNodeRegistryEntry entry{};
     entry.logicalNode = slotEntry.logicalNode;
     entry.slotName = slotEntry.slotName;
-    entry.modelNodePath = slotEntry.modelNodePath;
     entry.assetNodeName = ResolveAssetNodeName(slotEntry.slotName);
-    entry.assetNodePath = assetNodeSelectorPrefix + "/" + ResolveAssetNodePathSuffix(entry.assetNodeName);
-    entry.sourceTag = slotEntry.sourceTag;
     entry.registryWeight = ResolveRegistryWeight(slotEntry.logicalNode, slotEntry.bindWeight);
     entry.resolved = registryReady && slotEntry.slotReady && entry.registryWeight > 0.0f;
     return entry;
@@ -162,13 +139,11 @@ BuildWin32MouseCompanionRealRendererModelNodeRegistryProfile(
 
     const bool registryReady = runtime.assets && runtime.assets->modelNodeRegistryReady;
     const auto& slots = runtime.modelNodeSlotProfile;
-    const std::string assetNodeSelectorPrefix =
-        runtime.assets == nullptr ? "/preview/asset" : runtime.assets->modelNodeSelectorPrefix;
-    profile.bodyEntry = BuildRegistryEntry(slots.bodySlot, assetNodeSelectorPrefix, registryReady);
-    profile.headEntry = BuildRegistryEntry(slots.headSlot, assetNodeSelectorPrefix, registryReady);
-    profile.appendageEntry = BuildRegistryEntry(slots.appendageSlot, assetNodeSelectorPrefix, registryReady);
-    profile.overlayEntry = BuildRegistryEntry(slots.overlaySlot, assetNodeSelectorPrefix, registryReady);
-    profile.groundingEntry = BuildRegistryEntry(slots.groundingSlot, assetNodeSelectorPrefix, registryReady);
+    profile.bodyEntry = BuildRegistryEntry(slots.bodySlot, registryReady);
+    profile.headEntry = BuildRegistryEntry(slots.headSlot, registryReady);
+    profile.appendageEntry = BuildRegistryEntry(slots.appendageSlot, registryReady);
+    profile.overlayEntry = BuildRegistryEntry(slots.overlaySlot, registryReady);
+    profile.groundingEntry = BuildRegistryEntry(slots.groundingSlot, registryReady);
 
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief =
