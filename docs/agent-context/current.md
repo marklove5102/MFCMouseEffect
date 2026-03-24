@@ -142,7 +142,7 @@
 - Backend selection diagnostics are active for preference source/name, selected backend, selection/failure reasons, available/unavailable backends, backend catalog, `real_renderer_preview`, and `renderer_runtime_*`.
 - Backend lifecycle seam treats `Start() / IsReady() / LastErrorReason()` as first-class fallback signals.
 - Placeholder backend remains the always-ready reference implementation.
-- `real` backend has a complete internal preview pipeline, but default selection still keeps it behind rollout gate `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE`.
+- `real` backend now defaults to enabled when available; `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE=0|false|off|no` is the explicit opt-out gate.
 - Real-preview dynamic readability is already stronger:
   - `dreamy` biases `follow` toward lighter lift and softer grounding
   - `agile` biases `drag/follow` toward sharper lean and reach

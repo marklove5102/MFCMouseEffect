@@ -29,6 +29,10 @@ Expected long-term stack:
 - presenter/runtime coordinator
 - renderer backend
 
+## Current Rollout Rule
+- Windows real renderer is now default-on when its availability probes pass.
+- `MFX_WIN32_MOUSE_COMPANION_REAL_RENDERER_ENABLE=0|false|off|no` is the explicit opt-out switch for forcing fallback/placeholder validation.
+
 Conceptually:
 - `asset coordinator -> presenter/runtime -> renderer backend`
 

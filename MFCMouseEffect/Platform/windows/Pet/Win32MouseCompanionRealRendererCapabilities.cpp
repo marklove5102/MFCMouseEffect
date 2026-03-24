@@ -39,6 +39,15 @@ bool IsEnabledByEnv(const char* key) {
     return normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "on";
 }
 
+bool IsDisabledByEnv(const char* key) {
+    const std::string raw = ReadEnvCopy(key);
+    if (raw.empty()) {
+        return false;
+    }
+    const std::string normalized = ToLowerAscii(TrimAscii(raw));
+    return normalized == "0" || normalized == "false" || normalized == "no" || normalized == "off";
+}
+
 } // namespace
 
 bool IsWin32MouseCompanionRealRendererAssetResourceAdapterReady() {
@@ -54,7 +63,13 @@ bool IsWin32MouseCompanionRealRendererDrawExecutionReady() {
 }
 
 bool IsWin32MouseCompanionRealRendererRolloutEnabled() {
-    return IsEnabledByEnv(kRealRendererEnableEnvVar);
+    if (IsDisabledByEnv(kRealRendererEnableEnvVar)) {
+        return false;
+    }
+    if (IsEnabledByEnv(kRealRendererEnableEnvVar)) {
+        return true;
+    }
+    return true;
 }
 
 std::vector<std::string> ListWin32MouseCompanionRealRendererUnmetRequirements() {
