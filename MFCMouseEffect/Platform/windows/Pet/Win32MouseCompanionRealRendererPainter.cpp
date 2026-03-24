@@ -312,6 +312,11 @@ void DrawModelMeshLayer(
     }
 }
 
+void DrawActionOverlay(
+    Gdiplus::Graphics* graphics,
+    const Win32MouseCompanionRealRendererActionOverlay& overlay,
+    const Gdiplus::Color& strokeColor);
+
 void DrawMeshFirstScene(
     Gdiplus::Graphics* graphics,
     const Win32MouseCompanionRealRendererScene& scene) {
