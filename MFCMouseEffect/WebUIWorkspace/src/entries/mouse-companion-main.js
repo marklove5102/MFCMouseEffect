@@ -1030,6 +1030,34 @@ function writeRuntimeDiagnostics(runtimeState) {
     ),
   );
   writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_consumer_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_consumer_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_consumer_consumer_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_consumer_consumer_brief,
+      'body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_consumer_registry_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_consumer_registry_brief,
+      'preview_only/0/0',
+    ),
+  );
+  writeTextValue(
+    'mc_runtime_scene_runtime_model_asset_node_consumer_registry_registry_brief',
+    normalizeRuntimeText(
+      runtimeState.renderer_runtime_scene_runtime_model_asset_node_consumer_registry_registry_brief,
+      'body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only',
+    ),
+  );
+  writeTextValue(
     'mc_runtime_scene_runtime_asset_node_binding_brief',
     normalizeRuntimeText(runtimeState.renderer_runtime_scene_runtime_asset_node_binding_brief, 'preview_only/0/0'),
   );
