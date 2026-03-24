@@ -17,6 +17,10 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping|x64">
+      <Configuration>Shipping</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -56,6 +60,14 @@
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -71,6 +83,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -90,6 +105,11 @@
     <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)..\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
@@ -201,6 +221,43 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ResourceCompile>
       <Culture>0x0804</Culture>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist "$(OutDir)webui" rmdir /S /Q "$(OutDir)webui"
+if exist "$(ProjectDir)WebUI" xcopy /E /Y /I "$(ProjectDir)WebUI" "$(OutDir)webui\\"
+if exist "$(ProjectDir)Runtime\Dawn\webgpu_dawn.dll" copy /Y "$(ProjectDir)Runtime\Dawn\webgpu_dawn.dll" "$(OutDir)webgpu_dawn.dll"
+if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;MFX_SHIPPING_BUILD=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;MFX_SHIPPING_BUILD=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
@@ -977,29 +1034,59 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.cpp" />
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.Routing.cpp" />
     <ClCompile Include="MouseFx\Server\core\WebSettingsServer.TokenMonitor.cpp" />
-    <ClCompile Include="MouseFx\Server\diagnostics\MouseCompanionRendererBackendDiagnostics.cpp" />
-    <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.Diagnostics.cpp" />
+    <ClCompile Include="MouseFx\Server\diagnostics\MouseCompanionRendererBackendDiagnostics.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.Diagnostics.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.InputCaptureDiagnostics.cpp" />
     <ClCompile Include="MouseFx\Server\diagnostics\SettingsStateMapper.WasmDiagnostics.cpp" />
     <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.AutomationCatalogRoutes.cpp" />
     <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.AutomationRoutes.cpp" />
     <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.AutomationRouteUtils.cpp" />
     <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.AutomationShortcutCaptureRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationApiRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationInjectionApiRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationRouteUtils.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationScopeApiRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationShortcutApiRoutes.cpp" />
+    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationInjectionApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationRouteUtils.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationScopeApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\automation\WebSettingsServer.TestAutomationShortcutApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MouseFx\Server\routes\core\WebSettingsServer.CoreApiRoutes.cpp" />
     <ClCompile Include="MouseFx\Server\routes\core\WebSettingsServer.RequestGateway.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.MouseCompanionRenderProof.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestApiRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsApiRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsOverlayApiRoute.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsProfileApiRoute.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestMouseCompanionApiRoutes.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestRouteCommon.cpp" />
-    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestWasmInputApiRoutes.cpp" />
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.MouseCompanionRenderProof.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsOverlayApiRoute.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestEffectsProfileApiRoute.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestMouseCompanionApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestRouteCommon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MouseFx\Server\routes\testing\WebSettingsServer.TestWasmInputApiRoutes.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MouseFx\Server\routes\wasm\WebSettingsServer.WasmCatalogQueryRoutes.cpp" />
     <ClCompile Include="MouseFx\Server\routes\wasm\WebSettingsServer.WasmCatalogRoutes.cpp" />
     <ClCompile Include="MouseFx\Server\routes\wasm\WebSettingsServer.WasmExportRoutes.cpp" />
@@ -1033,6 +1120,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Platform\windows\Shell\Tray\Win32TrayMenuBuilder.cpp" />
     <ClCompile Include="Platform\windows\Shell\Tray\Win32TrayHostWindow.cpp" />

@@ -182,6 +182,7 @@
 - Default non-debug run avoids high-volume debug lanes.
 - WebUI debug polling is adaptive and focus-aware.
 - Mouse companion test route remains gated behind `MFX_ENABLE_MOUSE_COMPANION_TEST_API=1`.
+- Windows now also has a separate `Shipping|x64` project configuration for minimal release size: it keeps the main runtime/WebUI path but excludes `/api/test` route compilation plus the heavy `/api/state` runtime-diagnostics composition used for render-proof/lane-matrix style inspection.
 
 ## Regression Gates
 - Canonical regression entry: `./tools/platform/regression/run-posix-regression-suite.sh --platform auto`

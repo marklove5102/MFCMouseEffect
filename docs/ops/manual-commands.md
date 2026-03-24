@@ -18,6 +18,12 @@ Keep P1 concise; add details here when needed.
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-gesture-calibration-sweep.sh --skip-build`
 
 ## Windows Mouse Companion Bring-Up
+- minimal shipping build command:
+  - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\amd64\MSBuild.exe F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect\MFCMouseEffect.vcxproj /t:Build /p:Configuration=Shipping;Platform=x64`
+  - intent:
+    - keep the app runnable
+    - keep normal WebUI/static asset serving
+    - exclude `/api/test` routes and the heavy runtime diagnostics composition used for deep proof / lane-matrix inspection
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route sweep`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route proof -Event click`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Preset real-preview-smoke`
