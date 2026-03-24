@@ -80,6 +80,10 @@
   - 解析 `glb` header/chunk（v2，JSON chunk）
   - 提取 `skins[joints]` 与 `nodes` 父子关系
   - 构建 `SkeletonDesc`（骨骼名、父索引、源节点索引）
+- Windows real renderer 现在也已接入最小 `glb` 节点树摘要链路：
+  - 解析 `pet-main.glb` 的 header + JSON chunk
+  - 产出 `node index / parent / children / path`
+  - 首轮节点匹配从 `assetNodeMatchGraphProfile` 开始优先消费这组真实节点摘要，失败时仍回退 preview
 - `AppController::Start()` 现在会尝试加载默认模型路径：
   - `Assets/Pet3D/source/pet-main.glb`
   - `MFCMouseEffect/Assets/Pet3D/source/pet-main.glb`

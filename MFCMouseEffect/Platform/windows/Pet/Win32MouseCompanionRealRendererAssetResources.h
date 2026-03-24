@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Platform/windows/Pet/Win32MouseCompanionRendererInput.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGlbNodeTree.h"
 
 namespace mousefx::windows {
 
@@ -13,12 +14,14 @@ struct Win32MouseCompanionRealRendererAssetResources final {
     std::string modelFileName;
     std::string modelRootNodeKey{"preview_root"};
     std::string modelNodeSelectorPrefix{"/preview/model"};
+    Win32MouseCompanionRealRendererGlbNodeTree modelNodeTree{};
     std::string actionLibraryPath;
     std::string appearanceProfileSkinVariantId{"default"};
     std::vector<std::string> appearanceAccessoryIds;
     std::string appearanceRequestedPresetId;
     std::string appearanceResolvedPresetId;
     bool modelReady{false};
+    bool modelNodeTreeLoaded{false};
     bool modelNodeSlotsReady{false};
     bool modelNodeRegistryReady{false};
     bool assetNodeBindingsReady{false};

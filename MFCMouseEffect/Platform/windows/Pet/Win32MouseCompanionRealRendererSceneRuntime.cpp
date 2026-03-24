@@ -40,6 +40,9 @@ Win32MouseCompanionRealRendererSceneRuntime BuildWin32MouseCompanionRealRenderer
     sceneRuntime.click = runtime.click;
     sceneRuntime.poseFrameAvailable = runtime.poseFrameAvailable;
     sceneRuntime.poseBindingConfigured = runtime.poseBindingConfigured;
+    sceneRuntime.realModelNodeTreeLoaded = assets.modelNodeTreeLoaded;
+    sceneRuntime.realModelNodeCount =
+        static_cast<uint32_t>(assets.modelNodeTree.nodes.size());
     sceneRuntime.sceneRuntimeAdapterMode = runtime.sceneRuntimeAdapterMode;
     sceneRuntime.sceneRuntimePoseSampleCount = runtime.sceneRuntimePoseSampleCount;
     sceneRuntime.sceneRuntimeBoundPoseSampleCount = runtime.sceneRuntimeBoundPoseSampleCount;

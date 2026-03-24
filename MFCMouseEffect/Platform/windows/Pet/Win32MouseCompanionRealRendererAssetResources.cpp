@@ -75,6 +75,11 @@ Win32MouseCompanionRealRendererAssetResources BuildWin32MouseCompanionRealRender
     resources.appearanceRequestedPresetId = input.appearanceProfile.requestedPresetId;
     resources.appearanceResolvedPresetId = input.appearanceProfile.resolvedPresetId;
     resources.modelReady = input.modelAssetAvailable && !resources.modelPath.empty();
+    if (resources.modelReady && resources.modelSourceFormat == "glb") {
+        resources.modelNodeTree =
+            LoadWin32MouseCompanionRealRendererGlbNodeTree(resources.modelPath);
+        resources.modelNodeTreeLoaded = resources.modelNodeTree.loaded;
+    }
     resources.modelNodeSlotsReady = resources.modelReady;
     resources.modelNodeRegistryReady = resources.modelNodeSlotsReady;
     resources.assetNodeBindingsReady = resources.modelNodeRegistryReady;
