@@ -46,6 +46,8 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodePresentationRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeVisibilityProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeVisibilityRegistryProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodePresenceProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodePresenceRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeLiftProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeMountProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeResolveProfile.h"
@@ -176,6 +178,10 @@ struct Win32MouseCompanionRealRendererSceneRuntime final {
         modelAssetNodeVisibilityProfile{};
     Win32MouseCompanionRealRendererModelAssetNodeVisibilityRegistryProfile
         modelAssetNodeVisibilityRegistryProfile{};
+    Win32MouseCompanionRealRendererModelAssetNodePresenceProfile
+        modelAssetNodePresenceProfile{};
+    Win32MouseCompanionRealRendererModelAssetNodePresenceRegistryProfile
+        modelAssetNodePresenceRegistryProfile{};
     Win32MouseCompanionRealRendererAssetNodeBindingProfile assetNodeBindingProfile{};
     Win32MouseCompanionRealRendererAssetNodeTransformProfile assetNodeTransformProfile{};
     Win32MouseCompanionRealRendererAssetNodeResolverProfile assetNodeResolverProfile{};
