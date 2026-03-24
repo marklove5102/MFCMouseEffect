@@ -101,6 +101,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFootprintProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionOverlayProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionLayerProjector.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionAnchorProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageActionProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageGeometryProjector.h"
@@ -309,6 +310,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
     ApplyWin32MouseCompanionRealRendererModelProxyPaletteProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyPresenceProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyActionProjector(scene);
+    ApplyWin32MouseCompanionRealRendererModelProxyActionAnchorProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyAppendageActionProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyAppendagePresenceProjector(scene);
     ApplyWin32MouseCompanionRealRendererModelProxyAppendageStrokeProjector(scene);
