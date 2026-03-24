@@ -36,6 +36,15 @@ export const CARD_SECTIONS = [
     mountId: 'input_indicator_settings_mount',
   },
   {
+    id: 'cursor-decoration',
+    cardClass: 'card-input',
+    titleKey: 'section_cursor_decoration',
+    titleDefault: 'Cursor Decoration',
+    descKey: 'desc_cursor_decoration',
+    descDefault: 'Attach a persistent cursor decorator plugin such as a ring, orb, or meteor head.',
+    mountId: 'cursor_decoration_settings_mount',
+  },
+  {
     id: 'automation',
     cardClass: 'card-automation',
     titleKey: 'section_automation',

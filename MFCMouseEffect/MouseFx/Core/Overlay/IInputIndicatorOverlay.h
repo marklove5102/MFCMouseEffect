@@ -28,6 +28,9 @@ public:
     virtual void OnClick(const ClickEvent& ev) = 0;
     virtual void OnScroll(const ScrollEvent& ev) = 0;
     virtual void OnKey(const KeyEvent& ev) = 0;
+    virtual void OnMove(const ScreenPoint& pt) {
+        (void)pt;
+    }
 
     virtual bool ReadDebugState(InputIndicatorDebugState* outState) const {
         (void)outState;

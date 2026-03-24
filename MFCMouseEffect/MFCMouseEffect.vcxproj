@@ -501,6 +501,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClInclude Include="Platform\windows\Renderers\Hold\FluxFieldHudGpuV2D2DBackend.h" />
     <ClInclude Include="Platform\windows\Renderers\Hold\HoldQuantumHaloGpuV2D2DBackend.h" />
     <ClInclude Include="MouseFx\Renderers\Indicator\IndicatorRenderer.h" />
+    <ClInclude Include="MouseFx\Renderers\Indicator\CursorDecorationRenderer.h" />
     <ClInclude Include="MouseFx\Core\System\GdiPlusSession.h" />
     <ClInclude Include="MouseFx\Core\System\CursorPositionProvider.h" />
     <ClInclude Include="MouseFx\Core\System\ICursorPositionService.h" />
@@ -918,6 +919,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="MouseFx\Core\Control\DispatchRouter.Pointer.cpp" />
     <ClCompile Include="MouseFx\Effects\RippleBasedHoldRuntime.cpp" />
     <ClCompile Include="MouseFx\Renderers\Indicator\IndicatorRenderer.cpp" />
+    <ClCompile Include="MouseFx\Renderers\Indicator\CursorDecorationRenderer.cpp" />
     <ClCompile Include="MouseFx\Styles\ThemeCatalogLoader.cpp" />
     <ClCompile Include="MouseFx\Styles\ThemeStyle.cpp" />
     <ClCompile Include="MouseFx\Effects\TextEffect.cpp" />

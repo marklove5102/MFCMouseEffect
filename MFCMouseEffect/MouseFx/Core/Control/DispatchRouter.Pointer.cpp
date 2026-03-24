@@ -117,6 +117,7 @@ intptr_t DispatchRouter::OnMove(const DispatchMessage& message) {
 #else
     ctrl_->RememberLastPointerPoint(pt);
 #endif
+    ctrl_->IndicatorOverlay().OnMove(pt);
 
     petFeature_.OnMouseMove(*ctrl_, pt);
     automationFeature_.OnMouseMove(*ctrl_, pt);

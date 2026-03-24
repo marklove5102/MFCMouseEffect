@@ -164,6 +164,16 @@ struct MouseCompanionConfig {
 
 // Configuration for input action indicator (mouse/keyboard overlay).
 struct InputIndicatorConfig {
+    struct CursorDecorationConfig {
+        bool enabled = false;
+        // Built-in plugin id: "ring" | "orb" | "meteor_head"
+        std::string pluginId = "ring";
+        // Hex RGB color such as "#ff5a5a".
+        std::string colorHex = "#ff5a5a";
+        int sizePx = 22;
+        int alphaPercent = 82;
+    };
+
     bool enabled = true;
     bool keyboardEnabled = true;
     // Renderer backend: "native" | "wasm".
@@ -196,6 +206,7 @@ struct InputIndicatorConfig {
 
     // Per-monitor overrides (monitorId -> {enabled, x, y})
     std::map<std::string, PerMonitorPosOverride> perMonitorOverrides;
+    CursorDecorationConfig cursorDecoration;
 };
 
 struct AutomationKeyBinding {

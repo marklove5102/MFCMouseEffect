@@ -192,6 +192,29 @@ MouseCompanionConfig SanitizeMouseCompanionConfig(MouseCompanionConfig config) {
 }
 
 InputIndicatorConfig SanitizeInputIndicatorConfig(InputIndicatorConfig config) {
+    config.cursorDecoration.pluginId = ToLowerAscii(TrimAscii(config.cursorDecoration.pluginId));
+    if (config.cursorDecoration.pluginId != "ring" &&
+        config.cursorDecoration.pluginId != "orb" &&
+        config.cursorDecoration.pluginId != "meteor_head") {
+        config.cursorDecoration.pluginId = "ring";
+    }
+    config.cursorDecoration.colorHex = TrimAscii(config.cursorDecoration.colorHex);
+    if (config.cursorDecoration.colorHex.size() != 7 ||
+        config.cursorDecoration.colorHex[0] != '#' ||
+        !std::all_of(config.cursorDecoration.colorHex.begin() + 1,
+                     config.cursorDecoration.colorHex.end(),
+                     [](unsigned char ch) { return std::isxdigit(ch) != 0; })) {
+        config.cursorDecoration.colorHex = "#ff5a5a";
+    } else {
+        std::transform(
+            config.cursorDecoration.colorHex.begin(),
+            config.cursorDecoration.colorHex.end(),
+            config.cursorDecoration.colorHex.begin(),
+            [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    }
+    config.cursorDecoration.sizePx = ClampInt(config.cursorDecoration.sizePx, 12, 72);
+    config.cursorDecoration.alphaPercent = ClampInt(config.cursorDecoration.alphaPercent, 15, 100);
+
     config.positionMode = (config.positionMode == "absolute") ? "absolute" : "relative";
     config.renderMode = ToLowerAscii(TrimAscii(config.renderMode));
     if (config.renderMode != "native" && config.renderMode != "wasm") {

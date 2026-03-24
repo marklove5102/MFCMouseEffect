@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-24T14:09:49.400Z",
+  "generated_at": "2026-03-24T15:34:32.863Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -86,13 +86,13 @@
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
       "line_count": 220,
-      "size_bytes": 22992,
-      "estimated_tokens": 5748,
+      "size_bytes": 23328,
+      "estimated_tokens": 5832,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": false,
-      "hash_sha1": "7c1181da093e878df9dc87dbcea054b5b1951484",
-      "updated_at": "2026-03-24T14:09:26.530Z"
+      "hash_sha1": "3e7dbf3ec4831ba72ed957a7c264e015e02747f2",
+      "updated_at": "2026-03-24T15:30:33.132Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -123,14 +123,14 @@
       ],
       "summary": "This file is a P2 routing map.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 82,
-      "size_bytes": 4920,
-      "estimated_tokens": 1230,
+      "line_count": 86,
+      "size_bytes": 5137,
+      "estimated_tokens": 1285,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "07924484138eafce26df342859e889450ec29cc3",
-      "updated_at": "2026-03-22T09:24:21.022Z"
+      "hash_sha1": "bd65a5e439dcf8e81f9c554419aebaebe7b6a72f",
+      "updated_at": "2026-03-24T15:29:17.245Z"
     },
     {
       "id": "docs/architecture/agent-doc-governance.md",
@@ -191,6 +191,35 @@
       "line_limit_exceeded": false,
       "hash_sha1": "8d56f26976c437177bde461f9ddc4fc57df64830",
       "updated_at": "2026-03-21T03:16:41.549Z"
+    },
+    {
+      "id": "docs/architecture/cursor-decoration-plugin-contract.md",
+      "relative_path": "docs/architecture/cursor-decoration-plugin-contract.md",
+      "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/cursor-decoration-plugin-contract.md",
+      "priority": "P2",
+      "role": "architecture",
+      "topic": "wasm",
+      "first_read_rank": 0,
+      "tags": [
+        "cursor",
+        "decoration",
+        "plugin",
+        "contract",
+        "wasm",
+        "indicator",
+        "windows",
+        "abi"
+      ],
+      "summary": "cursor-decoration-plugin-contract",
+      "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
+      "line_count": 44,
+      "size_bytes": 1673,
+      "estimated_tokens": 419,
+      "max_read_tokens": 539,
+      "line_limit": 0,
+      "line_limit_exceeded": false,
+      "hash_sha1": "9060d53358018de31b85683f91760289650e5074",
+      "updated_at": "2026-03-24T15:29:05.704Z"
     },
     {
       "id": "docs/architecture/custom-effects-wasm-route.md",

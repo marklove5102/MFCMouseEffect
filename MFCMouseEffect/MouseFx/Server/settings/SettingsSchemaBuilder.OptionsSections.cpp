@@ -138,6 +138,15 @@ void AppendSettingsSchemaOptionsSections(const EffectConfig& config, json* out) 
         {{"value","native"},{"label", LabelByLang(L"\u539f\u751f\u6307\u793a\u5668\uff08\u63a8\u8350\uff09", L"Native Indicator (Recommended)", lang)}},
         {{"value","wasm"},{"label", LabelByLang(L"WASM \u6307\u793a\u5668\uff08\u81ea\u5b9a\u4e49\u6837\u5f0f\uff09", L"WASM Indicator (Custom Style)", lang)}}
     });
+    (*out)["cursor_decoration"] = {
+        {"plugins", json::array({
+            MakeOpt("ring", L"\u6307\u793a\u5708", L"Indicator Ring", lang),
+            MakeOpt("orb", L"\u5149\u7403", L"Glow Orb", lang),
+            MakeOpt("meteor_head", L"\u6d41\u661f\u5934", L"Meteor Head", lang),
+        })},
+        {"size_px_range", {{"min", 12}, {"max", 72}, {"step", 1}}},
+        {"alpha_percent_range", {{"min", 15}, {"max", 100}, {"step", 1}}},
+    };
     (*out)["key_display_modes"] = json::array({
         {{"value","all"},{"label", LabelByLang(L"\u663e\u793a\u5168\u90e8", L"Display All", lang)}},
         {{"value","significant"},{"label", LabelByLang(L"\u4ec5\u91cd\u8981\u6309\u952e (\u63a8\u8350)", L"Significant Keys Only (Recommended)", lang)}},

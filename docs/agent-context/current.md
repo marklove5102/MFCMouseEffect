@@ -21,6 +21,7 @@
 
 ### Visual Effects / WASM
 - `click / trail / scroll / hold / hover` are active in `core`.
+- New additive lane `cursor_decoration` is active through the existing input-indicator overlay seam; current built-in decoration plugin ids are `ring`, `orb`, and `meteor_head`, and the lane is configured from the dedicated `Cursor Decoration` WebUI card while persisting under `input_indicator.cursor_decoration`.
 - Shared command tail (`blend_mode / sort_key / group_id`) is active.
 - Group-retained model is active; transform/material/pass remain host-owned.
 - Windows blacklist routing root fix is active: pointer suppression resolves the process at the current screen point first, and trail synthetic-follow is limited to a short post-input smoothing window.
@@ -30,13 +31,12 @@
 - macOS/Windows label and streak semantics are aligned (`L xN`, `W+ xN`); indicator wasm dispatch has dedicated lanes, auto-inferred surface loading, immediate runtime sync on apply, and clean native fallback on missing/stale manifests.
 
 ### Plugin Management / WebUI
-- Unified top-level `Plugin Management` section is active.
+- Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Cursor Decoration -> Automation Mapping -> Plugin Management`
 - WebUI apply flow is backend-state-driven (`post-apply reconcile + refresh`).
 - Settings launch lifecycle is shared through `WebSettingsLaunchCoordinator`; platform shells still keep their own `OpenUrlUtf8(...)`.
 - First uncached WebUI reload now fetches `/api/state` and `/api/schema` in parallel.
 - Runtime settings page currently uses checked-in `WebUI/settings-form.js` and `WebUI/mouse-companion-settings.svelte.js`, not `WebUIWorkspace` source files directly.
 - When `mouse-companion` is the initially visible section and it has not rendered yet, `settings-form.js` now defers the first Mouse Companion render to the next animation frame to reduce first-paint blocking.
-- Sidebar order is fixed: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
 
 ### Mouse Companion
 - Backend reset remains in effect; old skeleton runtime stays removed.

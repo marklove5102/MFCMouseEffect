@@ -262,6 +262,12 @@ bool AppController::Start() {
     InitializeWasmHost();
     inputIndicatorOverlay_->Initialize();
     inputIndicatorOverlay_->UpdateConfig(config_.inputIndicator);
+    {
+        ScreenPoint cursorPt{};
+        if (QueryCursorScreenPoint(&cursorPt) || TryGetLastPointerPoint(&cursorPt)) {
+            inputIndicatorOverlay_->OnMove(cursorPt);
+        }
+    }
     inputAutomationEngine_.UpdateConfig(config_.automation);
     if (config_.mouseCompanion.enabled) {
         TryLoadDefaultPetModel();
@@ -288,6 +294,12 @@ bool AppController::Start() {
     diag_.stage = StartStage::EffectInit;
     ApplyConfiguredEffects();
     inputIndicatorOverlay_->UpdateConfig(config_.inputIndicator);
+    {
+        ScreenPoint cursorPt{};
+        if (QueryCursorScreenPoint(&cursorPt) || TryGetLastPointerPoint(&cursorPt)) {
+            inputIndicatorOverlay_->OnMove(cursorPt);
+        }
+    }
 
     if (NormalizeActiveEffectTypes() || themeNormalized) {
         PersistConfig();

@@ -10,6 +10,11 @@ const TARGETS = {
     name: 'MfxInputIndicatorSettingsBundle',
     fileName: 'input-indicator-settings.svelte.js',
   },
+  'cursor-decoration': {
+    entry: 'cursor-decoration-main.js',
+    name: 'MfxCursorDecorationSettingsBundle',
+    fileName: 'cursor-decoration-settings.svelte.js',
+  },
   trail: {
     entry: 'trail-main.js',
     name: 'MfxTrailSettingsBundle',

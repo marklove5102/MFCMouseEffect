@@ -273,6 +273,12 @@ void AppController::SetInputIndicatorConfig(const InputIndicatorConfig& cfg) {
         EnsureInputIndicatorWasmBudgetFloor();
     }
     inputIndicatorOverlay_->UpdateConfig(config_.inputIndicator);
+    {
+        ScreenPoint cursorPt{};
+        if (QueryCursorScreenPoint(&cursorPt) || TryGetLastPointerPoint(&cursorPt)) {
+            inputIndicatorOverlay_->OnMove(cursorPt);
+        }
+    }
     PersistConfig();
     SyncInputIndicatorWasmHostToConfig();
 }
