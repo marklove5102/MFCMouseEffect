@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-03-24T04:15:17.398Z",
+  "generated_at": "2026-03-24T04:17:33.097Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -47,13 +47,13 @@
       "summary": "Repository-level collaboration and engineering rules for AI agents and developers.",
       "when_to_read": "Always read first.",
       "line_count": 170,
-      "size_bytes": 9893,
-      "estimated_tokens": 2474,
+      "size_bytes": 9874,
+      "estimated_tokens": 2469,
       "max_read_tokens": 1500,
       "line_limit": 260,
       "line_limit_exceeded": false,
-      "hash_sha1": "d9198c78eca9d8f239aa3d2ba31e460c9063f9ea",
-      "updated_at": "2026-03-24T04:14:58.559Z"
+      "hash_sha1": "dc9ef0c948229b62a6fe2dc49f6f400f5d01b4a3",
+      "updated_at": "2026-03-24T04:17:16.255Z"
     },
     {
       "id": "docs/agent-context/current.md",
@@ -131,30 +131,6 @@
       "line_limit_exceeded": false,
       "hash_sha1": "07924484138eafce26df342859e889450ec29cc3",
       "updated_at": "2026-03-22T09:24:21.022Z"
-    },
-    {
-      "id": "docs/agent-context/windows-manual-handoff.md",
-      "relative_path": "docs/agent-context/windows-manual-handoff.md",
-      "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/windows-manual-handoff.md",
-      "priority": "P2",
-      "role": "capability",
-      "topic": "general",
-      "first_read_rank": 0,
-      "tags": [
-        "windows",
-        "manual",
-        "handoff"
-      ],
-      "summary": "1. Open `cmd` or PowerShell.",
-      "when_to_read": "Read only when task keywords match this capability area.",
-      "line_count": 39,
-      "size_bytes": 1401,
-      "estimated_tokens": 351,
-      "max_read_tokens": 471,
-      "line_limit": 0,
-      "line_limit_exceeded": false,
-      "hash_sha1": "f44353fe9980fa2a51a736bce06b5e07f87c63ba",
-      "updated_at": "2026-03-24T04:14:58.559Z"
     },
     {
       "id": "docs/architecture/agent-doc-governance.md",

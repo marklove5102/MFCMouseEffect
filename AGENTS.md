@@ -63,7 +63,7 @@ Include short evidence (code path/config/runtime behavior). If user-visible beha
   - do not ask the user to manually re-copy files as the first fallback when the synced workspace should already contain the latest sources
 - Windows manual handoff files:
   - Synced handoff doc for the user to open on Windows:
-    - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/windows-manual-handoff.md`
+    - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/windows-manual-handoff.md`
   - Optional local-only scratch file for the agent:
     - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/windows-manual-handoff.tmp`
   - When I need the user to do manual steps on Windows, I should update the synced `.md` file first.
