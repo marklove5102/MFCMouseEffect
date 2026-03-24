@@ -103,6 +103,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionLayerProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyMotionProjector.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyOverlaySuppressionProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyPresenceProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAdornmentProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyAppendageProjector.h"
@@ -660,6 +661,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
         executionDriverRouterRegistryBusRegistryProfile,
         scene);
     const auto pluginSelection = ResolveWin32MouseCompanionRenderPluginSelection();
+    ApplyWin32MouseCompanionRealRendererModelProxyOverlaySuppressionProjector(scene);
     const Win32MouseCompanionRealRendererPainter painter{};
     painter.Paint(scene, graphics, width, height);
 
