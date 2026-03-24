@@ -72,6 +72,8 @@ Win32MouseCompanionRealRendererAssetNodeTransformEntry BuildTransformEntry(
     entry.modelNodePath = bindingEntry.modelNodePath;
     entry.assetNodePath = bindingEntry.assetNodePath;
     entry.sourceTag = bindingEntry.sourceTag;
+    entry.selectorKey = bindingEntry.selectorKey;
+    entry.candidateNodeName = bindingEntry.candidateNodeName;
     entry.transformWeight =
         ResolveTransformWeight(bindingEntry.logicalNode, bindingEntry.bindingWeight);
     entry.offsetX = nodeBindingEntry.worldOffsetX * (0.80f + entry.transformWeight * 0.18f);

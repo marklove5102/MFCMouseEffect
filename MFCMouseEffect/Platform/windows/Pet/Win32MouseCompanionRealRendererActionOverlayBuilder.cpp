@@ -45,6 +45,22 @@ float ResolveNodePathSignal(const std::string& path) {
     return std::min(signal, 1.0f);
 }
 
+float ResolveSelectorSignal(const std::string& selectorKey, const std::string& candidateNodeName) {
+    float signal = 0.0f;
+    if (!selectorKey.empty() && selectorKey.find('|') != std::string::npos) {
+        signal += 0.45f;
+    }
+    if (!candidateNodeName.empty() && candidateNodeName != "unknown") {
+        signal += 0.25f;
+    }
+    if (selectorKey.find("vrm_root:") != std::string::npos ||
+        selectorKey.find("scene_root:") != std::string::npos ||
+        selectorKey.find("fbx_root:") != std::string::npos) {
+        signal += 0.20f;
+    }
+    return std::min(signal, 1.0f);
+}
+
 Gdiplus::RectF MakeCenteredRect(float centerX, float centerY, float width, float height) {
     return Gdiplus::RectF(centerX - width * 0.5f, centerY - height * 0.5f, width, height);
 }
@@ -70,9 +86,14 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
     const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float overlayIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.overlayEntry.sourceTag) *
-        std::max(
+        std::min(
+            1.0f,
+            std::max(
             ResolveNodePathSignal(finalTargetResolver.overlayEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.overlayEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.overlayEntry.assetNodePath)) +
+                ResolveSelectorSignal(
+                    finalTargetResolver.overlayEntry.selectorKey,
+                    finalTargetResolver.overlayEntry.candidateNodeName));
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float transformOverlayWeight = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedWeight

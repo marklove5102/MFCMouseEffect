@@ -12,6 +12,8 @@ struct Win32MouseCompanionRealRendererAssetNodeTransformEntry final {
     std::string modelNodePath;
     std::string assetNodePath;
     std::string sourceTag;
+    std::string selectorKey;
+    std::string candidateNodeName;
     float transformWeight{0.0f};
     float offsetX{0.0f};
     float offsetY{0.0f};

@@ -65,7 +65,29 @@ float ResolveAssetBindingWeight(const std::string& logicalNode, float registryWe
     return registryWeight;
 }
 
+std::string ResolveCandidateNodeName(
+    const Win32MouseCompanionRealRendererModelNodeRegistryEntry& registryEntry) {
+    if (!registryEntry.assetNodeName.empty()) {
+        return registryEntry.assetNodeName;
+    }
+    if (!registryEntry.slotName.empty()) {
+        return registryEntry.slotName;
+    }
+    return registryEntry.logicalNode.empty() ? "unknown" : registryEntry.logicalNode;
+}
+
+std::string ResolveSelectorKey(
+    const Win32MouseCompanionRealRendererSceneRuntime& runtime,
+    const Win32MouseCompanionRealRendererModelNodeRegistryEntry& registryEntry) {
+    const std::string rootKey =
+        runtime.assets == nullptr || runtime.assets->modelRootNodeKey.empty()
+            ? "preview_root"
+            : runtime.assets->modelRootNodeKey;
+    return rootKey + "|" + registryEntry.logicalNode + "|" + ResolveCandidateNodeName(registryEntry);
+}
+
 Win32MouseCompanionRealRendererAssetNodeBindingEntry BuildAssetBindingEntry(
+    const Win32MouseCompanionRealRendererSceneRuntime& runtime,
     const Win32MouseCompanionRealRendererModelNodeRegistryEntry& registryEntry,
     const std::string& assetBindingSelectorPrefix,
     bool assetBindingsReady) {
@@ -77,6 +99,8 @@ Win32MouseCompanionRealRendererAssetNodeBindingEntry BuildAssetBindingEntry(
     entry.assetNodePath =
         assetBindingSelectorPrefix + "/" + ResolveAssetNodePathSuffix(registryEntry.assetNodeName);
     entry.sourceTag = registryEntry.sourceTag;
+    entry.selectorKey = ResolveSelectorKey(runtime, registryEntry);
+    entry.candidateNodeName = ResolveCandidateNodeName(registryEntry);
     entry.bindingWeight =
         ResolveAssetBindingWeight(registryEntry.logicalNode, registryEntry.registryWeight);
     entry.resolved =
@@ -156,30 +180,35 @@ BuildWin32MouseCompanionRealRendererAssetNodeBindingProfile(
     const std::string assetBindingSelectorPrefix =
         runtime.assets == nullptr ? "/preview/binding" : runtime.assets->modelNodeSelectorPrefix;
     profile.bodyEntry = BuildAssetBindingEntry(
+        runtime,
         registry.bodyEntry,
         assetBindingSelectorPrefix,
         assetBindingsReady);
     profile.bodyEntry.bindingWeight *= executeWeight;
     profile.bodyEntry.resolved = profile.bodyEntry.resolved && profile.bodyEntry.bindingWeight > 0.0f;
     profile.headEntry = BuildAssetBindingEntry(
+        runtime,
         registry.headEntry,
         assetBindingSelectorPrefix,
         assetBindingsReady);
     profile.headEntry.bindingWeight *= executeWeight;
     profile.headEntry.resolved = profile.headEntry.resolved && profile.headEntry.bindingWeight > 0.0f;
     profile.appendageEntry = BuildAssetBindingEntry(
+        runtime,
         registry.appendageEntry,
         assetBindingSelectorPrefix,
         assetBindingsReady);
     profile.appendageEntry.bindingWeight *= executeWeight;
     profile.appendageEntry.resolved = profile.appendageEntry.resolved && profile.appendageEntry.bindingWeight > 0.0f;
     profile.overlayEntry = BuildAssetBindingEntry(
+        runtime,
         registry.overlayEntry,
         assetBindingSelectorPrefix,
         assetBindingsReady);
     profile.overlayEntry.bindingWeight *= executeWeight;
     profile.overlayEntry.resolved = profile.overlayEntry.resolved && profile.overlayEntry.bindingWeight > 0.0f;
     profile.groundingEntry = BuildAssetBindingEntry(
+        runtime,
         registry.groundingEntry,
         assetBindingSelectorPrefix,
         assetBindingsReady);

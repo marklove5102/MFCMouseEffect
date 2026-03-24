@@ -44,6 +44,22 @@ float ResolveNodePathSignal(const std::string& path) {
     return std::min(signal, 1.0f);
 }
 
+float ResolveSelectorSignal(const std::string& selectorKey, const std::string& candidateNodeName) {
+    float signal = 0.0f;
+    if (!selectorKey.empty() && selectorKey.find('|') != std::string::npos) {
+        signal += 0.45f;
+    }
+    if (selectorKey.find("vrm_root:") != std::string::npos ||
+        selectorKey.find("scene_root:") != std::string::npos ||
+        selectorKey.find("fbx_root:") != std::string::npos) {
+        signal += 0.25f;
+    }
+    if (!candidateNodeName.empty() && candidateNodeName != "unknown") {
+        signal += 0.20f;
+    }
+    return std::min(signal, 1.0f);
+}
+
 } // namespace
 
 Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendererFrame(
@@ -171,19 +187,34 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float bodyIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.bodyEntry.sourceTag) *
-        std::max(
+        std::min(
+            1.0f,
+            std::max(
             ResolveNodePathSignal(finalTargetResolver.bodyEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.bodyEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.bodyEntry.assetNodePath)) +
+                ResolveSelectorSignal(
+                    finalTargetResolver.bodyEntry.selectorKey,
+                    finalTargetResolver.bodyEntry.candidateNodeName));
     const float headIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.headEntry.sourceTag) *
-        std::max(
+        std::min(
+            1.0f,
+            std::max(
             ResolveNodePathSignal(finalTargetResolver.headEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.headEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.headEntry.assetNodePath)) +
+                ResolveSelectorSignal(
+                    finalTargetResolver.headEntry.selectorKey,
+                    finalTargetResolver.headEntry.candidateNodeName));
     const float groundingIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.groundingEntry.sourceTag) *
-        std::max(
+        std::min(
+            1.0f,
+            std::max(
             ResolveNodePathSignal(finalTargetResolver.groundingEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.groundingEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.groundingEntry.assetNodePath)) +
+                ResolveSelectorSignal(
+                    finalTargetResolver.groundingEntry.selectorKey,
+                    finalTargetResolver.groundingEntry.candidateNodeName));
     const float poseAnchorX = nodeBinding.bodyEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAnchorY = nodeBinding.bodyEntry.worldOffsetY * metrics.bodyHeight;
     const float poseHeadX = nodeBinding.headEntry.worldOffsetX * metrics.headWidth;

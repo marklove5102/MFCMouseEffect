@@ -13,6 +13,8 @@ struct Win32MouseCompanionRealRendererAssetNodeParentSpaceEntry final {
     std::string modelNodePath;
     std::string assetNodePath;
     std::string sourceTag;
+    std::string selectorKey;
+    std::string candidateNodeName;
     float parentSpaceOffsetX{0.0f};
     float parentSpaceOffsetY{0.0f};
     float parentSpaceScale{1.0f};

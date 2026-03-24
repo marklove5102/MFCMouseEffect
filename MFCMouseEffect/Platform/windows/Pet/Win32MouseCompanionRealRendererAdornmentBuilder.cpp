@@ -45,6 +45,22 @@ float ResolveNodePathSignal(const std::string& path) {
     return std::min(signal, 1.0f);
 }
 
+float ResolveSelectorSignal(const std::string& selectorKey, const std::string& candidateNodeName) {
+    float signal = 0.0f;
+    if (!selectorKey.empty() && selectorKey.find('|') != std::string::npos) {
+        signal += 0.45f;
+    }
+    if (!candidateNodeName.empty() && candidateNodeName != "unknown") {
+        signal += 0.25f;
+    }
+    if (selectorKey.find("vrm_root:") != std::string::npos ||
+        selectorKey.find("scene_root:") != std::string::npos ||
+        selectorKey.find("fbx_root:") != std::string::npos) {
+        signal += 0.20f;
+    }
+    return std::min(signal, 1.0f);
+}
+
 std::array<Gdiplus::PointF, 5> BuildStarPoints(
     float centerX,
     float centerY,
@@ -155,9 +171,14 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float appendageIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.appendageEntry.sourceTag) *
-        std::max(
+        std::min(
+            1.0f,
+            std::max(
             ResolveNodePathSignal(finalTargetResolver.appendageEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.appendageEntry.assetNodePath));
+            ResolveNodePathSignal(finalTargetResolver.appendageEntry.assetNodePath)) +
+                ResolveSelectorSignal(
+                    finalTargetResolver.appendageEntry.selectorKey,
+                    finalTargetResolver.appendageEntry.candidateNodeName));
     const float poseAdornmentX =
         nodeBinding.appendageEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAdornmentY =

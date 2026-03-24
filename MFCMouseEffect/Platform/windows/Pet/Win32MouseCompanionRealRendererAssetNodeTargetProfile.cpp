@@ -65,6 +65,8 @@ Win32MouseCompanionRealRendererAssetNodeTargetEntry BuildTargetEntry(
     entry.modelNodePath = parentEntry.modelNodePath;
     entry.assetNodePath = parentEntry.assetNodePath;
     entry.sourceTag = parentEntry.sourceTag;
+    entry.selectorKey = parentEntry.selectorKey;
+    entry.candidateNodeName = parentEntry.candidateNodeName;
     entry.targetWeight = ResolveTargetWeight(parentEntry.logicalNode, parentEntry.resolvedWeight);
     entry.targetOffsetX =
         parentEntry.parentSpaceOffsetX * (0.82f + entry.targetWeight * 0.14f);

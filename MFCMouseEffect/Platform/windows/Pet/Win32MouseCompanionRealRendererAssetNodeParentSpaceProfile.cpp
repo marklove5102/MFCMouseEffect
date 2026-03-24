@@ -54,6 +54,8 @@ Win32MouseCompanionRealRendererAssetNodeParentSpaceEntry BuildRootEntry(
     entry.modelNodePath = resolverEntry.modelNodePath;
     entry.assetNodePath = resolverEntry.assetNodePath;
     entry.sourceTag = resolverEntry.sourceTag;
+    entry.selectorKey = resolverEntry.selectorKey;
+    entry.candidateNodeName = resolverEntry.candidateNodeName;
     entry.parentSpaceOffsetX = resolverEntry.localOffsetX;
     entry.parentSpaceOffsetY = resolverEntry.localOffsetY;
     entry.parentSpaceScale = resolverEntry.localScale;
@@ -72,6 +74,8 @@ Win32MouseCompanionRealRendererAssetNodeParentSpaceEntry BuildChildEntry(
     entry.modelNodePath = resolverEntry.modelNodePath;
     entry.assetNodePath = resolverEntry.assetNodePath;
     entry.sourceTag = resolverEntry.sourceTag;
+    entry.selectorKey = resolverEntry.selectorKey;
+    entry.candidateNodeName = resolverEntry.candidateNodeName;
 
     const auto* parentResolver = ResolveParentResolverEntry(resolver, resolverEntry.parentLogicalNode);
     const Win32MouseCompanionRealRendererAssetNodeParentSpaceEntry* parentEntry = nullptr;
