@@ -1,10 +1,11 @@
 # Windows Installer Packaging
 
 ## Scope
+- Preferred user entrypoints now stay inside `mfx`:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/./mfx build`
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/./mfx package`
 - Windows installer path uses Inno Setup script:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/Install/MFCMouseEffect.iss`
-- Preferred user entrypoint:
-  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/./mfx package`
 - Runtime source payload is taken from:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/x64/Release`
 
@@ -15,10 +16,14 @@
   - `webui/`
   - runtime DLLs required by the current Windows lane
 - Windows package build now accepts an explicit GPU toggle:
+  - `./mfx build`
+  - `./mfx build --gpu`
+  - `./mfx build --shipping`
   - `./mfx package`
   - `./mfx package --gpu`
   - `./mfx package --no-gpu`
   - default is now `--no-gpu`
+  - `./mfx package` now reuses the same Windows build contract as `./mfx build`
   - `--no-gpu` forwards `MfxEnableWindowsGpuEffects=false`, excludes Windows GPU hold compile units from the Release build, and removes `webgpu_dawn.dll` from the installer payload
 - Do not copy optional repo docs like `README.md` or `LICENSE` into the install directory.
 - Do not expose installer-side launch-at-startup configuration.
@@ -32,8 +37,11 @@
 
 ## Validation
 1. Build Windows release:
-   - `./mfx package`
+   - `./mfx build`
+   - or directly `./mfx package`
      - default: no GPU
+   - `./mfx build --gpu`
+   - `./mfx build --shipping`
    - or `./mfx package-no-build` when reusing the current `Release|x64` output
   - GPU-selectable examples:
     - `./mfx package --gpu`
