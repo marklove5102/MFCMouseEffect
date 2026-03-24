@@ -246,6 +246,30 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeModelAssetResidencyCacheBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelAssetResidencyValueBrief =
         rendererRuntime.sceneRuntimeModelAssetResidencyValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetInstanceState =
+        rendererRuntime.sceneRuntimeModelAssetInstanceState;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetInstanceEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetInstanceEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetInstanceResolvedEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetInstanceResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetInstanceBrief =
+        rendererRuntime.sceneRuntimeModelAssetInstanceBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetInstanceSlotBrief =
+        rendererRuntime.sceneRuntimeModelAssetInstanceSlotBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetInstanceValueBrief =
+        rendererRuntime.sceneRuntimeModelAssetInstanceValueBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetActivationState =
+        rendererRuntime.sceneRuntimeModelAssetActivationState;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetActivationEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetActivationEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetActivationResolvedEntryCount =
+        rendererRuntime.sceneRuntimeModelAssetActivationResolvedEntryCount;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetActivationBrief =
+        rendererRuntime.sceneRuntimeModelAssetActivationBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetActivationRouteBrief =
+        rendererRuntime.sceneRuntimeModelAssetActivationRouteBrief;
+    diagnostics.rendererRuntime.sceneRuntimeModelAssetActivationValueBrief =
+        rendererRuntime.sceneRuntimeModelAssetActivationValueBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelSceneAdapterState =
         rendererRuntime.sceneRuntimeModelSceneAdapterState;
     diagnostics.rendererRuntime.sceneRuntimeModelSceneSeamReadiness =

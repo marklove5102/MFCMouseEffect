@@ -455,6 +455,60 @@ function Add-ModelAssetResidencySummaryProperty($Node) {
     $Node | Add-Member -NotePropertyName "scene_runtime_model_asset_residency_brief" -NotePropertyValue $brief
 }
 
+function Format-ModelAssetInstanceSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_model_asset_instance_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    $state = [string]$Node.scene_runtime_model_asset_instance_state
+    if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+    $entryCount = [int]([string]$Node.scene_runtime_model_asset_instance_entry_count)
+    $resolved = [int]([string]$Node.scene_runtime_model_asset_instance_resolved_entry_count)
+    return "{0}/{1}/{2}" -f $state, $entryCount, $resolved
+}
+
+function Add-ModelAssetInstanceSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-ModelAssetInstanceSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_model_asset_instance_brief").Count -gt 0) {
+        $Node.scene_runtime_model_asset_instance_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_model_asset_instance_brief" -NotePropertyValue $brief
+}
+
+function Format-ModelAssetActivationSummary($Node) {
+    if ($null -eq $Node) {
+        return "preview_only/0/0"
+    }
+    $existing = [string]$Node.scene_runtime_model_asset_activation_brief
+    if (-not [string]::IsNullOrWhiteSpace($existing)) {
+        return $existing
+    }
+    $state = [string]$Node.scene_runtime_model_asset_activation_state
+    if ([string]::IsNullOrWhiteSpace($state)) { $state = "preview_only" }
+    $entryCount = [int]([string]$Node.scene_runtime_model_asset_activation_entry_count)
+    $resolved = [int]([string]$Node.scene_runtime_model_asset_activation_resolved_entry_count)
+    return "{0}/{1}/{2}" -f $state, $entryCount, $resolved
+}
+
+function Add-ModelAssetActivationSummaryProperty($Node) {
+    if ($null -eq $Node) {
+        return
+    }
+    $brief = Format-ModelAssetActivationSummary $Node
+    if ($Node.PSObject.Properties.Match("scene_runtime_model_asset_activation_brief").Count -gt 0) {
+        $Node.scene_runtime_model_asset_activation_brief = $brief
+        return
+    }
+    $Node | Add-Member -NotePropertyName "scene_runtime_model_asset_activation_brief" -NotePropertyValue $brief
+}
+
 function Format-ModelNodeAdapterSummary($Node) {
     if ($null -eq $Node) {
         return "preview_only/0.00"
@@ -2409,6 +2463,8 @@ if ($Route -eq "sweep") {
                 Add-ModelAssetLoadSummaryProperty $item.real_renderer_preview
                 Add-ModelAssetDecodeSummaryProperty $item.real_renderer_preview
                 Add-ModelAssetResidencySummaryProperty $item.real_renderer_preview
+                Add-ModelAssetInstanceSummaryProperty $item.real_renderer_preview
+                Add-ModelAssetActivationSummaryProperty $item.real_renderer_preview
                 Add-ModelSceneAdapterSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeAdapterSummaryProperty $item.real_renderer_preview
                 Add-ModelNodeChannelSummaryProperty $item.real_renderer_preview
@@ -2477,6 +2533,8 @@ if ($Route -eq "sweep") {
                     Add-ModelAssetLoadSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelAssetDecodeSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelAssetResidencySummaryProperty $item.proof.renderer_runtime_after
+                    Add-ModelAssetInstanceSummaryProperty $item.proof.renderer_runtime_after
+                    Add-ModelAssetActivationSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelSceneAdapterSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeAdapterSummaryProperty $item.proof.renderer_runtime_after
                     Add-ModelNodeChannelSummaryProperty $item.proof.renderer_runtime_after
@@ -2548,6 +2606,8 @@ if ($Route -eq "sweep") {
         Add-ModelAssetLoadSummaryProperty $response.real_renderer_preview
         Add-ModelAssetDecodeSummaryProperty $response.real_renderer_preview
         Add-ModelAssetResidencySummaryProperty $response.real_renderer_preview
+        Add-ModelAssetInstanceSummaryProperty $response.real_renderer_preview
+        Add-ModelAssetActivationSummaryProperty $response.real_renderer_preview
         Add-ModelSceneAdapterSummaryProperty $response.real_renderer_preview
         Add-ModelNodeAdapterSummaryProperty $response.real_renderer_preview
         Add-ModelNodeChannelSummaryProperty $response.real_renderer_preview
@@ -2615,6 +2675,8 @@ if ($Route -eq "sweep") {
         Add-ModelAssetLoadSummaryProperty $response.renderer_runtime_after
         Add-ModelAssetDecodeSummaryProperty $response.renderer_runtime_after
         Add-ModelAssetResidencySummaryProperty $response.renderer_runtime_after
+        Add-ModelAssetInstanceSummaryProperty $response.renderer_runtime_after
+        Add-ModelAssetActivationSummaryProperty $response.renderer_runtime_after
         Add-ModelSceneAdapterSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeAdapterSummaryProperty $response.renderer_runtime_after
         Add-ModelNodeChannelSummaryProperty $response.renderer_runtime_after

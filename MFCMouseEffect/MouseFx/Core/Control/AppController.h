@@ -218,6 +218,24 @@ public:
             "model:cold|action:cold|appearance:cold|pose:cold|adapter:runtime_only"};
         std::string rendererRuntimeSceneRuntimeModelAssetResidencyValueBrief{
             "model:0.00|action:0.00|appearance:0.00|pose:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetInstanceState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetInstanceEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetInstanceResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetInstanceBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetInstanceSlotBrief{
+            "model:stub|action:stub|appearance:stub|pose:stub|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetInstanceValueBrief{
+            "model:0.00|action:0.00|appearance:0.00|pose:0.00|adapter:0.00"};
+        std::string rendererRuntimeSceneRuntimeModelAssetActivationState{"preview_only"};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetActivationEntryCount{0};
+        uint32_t rendererRuntimeSceneRuntimeModelAssetActivationResolvedEntryCount{0};
+        std::string rendererRuntimeSceneRuntimeModelAssetActivationBrief{
+            "preview_only/0/0"};
+        std::string rendererRuntimeSceneRuntimeModelAssetActivationRouteBrief{
+            "action:idle|reactive:idle|follow:0|drag:0|hold:0|scroll:0|adapter:runtime_only"};
+        std::string rendererRuntimeSceneRuntimeModelAssetActivationValueBrief{
+            "action:0.00|reactive:0.00|motion:0.00|pose:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeModelSceneAdapterState{"preview_only"};
         float rendererRuntimeSceneRuntimeModelSceneSeamReadiness{0.0f};
         std::string rendererRuntimeSceneRuntimeModelSceneAdapterBrief{

@@ -98,6 +98,18 @@ export function getMouseCompanionSectionMarkup() {
         <label>Model Residency Cache</label>
         <output id="mc_runtime_scene_runtime_model_asset_residency_cache_brief">-</output>
 
+        <label>Model Asset Instance</label>
+        <output id="mc_runtime_scene_runtime_model_asset_instance_brief">-</output>
+
+        <label>Model Instance Slots</label>
+        <output id="mc_runtime_scene_runtime_model_asset_instance_slot_brief">-</output>
+
+        <label>Model Asset Activation</label>
+        <output id="mc_runtime_scene_runtime_model_asset_activation_brief">-</output>
+
+        <label>Model Activation Route</label>
+        <output id="mc_runtime_scene_runtime_model_asset_activation_route_brief">-</output>
+
         <label>Model Scene Adapter</label>
         <output id="mc_runtime_scene_runtime_model_scene_adapter_brief">-</output>
 

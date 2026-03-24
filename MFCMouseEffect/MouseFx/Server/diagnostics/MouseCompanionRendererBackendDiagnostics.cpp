@@ -281,6 +281,46 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
         TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetResidencyValueBrief).empty()
             ? "model:0.00|action:0.00|appearance:0.00|pose:0.00|adapter:0.00"
             : status.rendererRuntimeSceneRuntimeModelAssetResidencyValueBrief;
+    diagnostics.sceneRuntimeModelAssetInstanceState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetInstanceState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetInstanceState;
+    diagnostics.sceneRuntimeModelAssetInstanceEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceEntryCount;
+    diagnostics.sceneRuntimeModelAssetInstanceResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceResolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetInstanceBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetInstanceBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeModelAssetInstanceBrief;
+    diagnostics.sceneRuntimeModelAssetInstanceSlotBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetInstanceSlotBrief).empty()
+            ? "model:stub|action:stub|appearance:stub|pose:stub|adapter:runtime_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetInstanceSlotBrief;
+    diagnostics.sceneRuntimeModelAssetInstanceValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetInstanceValueBrief).empty()
+            ? "model:0.00|action:0.00|appearance:0.00|pose:0.00|adapter:0.00"
+            : status.rendererRuntimeSceneRuntimeModelAssetInstanceValueBrief;
+    diagnostics.sceneRuntimeModelAssetActivationState =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetActivationState).empty()
+            ? "preview_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetActivationState;
+    diagnostics.sceneRuntimeModelAssetActivationEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationEntryCount;
+    diagnostics.sceneRuntimeModelAssetActivationResolvedEntryCount =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationResolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetActivationBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetActivationBrief).empty()
+            ? "preview_only/0/0"
+            : status.rendererRuntimeSceneRuntimeModelAssetActivationBrief;
+    diagnostics.sceneRuntimeModelAssetActivationRouteBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetActivationRouteBrief).empty()
+            ? "action:idle|reactive:idle|follow:0|drag:0|hold:0|scroll:0|adapter:runtime_only"
+            : status.rendererRuntimeSceneRuntimeModelAssetActivationRouteBrief;
+    diagnostics.sceneRuntimeModelAssetActivationValueBrief =
+        TrimAscii(status.rendererRuntimeSceneRuntimeModelAssetActivationValueBrief).empty()
+            ? "action:0.00|reactive:0.00|motion:0.00|pose:0.00|adapter:0.00"
+            : status.rendererRuntimeSceneRuntimeModelAssetActivationValueBrief;
     diagnostics.sceneRuntimeModelSceneAdapterState =
         TrimAscii(status.rendererRuntimeSceneRuntimeModelSceneAdapterState).empty()
             ? "preview_only"

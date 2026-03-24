@@ -361,6 +361,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeModelAssetResidencyCacheBrief},
         {"scene_runtime_model_asset_residency_value_brief",
          realRendererPreviewDiagnostics.sceneRuntimeModelAssetResidencyValueBrief},
+        {"scene_runtime_model_asset_instance_state",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetInstanceState},
+        {"scene_runtime_model_asset_instance_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetInstanceEntryCount},
+        {"scene_runtime_model_asset_instance_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetInstanceResolvedEntryCount},
+        {"scene_runtime_model_asset_instance_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetInstanceBrief},
+        {"scene_runtime_model_asset_instance_slot_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetInstanceSlotBrief},
+        {"scene_runtime_model_asset_instance_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetInstanceValueBrief},
+        {"scene_runtime_model_asset_activation_state",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetActivationState},
+        {"scene_runtime_model_asset_activation_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetActivationEntryCount},
+        {"scene_runtime_model_asset_activation_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetActivationResolvedEntryCount},
+        {"scene_runtime_model_asset_activation_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetActivationBrief},
+        {"scene_runtime_model_asset_activation_route_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetActivationRouteBrief},
+        {"scene_runtime_model_asset_activation_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetActivationValueBrief},
         {"scene_runtime_model_scene_adapter_state",
          realRendererPreviewDiagnostics.sceneRuntimeModelSceneAdapterState},
         {"scene_runtime_model_scene_seam_readiness",
@@ -1153,6 +1177,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeModelAssetResidencyCacheBrief;
     out["renderer_runtime_scene_runtime_model_asset_residency_value_brief"] =
         status.rendererRuntimeSceneRuntimeModelAssetResidencyValueBrief;
+    out["renderer_runtime_scene_runtime_model_asset_instance_state"] =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceState;
+    out["renderer_runtime_scene_runtime_model_asset_instance_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_instance_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_instance_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceBrief;
+    out["renderer_runtime_scene_runtime_model_asset_instance_slot_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceSlotBrief;
+    out["renderer_runtime_scene_runtime_model_asset_instance_value_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetInstanceValueBrief;
+    out["renderer_runtime_scene_runtime_model_asset_activation_state"] =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationState;
+    out["renderer_runtime_scene_runtime_model_asset_activation_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_activation_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_activation_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationBrief;
+    out["renderer_runtime_scene_runtime_model_asset_activation_route_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationRouteBrief;
+    out["renderer_runtime_scene_runtime_model_asset_activation_value_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetActivationValueBrief;
     out["renderer_runtime_scene_runtime_model_scene_adapter_state"] =
         status.rendererRuntimeSceneRuntimeModelSceneAdapterState;
     out["renderer_runtime_scene_runtime_model_scene_seam_readiness"] =
