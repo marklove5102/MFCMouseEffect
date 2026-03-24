@@ -222,6 +222,22 @@ struct MouseCompanionRealRendererPreviewDiagnostics {
         "body:stub|head:stub|appendage:stub|grounding:stub|adapter:runtime_only"};
     std::string sceneRuntimeModelAssetNodeRouteValueBrief{
         "body:0.00|head:0.00|appendage:0.00|grounding:0.00|adapter:0.00"};
+    std::string sceneRuntimeModelAssetNodeDispatchState{"preview_only"};
+    uint32_t sceneRuntimeModelAssetNodeDispatchEntryCount{0};
+    uint32_t sceneRuntimeModelAssetNodeDispatchResolvedEntryCount{0};
+    std::string sceneRuntimeModelAssetNodeDispatchBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelAssetNodeDispatchDispatchBrief{
+        "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
+    std::string sceneRuntimeModelAssetNodeDispatchValueBrief{
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
+    std::string sceneRuntimeModelAssetNodeExecuteState{"preview_only"};
+    uint32_t sceneRuntimeModelAssetNodeExecuteEntryCount{0};
+    uint32_t sceneRuntimeModelAssetNodeExecuteResolvedEntryCount{0};
+    std::string sceneRuntimeModelAssetNodeExecuteBrief{"preview_only/0/0"};
+    std::string sceneRuntimeModelAssetNodeExecuteExecuteBrief{
+        "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
+    std::string sceneRuntimeModelAssetNodeExecuteValueBrief{
+        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
     std::string sceneRuntimeAssetNodeBindingState{"preview_only"};
     uint32_t sceneRuntimeAssetNodeBindingEntryCount{0};
     uint32_t sceneRuntimeAssetNodeBindingResolvedEntryCount{0};

@@ -581,6 +581,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
          realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeRouteRouteBrief},
         {"scene_runtime_model_asset_node_route_value_brief",
          realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeRouteValueBrief},
+        {"scene_runtime_model_asset_node_dispatch_state",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeDispatchState},
+        {"scene_runtime_model_asset_node_dispatch_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeDispatchEntryCount},
+        {"scene_runtime_model_asset_node_dispatch_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeDispatchResolvedEntryCount},
+        {"scene_runtime_model_asset_node_dispatch_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeDispatchBrief},
+        {"scene_runtime_model_asset_node_dispatch_dispatch_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeDispatchDispatchBrief},
+        {"scene_runtime_model_asset_node_dispatch_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeDispatchValueBrief},
+        {"scene_runtime_model_asset_node_execute_state",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeExecuteState},
+        {"scene_runtime_model_asset_node_execute_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeExecuteEntryCount},
+        {"scene_runtime_model_asset_node_execute_resolved_entry_count",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeExecuteResolvedEntryCount},
+        {"scene_runtime_model_asset_node_execute_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeExecuteBrief},
+        {"scene_runtime_model_asset_node_execute_execute_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeExecuteExecuteBrief},
+        {"scene_runtime_model_asset_node_execute_value_brief",
+         realRendererPreviewDiagnostics.sceneRuntimeModelAssetNodeExecuteValueBrief},
         {"scene_runtime_asset_node_binding_state",
          realRendererPreviewDiagnostics.sceneRuntimeAssetNodeBindingState},
         {"scene_runtime_asset_node_binding_entry_count",
@@ -1469,6 +1493,30 @@ json BuildMouseCompanionRuntimeState(const AppController* controller) {
         status.rendererRuntimeSceneRuntimeModelNodeRegistryAssetNodeBrief;
     out["renderer_runtime_scene_runtime_model_node_registry_weight_brief"] =
         status.rendererRuntimeSceneRuntimeModelNodeRegistryWeightBrief;
+    out["renderer_runtime_scene_runtime_model_asset_node_dispatch_state"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeDispatchState;
+    out["renderer_runtime_scene_runtime_model_asset_node_dispatch_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeDispatchEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_node_dispatch_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeDispatchResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_node_dispatch_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeDispatchBrief;
+    out["renderer_runtime_scene_runtime_model_asset_node_dispatch_dispatch_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeDispatchDispatchBrief;
+    out["renderer_runtime_scene_runtime_model_asset_node_dispatch_value_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeDispatchValueBrief;
+    out["renderer_runtime_scene_runtime_model_asset_node_execute_state"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeExecuteState;
+    out["renderer_runtime_scene_runtime_model_asset_node_execute_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeExecuteEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_node_execute_resolved_entry_count"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeExecuteResolvedEntryCount;
+    out["renderer_runtime_scene_runtime_model_asset_node_execute_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeExecuteBrief;
+    out["renderer_runtime_scene_runtime_model_asset_node_execute_execute_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeExecuteExecuteBrief;
+    out["renderer_runtime_scene_runtime_model_asset_node_execute_value_brief"] =
+        status.rendererRuntimeSceneRuntimeModelAssetNodeExecuteValueBrief;
     out["renderer_runtime_scene_runtime_asset_node_binding_state"] =
         status.rendererRuntimeSceneRuntimeAssetNodeBindingState;
     out["renderer_runtime_scene_runtime_asset_node_binding_entry_count"] =

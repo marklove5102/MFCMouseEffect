@@ -295,6 +295,10 @@ It should **not** own:
     - `scene_runtime_model_asset_node_mount_brief = node_mount_state/entry_count/resolved_entry_count`
     - `scene_runtime_model_asset_node_route_state`
     - `scene_runtime_model_asset_node_route_brief = node_route_state/entry_count/resolved_entry_count`
+    - `scene_runtime_model_asset_node_dispatch_state`
+    - `scene_runtime_model_asset_node_dispatch_brief = node_dispatch_state/entry_count/resolved_entry_count`
+    - `scene_runtime_model_asset_node_execute_state`
+    - `scene_runtime_model_asset_node_execute_brief = node_execute_state/entry_count/resolved_entry_count`
   - `Win32MouseCompanionRealRendererSceneRuntime` should also carry a cached `modelNodeSlotProfile`; runtime/proof/WebUI may expose:
     - `scene_runtime_model_node_slot_state`
     - `scene_runtime_model_node_slot_count`

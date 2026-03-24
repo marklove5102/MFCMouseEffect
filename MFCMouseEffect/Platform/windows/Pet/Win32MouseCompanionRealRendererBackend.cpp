@@ -67,8 +67,10 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeAttachProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeBindProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeDriveProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeDispatchProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeLiftProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeMountProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeExecuteProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeResolveProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeRouteProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneBindingProfile.h"
@@ -256,6 +258,16 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeRouteProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetNodeRouteProfile(
         modelAssetNodeRouteProfile,
+        scene);
+    const auto modelAssetNodeDispatchProfile =
+        sceneRuntime.modelAssetNodeDispatchProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetNodeDispatchProfile(
+        modelAssetNodeDispatchProfile,
+        scene);
+    const auto modelAssetNodeExecuteProfile =
+        sceneRuntime.modelAssetNodeExecuteProfile;
+    ApplyWin32MouseCompanionRealRendererModelAssetNodeExecuteProfile(
+        modelAssetNodeExecuteProfile,
         scene);
     const auto poseResolverProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseResolverProfile(
@@ -826,6 +838,30 @@ void Win32MouseCompanionRealRendererBackend::Render(
         modelAssetNodeRouteProfile.routeBrief;
     diagnostics.sceneRuntimeModelAssetNodeRouteValueBrief =
         modelAssetNodeRouteProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeDispatchState =
+        modelAssetNodeDispatchProfile.dispatchState;
+    diagnostics.sceneRuntimeModelAssetNodeDispatchEntryCount =
+        modelAssetNodeDispatchProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetNodeDispatchResolvedEntryCount =
+        modelAssetNodeDispatchProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeDispatchBrief =
+        modelAssetNodeDispatchProfile.brief;
+    diagnostics.sceneRuntimeModelAssetNodeDispatchDispatchBrief =
+        modelAssetNodeDispatchProfile.dispatchBrief;
+    diagnostics.sceneRuntimeModelAssetNodeDispatchValueBrief =
+        modelAssetNodeDispatchProfile.valueBrief;
+    diagnostics.sceneRuntimeModelAssetNodeExecuteState =
+        modelAssetNodeExecuteProfile.executeState;
+    diagnostics.sceneRuntimeModelAssetNodeExecuteEntryCount =
+        modelAssetNodeExecuteProfile.entryCount;
+    diagnostics.sceneRuntimeModelAssetNodeExecuteResolvedEntryCount =
+        modelAssetNodeExecuteProfile.resolvedEntryCount;
+    diagnostics.sceneRuntimeModelAssetNodeExecuteBrief =
+        modelAssetNodeExecuteProfile.brief;
+    diagnostics.sceneRuntimeModelAssetNodeExecuteExecuteBrief =
+        modelAssetNodeExecuteProfile.executeBrief;
+    diagnostics.sceneRuntimeModelAssetNodeExecuteValueBrief =
+        modelAssetNodeExecuteProfile.valueBrief;
     diagnostics.sceneRuntimeAssetNodeBindingState =
         sceneRuntime.assetNodeBindingProfile.bindingState;
     diagnostics.sceneRuntimeAssetNodeBindingEntryCount =

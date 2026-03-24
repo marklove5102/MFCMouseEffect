@@ -109,6 +109,10 @@ Win32MouseCompanionRealRendererSceneRuntime BuildWin32MouseCompanionRealRenderer
         BuildWin32MouseCompanionRealRendererModelAssetNodeMountProfile(sceneRuntime);
     sceneRuntime.modelAssetNodeRouteProfile =
         BuildWin32MouseCompanionRealRendererModelAssetNodeRouteProfile(sceneRuntime);
+    sceneRuntime.modelAssetNodeDispatchProfile =
+        BuildWin32MouseCompanionRealRendererModelAssetNodeDispatchProfile(sceneRuntime);
+    sceneRuntime.modelAssetNodeExecuteProfile =
+        BuildWin32MouseCompanionRealRendererModelAssetNodeExecuteProfile(sceneRuntime);
     sceneRuntime.assetNodeBindingProfile =
         BuildWin32MouseCompanionRealRendererAssetNodeBindingProfile(sceneRuntime);
     sceneRuntime.assetNodeTransformProfile =
