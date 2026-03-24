@@ -60,6 +60,20 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     return std::min(signal, 1.0f);
 }
 
+float ResolveEnumerationSignal(
+    const std::string& parserLocator,
+    const std::string& enumerationLabel,
+    float enumerationConfidence) {
+    float signal = enumerationConfidence * 0.60f;
+    if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
+        signal += 0.25f;
+    }
+    if (!enumerationLabel.empty() && enumerationLabel.find("@enumeration") != std::string::npos) {
+        signal += 0.15f;
+    }
+    return std::min(signal, 1.0f);
+}
+
 } // namespace
 
 Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendererFrame(
@@ -172,6 +186,7 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
+    const auto& matchEnumeration = runtime.assetNodeMatchEnumerationProfile;
     const float bodyRegistryWeight =
         nodeRegistry.bodyEntry.resolved ? nodeRegistry.bodyEntry.registryWeight : 0.0f;
     const float headRegistryWeight =
@@ -190,31 +205,43 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
         std::min(
             1.0f,
             std::max(
-            ResolveNodePathSignal(finalTargetResolver.bodyEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.bodyEntry.assetNodePath)) +
+                ResolveNodePathSignal(finalTargetResolver.bodyEntry.modelNodePath),
+                ResolveNodePathSignal(finalTargetResolver.bodyEntry.assetNodePath)) +
                 ResolveSelectorSignal(
                     finalTargetResolver.bodyEntry.selectorKey,
-                    finalTargetResolver.bodyEntry.candidateNodeName));
+                    finalTargetResolver.bodyEntry.candidateNodeName) +
+                ResolveEnumerationSignal(
+                    matchEnumeration.bodyEntry.parserLocator,
+                    matchEnumeration.bodyEntry.enumerationLabel,
+                    matchEnumeration.bodyEntry.enumerationConfidence));
     const float headIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.headEntry.sourceTag) *
         std::min(
             1.0f,
             std::max(
-            ResolveNodePathSignal(finalTargetResolver.headEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.headEntry.assetNodePath)) +
+                ResolveNodePathSignal(finalTargetResolver.headEntry.modelNodePath),
+                ResolveNodePathSignal(finalTargetResolver.headEntry.assetNodePath)) +
                 ResolveSelectorSignal(
                     finalTargetResolver.headEntry.selectorKey,
-                    finalTargetResolver.headEntry.candidateNodeName));
+                    finalTargetResolver.headEntry.candidateNodeName) +
+                ResolveEnumerationSignal(
+                    matchEnumeration.headEntry.parserLocator,
+                    matchEnumeration.headEntry.enumerationLabel,
+                    matchEnumeration.headEntry.enumerationConfidence));
     const float groundingIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.groundingEntry.sourceTag) *
         std::min(
             1.0f,
             std::max(
-            ResolveNodePathSignal(finalTargetResolver.groundingEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.groundingEntry.assetNodePath)) +
+                ResolveNodePathSignal(finalTargetResolver.groundingEntry.modelNodePath),
+                ResolveNodePathSignal(finalTargetResolver.groundingEntry.assetNodePath)) +
                 ResolveSelectorSignal(
                     finalTargetResolver.groundingEntry.selectorKey,
-                    finalTargetResolver.groundingEntry.candidateNodeName));
+                    finalTargetResolver.groundingEntry.candidateNodeName) +
+                ResolveEnumerationSignal(
+                    matchEnumeration.groundingEntry.parserLocator,
+                    matchEnumeration.groundingEntry.enumerationLabel,
+                    matchEnumeration.groundingEntry.enumerationConfidence));
     const float poseAnchorX = nodeBinding.bodyEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAnchorY = nodeBinding.bodyEntry.worldOffsetY * metrics.bodyHeight;
     const float poseHeadX = nodeBinding.headEntry.worldOffsetX * metrics.headWidth;

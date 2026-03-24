@@ -61,6 +61,20 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     return std::min(signal, 1.0f);
 }
 
+float ResolveEnumerationSignal(
+    const std::string& parserLocator,
+    const std::string& enumerationLabel,
+    float enumerationConfidence) {
+    float signal = enumerationConfidence * 0.60f;
+    if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
+        signal += 0.25f;
+    }
+    if (!enumerationLabel.empty() && enumerationLabel.find("@enumeration") != std::string::npos) {
+        signal += 0.15f;
+    }
+    return std::min(signal, 1.0f);
+}
+
 Gdiplus::RectF MakeCenteredRect(float centerX, float centerY, float width, float height) {
     return Gdiplus::RectF(centerX - width * 0.5f, centerY - height * 0.5f, width, height);
 }
@@ -84,16 +98,21 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
             ? runtime.modelNodeRegistryProfile.overlayEntry.registryWeight
             : 0.0f;
     const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
+    const auto& matchEnumeration = runtime.assetNodeMatchEnumerationProfile;
     const float overlayIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.overlayEntry.sourceTag) *
         std::min(
             1.0f,
             std::max(
             ResolveNodePathSignal(finalTargetResolver.overlayEntry.modelNodePath),
-            ResolveNodePathSignal(finalTargetResolver.overlayEntry.assetNodePath)) +
+                ResolveNodePathSignal(finalTargetResolver.overlayEntry.assetNodePath)) +
                 ResolveSelectorSignal(
                     finalTargetResolver.overlayEntry.selectorKey,
-                    finalTargetResolver.overlayEntry.candidateNodeName));
+                    finalTargetResolver.overlayEntry.candidateNodeName) +
+                ResolveEnumerationSignal(
+                    matchEnumeration.overlayEntry.parserLocator,
+                    matchEnumeration.overlayEntry.enumerationLabel,
+                    matchEnumeration.overlayEntry.enumerationConfidence));
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float transformOverlayWeight = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedWeight
