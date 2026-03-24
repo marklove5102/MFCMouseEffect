@@ -78,9 +78,10 @@
 ## 快速开始
 
 ### Windows（Visual Studio）
-1. 用 Visual Studio 2026 打开 `MFCMouseEffect.slnx`
-2. 选择 `Release | x64` 并重建
-3. 运行 `x64/Release/MFCMouseEffect.exe`
+1. 用 `.\mfx.cmd build` 作为默认 Windows 编译入口
+2. 默认是 `Release | x64 | no-gpu`
+3. 如需完整版再显式用 `.\mfx.cmd build --gpu`
+4. 运行 `x64/Release/MFCMouseEffect.exe`
 
 ### macOS（日常开发快捷入口）
 ```bash
@@ -92,6 +93,15 @@
 
 # 30 秒自动退出（便于快速手测）
 ./mfx run-no-build --seconds 30
+
+# Windows 默认编译入口（Release|x64|no-gpu）
+./mfx build
+
+# Windows 最小发行编译
+./mfx build --shipping
+
+# Windows 完整 GPU 编译
+./mfx build --gpu
 
 # 完整编译后打包 macOS ARM64 .app + zip + dmg
 ./mfx package

@@ -190,8 +190,13 @@
 - Windows: uses `HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run`, and current executable path is rewritten idempotently so relocation can self-heal.
 
 ### Packaging
+- Preferred Windows user entrypoints now stay inside `./mfx`:
+  - `./mfx build`
+  - `./mfx build --shipping`
+  - `./mfx build --gpu`
 - Preferred packaging entrypoint is `./mfx package`.
 - Windows installer remains Inno Setup based.
+- `./mfx package` now reuses the same Windows build contract as `./mfx build`, so Windows compile/package no longer depend on raw MSBuild as the primary user-facing entrypoint.
 - Windows Release/Shipping now supports build-time GPU selection through `MfxEnableWindowsGpuEffects=true|false`, and the default is now `false`:
   - `true`: compile/package the current GPU hold runtime and bundle `webgpu_dawn.dll`
   - `false` (default): exclude Windows GPU hold compile units, hide GPU-only hold choices, normalize old GPU hold configs to compatible non-GPU routes, and omit `webgpu_dawn.dll` from build output + installer payload
