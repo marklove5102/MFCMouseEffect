@@ -24,6 +24,7 @@ Keep P1 concise; add details here when needed.
     - keep the app runnable
     - keep normal WebUI/static asset serving
     - exclude `/api/test` routes and the heavy runtime diagnostics composition used for deep proof / lane-matrix inspection
+    - exclude embedded WebUI fallback `RCDATA`; `Shipping` depends on the copied `$(OutDir)webui` folder instead of baking those fallback assets into the exe
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route sweep`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route proof -Event click`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Preset real-preview-smoke`

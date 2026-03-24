@@ -36,8 +36,7 @@
 - First uncached WebUI reload now fetches `/api/state` and `/api/schema` in parallel.
 - Runtime settings page currently uses checked-in `WebUI/settings-form.js` and `WebUI/mouse-companion-settings.svelte.js`, not `WebUIWorkspace` source files directly.
 - When `mouse-companion` is the initially visible section and it has not rendered yet, `settings-form.js` now defers the first Mouse Companion render to the next animation frame to reduce first-paint blocking.
-- Sidebar order is fixed:
-  - `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
+- Sidebar order is fixed: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
 
 ### Mouse Companion
 - Backend reset remains in effect; old skeleton runtime stays removed.
@@ -62,20 +61,14 @@
 #### Windows Pet Renderer / Plugin Lane
 - `Win32MouseCompanionRenderPluginHost` is the current Windows-first seam for renderer-owned appearance/persona semantics.
 - Stable provider today is still `builtin native`.
-- Windows renderer-plugin env entry:
-  - `MFX_WIN32_MOUSE_COMPANION_RENDER_PLUGIN`
-  - `MFX_WIN32_MOUSE_COMPANION_RENDER_PLUGIN_WASM_MANIFEST`
+- Windows renderer-plugin env entry: `MFX_WIN32_MOUSE_COMPANION_RENDER_PLUGIN`, `MFX_WIN32_MOUSE_COMPANION_RENDER_PLUGIN_WASM_MANIFEST`
 - wasm request contract:
   - manifest must target `effects`
   - manifest must enable `frame_tick`
   - failure falls back to builtin immediately
 - wasm preflight/load failures are normalized to machine-readable codes; do not depend on free-form text in tests.
 - Optional sidecar metadata path is `<manifest>.mouse_companion_renderer.json`.
-- Sidecar must declare:
-  - `schema_version >= 1`
-  - `renderer_lane = mouse_companion_renderer`
-  - `supports_appearance_semantics = true`
-  - `appearance_semantics_mode = builtin_passthrough|wasm_v1`
+- Sidecar must declare `schema_version >= 1`, `renderer_lane = mouse_companion_renderer`, `supports_appearance_semantics = true`, and `appearance_semantics_mode = builtin_passthrough|wasm_v1`.
 - Runtime plugin diagnostics surface at least:
   - `appearance_plugin_id`
   - `appearance_plugin_kind`
@@ -141,10 +134,8 @@
 - `SceneRuntime` now also owns `assetNodeTransformProfile` and `assetNodeAnchorProfile`, lifting asset-node paths into a minimal transform table and then shared `body/head/appendage/overlay/grounding` anchors; frame/face/adornment/overlay now consume those shared seams and runtime/proof/matrix/WebUI surface both `scene_runtime_asset_node_transform_*` and `scene_runtime_asset_node_anchor_*`.
 - `SceneRuntime` now also owns `assetNodeResolverProfile` and `assetNodeParentSpaceProfile`, lifting those local transforms into shared parent-aware node tables before anchor generation; frame/face/adornment/overlay now consume resolver/parent-space seams instead of re-deriving hierarchy drift locally, and runtime/proof/matrix/WebUI surface `scene_runtime_asset_node_resolver_*` and `scene_runtime_asset_node_parent_space_*`.
 - `SceneRuntime` now also owns `assetNodeTargetProfile` and `assetNodeTargetResolverProfile`, lifting parent-space values into shared per-node target entries and then into asset-path-aware resolved target entries before anchor generation; the real renderer backend then derives post-scene `assetNodeWorldSpaceProfile`, `assetNodePoseProfile`, `assetNodePoseResolverProfile`, `assetNodePoseRegistryProfile`, `assetNodePoseChannelProfile`, `assetNodePoseConstraintProfile`, `assetNodePoseSolveProfile`, `assetNodeJointHintProfile`, `assetNodeArticulationProfile`, `assetNodeLocalJointRegistryProfile`, `assetNodeArticulationMapProfile`, `assetNodeControlRigHintProfile`, `assetNodeRigChannelProfile`, `assetNodeControlSurfaceProfile`, `assetNodeRigDriverProfile`, `assetNodeSurfaceDriverProfile`, `assetNodePoseBusProfile`, `assetNodeControllerTableProfile`, `assetNodeControllerRegistryProfile`, `assetNodeDriverBusProfile`, `assetNodeControllerDriverRegistryProfile`, `assetNodeExecutionLaneProfile`, `assetNodeControllerPhaseProfile`, `assetNodeExecutionSurfaceProfile`, `assetNodeControllerPhaseRegistryProfile`, `assetNodeSurfaceCompositionBusProfile`, `assetNodeExecutionStackProfile`, `assetNodeExecutionStackRouterProfile`, `assetNodeExecutionStackRouterRegistryProfile`, `assetNodeCompositionRegistryProfile`, `assetNodeSurfaceRouteProfile`, `assetNodeSurfaceRouteRegistryProfile`, `assetNodeSurfaceRouteRouterBusProfile`, `assetNodeSurfaceRouteBusRegistryProfile`, `assetNodeSurfaceRouteBusDriverProfile`, `assetNodeSurfaceRouteBusDriverRegistryProfile`, `assetNodeSurfaceRouteBusDriverRegistryRouterProfile`, `assetNodeExecutionDriverTableProfile`, `assetNodeExecutionDriverRouterTableProfile`, `assetNodeExecutionDriverRouterRegistryProfile`, `assetNodeExecutionDriverRouterRegistryBusProfile`, and `assetNodeExecutionDriverRouterRegistryBusRegistryProfile`, so builders consume target-resolver seams, painter readability consumes world-space/pose/registry/channel/constraint/solve/joint-hint/articulation/local-joint/articulation-map/control-rig/rig-channel/control-surface/rig-driver/surface-driver/pose-bus/controller-table/controller-registry/driver-bus/controller-driver-registry/execution-lane/controller-phase/execution-surface/controller-phase-registry/surface-composition-bus/execution-stack/execution-stack-router/execution-stack-router-registry/composition-registry/surface-route/surface-route-registry/surface-route-router-bus/surface-route-bus-registry/surface-route-bus-driver/surface-route-bus-driver-registry/surface-route-bus-driver-registry-router/execution-driver-table/execution-driver-router-table/execution-driver-router-registry/execution-driver-router-registry-bus/execution-driver-router-registry-bus-registry seams, and runtime/proof/matrix/WebUI surface the matching `scene_runtime_asset_node_*` diagnostics through execution-driver-router-registry-bus-registry level.
-- Sidecar smoke presets now also assert `default_lane_style_intent` and `appearance_plugin_sample_tier`; `renderer-sidecar-wasm-v1-smoke` accepts `-WasmV1Style default|agile|dreamy|charming`, and `render-proof` now exposes `default_lane_summary`, `default_lane_candidate_tier`, and `appearance_plugin_contract_brief` in both console summaries and saved JSON.
-- Lane matrix recommendation now prefers runtime `default_lane_candidate_tier` first, then `sample_tier`, then runtime `default_lane_style_intent`; `observation-template.md` also pre-fills `candidate_tier`, `runtime_default_lane_brief`, and `recommended_sample_tier`, so final manual decisions stay on the same contract vocabulary as runtime and summary.
-- `default_lane_candidate_tier` currently uses short machine values to distinguish runtime recommendation semantics: `builtin_shipped_default`, `baseline_reference_candidate`, `ship_default_candidate`, `experimental_style_candidate`, `unclassified_candidate`.
-- Lane matrix also derives `style_focus_profile` to summarize the intended motion emphasis: `builtin_control`, `baseline_passthrough_reference`, `balanced_all_rounder`, `follow_drag_tension`, `follow_scroll_float`, `click_hold_warmth`, `unclassified_focus`.
+- Sidecar smoke presets now also assert `default_lane_style_intent` and `appearance_plugin_sample_tier`; lane-matrix recommendation prefers runtime `default_lane_candidate_tier`, then `sample_tier`, then `default_lane_style_intent`, and `observation-template.md` stays on the same contract vocabulary as runtime/summary.
+- `default_lane_candidate_tier` uses short machine values such as `builtin_shipped_default`, `baseline_reference_candidate`, `ship_default_candidate`, and `experimental_style_candidate`; lane matrix also derives `style_focus_profile` such as `balanced_all_rounder`, `follow_drag_tension`, `follow_scroll_float`, and `click_hold_warmth`.
 - Mouse Companion WebUI mirrors runtime lane state in `Runtime Diagnostics`, including a short `Lane Verdict`, `Style Intent`, `Candidate Tier`, `Sample Tier`, and `Contract Brief`.
 
 #### Windows Renderer Backend / Preview
@@ -216,8 +207,5 @@
 
 ## P2 Routing
 - P2 index: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/agent-context/p2-capability-index.md`
-- Windows real-renderer contract: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-real-renderer-contract.md`
-- Mouse companion plugin roadmap: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md`
-- Windows manual checklist: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/ops/windows-mouse-companion-manual-checklist.md`
-- Server structure: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/server-structure.md`
-- Regression workflow: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-regression-suite-workflow.md`
+- Windows pet / plugin / checklist: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/windows-mouse-companion-real-renderer-contract.md`, `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md`, `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/ops/windows-mouse-companion-manual-checklist.md`
+- Server / regression: `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/server-structure.md`, `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-regression-suite-workflow.md`
