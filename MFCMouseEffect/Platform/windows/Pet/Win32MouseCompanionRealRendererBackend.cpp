@@ -97,6 +97,7 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSceneHookProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetSourceProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelSceneAdapterProfile.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelMeshLayerBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyLayerBuilder.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyFootprintProjector.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelProxyActionOverlayProjector.h"
@@ -291,6 +292,7 @@ void Win32MouseCompanionRealRendererBackend::Render(
     ApplyWin32MouseCompanionRealRendererModelScenePoseProjector(worldSpaceProfile, scene);
     ApplyWin32MouseCompanionRealRendererModelSceneTopologyProjector(worldSpaceProfile, scene);
     BuildWin32MouseCompanionRealRendererModelProxyLayer(worldSpaceProfile, scene);
+    BuildWin32MouseCompanionRealRendererModelMeshLayer(sceneRuntime, scene);
     BuildWin32MouseCompanionRealRendererModelProxySilhouetteLayer(worldSpaceProfile, scene);
     BuildWin32MouseCompanionRealRendererModelProxySurfaces(worldSpaceProfile, scene);
     ApplyWin32MouseCompanionRealRendererModelProxyFrameProjector(scene);

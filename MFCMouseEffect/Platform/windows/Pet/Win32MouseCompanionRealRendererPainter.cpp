@@ -294,6 +294,24 @@ void DrawModelProxyLayer(
     }
 }
 
+void DrawModelMeshLayer(
+    Gdiplus::Graphics* graphics,
+    const Win32MouseCompanionRealRendererScene& scene) {
+    if (!graphics || !scene.modelMeshVisible) {
+        return;
+    }
+
+    for (const auto& triangle : scene.modelMeshTriangles) {
+        Gdiplus::SolidBrush brush(WithAlpha(triangle.fill, triangle.alpha));
+        Gdiplus::Pen pen(
+            WithAlpha(triangle.fill, std::min(255.0f, triangle.alpha + 34.0f)),
+            0.9f);
+        pen.SetLineJoin(Gdiplus::LineJoinRound);
+        graphics->FillPolygon(&brush, triangle.points.data(), static_cast<INT>(triangle.points.size()));
+        graphics->DrawPolygon(&pen, triangle.points.data(), static_cast<INT>(triangle.points.size()));
+    }
+}
+
 Gdiplus::Color ResolveImprintColor(
     const Win32MouseCompanionRealRendererScene& scene,
     const std::string& logicalNode) {
@@ -931,6 +949,7 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     graphics->FillEllipse(&glowBrush, scene.glowRect);
     graphics->FillEllipse(&shadowBrush, scene.shadowRect);
     DrawModelSceneGraph(graphics, scene);
+    DrawModelMeshLayer(graphics, scene);
     DrawModelProxyLayer(graphics, scene);
     DrawModelProxyFrameLayer(graphics, scene);
     DrawModelProxyContourLayer(graphics, scene);
