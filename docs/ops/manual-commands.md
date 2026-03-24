@@ -18,35 +18,25 @@ Keep P1 concise; add details here when needed.
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-gesture-calibration-sweep.sh --skip-build`
 
 ## Windows Mouse Companion Bring-Up
-- Preferred `mfx` build entrypoints:
-  - `F:\language\cpp\code\MFCMouseEffect\mfx build`
-  - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping`
-  - `F:\language\cpp\code\MFCMouseEffect\mfx build --gpu`
-  - PowerShell / cmd wrapper:
-    - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd build`
-    - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd build --shipping`
-    - `F:\language\cpp\code\MFCMouseEffect\mfx.cmd build --gpu`
 - Release without GPU:
-  - `F:\language\cpp\code\MFCMouseEffect\mfx build`
+  - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\amd64\MSBuild.exe F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect\MFCMouseEffect.vcxproj /t:Build /p:Configuration=Release;Platform=x64 /p:MfxEnableWindowsGpuEffects=false`
+  - this is now the default if `/p:MfxEnableWindowsGpuEffects` is omitted
   - behavior:
     - excludes Windows GPU hold compile units
     - removes copied `webgpu_dawn.dll` from the output directory
     - hides GPU-only hold routes from settings schema
     - auto-normalizes persisted GPU hold types onto compatible non-GPU routes
 - Release with GPU:
-  - `F:\language\cpp\code\MFCMouseEffect\mfx build --gpu`
+  - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\amd64\MSBuild.exe F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect\MFCMouseEffect.vcxproj /t:Build /p:Configuration=Release;Platform=x64 /p:MfxEnableWindowsGpuEffects=true`
 - minimal shipping build command:
-  - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping`
+  - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\amd64\MSBuild.exe F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect\MFCMouseEffect.vcxproj /t:Build /p:Configuration=Shipping;Platform=x64`
   - intent:
     - keep the app runnable
     - keep normal WebUI/static asset serving
     - exclude `/api/test` routes and the heavy runtime diagnostics composition used for deep proof / lane-matrix inspection
     - exclude embedded WebUI fallback `RCDATA`; `Shipping` depends on the copied `$(OutDir)webui` folder instead of baking those fallback assets into the exe
   - GPU selection also applies here:
-    - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping --gpu`
-    - `F:\language\cpp\code\MFCMouseEffect\mfx build --shipping --no-gpu`
-- Low-level fallback only when `mfx` wrapper is unavailable:
-  - `C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\amd64\MSBuild.exe F:\language\cpp\code\MFCMouseEffect\MFCMouseEffect\MFCMouseEffect.vcxproj /t:Build /p:Configuration=Release;Platform=x64 /p:MfxEnableWindowsGpuEffects=false`
+    - append `/p:MfxEnableWindowsGpuEffects=true|false`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route sweep`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Route proof -Event click`
 - `D:\code\MFCMouseEffect\tools\platform\manual\run-windows-mouse-companion-render-proof.cmd -BaseUrl <url> -Token <token> -Preset real-preview-smoke`
