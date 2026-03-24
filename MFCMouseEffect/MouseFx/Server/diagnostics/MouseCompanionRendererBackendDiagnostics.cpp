@@ -4,20 +4,31 @@
 
 #include "MouseFx/Utils/StringUtils.h"
 #include "Platform/PlatformTarget.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreferenceSources.h"
 #if MFX_PLATFORM_WINDOWS
+#include "Platform/windows/Pet/Win32MouseCompanionRendererBackendPreference.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererCapabilities.h"
 #endif
 
 namespace mousefx {
 namespace {
 
+constexpr const char* kAutoRendererBackendName = "auto";
+constexpr const char* kDefaultRendererBackendAlias = "default";
+
 bool StartsWithAscii(const std::string& value, const char* prefix) {
     if (!prefix) {
         return false;
     }
     return TrimAscii(value).rfind(prefix, 0) == 0;
+}
+
+std::string NormalizeRendererBackendName(const std::string& rawBackendName) {
+    const std::string normalized = ToLowerAscii(TrimAscii(rawBackendName));
+    if (normalized.empty() || normalized == kDefaultRendererBackendAlias) {
+        return kAutoRendererBackendName;
+    }
+    return normalized;
 }
 
 std::string ResolveConfiguredPreferenceSource(const AppController::MouseCompanionRuntimeStatus& status) {
@@ -31,10 +42,9 @@ const PetVisualHostRendererBackendCatalogEntry* FindRendererBackendCatalogEntry(
     if (!backendName) {
         return nullptr;
     }
-    const std::string normalizedBackendName =
-        windows::NormalizeWin32MouseCompanionRendererBackendName(backendName);
+    const std::string normalizedBackendName = NormalizeRendererBackendName(backendName);
     for (const auto& entry : status.rendererBackendCatalog) {
-        if (windows::NormalizeWin32MouseCompanionRendererBackendName(entry.name) == normalizedBackendName) {
+        if (NormalizeRendererBackendName(entry.name) == normalizedBackendName) {
             return &entry;
         }
     }
@@ -61,10 +71,8 @@ EvaluateConfiguredMouseCompanionRendererBackendPreferenceDiagnostics(
         return diagnostics;
     }
 
-    const std::string normalizedConfiguredName =
-        windows::NormalizeWin32MouseCompanionRendererBackendName(configuredName);
-    const std::string normalizedPreferredName =
-        windows::NormalizeWin32MouseCompanionRendererBackendName(status.preferredRendererBackend);
+    const std::string normalizedConfiguredName = NormalizeRendererBackendName(configuredName);
+    const std::string normalizedPreferredName = NormalizeRendererBackendName(status.preferredRendererBackend);
     const std::string configuredSource = ResolveConfiguredPreferenceSource(status);
     const std::string preferredSource = TrimAscii(status.preferredRendererBackendSource);
 
@@ -98,8 +106,7 @@ EvaluateMouseCompanionRealRendererPreviewDiagnostics(
     const AppController::MouseCompanionRuntimeStatus& status) {
     MouseCompanionRealRendererPreviewDiagnostics diagnostics{};
     diagnostics.rolloutEnabled = IsRealRendererRolloutEnabledForCurrentPlatform();
-    diagnostics.previewSelected =
-        windows::NormalizeWin32MouseCompanionRendererBackendName(status.selectedRendererBackend) == "real";
+    diagnostics.previewSelected = NormalizeRendererBackendName(status.selectedRendererBackend) == "real";
     diagnostics.previewActive =
         diagnostics.rolloutEnabled &&
         diagnostics.previewSelected &&

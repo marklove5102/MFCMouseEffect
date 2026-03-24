@@ -34,8 +34,8 @@
 - Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Cursor Decoration -> Automation Mapping -> Plugin Management`
 - WebUI apply flow is backend-state-driven (`post-apply reconcile + refresh`).
 - Settings launch lifecycle is shared through `WebSettingsLaunchCoordinator`; platform shells still keep their own `OpenUrlUtf8(...)`.
-- First uncached WebUI reload now fetches `/api/state` and `/api/schema` in parallel.
-- Runtime settings page currently uses checked-in `WebUI/settings-form.js` and `WebUI/mouse-companion-settings.svelte.js`, not `WebUIWorkspace` source files directly.
+- `WebSettingsLaunchCoordinator` destructor must stay out-of-line while `WebSettingsServer` is forward-declared, otherwise libc++/clang host builds can fail on incomplete-type `unique_ptr` destruction.
+- POSIX/mac host runtime source lists must explicitly carry `WebSettingsLaunchCoordinator.cpp`, `PetVisualAssetCoordinator.cpp`, `MouseCompanionRendererBackendDiagnostics.cpp`, and `PlatformPetVisualHost.cpp`; missing any of them can surface as arm64 link failures during `./mfx run`.
 - When `mouse-companion` is the initially visible section and it has not rendered yet, `settings-form.js` now defers the first Mouse Companion render to the next animation frame to reduce first-paint blocking.
 
 ### Mouse Companion
