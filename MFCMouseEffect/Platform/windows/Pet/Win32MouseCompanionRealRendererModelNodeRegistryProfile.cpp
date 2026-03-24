@@ -9,6 +9,25 @@
 namespace mousefx::windows {
 namespace {
 
+const char* ResolveAssetNodePath(const std::string& assetNodeName) {
+    if (assetNodeName == "asset.body.root") {
+        return "/pet/body/root";
+    }
+    if (assetNodeName == "asset.head.anchor") {
+        return "/pet/body/head";
+    }
+    if (assetNodeName == "asset.appendage.anchor") {
+        return "/pet/body/appendage";
+    }
+    if (assetNodeName == "asset.overlay.anchor") {
+        return "/pet/fx/overlay";
+    }
+    if (assetNodeName == "asset.grounding.anchor") {
+        return "/pet/fx/grounding";
+    }
+    return "/pet/unknown";
+}
+
 std::string ResolveRegistryState(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
     const std::string& slotState = runtime.modelNodeSlotProfile.slotState;
@@ -66,7 +85,10 @@ Win32MouseCompanionRealRendererModelNodeRegistryEntry BuildRegistryEntry(
     Win32MouseCompanionRealRendererModelNodeRegistryEntry entry{};
     entry.logicalNode = slotEntry.logicalNode;
     entry.slotName = slotEntry.slotName;
+    entry.modelNodePath = slotEntry.modelNodePath;
     entry.assetNodeName = ResolveAssetNodeName(slotEntry.slotName);
+    entry.assetNodePath = ResolveAssetNodePath(entry.assetNodeName);
+    entry.sourceTag = slotEntry.sourceTag;
     entry.registryWeight = ResolveRegistryWeight(slotEntry.logicalNode, slotEntry.bindWeight);
     entry.resolved = registryReady && slotEntry.slotReady && entry.registryWeight > 0.0f;
     return entry;

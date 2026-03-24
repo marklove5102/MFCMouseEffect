@@ -70,8 +70,11 @@ Win32MouseCompanionRealRendererAssetNodeBindingEntry BuildAssetBindingEntry(
     bool assetBindingsReady) {
     Win32MouseCompanionRealRendererAssetNodeBindingEntry entry{};
     entry.logicalNode = registryEntry.logicalNode;
+    entry.slotName = registryEntry.slotName;
+    entry.modelNodePath = registryEntry.modelNodePath;
     entry.assetNodeName = registryEntry.assetNodeName;
     entry.assetNodePath = ResolveAssetNodePath(registryEntry.assetNodeName);
+    entry.sourceTag = registryEntry.sourceTag;
     entry.bindingWeight =
         ResolveAssetBindingWeight(registryEntry.logicalNode, registryEntry.registryWeight);
     entry.resolved =

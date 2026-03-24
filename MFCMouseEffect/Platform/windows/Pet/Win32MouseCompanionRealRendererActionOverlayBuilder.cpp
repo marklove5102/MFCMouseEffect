@@ -12,6 +12,39 @@ float ClampAlpha(float value) {
     return std::clamp(value, 0.0f, 255.0f);
 }
 
+float ResolveNodeSourceConfidence(const std::string& sourceTag) {
+    if (sourceTag.rfind("bound:", 0) == 0) {
+        return 1.0f;
+    }
+    if (sourceTag.rfind("pose:", 0) == 0) {
+        return 0.92f;
+    }
+    if (sourceTag.rfind("manifest:", 0) == 0) {
+        return 0.84f;
+    }
+    if (sourceTag.rfind("source:", 0) == 0) {
+        return 0.72f;
+    }
+    if (sourceTag.rfind("stub:", 0) == 0) {
+        return 0.38f;
+    }
+    return 0.0f;
+}
+
+float ResolveNodePathSignal(const std::string& path) {
+    if (path.empty()) {
+        return 0.0f;
+    }
+    float signal = 0.25f;
+    if (path.find("/overlay") != std::string::npos) {
+        signal += 0.40f;
+    }
+    if (path.find("/fx/") != std::string::npos) {
+        signal += 0.20f;
+    }
+    return std::min(signal, 1.0f);
+}
+
 Gdiplus::RectF MakeCenteredRect(float centerX, float centerY, float width, float height) {
     return Gdiplus::RectF(centerX - width * 0.5f, centerY - height * 0.5f, width, height);
 }
@@ -34,16 +67,21 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
         runtime.modelNodeRegistryProfile.overlayEntry.resolved
             ? runtime.modelNodeRegistryProfile.overlayEntry.registryWeight
             : 0.0f;
+    const float overlayIdentitySignal =
+        ResolveNodeSourceConfidence(runtime.assetNodeBindingProfile.overlayEntry.sourceTag) *
+        std::max(
+            ResolveNodePathSignal(runtime.assetNodeBindingProfile.overlayEntry.modelNodePath),
+            ResolveNodePathSignal(runtime.assetNodeBindingProfile.overlayEntry.assetNodePath));
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float transformOverlayWeight = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedWeight
         : 0.0f;
     const float overlayAlphaScale =
         1.0f + poseReadabilityBias * 0.10f + registryOverlayWeight * 0.08f + assetOverlayWeight * 0.06f +
-        transformOverlayWeight * 0.05f;
+        transformOverlayWeight * 0.05f + overlayIdentitySignal * 0.06f;
     const float overlayStrokeScale =
         1.0f + poseReadabilityBias * 0.08f + registryOverlayWeight * 0.10f + assetOverlayWeight * 0.08f +
-        transformOverlayWeight * 0.07f;
+        transformOverlayWeight * 0.07f + overlayIdentitySignal * 0.08f;
     const float poseOverlayCenterX =
         runtime.modelNodeBindingProfile.overlayEntry.worldOffsetX * metrics.bodyWidth;
     const float poseOverlayCenterY =
@@ -55,8 +93,10 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
         ? assetTargetResolver.overlayEntry.resolvedOffsetY * metrics.bodyHeight
         : 0.0f;
     scene.overlayAnchor = Gdiplus::PointF(
-        scene.centerX + poseOverlayCenterX + transformOverlayCenterX,
-        scene.centerY + poseOverlayCenterY + transformOverlayCenterY);
+        scene.centerX + poseOverlayCenterX + transformOverlayCenterX +
+            metrics.bodyWidth * overlayIdentitySignal * 0.012f * runtime.facingSign,
+        scene.centerY + poseOverlayCenterY + transformOverlayCenterY -
+            metrics.bodyHeight * overlayIdentitySignal * 0.010f);
     scene.overlayAnchorScale = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedScale
         : 1.0f;
