@@ -488,32 +488,6 @@ public:
             "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
         std::string rendererRuntimeSceneRuntimeModelAssetNodeRealizationRegistryValueBrief{
             "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeMaterializationState{
-            "preview_only"};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeMaterializationEntryCount{0};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeMaterializationResolvedEntryCount{
-            0};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeMaterializationBrief{
-            "preview_only/0/0"};
-        std::string
-            rendererRuntimeSceneRuntimeModelAssetNodeMaterializationMaterializationBrief{
-                "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeMaterializationValueBrief{
-            "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryState{
-            "preview_only"};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryEntryCount{
-            0};
-        uint32_t
-            rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryResolvedEntryCount{
-                0};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryBrief{
-            "preview_only/0/0"};
-        std::string
-            rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief{
-                "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeMaterializationRegistryValueBrief{
-            "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeAssetNodeBindingState{"preview_only"};
         uint32_t rendererRuntimeSceneRuntimeAssetNodeBindingEntryCount{0};
         uint32_t rendererRuntimeSceneRuntimeAssetNodeBindingResolvedEntryCount{0};

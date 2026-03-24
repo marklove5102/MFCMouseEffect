@@ -77,8 +77,6 @@
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeDriverRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeConsumerProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeConsumerRegistryProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeMaterializationProfile.h"
-#include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeMaterializationRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeProjectionProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeProjectionRegistryProfile.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererModelAssetNodeRealizationProfile.h"
@@ -330,16 +328,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeRealizationRegistryProfile;
     ApplyWin32MouseCompanionRealRendererModelAssetNodeRealizationRegistryProfile(
         modelAssetNodeRealizationRegistryProfile,
-        scene);
-    const auto modelAssetNodeMaterializationProfile =
-        sceneRuntime.modelAssetNodeMaterializationProfile;
-    ApplyWin32MouseCompanionRealRendererModelAssetNodeMaterializationProfile(
-        modelAssetNodeMaterializationProfile,
-        scene);
-    const auto modelAssetNodeMaterializationRegistryProfile =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile;
-    ApplyWin32MouseCompanionRealRendererModelAssetNodeMaterializationRegistryProfile(
-        modelAssetNodeMaterializationRegistryProfile,
         scene);
     const auto poseResolverProfile =
         BuildWin32MouseCompanionRealRendererAssetNodePoseResolverProfile(
@@ -1055,31 +1043,6 @@ void Win32MouseCompanionRealRendererBackend::Render(
         sceneRuntime.modelAssetNodeRealizationRegistryProfile.registryBrief;
     diagnostics.sceneRuntimeModelAssetNodeRealizationRegistryValueBrief =
         sceneRuntime.modelAssetNodeRealizationRegistryProfile.valueBrief;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationState =
-        sceneRuntime.modelAssetNodeMaterializationProfile.materializationState;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationEntryCount =
-        sceneRuntime.modelAssetNodeMaterializationProfile.entryCount;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationResolvedEntryCount =
-        sceneRuntime.modelAssetNodeMaterializationProfile.resolvedEntryCount;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationBrief =
-        sceneRuntime.modelAssetNodeMaterializationProfile.brief;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationMaterializationBrief =
-        sceneRuntime.modelAssetNodeMaterializationProfile.materializationBrief;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationValueBrief =
-        sceneRuntime.modelAssetNodeMaterializationProfile.valueBrief;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryState =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile
-            .materializationRegistryState;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryEntryCount =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile.entryCount;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryResolvedEntryCount =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile.resolvedEntryCount;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryBrief =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile.brief;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile.registryBrief;
-    diagnostics.sceneRuntimeModelAssetNodeMaterializationRegistryValueBrief =
-        sceneRuntime.modelAssetNodeMaterializationRegistryProfile.valueBrief;
     diagnostics.sceneRuntimeAssetNodeBindingState =
         sceneRuntime.assetNodeBindingProfile.bindingState;
     diagnostics.sceneRuntimeAssetNodeBindingEntryCount =

@@ -611,32 +611,6 @@ PetVisualHostDiagnostics Win32MouseCompanionVisualHost::ReadDiagnostics() const 
         rendererRuntime.sceneRuntimeModelAssetNodeRealizationRegistryRegistryBrief;
     diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeRealizationRegistryValueBrief =
         rendererRuntime.sceneRuntimeModelAssetNodeRealizationRegistryValueBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationState =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationState;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationResolvedEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationResolvedEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationMaterializationBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationMaterializationBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationValueBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationValueBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryState =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryState;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryEntryCount;
-    diagnostics.rendererRuntime
-        .sceneRuntimeModelAssetNodeMaterializationRegistryResolvedEntryCount =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryResolvedEntryCount;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryBrief;
-    diagnostics.rendererRuntime
-        .sceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryRegistryBrief;
-    diagnostics.rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryValueBrief =
-        rendererRuntime.sceneRuntimeModelAssetNodeMaterializationRegistryValueBrief;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeBindingState =
         rendererRuntime.sceneRuntimeAssetNodeBindingState;
     diagnostics.rendererRuntime.sceneRuntimeAssetNodeBindingEntryCount =
