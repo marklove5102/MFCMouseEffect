@@ -413,7 +413,8 @@ void Win32MouseCompanionRealRendererBackend::Render(
         scene);
     const auto jointHintProfile =
         BuildWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
-            poseSolveProfile);
+            poseSolveProfile,
+            sceneRuntime.assetNodeMatchCatalogProfile);
     ApplyWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
         jointHintProfile,
         scene);

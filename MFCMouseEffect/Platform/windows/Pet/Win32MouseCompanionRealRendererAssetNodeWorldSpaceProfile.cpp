@@ -46,13 +46,14 @@ Win32MouseCompanionRealRendererAssetNodeWorldSpaceEntry BuildWorldSpaceEntry(
     const char* logicalNode,
     const Gdiplus::PointF& point,
     float scale,
-    const Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry& targetResolverEntry) {
+    const Win32MouseCompanionRealRendererAssetNodeTargetResolverEntry& targetResolverEntry,
+    const Win32MouseCompanionRealRendererAssetNodeMatchCatalogEntry& matchCatalogEntry) {
     Win32MouseCompanionRealRendererAssetNodeWorldSpaceEntry entry{};
     entry.logicalNode = logicalNode ? logicalNode : "";
     entry.assetNodePath = targetResolverEntry.assetNodePath;
-    entry.resolvedNodeKey = targetResolverEntry.resolvedNodeKey;
-    entry.resolvedNodeLabel = targetResolverEntry.resolvedNodeLabel;
-    entry.matchConfidence = targetResolverEntry.matchConfidence;
+    entry.resolvedNodeKey = matchCatalogEntry.canonicalNodeKey;
+    entry.resolvedNodeLabel = matchCatalogEntry.canonicalNodeLabel;
+    entry.matchConfidence = matchCatalogEntry.matchConfidence;
     entry.worldX = point.X;
     entry.worldY = point.Y;
     entry.worldScale = scale;
@@ -138,31 +139,37 @@ BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
     profile.entryCount = 5;
 
     const auto& targetResolver = runtime.assetNodeTargetResolverProfile;
+    const auto& matchCatalog = runtime.assetNodeMatchCatalogProfile;
     profile.bodyEntry = BuildWorldSpaceEntry(
         "body",
         scene.bodyAnchor,
         scene.bodyAnchorScale,
-        targetResolver.bodyEntry);
+        targetResolver.bodyEntry,
+        matchCatalog.bodyEntry);
     profile.headEntry = BuildWorldSpaceEntry(
         "head",
         scene.headAnchor,
         scene.headAnchorScale,
-        targetResolver.headEntry);
+        targetResolver.headEntry,
+        matchCatalog.headEntry);
     profile.appendageEntry = BuildWorldSpaceEntry(
         "appendage",
         scene.appendageAnchor,
         scene.appendageAnchorScale,
-        targetResolver.appendageEntry);
+        targetResolver.appendageEntry,
+        matchCatalog.appendageEntry);
     profile.overlayEntry = BuildWorldSpaceEntry(
         "overlay",
         scene.overlayAnchor,
         scene.overlayAnchorScale,
-        targetResolver.overlayEntry);
+        targetResolver.overlayEntry,
+        matchCatalog.overlayEntry);
     profile.groundingEntry = BuildWorldSpaceEntry(
         "grounding",
         scene.groundingAnchor,
         scene.groundingAnchorScale,
-        targetResolver.groundingEntry);
+        targetResolver.groundingEntry,
+        matchCatalog.groundingEntry);
 
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief = BuildBrief(
