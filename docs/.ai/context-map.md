@@ -1,6 +1,6 @@
 # AI Context Map
 
-Generated: 2026-03-24T02:40:48.853Z
+Generated: 2026-03-24T02:44:08.227Z
 
 ## Goal
 Load minimal docs by task keyword while keeping AGENTS + current context as mandatory baseline.

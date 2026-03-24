@@ -72,11 +72,11 @@ std::string BuildValueBrief(
     float commandWeight,
     const Win32MouseCompanionRealRendererModelNodeBindingProfile& nodeBindingProfile,
     const std::string& adapterMode) {
-    const float bodyWeight = commandWeight * nodeBindingProfile.bodyEntry.bindingWeight;
-    const float headWeight = commandWeight * nodeBindingProfile.headEntry.bindingWeight;
-    const float appendageWeight = commandWeight * nodeBindingProfile.appendageEntry.bindingWeight;
-    const float overlayWeight = commandWeight * nodeBindingProfile.overlayEntry.bindingWeight;
-    const float groundingWeight = commandWeight * nodeBindingProfile.groundingEntry.bindingWeight;
+    const float bodyWeight = commandWeight * nodeBindingProfile.bodyEntry.bindWeight;
+    const float headWeight = commandWeight * nodeBindingProfile.headEntry.bindWeight;
+    const float appendageWeight = commandWeight * nodeBindingProfile.appendageEntry.bindWeight;
+    const float overlayWeight = commandWeight * nodeBindingProfile.overlayEntry.bindWeight;
+    const float groundingWeight = commandWeight * nodeBindingProfile.groundingEntry.bindWeight;
     const float adapterWeight =
         adapterMode == "pose_bound" ? commandWeight :
         (adapterMode == "pose_unbound" ? commandWeight * 0.92f : commandWeight * 0.74f);
