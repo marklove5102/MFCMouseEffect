@@ -432,24 +432,6 @@ public:
             "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
         std::string rendererRuntimeSceneRuntimeModelAssetNodeDriverRegistryValueBrief{
             "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerState{"preview_only"};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeConsumerEntryCount{0};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeConsumerResolvedEntryCount{0};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerBrief{
-            "preview_only/0/0"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerConsumerBrief{
-            "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerValueBrief{
-            "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerRegistryState{"preview_only"};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeConsumerRegistryEntryCount{0};
-        uint32_t rendererRuntimeSceneRuntimeModelAssetNodeConsumerRegistryResolvedEntryCount{0};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerRegistryBrief{
-            "preview_only/0/0"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerRegistryRegistryBrief{
-            "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
-        std::string rendererRuntimeSceneRuntimeModelAssetNodeConsumerRegistryValueBrief{
-            "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
         std::string rendererRuntimeSceneRuntimeAssetNodeBindingState{"preview_only"};
         uint32_t rendererRuntimeSceneRuntimeAssetNodeBindingEntryCount{0};
         uint32_t rendererRuntimeSceneRuntimeAssetNodeBindingResolvedEntryCount{0};

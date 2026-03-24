@@ -11,17 +11,17 @@ namespace {
 
 std::string ResolveAssetBindingState(
     const Win32MouseCompanionRealRendererSceneRuntime& runtime) {
-    const std::string& consumerRegistryState =
-        runtime.modelAssetNodeConsumerRegistryProfile.consumerRegistryState;
-    if (consumerRegistryState == "model_asset_node_consumer_registry_bound" && runtime.assets &&
+    const std::string& driverRegistryState =
+        runtime.modelAssetNodeDriverRegistryProfile.driverRegistryState;
+    if (driverRegistryState == "model_asset_node_driver_registry_bound" && runtime.assets &&
         runtime.assets->assetNodeBindingsReady) {
         return "asset_binding_ready";
     }
-    if (consumerRegistryState == "model_asset_node_consumer_registry_pose_ready") {
+    if (driverRegistryState == "model_asset_node_driver_registry_pose_ready") {
         return "asset_binding_stub_ready";
     }
-    if (consumerRegistryState == "model_asset_node_consumer_registry_ready" ||
-        consumerRegistryState == "model_asset_node_consumer_registry_partial") {
+    if (driverRegistryState == "model_asset_node_driver_registry_ready" ||
+        driverRegistryState == "model_asset_node_driver_registry_partial") {
         return "asset_binding_scaffold";
     }
     return "preview_only";
@@ -147,7 +147,7 @@ BuildWin32MouseCompanionRealRendererAssetNodeBindingProfile(
     const bool assetBindingsReady = runtime.assets && runtime.assets->assetNodeBindingsReady;
     const auto& registry = runtime.modelNodeRegistryProfile;
     const float executeWeight =
-        runtime.modelAssetNodeConsumerRegistryProfile.consumerRegistryWeight;
+        runtime.modelAssetNodeDriverRegistryProfile.driverRegistryWeight;
     profile.bodyEntry = BuildAssetBindingEntry(registry.bodyEntry, assetBindingsReady);
     profile.bodyEntry.bindingWeight *= executeWeight;
     profile.bodyEntry.resolved = profile.bodyEntry.resolved && profile.bodyEntry.bindingWeight > 0.0f;

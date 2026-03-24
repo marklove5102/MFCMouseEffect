@@ -269,22 +269,6 @@ struct Win32MouseCompanionRendererBackendRuntimeDiagnostics {
         "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
     std::string sceneRuntimeModelAssetNodeDriverRegistryValueBrief{
         "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
-    std::string sceneRuntimeModelAssetNodeConsumerState{"preview_only"};
-    uint32_t sceneRuntimeModelAssetNodeConsumerEntryCount{0};
-    uint32_t sceneRuntimeModelAssetNodeConsumerResolvedEntryCount{0};
-    std::string sceneRuntimeModelAssetNodeConsumerBrief{"preview_only/0/0"};
-    std::string sceneRuntimeModelAssetNodeConsumerConsumerBrief{
-        "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
-    std::string sceneRuntimeModelAssetNodeConsumerValueBrief{
-        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
-    std::string sceneRuntimeModelAssetNodeConsumerRegistryState{"preview_only"};
-    uint32_t sceneRuntimeModelAssetNodeConsumerRegistryEntryCount{0};
-    uint32_t sceneRuntimeModelAssetNodeConsumerRegistryResolvedEntryCount{0};
-    std::string sceneRuntimeModelAssetNodeConsumerRegistryBrief{"preview_only/0/0"};
-    std::string sceneRuntimeModelAssetNodeConsumerRegistryRegistryBrief{
-        "body:stub|head:stub|appendage:stub|overlay:stub|grounding:stub|adapter:runtime_only"};
-    std::string sceneRuntimeModelAssetNodeConsumerRegistryValueBrief{
-        "body:0.00|head:0.00|appendage:0.00|overlay:0.00|grounding:0.00|adapter:0.00"};
     std::string sceneRuntimeAssetNodeBindingState{"preview_only"};
     uint32_t sceneRuntimeAssetNodeBindingEntryCount{0};
     uint32_t sceneRuntimeAssetNodeBindingResolvedEntryCount{0};

@@ -269,18 +269,6 @@ export function getMouseCompanionSectionMarkup() {
         <label>Model Node Driver Registry</label>
         <output id="mc_runtime_scene_runtime_model_asset_node_driver_registry_registry_brief">-</output>
 
-        <label>Model Asset Node Consumer</label>
-        <output id="mc_runtime_scene_runtime_model_asset_node_consumer_brief">-</output>
-
-        <label>Model Node Consumer</label>
-        <output id="mc_runtime_scene_runtime_model_asset_node_consumer_consumer_brief">-</output>
-
-        <label>Model Asset Node Consumer Registry</label>
-        <output id="mc_runtime_scene_runtime_model_asset_node_consumer_registry_brief">-</output>
-
-        <label>Model Node Consumer Registry</label>
-        <output id="mc_runtime_scene_runtime_model_asset_node_consumer_registry_registry_brief">-</output>
-
         <label>Asset Node Binding</label>
         <output id="mc_runtime_scene_runtime_asset_node_binding_brief">-</output>
 
