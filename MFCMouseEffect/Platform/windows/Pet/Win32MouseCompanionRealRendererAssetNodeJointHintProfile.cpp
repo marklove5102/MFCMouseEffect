@@ -33,14 +33,23 @@ std::string ResolveJointHintState(
     return "preview_only";
 }
 
-const char* ResolveJointHintName(const std::string& logicalNode) {
+const char* ResolveJointHintName(const std::string& logicalNode, const std::string& semanticTag) {
     if (logicalNode == "body") {
         return "joint.body.spine";
     }
     if (logicalNode == "head") {
+        if (semanticTag == "neck") {
+            return "joint.head.neck";
+        }
         return "joint.head.look";
     }
     if (logicalNode == "appendage") {
+        if (semanticTag == "ear") {
+            return "joint.appendage.ear";
+        }
+        if (semanticTag == "leg") {
+            return "joint.appendage.stance";
+        }
         return "joint.appendage.reach";
     }
     if (logicalNode == "overlay") {
@@ -61,7 +70,9 @@ Win32MouseCompanionRealRendererAssetNodeJointHintEntry BuildJointHintEntry(
     entry.assetNodePath = solveEntry.assetNodePath;
     entry.resolvedNodeKey = matchCatalogEntry.canonicalNodeKey;
     entry.resolvedNodeLabel = matchGraphEntry.graphNodeLabel;
-    entry.jointHintName = ResolveJointHintName(solveEntry.logicalNode);
+    entry.matchBasis = matchGraphEntry.matchBasis;
+    entry.semanticTag = matchGraphEntry.semanticTag;
+    entry.jointHintName = ResolveJointHintName(solveEntry.logicalNode, entry.semanticTag);
     entry.matchConfidence =
         solveEntry.resolved
             ? std::clamp(

@@ -2,6 +2,7 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppearanceSemantics.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAdornmentBuilder.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGraphSignal.h"
 
 #include <algorithm>
 #include <cmath>
@@ -57,20 +58,6 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
         selectorKey.find("scene_root:") != std::string::npos ||
         selectorKey.find("fbx_root:") != std::string::npos) {
         signal += 0.20f;
-    }
-    return std::min(signal, 1.0f);
-}
-
-float ResolvePlanSignal(
-    const std::string& parserLocator,
-    const std::string& probeLabel,
-    float planConfidence) {
-    float signal = planConfidence * 0.60f;
-    if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
-        signal += 0.24f;
-    }
-    if (!probeLabel.empty() && probeLabel.find("@") != std::string::npos) {
-        signal += 0.16f;
     }
     return std::min(signal, 1.0f);
 }
@@ -194,10 +181,11 @@ void BuildWin32MouseCompanionRealRendererAdornment(
                 ResolveSelectorSignal(
                     finalTargetResolver.appendageEntry.selectorKey,
                     finalTargetResolver.appendageEntry.candidateNodeName) +
-                ResolvePlanSignal(
-                    matchGraph.appendageEntry.graphLocator,
-                    matchGraph.appendageEntry.graphNodeLabel,
-                    matchGraph.appendageEntry.graphConfidence));
+                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
+                    matchGraph.appendageEntry) *
+                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
+                                         matchGraph.appendageEntry,
+                                         "appendage")));
     const float poseAdornmentX =
         nodeBinding.appendageEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAdornmentY =

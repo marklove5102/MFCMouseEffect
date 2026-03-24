@@ -2,6 +2,7 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppearanceSemantics.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererFrameBuilder.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGraphSignal.h"
 
 #include <algorithm>
 
@@ -56,20 +57,6 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     }
     if (!candidateNodeName.empty() && candidateNodeName != "unknown") {
         signal += 0.20f;
-    }
-    return std::min(signal, 1.0f);
-}
-
-float ResolvePlanSignal(
-    const std::string& parserLocator,
-    const std::string& probeLabel,
-    float planConfidence) {
-    float signal = planConfidence * 0.62f;
-    if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
-        signal += 0.24f;
-    }
-    if (!probeLabel.empty() && probeLabel.find("@") != std::string::npos) {
-        signal += 0.14f;
     }
     return std::min(signal, 1.0f);
 }
@@ -210,10 +197,11 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
                 ResolveSelectorSignal(
                     finalTargetResolver.bodyEntry.selectorKey,
                     finalTargetResolver.bodyEntry.candidateNodeName) +
-                ResolvePlanSignal(
-                    matchGraph.bodyEntry.graphLocator,
-                    matchGraph.bodyEntry.graphNodeLabel,
-                    matchGraph.bodyEntry.graphConfidence));
+                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
+                    matchGraph.bodyEntry) *
+                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
+                                         matchGraph.bodyEntry,
+                                         "body")));
     const float headIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.headEntry.sourceTag) *
         std::min(
@@ -224,10 +212,11 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
                 ResolveSelectorSignal(
                     finalTargetResolver.headEntry.selectorKey,
                     finalTargetResolver.headEntry.candidateNodeName) +
-                ResolvePlanSignal(
-                    matchGraph.headEntry.graphLocator,
-                    matchGraph.headEntry.graphNodeLabel,
-                    matchGraph.headEntry.graphConfidence));
+                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
+                    matchGraph.headEntry) *
+                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
+                                         matchGraph.headEntry,
+                                         "head")));
     const float groundingIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.groundingEntry.sourceTag) *
         std::min(
@@ -238,10 +227,11 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
                 ResolveSelectorSignal(
                     finalTargetResolver.groundingEntry.selectorKey,
                     finalTargetResolver.groundingEntry.candidateNodeName) +
-                ResolvePlanSignal(
-                    matchGraph.groundingEntry.graphLocator,
-                    matchGraph.groundingEntry.graphNodeLabel,
-                    matchGraph.groundingEntry.graphConfidence));
+                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
+                    matchGraph.groundingEntry) *
+                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
+                                         matchGraph.groundingEntry,
+                                         "grounding")));
     const float poseAnchorX = nodeBinding.bodyEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAnchorY = nodeBinding.bodyEntry.worldOffsetY * metrics.bodyHeight;
     const float poseHeadX = nodeBinding.headEntry.worldOffsetX * metrics.headWidth;

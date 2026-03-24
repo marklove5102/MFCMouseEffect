@@ -68,6 +68,51 @@ float ResolveConfidenceFromScore(int score) {
     return std::clamp(0.35f + static_cast<float>(score) * 0.025f, 0.0f, 0.98f);
 }
 
+uint32_t ResolveNodeDepth(const std::string& nodePath) {
+    if (nodePath.empty()) {
+        return 0;
+    }
+    uint32_t depth = 0;
+    for (char ch : nodePath) {
+        if (ch == '/') {
+            ++depth;
+        }
+    }
+    return depth;
+}
+
+std::string ResolveSemanticTag(
+    const std::string& logicalNode,
+    const std::string& normalizedName,
+    const std::string& normalizedPath) {
+    const std::string combined = normalizedName + "|" + normalizedPath;
+    if (ContainsToken(combined, "head")) {
+        return "head";
+    }
+    if (ContainsToken(combined, "neck")) {
+        return "neck";
+    }
+    if (ContainsToken(combined, "ear")) {
+        return "ear";
+    }
+    if (ContainsToken(combined, "arm")) {
+        return "arm";
+    }
+    if (ContainsToken(combined, "leg")) {
+        return "leg";
+    }
+    if (ContainsToken(combined, "spine")) {
+        return "spine";
+    }
+    if (ContainsToken(combined, "root")) {
+        return "root";
+    }
+    if (ContainsToken(combined, "object") || ContainsToken(combined, "overlay")) {
+        return "overlay";
+    }
+    return logicalNode.empty() ? "unknown" : logicalNode;
+}
+
 } // namespace
 
 Win32MouseCompanionRealRendererGlbNodeMatchResult ResolveWin32MouseCompanionRealRendererGlbNodeMatch(
@@ -128,7 +173,17 @@ Win32MouseCompanionRealRendererGlbNodeMatchResult ResolveWin32MouseCompanionReal
     result.nodeIndex = bestNode->nodeIndex;
     result.nodeName = bestNode->nodeName;
     result.nodePath = bestNode->nodePath;
+    if (bestNode->parentIndex >= 0 &&
+        static_cast<size_t>(bestNode->parentIndex) < tree.nodes.size()) {
+        result.parentNodeName = tree.nodes[static_cast<size_t>(bestNode->parentIndex)].nodeName;
+    }
+    const std::string normalizedName =
+        NormalizeWin32MouseCompanionNodeMatchToken(bestNode->nodeName);
+    const std::string normalizedPath =
+        NormalizeWin32MouseCompanionNodeMatchToken(bestNode->nodePath);
+    result.semanticTag = ResolveSemanticTag(logicalNode, normalizedName, normalizedPath);
     result.matchBasis = bestBasis.empty() ? "logical" : bestBasis;
+    result.nodeDepth = ResolveNodeDepth(bestNode->nodePath);
     result.confidence = ResolveConfidenceFromScore(bestScore);
     result.matched = true;
     return result;

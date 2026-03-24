@@ -820,6 +820,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererAssetResources.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererGlbNodeMatcher.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererGlbNodeTree.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererGraphSignal.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererNodeMatchNaming.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererCapabilities.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererBackend.cpp" />

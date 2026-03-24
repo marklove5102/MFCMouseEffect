@@ -16,6 +16,8 @@ struct Win32MouseCompanionRealRendererAssetNodeJointHintEntry final {
     std::string resolvedNodeKey;
     std::string resolvedNodeLabel;
     std::string jointHintName;
+    std::string matchBasis;
+    std::string semanticTag;
     float matchConfidence{0.0f};
     float hintWeight{0.0f};
     float reachBias{0.0f};

@@ -69,10 +69,13 @@ Win32MouseCompanionRealRendererAssetNodeMatchGraphEntry BuildGraphEntry(
             entry.graphNodeKey = runtime.assets->modelRootNodeKey + "#" +
                 std::to_string(match.nodeIndex);
             entry.graphNodeLabel = match.nodeName;
+            entry.graphParentNodeLabel = match.parentNodeName;
             entry.graphAlias = match.nodeName;
             entry.graphTokenSeed = match.nodePath;
             entry.matchBasis = match.matchBasis;
+            entry.semanticTag = match.semanticTag;
             entry.matchedNodeIndex = match.nodeIndex;
+            entry.graphDepth = match.nodeDepth;
             entry.graphConfidence = std::max(entry.graphConfidence, match.confidence);
             entry.resolved = true;
         }
@@ -83,6 +86,9 @@ Win32MouseCompanionRealRendererAssetNodeMatchGraphEntry BuildGraphEntry(
             NormalizeWin32MouseCompanionNodeMatchToken(entry.graphAlias).empty()
                 ? "query"
                 : "alias";
+    }
+    if (entry.semanticTag.empty()) {
+        entry.semanticTag = entry.logicalNode.empty() ? "unknown" : entry.logicalNode;
     }
     return entry;
 }

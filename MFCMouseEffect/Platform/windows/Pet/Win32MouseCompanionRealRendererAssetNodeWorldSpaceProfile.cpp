@@ -190,6 +190,24 @@ BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
     profile.overlayEntry.matchConfidence = matchGraph.overlayEntry.graphConfidence;
     profile.groundingEntry.matchConfidence = matchGraph.groundingEntry.graphConfidence;
 
+    profile.bodyEntry.resolvedNodePath = matchGraph.bodyEntry.graphLocator;
+    profile.headEntry.resolvedNodePath = matchGraph.headEntry.graphLocator;
+    profile.appendageEntry.resolvedNodePath = matchGraph.appendageEntry.graphLocator;
+    profile.overlayEntry.resolvedNodePath = matchGraph.overlayEntry.graphLocator;
+    profile.groundingEntry.resolvedNodePath = matchGraph.groundingEntry.graphLocator;
+
+    profile.bodyEntry.matchBasis = matchGraph.bodyEntry.matchBasis;
+    profile.headEntry.matchBasis = matchGraph.headEntry.matchBasis;
+    profile.appendageEntry.matchBasis = matchGraph.appendageEntry.matchBasis;
+    profile.overlayEntry.matchBasis = matchGraph.overlayEntry.matchBasis;
+    profile.groundingEntry.matchBasis = matchGraph.groundingEntry.matchBasis;
+
+    profile.bodyEntry.semanticTag = matchGraph.bodyEntry.semanticTag;
+    profile.headEntry.semanticTag = matchGraph.headEntry.semanticTag;
+    profile.appendageEntry.semanticTag = matchGraph.appendageEntry.semanticTag;
+    profile.overlayEntry.semanticTag = matchGraph.overlayEntry.semanticTag;
+    profile.groundingEntry.semanticTag = matchGraph.groundingEntry.semanticTag;
+
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief = BuildBrief(
         profile.worldSpaceState,

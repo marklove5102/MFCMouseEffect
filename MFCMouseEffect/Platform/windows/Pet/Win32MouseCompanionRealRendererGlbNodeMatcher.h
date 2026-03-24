@@ -11,7 +11,10 @@ struct Win32MouseCompanionRealRendererGlbNodeMatchResult final {
     uint32_t nodeIndex{0};
     std::string nodeName;
     std::string nodePath;
+    std::string parentNodeName;
+    std::string semanticTag;
     std::string matchBasis;
+    uint32_t nodeDepth{0};
     float confidence{0.0f};
     bool matched{false};
 };

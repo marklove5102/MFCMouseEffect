@@ -2,6 +2,7 @@
 
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererAppearanceSemantics.h"
 #include "Platform/windows/Pet/Win32MouseCompanionRealRendererActionOverlayBuilder.h"
+#include "Platform/windows/Pet/Win32MouseCompanionRealRendererGraphSignal.h"
 
 #include <algorithm>
 
@@ -61,20 +62,6 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     return std::min(signal, 1.0f);
 }
 
-float ResolvePlanSignal(
-    const std::string& parserLocator,
-    const std::string& probeLabel,
-    float planConfidence) {
-    float signal = planConfidence * 0.62f;
-    if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
-        signal += 0.24f;
-    }
-    if (!probeLabel.empty() && probeLabel.find("@") != std::string::npos) {
-        signal += 0.14f;
-    }
-    return std::min(signal, 1.0f);
-}
-
 Gdiplus::RectF MakeCenteredRect(float centerX, float centerY, float width, float height) {
     return Gdiplus::RectF(centerX - width * 0.5f, centerY - height * 0.5f, width, height);
 }
@@ -109,10 +96,11 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
                 ResolveSelectorSignal(
                     finalTargetResolver.overlayEntry.selectorKey,
                     finalTargetResolver.overlayEntry.candidateNodeName) +
-                ResolvePlanSignal(
-                    matchGraph.overlayEntry.graphLocator,
-                    matchGraph.overlayEntry.graphNodeLabel,
-                    matchGraph.overlayEntry.graphConfidence));
+                ResolveWin32MouseCompanionRealRendererGraphEntrySignal(
+                    matchGraph.overlayEntry) *
+                    (0.65f + 0.35f * ResolveWin32MouseCompanionRealRendererGraphSemanticSignal(
+                                         matchGraph.overlayEntry,
+                                         "overlay")));
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float transformOverlayWeight = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedWeight
