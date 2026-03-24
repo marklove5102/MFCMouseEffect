@@ -11,6 +11,9 @@ struct Win32MouseCompanionRealRendererSceneRuntime;
 struct Win32MouseCompanionRealRendererAssetNodeWorldSpaceEntry final {
     std::string logicalNode;
     std::string assetNodePath;
+    std::string resolvedNodeKey;
+    std::string resolvedNodeLabel;
+    float matchConfidence{0.0f};
     float worldX{0.0f};
     float worldY{0.0f};
     float worldScale{1.0f};

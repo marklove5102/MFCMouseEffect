@@ -11,7 +11,10 @@ struct Win32MouseCompanionRealRendererScene;
 struct Win32MouseCompanionRealRendererAssetNodeJointHintEntry final {
     std::string logicalNode;
     std::string assetNodePath;
+    std::string resolvedNodeKey;
+    std::string resolvedNodeLabel;
     std::string jointHintName;
+    float matchConfidence{0.0f};
     float hintWeight{0.0f};
     float reachBias{0.0f};
     float spreadBias{0.0f};

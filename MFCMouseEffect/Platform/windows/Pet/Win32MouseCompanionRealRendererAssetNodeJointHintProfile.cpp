@@ -55,7 +55,10 @@ Win32MouseCompanionRealRendererAssetNodeJointHintEntry BuildJointHintEntry(
     Win32MouseCompanionRealRendererAssetNodeJointHintEntry entry{};
     entry.logicalNode = solveEntry.logicalNode;
     entry.assetNodePath = solveEntry.assetNodePath;
+    entry.resolvedNodeKey = solveEntry.logicalNode + "|" + solveEntry.assetNodePath;
+    entry.resolvedNodeLabel = solveEntry.logicalNode + "@pose_solve";
     entry.jointHintName = ResolveJointHintName(solveEntry.logicalNode);
+    entry.matchConfidence = solveEntry.resolved ? std::clamp(solveEntry.solvedPoseWeight, 0.0f, 1.0f) : 0.0f;
     entry.hintWeight = solveEntry.solvedPoseWeight;
     entry.reachBias = solveEntry.solvedPoseX;
     entry.spreadBias = (solveEntry.solvedPoseScale - 1.0f) * 10.0f;
@@ -170,7 +173,8 @@ void ApplyWin32MouseCompanionRealRendererAssetNodeJointHintProfile(
 
     scene.bodyTiltDeg += body.tiltBiasDeg * 0.35f + head.tiltBiasDeg * 0.15f;
     scene.whiskerStrokeWidth *= 1.0f + head.spreadBias * 0.002f;
-    scene.accessoryStrokeWidth *= 1.0f + appendage.spreadBias * 0.002f;
+    scene.accessoryStrokeWidth *=
+        1.0f + appendage.spreadBias * 0.002f + appendage.matchConfidence * 0.010f;
     scene.poseBadgeAlpha = std::clamp(
         scene.poseBadgeAlpha + overlay.hintWeight * 6.0f,
         0.0f,

@@ -50,6 +50,9 @@ Win32MouseCompanionRealRendererAssetNodeWorldSpaceEntry BuildWorldSpaceEntry(
     Win32MouseCompanionRealRendererAssetNodeWorldSpaceEntry entry{};
     entry.logicalNode = logicalNode ? logicalNode : "";
     entry.assetNodePath = targetResolverEntry.assetNodePath;
+    entry.resolvedNodeKey = targetResolverEntry.resolvedNodeKey;
+    entry.resolvedNodeLabel = targetResolverEntry.resolvedNodeLabel;
+    entry.matchConfidence = targetResolverEntry.matchConfidence;
     entry.worldX = point.X;
     entry.worldY = point.Y;
     entry.worldScale = scale;
@@ -182,11 +185,14 @@ void ApplyWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
     scene.shadowAlphaScale *= 1.0f + groundingWeight * 0.04f;
     scene.pedestalAlphaScale *= 1.0f + groundingWeight * 0.03f;
     scene.poseBadgeAlpha = std::clamp(
-        scene.poseBadgeAlpha + (overlayWeight * 16.0f + headWeight * 10.0f),
+        scene.poseBadgeAlpha +
+            (overlayWeight * 16.0f + headWeight * 10.0f +
+             (profile.overlayEntry.matchConfidence + profile.headEntry.matchConfidence) * 6.0f),
         0.0f,
         255.0f);
     scene.accessoryAlphaScale *= 1.0f + appendageWeight * 0.05f;
-    scene.accessoryStrokeWidth += appendageWeight * 0.08f;
+    scene.accessoryStrokeWidth +=
+        appendageWeight * 0.08f + profile.appendageEntry.matchConfidence * 0.04f;
     scene.actionOverlay.clickRingAlpha = std::clamp(
         scene.actionOverlay.clickRingAlpha * (1.0f + overlayWeight * 0.03f),
         0.0f,

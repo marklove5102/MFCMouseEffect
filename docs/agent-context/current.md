@@ -191,7 +191,6 @@
   - `./mfx build`
   - `./mfx build --shipping`
   - `./mfx build --gpu`
-- Preferred packaging entrypoint is `./mfx package`.
 - Windows installer remains Inno Setup based.
 - `./mfx package` now reuses the same Windows build contract as `./mfx build`, and `--shipping` forwards `BuildConfiguration=Shipping` into Inno Setup so Windows compile/package no longer depend on raw MSBuild as the primary user-facing entrypoint.
 - Windows Release/Shipping now supports build-time GPU selection through `MfxEnableWindowsGpuEffects=true|false`, and the default is now `false`:
@@ -201,6 +200,7 @@
 - Windows pet model-node runtime now carries internal node identity metadata (`modelNodePath` + `sourceTag`) through `modelNodeSlotProfile -> modelNodeRegistryProfile -> assetNodeBindingProfile`, and `FrameBuilder` / `AdornmentBuilder` / `ActionOverlayBuilder` already consume those signals to bias layout, accessory placement, and overlay anchoring toward real asset-backed nodes.
 - Windows pet asset resources now also derive `modelFileName`, `modelRootNodeKey`, and `modelNodeSelectorPrefix` from the incoming model path/format, so slot/registry/binding paths already point at asset-rooted selector prefixes instead of fixed preview-only paths.
 - That same node identity metadata now flows through `assetNodeTransformProfile -> assetNodeResolverProfile -> assetNodeParentSpaceProfile -> assetNodeTargetProfile -> assetNodeTargetResolverProfile`; the terminal chain now carries `selectorKey` + `candidateNodeName`, and frame/adornment/overlay builders prefer that end-stage selector signal over the earlier binding-only signal.
+- `assetNodeTargetResolverProfile` now emits structured placeholder match results (`resolvedNodeKey`, `resolvedNodeLabel`, `matchConfidence`), and downstream `assetNodeWorldSpaceProfile` / `assetNodeJointHintProfile` already consume those end-stage results instead of raw path-only resolution.
 - macOS package output remains `MFCMouseEffect.app`, `Install/macos`, folder + `.zip` + unsigned `.dmg`.
 - Current package policy: minimal pet runtime assets only, wasm demo plugin ships runtime files only, packaged host binary is stripped in-bundle, `Install/macos/` is git-ignored, and Gatekeeper/notarization is still deferred.
 ### Local Dev Sync
