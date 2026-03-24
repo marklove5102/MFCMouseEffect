@@ -6,21 +6,18 @@
 
 ## Current Task
 ### Goal
-- Run the default Windows no-GPU build and report whether it succeeds.
+- No active Windows manual step right now.
+- The current priority is to investigate the cross-machine sync inconsistency itself, not to keep testing a temporary build workaround.
 
 ### Windows Working Path
 - `F:\language\cpp\code\MFCMouseEffect`
 
 ### Steps
-1. Open `cmd` or PowerShell.
-2. Run:
-   - `cd /d F:\language\cpp\code\MFCMouseEffect`
-   - `.\mfx.cmd build`
+1. Wait for the next synced handoff update.
+2. I will replace this file with the next minimal Windows-side step when the sync investigation reaches a concrete checkpoint.
 
 ### Expected Result
-- The default Windows no-GPU build starts and completes successfully.
+- This file will be updated again only when there is a real Windows-side step worth executing.
 
 ### Send Back If It Fails
-- Reply with:
-  - `成功`
-  - or paste the first error block
+- No action required yet.
