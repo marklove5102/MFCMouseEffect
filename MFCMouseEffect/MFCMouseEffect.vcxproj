@@ -470,6 +470,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyActionLayerProjector.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyActionProjector.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendageActionProjector.h" />
+    <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendageGeometryProjector.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendagePresenceProjector.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendageStrokeProjector.h" />
     <ClInclude Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAdornmentLayerProjector.h" />
@@ -856,6 +857,7 @@ if exist "$(OutDir)d3dcompiler_47.dll" del /Q "$(OutDir)d3dcompiler_47.dll"</Com
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyActionLayerProjector.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyActionProjector.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendageActionProjector.cpp" />
+    <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendageGeometryProjector.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendagePresenceProjector.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAppendageStrokeProjector.cpp" />
     <ClCompile Include="Platform\windows\Pet\Win32MouseCompanionRealRendererModelProxyAdornmentLayerProjector.cpp" />
