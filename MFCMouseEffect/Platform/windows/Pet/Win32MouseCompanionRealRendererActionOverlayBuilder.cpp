@@ -61,16 +61,16 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     return std::min(signal, 1.0f);
 }
 
-float ResolveEnumerationSignal(
+float ResolvePlanSignal(
     const std::string& parserLocator,
-    const std::string& enumerationLabel,
-    float enumerationConfidence) {
-    float signal = enumerationConfidence * 0.60f;
+    const std::string& probeLabel,
+    float planConfidence) {
+    float signal = planConfidence * 0.62f;
     if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
-        signal += 0.25f;
+        signal += 0.24f;
     }
-    if (!enumerationLabel.empty() && enumerationLabel.find("@enumeration") != std::string::npos) {
-        signal += 0.15f;
+    if (!probeLabel.empty() && probeLabel.find("@") != std::string::npos) {
+        signal += 0.14f;
     }
     return std::min(signal, 1.0f);
 }
@@ -98,7 +98,7 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
             ? runtime.modelNodeRegistryProfile.overlayEntry.registryWeight
             : 0.0f;
     const auto& finalTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const auto& matchEnumeration = runtime.assetNodeMatchEnumerationProfile;
+    const auto& matchPlan = runtime.assetNodeMatchPlanProfile;
     const float overlayIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.overlayEntry.sourceTag) *
         std::min(
@@ -109,10 +109,10 @@ void BuildWin32MouseCompanionRealRendererActionOverlay(
                 ResolveSelectorSignal(
                     finalTargetResolver.overlayEntry.selectorKey,
                     finalTargetResolver.overlayEntry.candidateNodeName) +
-                ResolveEnumerationSignal(
-                    matchEnumeration.overlayEntry.parserLocator,
-                    matchEnumeration.overlayEntry.enumerationLabel,
-                    matchEnumeration.overlayEntry.enumerationConfidence));
+                ResolvePlanSignal(
+                    matchPlan.overlayEntry.parserLocator,
+                    matchPlan.overlayEntry.probeLabel,
+                    matchPlan.overlayEntry.planConfidence));
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
     const float transformOverlayWeight = assetTargetResolver.overlayEntry.resolved
         ? assetTargetResolver.overlayEntry.resolvedWeight

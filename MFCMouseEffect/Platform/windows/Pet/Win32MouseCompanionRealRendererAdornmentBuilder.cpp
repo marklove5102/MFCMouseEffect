@@ -61,16 +61,16 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     return std::min(signal, 1.0f);
 }
 
-float ResolveEnumerationSignal(
+float ResolvePlanSignal(
     const std::string& parserLocator,
-    const std::string& enumerationLabel,
-    float enumerationConfidence) {
-    float signal = enumerationConfidence * 0.58f;
+    const std::string& probeLabel,
+    float planConfidence) {
+    float signal = planConfidence * 0.60f;
     if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
         signal += 0.24f;
     }
-    if (!enumerationLabel.empty() && enumerationLabel.find("@enumeration") != std::string::npos) {
-        signal += 0.14f;
+    if (!probeLabel.empty() && probeLabel.find("@") != std::string::npos) {
+        signal += 0.16f;
     }
     return std::min(signal, 1.0f);
 }
@@ -178,7 +178,7 @@ void BuildWin32MouseCompanionRealRendererAdornment(
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const auto& matchEnumeration = runtime.assetNodeMatchEnumerationProfile;
+    const auto& matchPlan = runtime.assetNodeMatchPlanProfile;
     const float registryAppendageWeight =
         nodeRegistry.appendageEntry.resolved ? nodeRegistry.appendageEntry.registryWeight : 0.0f;
     const float assetAppendageWeight =
@@ -194,10 +194,10 @@ void BuildWin32MouseCompanionRealRendererAdornment(
                 ResolveSelectorSignal(
                     finalTargetResolver.appendageEntry.selectorKey,
                     finalTargetResolver.appendageEntry.candidateNodeName) +
-                ResolveEnumerationSignal(
-                    matchEnumeration.appendageEntry.parserLocator,
-                    matchEnumeration.appendageEntry.enumerationLabel,
-                    matchEnumeration.appendageEntry.enumerationConfidence));
+                ResolvePlanSignal(
+                    matchPlan.appendageEntry.parserLocator,
+                    matchPlan.appendageEntry.probeLabel,
+                    matchPlan.appendageEntry.planConfidence));
     const float poseAdornmentX =
         nodeBinding.appendageEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAdornmentY =

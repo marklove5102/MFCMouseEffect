@@ -140,7 +140,7 @@ BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
 
     const auto& targetResolver = runtime.assetNodeTargetResolverProfile;
     const auto& matchCatalog = runtime.assetNodeMatchCatalogProfile;
-    const auto& matchEnumeration = runtime.assetNodeMatchEnumerationProfile;
+    const auto& matchPlan = runtime.assetNodeMatchPlanProfile;
     profile.bodyEntry = BuildWorldSpaceEntry(
         "body",
         scene.bodyAnchor,
@@ -172,17 +172,17 @@ BuildWin32MouseCompanionRealRendererAssetNodeWorldSpaceProfile(
         targetResolver.groundingEntry,
         matchCatalog.groundingEntry);
 
-    profile.bodyEntry.resolvedNodeLabel = matchEnumeration.bodyEntry.enumerationLabel;
-    profile.headEntry.resolvedNodeLabel = matchEnumeration.headEntry.enumerationLabel;
-    profile.appendageEntry.resolvedNodeLabel = matchEnumeration.appendageEntry.enumerationLabel;
-    profile.overlayEntry.resolvedNodeLabel = matchEnumeration.overlayEntry.enumerationLabel;
-    profile.groundingEntry.resolvedNodeLabel = matchEnumeration.groundingEntry.enumerationLabel;
+    profile.bodyEntry.resolvedNodeLabel = matchPlan.bodyEntry.probeLabel;
+    profile.headEntry.resolvedNodeLabel = matchPlan.headEntry.probeLabel;
+    profile.appendageEntry.resolvedNodeLabel = matchPlan.appendageEntry.probeLabel;
+    profile.overlayEntry.resolvedNodeLabel = matchPlan.overlayEntry.probeLabel;
+    profile.groundingEntry.resolvedNodeLabel = matchPlan.groundingEntry.probeLabel;
 
-    profile.bodyEntry.matchConfidence = matchEnumeration.bodyEntry.enumerationConfidence;
-    profile.headEntry.matchConfidence = matchEnumeration.headEntry.enumerationConfidence;
-    profile.appendageEntry.matchConfidence = matchEnumeration.appendageEntry.enumerationConfidence;
-    profile.overlayEntry.matchConfidence = matchEnumeration.overlayEntry.enumerationConfidence;
-    profile.groundingEntry.matchConfidence = matchEnumeration.groundingEntry.enumerationConfidence;
+    profile.bodyEntry.matchConfidence = matchPlan.bodyEntry.planConfidence;
+    profile.headEntry.matchConfidence = matchPlan.headEntry.planConfidence;
+    profile.appendageEntry.matchConfidence = matchPlan.appendageEntry.planConfidence;
+    profile.overlayEntry.matchConfidence = matchPlan.overlayEntry.planConfidence;
+    profile.groundingEntry.matchConfidence = matchPlan.groundingEntry.planConfidence;
 
     profile.resolvedEntryCount = CountResolvedEntries(profile);
     profile.brief = BuildBrief(

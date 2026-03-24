@@ -60,16 +60,16 @@ float ResolveSelectorSignal(const std::string& selectorKey, const std::string& c
     return std::min(signal, 1.0f);
 }
 
-float ResolveEnumerationSignal(
+float ResolvePlanSignal(
     const std::string& parserLocator,
-    const std::string& enumerationLabel,
-    float enumerationConfidence) {
-    float signal = enumerationConfidence * 0.60f;
+    const std::string& probeLabel,
+    float planConfidence) {
+    float signal = planConfidence * 0.62f;
     if (!parserLocator.empty() && parserLocator.rfind("parser://", 0) == 0) {
-        signal += 0.25f;
+        signal += 0.24f;
     }
-    if (!enumerationLabel.empty() && enumerationLabel.find("@enumeration") != std::string::npos) {
-        signal += 0.15f;
+    if (!probeLabel.empty() && probeLabel.find("@") != std::string::npos) {
+        signal += 0.14f;
     }
     return std::min(signal, 1.0f);
 }
@@ -186,7 +186,7 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
     const auto& nodeRegistry = runtime.modelNodeRegistryProfile;
     const auto& assetBinding = runtime.assetNodeBindingProfile;
     const auto& assetTargetResolver = runtime.assetNodeTargetResolverProfile;
-    const auto& matchEnumeration = runtime.assetNodeMatchEnumerationProfile;
+    const auto& matchPlan = runtime.assetNodeMatchPlanProfile;
     const float bodyRegistryWeight =
         nodeRegistry.bodyEntry.resolved ? nodeRegistry.bodyEntry.registryWeight : 0.0f;
     const float headRegistryWeight =
@@ -210,10 +210,10 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
                 ResolveSelectorSignal(
                     finalTargetResolver.bodyEntry.selectorKey,
                     finalTargetResolver.bodyEntry.candidateNodeName) +
-                ResolveEnumerationSignal(
-                    matchEnumeration.bodyEntry.parserLocator,
-                    matchEnumeration.bodyEntry.enumerationLabel,
-                    matchEnumeration.bodyEntry.enumerationConfidence));
+                ResolvePlanSignal(
+                    matchPlan.bodyEntry.parserLocator,
+                    matchPlan.bodyEntry.probeLabel,
+                    matchPlan.bodyEntry.planConfidence));
     const float headIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.headEntry.sourceTag) *
         std::min(
@@ -224,10 +224,10 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
                 ResolveSelectorSignal(
                     finalTargetResolver.headEntry.selectorKey,
                     finalTargetResolver.headEntry.candidateNodeName) +
-                ResolveEnumerationSignal(
-                    matchEnumeration.headEntry.parserLocator,
-                    matchEnumeration.headEntry.enumerationLabel,
-                    matchEnumeration.headEntry.enumerationConfidence));
+                ResolvePlanSignal(
+                    matchPlan.headEntry.parserLocator,
+                    matchPlan.headEntry.probeLabel,
+                    matchPlan.headEntry.planConfidence));
     const float groundingIdentitySignal =
         ResolveNodeSourceConfidence(finalTargetResolver.groundingEntry.sourceTag) *
         std::min(
@@ -238,10 +238,10 @@ Win32MouseCompanionRealRendererLayoutMetrics BuildWin32MouseCompanionRealRendere
                 ResolveSelectorSignal(
                     finalTargetResolver.groundingEntry.selectorKey,
                     finalTargetResolver.groundingEntry.candidateNodeName) +
-                ResolveEnumerationSignal(
-                    matchEnumeration.groundingEntry.parserLocator,
-                    matchEnumeration.groundingEntry.enumerationLabel,
-                    matchEnumeration.groundingEntry.enumerationConfidence));
+                ResolvePlanSignal(
+                    matchPlan.groundingEntry.parserLocator,
+                    matchPlan.groundingEntry.probeLabel,
+                    matchPlan.groundingEntry.planConfidence));
     const float poseAnchorX = nodeBinding.bodyEntry.worldOffsetX * metrics.bodyWidth;
     const float poseAnchorY = nodeBinding.bodyEntry.worldOffsetY * metrics.bodyHeight;
     const float poseHeadX = nodeBinding.headEntry.worldOffsetX * metrics.headWidth;
