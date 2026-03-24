@@ -851,6 +851,65 @@ void DrawModelProxyContourLayer(
         0.0f);
 }
 
+void DrawModelProxyAppendageLayer(
+    Gdiplus::Graphics* graphics,
+    const Win32MouseCompanionRealRendererScene& scene) {
+    if (!graphics || !scene.modelProxyAppendageLayer.visible) {
+        return;
+    }
+
+    const auto& layer = scene.modelProxyAppendageLayer;
+    FillEllipse(
+        graphics,
+        layer.tailRootCuffRect,
+        WithScaledAlpha(scene.tailFillRear, scene.tailFillRear.GetA(), layer.rearAlphaScale),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.tailBridgeRect,
+        WithScaledAlpha(scene.tailMidFill, scene.tailMidFill.GetA(), layer.rearAlphaScale),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.tailMidContourRect,
+        WithScaledAlpha(scene.tailMidFill, scene.tailMidFill.GetA(), layer.rearAlphaScale),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.tailTipBridgeRect,
+        WithScaledAlpha(scene.tailTipFill, scene.tailTipFill.GetA(), layer.rearAlphaScale),
+        Gdiplus::Color(0, 0, 0, 0),
+        0.0f);
+    FillEllipse(
+        graphics,
+        layer.tailTipRect,
+        WithScaledAlpha(scene.tailTipFill, scene.tailTipFill.GetA(), layer.accentAlphaScale),
+        WithScaledAlpha(scene.tailStroke, scene.tailStroke.GetA(), layer.strokeAlphaScale),
+        std::max(0.9f, scene.tailStrokeWidth - 0.2f));
+
+    const auto rearFill = WithScaledAlpha(scene.bodyFillRear, scene.bodyFillRear.GetA(), layer.rearAlphaScale);
+    const auto rearAccent = WithScaledAlpha(scene.blushFill, scene.blushFill.GetA(), layer.accentAlphaScale);
+    FillEllipse(graphics, layer.leftLegSilhouetteBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightLegSilhouetteBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftLegCadenceBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightLegCadenceBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftLegRootCuffRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightLegRootCuffRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftLegPadRect, rearAccent, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightLegPadRect, rearAccent, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftHandSilhouetteBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightHandSilhouetteBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftHandCadenceBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightHandCadenceBridgeRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftHandRootCuffRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightHandRootCuffRect, rearFill, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.leftHandPadRect, rearAccent, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+    FillEllipse(graphics, layer.rightHandPadRect, rearAccent, Gdiplus::Color(0, 0, 0, 0), 0.0f);
+}
+
 } // namespace
 
 void Win32MouseCompanionRealRendererPainter::Paint(
@@ -875,6 +934,7 @@ void Win32MouseCompanionRealRendererPainter::Paint(
     DrawModelProxyLayer(graphics, scene);
     DrawModelProxyFrameLayer(graphics, scene);
     DrawModelProxyContourLayer(graphics, scene);
+    DrawModelProxyAppendageLayer(graphics, scene);
     DrawModelProxyDetailLayer(graphics, scene);
     DrawModelProxyAdornmentLayer(graphics, scene);
     DrawModelProxyActionLayer(graphics, scene.modelProxyActionLayer);
