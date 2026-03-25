@@ -31,7 +31,7 @@
 ### Plugin Management / WebUI
 - Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
 - WebUI apply flow is backend-state-driven (`post-apply reconcile + refresh`).
-- `cursor_decoration` no longer ships a standalone WebUI entry bundle: the lane is embedded only inside `Cursor Effects`, and the unused detached `cursor-decoration-settings.svelte.js` loader path was removed because its orphaned lazy-mount observer could keep scanning the whole document and freeze the settings page after the sixth effect landed.
+- `cursor_decoration` no longer ships a standalone WebUI entry bundle, and its channel dropdown now derives the trailing disabled label from the same localized option set as the built-in plugins, so Chinese pages show `无` and English pages show `None` without relying on `document.lang`.
 - `section-workspace` is now mount-order tolerant with bounded retry: if `settings_grid` cards are not yet collectable on first pass, it performs short timed retries and temporarily reveals cards instead of binding a long-lived subtree observer.
 - Settings launch lifecycle is shared through `WebSettingsLaunchCoordinator`; platform shells still keep their own `OpenUrlUtf8(...)`.
 - `WebSettingsLaunchCoordinator` destructor must stay out-of-line while `WebSettingsServer` is forward-declared, otherwise libc++/clang host builds can fail on incomplete-type `unique_ptr` destruction.

@@ -78,12 +78,10 @@
     return value[key] !== false;
   }
 
-  function resolveCursorDecorationDisabledLabel() {
-    if (typeof document === 'undefined') {
-      return 'None';
-    }
-    const lang = `${document.documentElement?.lang || ''}`.trim().toLowerCase();
-    return lang.startsWith('zh') ? '无' : 'None';
+  function resolveCursorDecorationDisabledLabel(options) {
+    const values = Array.isArray(options) ? options : [];
+    const hasNonAsciiLabel = values.some((option) => /[^\x00-\x7F]/.test(`${option?.label || ''}`));
+    return hasNonAsciiLabel ? '无' : 'None';
   }
 
   const effectKeys = ['click', 'trail', 'scroll', 'hold', 'hover'];
@@ -94,7 +92,7 @@
   $: decorationChannelValue = normalizeCursorDecorationChannelValue(normalizedCursorDecoration);
   $: cursorDecorationDisabledOption = {
     value: '__disabled__',
-    label: resolveCursorDecorationDisabledLabel(),
+    label: resolveCursorDecorationDisabledLabel(cursorDecorationOptions),
   };
   $: decorationChannelOptions = [...(cursorDecorationOptions || []), cursorDecorationDisabledOption];
 
