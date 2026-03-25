@@ -5,7 +5,6 @@ import { readUiState, writeUiState } from './ui-state-storage.js';
 const state = {
   initialized: false,
   hashBound: false,
-  sectionObserverBound: false,
   sections: [],
   activeId: '',
   i18n: null,
@@ -13,7 +12,8 @@ const state = {
   runtimeState: {},
   component: null,
   contextComponent: null,
-  sectionObserver: null,
+  recoverTimer: 0,
+  recoverAttempts: 0,
 };
 
 const WORKSPACE_STATE_STORAGE_NS = 'workspace.v1';
@@ -86,34 +86,40 @@ function collectSections() {
   state.sections = out;
 }
 
-function stopSectionObserver() {
-  if (!state.sectionObserver) {
+function clearRecoverTimer() {
+  if (!state.recoverTimer) {
     return;
   }
-  state.sectionObserver.disconnect();
-  state.sectionObserver = null;
-  state.sectionObserverBound = false;
+  window.clearTimeout(state.recoverTimer);
+  state.recoverTimer = 0;
 }
 
-function bindSectionObserver() {
-  if (state.sectionObserverBound || typeof MutationObserver !== 'function') {
-    return;
+function revealCardsFallback() {
+  const cards = Array.from(document.querySelectorAll('#settings_grid > .card[id]'));
+  for (const card of cards) {
+    card.hidden = false;
+    card.classList.remove('is-active');
   }
-  const root = document.getElementById('settings_grid') || document.body || document.documentElement;
-  if (!root) {
-    return;
-  }
+}
 
-  state.sectionObserver = new MutationObserver(() => {
+function scheduleRecoverRefresh() {
+  if (state.recoverTimer) {
+    return;
+  }
+  if (state.recoverAttempts >= 40) {
+    return;
+  }
+  state.recoverTimer = window.setTimeout(() => {
+    state.recoverTimer = 0;
+    state.recoverAttempts += 1;
     collectSections();
     if (state.sections.length <= 0) {
+      scheduleRecoverRefresh();
       return;
     }
-    stopSectionObserver();
+    state.recoverAttempts = 0;
     refresh();
-  });
-  state.sectionObserver.observe(root, { childList: true, subtree: true });
-  state.sectionObserverBound = true;
+  }, 50);
 }
 
 function sectionById(id) {
@@ -256,11 +262,15 @@ function render(options) {
   const opts = options || {};
   state.activeId = pickAvailableSectionId(state.activeId);
   if (!state.activeId) {
-    bindSectionObserver();
+    revealCardsFallback();
+    updateSidebarView();
+    updateContextView();
+    scheduleRecoverRefresh();
     return;
   }
 
-  stopSectionObserver();
+  clearRecoverTimer();
+  state.recoverAttempts = 0;
 
   writeWorkspaceStorage({
     activeSectionId: state.activeId,
@@ -351,9 +361,6 @@ function ensureContextComponent() {
 
 function init() {
   collectSections();
-  if (state.sections.length <= 0) {
-    bindSectionObserver();
-  }
   ensureSidebarComponent();
   ensureContextComponent();
   bindHashChange();
@@ -371,9 +378,6 @@ function refresh() {
   }
 
   collectSections();
-  if (state.sections.length <= 0) {
-    bindSectionObserver();
-  }
   ensureSidebarComponent();
   ensureContextComponent();
   bindHashChange();

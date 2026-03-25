@@ -32,7 +32,7 @@
 ### Plugin Management / WebUI
 - Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
 - WebUI apply flow is backend-state-driven (`post-apply reconcile + refresh`).
-- `section-workspace` is now mount-order tolerant: if `settings_grid` cards are not yet collectable on first pass, it binds a short-lived observer and retries automatically instead of leaving the whole settings body blank behind the shell header.
+- `section-workspace` is now mount-order tolerant with bounded retry: if `settings_grid` cards are not yet collectable on first pass, it performs short timed retries and temporarily reveals cards instead of binding a long-lived subtree observer.
 - Settings launch lifecycle is shared through `WebSettingsLaunchCoordinator`; platform shells still keep their own `OpenUrlUtf8(...)`.
 - `WebSettingsLaunchCoordinator` destructor must stay out-of-line while `WebSettingsServer` is forward-declared, otherwise libc++/clang host builds can fail on incomplete-type `unique_ptr` destruction.
 - POSIX/mac host runtime source lists must explicitly carry `WebSettingsLaunchCoordinator.cpp`, `PetVisualAssetCoordinator.cpp`, `MouseCompanionRendererBackendDiagnostics.cpp`, and `PlatformPetVisualHost.cpp`; missing any of them can surface as arm64 link failures during `./mfx run`.
