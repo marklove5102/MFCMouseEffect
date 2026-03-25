@@ -438,6 +438,7 @@ WasmConfig SanitizeWasmConfig(WasmConfig config) {
     config.manifestPathScroll = TrimAscii(config.manifestPathScroll);
     config.manifestPathHold = TrimAscii(config.manifestPathHold);
     config.manifestPathHover = TrimAscii(config.manifestPathHover);
+    config.manifestPathCursorDecoration = TrimAscii(config.manifestPathCursorDecoration);
     config.catalogRootPath = TrimAscii(config.catalogRootPath);
     config.outputBufferBytes = static_cast<uint32_t>(ClampInt(
         static_cast<int>(config.outputBufferBytes),

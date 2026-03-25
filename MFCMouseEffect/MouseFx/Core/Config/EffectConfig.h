@@ -282,6 +282,7 @@ struct WasmConfig {
     std::string manifestPathScroll;
     std::string manifestPathHold;
     std::string manifestPathHover;
+    std::string manifestPathCursorDecoration;
     // Optional extra catalog root path (UTF-8 path string) for plugin discovery.
     std::string catalogRootPath;
     // WASM execution budget policy.

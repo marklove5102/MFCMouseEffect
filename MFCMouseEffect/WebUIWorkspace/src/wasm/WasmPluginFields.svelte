@@ -17,18 +17,11 @@
     resolveWasmActionErrorMessage,
   } from './action-error-model.js';
   import { normalizeWasmState } from './state-model.js';
-  import {
-    buildCursorDecorationFromPreset,
-    normalizeCursorDecorationPluginId,
-  } from '../effects/cursor-decoration-presets.js';
 
   export let schemaState = {};
   export let payloadState = {};
-  export let cursorDecoration = {};
-  export let cursorDecorationOptions = [];
   export let i18n = {};
   export let onAction = null;
-  export let onCursorDecorationChange = null;
 
   function text(key, fallback) {
     const value = i18n || {};
@@ -39,57 +32,6 @@
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : fallback;
   }
-
-  function normalizeCursorDecoration(input) {
-    const value = input || {};
-    return {
-      enabled: value.enabled === true,
-      plugin_id: normalizeCursorDecorationPluginId(value.plugin_id || 'focus_ring'),
-      color_hex: `${value.color_hex || '#ff5a5a'}`.trim() || '#ff5a5a',
-      size_px: toNumber(value.size_px, 22),
-      alpha_percent: toNumber(value.alpha_percent, 82),
-    };
-  }
-
-  function sameCursorDecoration(left, right) {
-    const a = normalizeCursorDecoration(left);
-    const b = normalizeCursorDecoration(right);
-    return a.enabled === b.enabled
-      && a.plugin_id === b.plugin_id
-      && a.color_hex === b.color_hex
-      && a.size_px === b.size_px
-      && a.alpha_percent === b.alpha_percent;
-  }
-
-  function resolveCursorDecorationNoneLabel(options) {
-    const source = Array.isArray(options) ? options : [];
-    const hasNonAsciiLabel = source.some((item) => /[^\x00-\x7F]/.test(`${item?.label || ''}`));
-    return hasNonAsciiLabel ? '无' : 'None';
-  }
-
-  function buildCursorDecorationOptions(options) {
-    const source = Array.isArray(options) ? options : [];
-    const normalized = source
-      .filter((item) => {
-        const value = `${item?.value || ''}`.trim();
-        return value.length > 0 && value !== '__disabled__';
-      })
-      .map((item) => ({
-        value: `${item?.value || ''}`.trim(),
-        label: `${item?.label || item?.value || ''}`.trim(),
-      }));
-    normalized.push({
-      value: '__disabled__',
-      label: resolveCursorDecorationNoneLabel(source),
-    });
-    return normalized;
-  }
-
-  function decorationSelectValue(value) {
-    const normalized = normalizeCursorDecoration(value);
-    return normalized.enabled ? normalized.plugin_id : '__disabled__';
-  }
-
 
   function normalizeCatalogItems(input) {
     const source = Array.isArray(input) ? input : [];
@@ -158,6 +100,9 @@
     }
     if (id === 'hover') {
       return kinds.includes('hover') || kinds.some((entry) => entry.startsWith('hover_'));
+    }
+    if (id === 'cursor_decoration') {
+      return kinds.includes('move') || kinds.includes('trail') || kinds.includes('hover') || kinds.length === 0;
     }
     return true;
   }
@@ -277,6 +222,7 @@
     { id: 'scroll', labelKey: 'label_scroll', fallback: 'Scroll' },
     { id: 'hold', labelKey: 'label_hold', fallback: 'Hold' },
     { id: 'hover', labelKey: 'label_hover', fallback: 'Hover' },
+    { id: 'cursor_decoration', labelKey: 'section_cursor_decoration', fallback: 'Cursor Decoration' },
   ];
   const EFFECT_CHANNEL_IDS = EFFECT_CHANNELS.map((entry) => entry.id);
 
@@ -287,6 +233,7 @@
       scroll: '',
       hold: '',
       hover: '',
+      cursor_decoration: '',
     };
   }
 
@@ -297,6 +244,7 @@
       scroll: [],
       hold: [],
       hover: [],
+      cursor_decoration: [],
     };
   }
 
@@ -307,6 +255,7 @@
       scroll: null,
       hold: null,
       hover: null,
+      cursor_decoration: null,
     };
   }
 
@@ -343,6 +292,9 @@
     if (id === 'hover') {
       return `${s.configured_manifest_path_hover || ''}`.trim() || `${s.configured_manifest_path || ''}`.trim();
     }
+    if (id === 'cursor_decoration') {
+      return `${s.configured_manifest_path_cursor_decoration || ''}`.trim();
+    }
     return `${s.configured_manifest_path || ''}`.trim();
   }
 
@@ -364,6 +316,9 @@
     if (id === 'hover') {
       return `${s.configured_manifest_path_hover || ''}`.trim();
     }
+    if (id === 'cursor_decoration') {
+      return `${s.configured_manifest_path_cursor_decoration || ''}`.trim();
+    }
     return '';
   }
 
@@ -384,6 +339,9 @@
     }
     if (id === 'hover') {
       return `${s.active_manifest_path_hover || ''}`.trim();
+    }
+    if (id === 'cursor_decoration') {
+      return `${s.active_manifest_path_cursor_decoration || ''}`.trim();
     }
     return `${s.active_manifest_path || ''}`.trim();
   }
@@ -409,7 +367,11 @@
       next.configured_manifest_path_hold = value;
       return next;
     }
-    next.configured_manifest_path_hover = value;
+    if (id === 'hover') {
+      next.configured_manifest_path_hover = value;
+      return next;
+    }
+    next.configured_manifest_path_cursor_decoration = value;
     return next;
   }
 
@@ -421,6 +383,7 @@
       scroll: configuredManifestPathForChannelRaw(source, 'scroll'),
       hold: configuredManifestPathForChannelRaw(source, 'hold'),
       hover: configuredManifestPathForChannelRaw(source, 'hover'),
+      cursor_decoration: configuredManifestPathForChannelRaw(source, 'cursor_decoration'),
     };
   }
 
@@ -477,10 +440,6 @@
   let activePluginTitle = current.active_plugin_name || current.active_plugin_id || text('wasm_text_no_active_plugin', 'Not loaded');
   let manifestPathDisplay = current.active_manifest_path || current.configured_manifest_path || '-';
   let showConfiguredManifestPath = false;
-  let decorationForm = normalizeCursorDecoration(cursorDecoration);
-  let lastCursorDecorationRef = cursorDecoration;
-  let lastEmittedCursorDecoration = normalizeCursorDecoration(cursorDecoration);
-
   function setSelectedManifestPath(channelId, manifestPath) {
     const id = sanitizeChannelId(channelId);
     selectedManifestPathByChannel = {
@@ -735,42 +694,6 @@
     await savePolicy();
   }
 
-  function emitCursorDecorationIfNeeded() {
-    const nextValue = normalizeCursorDecoration(decorationForm);
-    if (sameCursorDecoration(lastEmittedCursorDecoration, nextValue)) {
-      return;
-    }
-    lastEmittedCursorDecoration = nextValue;
-    if (typeof onCursorDecorationChange === 'function') {
-      onCursorDecorationChange(nextValue);
-    }
-  }
-
-  function handleCursorDecorationSelection(event) {
-    const selected = `${event?.currentTarget?.value || ''}`.trim();
-    if (!selected || selected === '__disabled__') {
-      decorationForm = {
-        ...decorationForm,
-        enabled: false,
-      };
-      emitCursorDecorationIfNeeded();
-      return;
-    }
-    decorationForm = buildCursorDecorationFromPreset(selected, {
-      ...decorationForm,
-      enabled: true,
-    });
-    emitCursorDecorationIfNeeded();
-  }
-
-  function toggleCursorDecorationEnabled() {
-    decorationForm = {
-      ...decorationForm,
-      enabled: !decorationForm.enabled,
-    };
-    emitCursorDecorationIfNeeded();
-  }
-
   $: if (schemaState !== lastSchemaRef) {
     lastSchemaRef = schemaState;
     currentRanges = normalizePolicyRanges(schemaState?.policy_ranges || {});
@@ -799,15 +722,6 @@
     );
     syncChannelSelectionsFromCurrent();
   }
-
-  $: if (cursorDecoration !== lastCursorDecorationRef) {
-    lastCursorDecorationRef = cursorDecoration;
-    decorationForm = normalizeCursorDecoration(cursorDecoration);
-    lastEmittedCursorDecoration = normalizeCursorDecoration(cursorDecoration);
-  }
-
-  $: decorationPluginOptions = buildCursorDecorationOptions(cursorDecorationOptions);
-  $: decorationSelectedValue = decorationSelectValue(decorationForm);
 
   $: activePluginTitle = current.active_plugin_name || current.active_plugin_id || text('wasm_text_no_active_plugin', 'Not loaded');
 
@@ -906,34 +820,6 @@
           </button>
         </div>
       {/each}
-
-      <div class="wasm-catalog-controls wasm-catalog-controls--channel wasm-catalog-controls--cursor-decoration">
-        <span class="wasm-catalog-channel-label" data-i18n="section_cursor_decoration">Cursor Decoration</span>
-        <select value={decorationSelectedValue} on:change={handleCursorDecorationSelection}>
-          {#each decorationPluginOptions as option}
-            <option value={option.value}>{option.label}</option>
-          {/each}
-        </select>
-        <button
-          type="button"
-          class={`wasm-toggle wasm-channel-toggle ${decorationForm.enabled ? 'is-on' : 'is-off'}`}
-          on:click={toggleCursorDecorationEnabled}
-          aria-pressed={decorationForm.enabled ? 'true' : 'false'}
-        >
-          <span class="wasm-toggle-track" aria-hidden="true">
-            <span class="wasm-toggle-knob"></span>
-          </span>
-          <span
-            class="wasm-toggle-text"
-            data-i18n={decorationForm.enabled ? 'text_wasm_channel_loaded' : 'text_wasm_channel_enable'}
-          >
-            {decorationForm.enabled
-              ? text('text_wasm_channel_loaded', 'Loaded')
-              : text('text_wasm_channel_enable', 'Enable')}
-          </span>
-        </button>
-      </div>
-
     </div>
 
     <details class="wasm-collapsible-block grid-offset-top">

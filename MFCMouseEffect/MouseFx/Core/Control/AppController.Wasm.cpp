@@ -20,6 +20,7 @@ enum class EffectsWasmLane : size_t {
     Scroll = 2,
     Hold = 3,
     Hover = 4,
+    CursorDecoration = 5,
 };
 
 wasm::ExecutionBudget BuildExecutionBudget(const WasmConfig& cfg) {
@@ -42,6 +43,8 @@ EffectsWasmLane LaneFromIndex(size_t index) {
         return EffectsWasmLane::Hold;
     case 4:
         return EffectsWasmLane::Hover;
+    case 5:
+        return EffectsWasmLane::CursorDecoration;
     default:
         return EffectsWasmLane::Click;
     }
@@ -76,6 +79,10 @@ bool TryResolveEffectsLane(const std::string& channelRaw, EffectsWasmLane* outLa
         *outLane = EffectsWasmLane::Hover;
         return true;
     }
+    if (channel == "cursor_decoration" || channel == "cursor-decoration" || channel == "cursor") {
+        *outLane = EffectsWasmLane::CursorDecoration;
+        return true;
+    }
     return false;
 }
 
@@ -94,6 +101,8 @@ std::string* MutableEffectsLaneManifestPath(WasmConfig* cfg, EffectsWasmLane lan
         return &cfg->manifestPathHold;
     case EffectsWasmLane::Hover:
         return &cfg->manifestPathHover;
+    case EffectsWasmLane::CursorDecoration:
+        return &cfg->manifestPathCursorDecoration;
     default:
         return nullptr;
     }
@@ -111,6 +120,8 @@ const std::string* EffectsLaneManifestPath(const WasmConfig& cfg, EffectsWasmLan
         return &cfg.manifestPathHold;
     case EffectsWasmLane::Hover:
         return &cfg.manifestPathHover;
+    case EffectsWasmLane::CursorDecoration:
+        return &cfg.manifestPathCursorDecoration;
     default:
         return nullptr;
     }
@@ -124,6 +135,9 @@ std::string ResolveEffectsConfiguredManifestPath(const WasmConfig& cfg, EffectsW
             return specific;
         }
     }
+    if (lane == EffectsWasmLane::CursorDecoration) {
+        return {};
+    }
     return TrimAscii(cfg.manifestPath);
 }
 
@@ -136,6 +150,7 @@ void ClearEffectsLaneManifestPaths(WasmConfig* cfg) {
     cfg->manifestPathScroll.clear();
     cfg->manifestPathHold.clear();
     cfg->manifestPathHover.clear();
+    cfg->manifestPathCursorDecoration.clear();
 }
 
 std::string ResolveEffectsStartupManifestPath(const EffectConfig& cfg, EffectsWasmLane lane) {

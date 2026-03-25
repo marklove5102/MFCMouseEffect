@@ -8,11 +8,8 @@
 ## Product Boundary
 - `cursor_decoration` is an optional plugin lane, not a mutually exclusive main effect.
 - It can coexist with `click / trail / scroll / hold / hover`.
-- First built-in plugin ids:
-  - `focus_ring`
-  - `signal_ring`
-  - `soft_orb`
-  - `halo_orb`
+- `Effect Channel` owns the built-in lane switch only.
+- `Effect Plugins` must bind a real WASM plugin for the sixth row; it must not mirror built-in preset ids.
 
 ## Runtime Contract
 - Stored under `input_indicator.cursor_decoration` in config JSON.
@@ -22,6 +19,12 @@
   - `color_hex`
   - `size_px`
   - `alpha_percent`
+- Sixth WASM effect lane is stored under `wasm.manifest_path_cursor_decoration`.
+- The lane is dispatched through the same host-owned `effects` WASM runtime as the five main effect categories.
+- The current official sample bundles are:
+  - `demo.cursor-decoration.focus-ring.v2`
+  - `demo.cursor-decoration.soft-orb.v2`
+  - `demo.cursor-decoration.halo-orb.v2`
 - The lane is driven by pointer move updates through `IInputIndicatorOverlay::OnMove(...)`.
 - Native click/scroll/key input indicator behavior remains unchanged; cursor decoration is an additive persistent layer.
 
@@ -36,17 +39,20 @@
   - built-in decoration rendering lives in `Platform/macos/Overlay/MacosCursorDecorationBridge.swift`
 - Web settings:
   - `Cursor Effects -> Effect Channel` now exposes `cursor_decoration` as the sixth built-in lane
-  - `Cursor Effects -> Effect Config` now owns `color_hex / size_px / alpha_percent`
+  - `Cursor Effects -> Effect Config` now owns native fallback `color_hex / size_px / alpha_percent`
   - inside `Effect Config`, cursor-decoration tuning must render as its own compact subpanel below the five main effect scale rows; do not append its title/description/fields directly into the same size-slider grid
-  - `Cursor Effects -> Effect Plugins` keeps a sixth `Cursor Decoration` row with real built-in decoration plugin presets; switching that row updates `plugin_id` and also loads the matching default `color_hex / size_px / alpha_percent`, while detailed tuning still belongs to `Effect Config`
-  - read/write path still merges back into `input_indicator.cursor_decoration`
+  - `Cursor Effects -> Effect Plugins` keeps a sixth `Cursor Decoration` row that must load a real WASM manifest through the same plugin catalog/load/toggle flow as `Click / Trail / Scroll / Hold / Hover`
+  - read/write path is split on purpose:
+    - built-in lane state: `input_indicator.cursor_decoration`
+    - plugin binding: `wasm.manifest_path_cursor_decoration`
   - there is no standalone `cursor-decoration` settings page bundle anymore; the earlier detached bundle path was removed after it left an orphan `lazy-mount` observer on pages that never contained a dedicated cursor-decoration mount
 
 ## Guardrails
 - Do not turn this lane into a sixth mutually exclusive main effect.
+- Do not fake the sixth plugin row with built-in preset ids or mirror state.
 - Do not couple it to the WASM indicator override switch.
 - Keep file responsibilities narrow:
   - config/schema/state/apply
-  - overlay move dispatch
-  - focused decoration renderer
-  - focused WebUI card
+  - effects wasm dispatch
+  - focused sample/plugin bundles
+  - focused WebUI rows

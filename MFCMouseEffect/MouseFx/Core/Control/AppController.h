@@ -1252,7 +1252,7 @@ private:
     mutable ShortcutCaptureSession shortcutCaptureSession_{};
     MouseCompanionPluginHostPhase0 petPluginHostPhase0_{};
     MouseCompanionPluginHostV1 petPluginHostV1_{};
-    static constexpr size_t kWasmEffectsHostCount = 5;
+    static constexpr size_t kWasmEffectsHostCount = 6;
     std::array<std::unique_ptr<wasm::WasmEffectHost>, kWasmEffectsHostCount> wasmEffectHosts_{};
     std::unique_ptr<wasm::WasmEffectHost> wasmIndicatorHost_{};
     bool vmEffectsSuppressed_ = false;
