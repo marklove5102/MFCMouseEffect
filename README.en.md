@@ -1,346 +1,178 @@
-# MFCMouseEffect
-
 <p align="center">
   <img src="./MFCMouseEffect/res/logo_elegant.png" width="128" alt="MFCMouseEffect Logo">
 </p>
 
+<h1 align="center">MFCMouseEffect</h1>
+
 <p align="center">
-  <a href="https://github.com/sqmw/MFCMouseEffect/stargazers"><img src="https://img.shields.io/github/stars/sqmw/MFCMouseEffect?style=for-the-badge" alt="stars"></a>
-  <a href="https://github.com/sqmw/MFCMouseEffect/releases/latest"><img src="https://img.shields.io/github/v/release/sqmw/MFCMouseEffect?style=for-the-badge" alt="release"></a>
+  <b>Make every click, drag, and scroll visible.</b><br>
+  Cross-platform desktop input feedback engine · Extensible · Plugin-powered · WASM-ready
+</p>
+
+<p align="center">
+  <a href="https://github.com/sqmw/MFCMouseEffect/stargazers"><img src="https://img.shields.io/github/stars/sqmw/MFCMouseEffect?style=for-the-badge&color=f5c542" alt="stars"></a>
+  <a href="https://github.com/sqmw/MFCMouseEffect/releases/latest"><img src="https://img.shields.io/github/v/release/sqmw/MFCMouseEffect?style=for-the-badge&color=6c63ff" alt="release"></a>
   <a href="https://github.com/sqmw/MFCMouseEffect/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-brightgreen?style=for-the-badge" alt="license"></a>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="platform">
 </p>
 
 <p align="center">
-  A cross-platform engine for desktop input feedback, input visualization, automation mapping, and WASM-powered extensibility.
+  <a href="https://github.com/sqmw/MFCMouseEffect/releases">📦 Download</a> ·
+  <a href="./docs/README.md">📖 Docs</a> ·
+  <a href="https://github.com/sqmw/MFCMouseEffect/issues">🐛 Issues</a> ·
+  <a href="#-contributing">🤝 Contributing</a> ·
+  <a href="https://github.com/sqmw/MFCMouseEffect">⭐ Star</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/sqmw/MFCMouseEffect">Star</a> ·
-  <a href="https://github.com/sqmw/MFCMouseEffect/issues">Issues</a> ·
-  <a href="https://github.com/sqmw/MFCMouseEffect/releases">Releases</a> ·
-  <a href="./docs/README.md">Docs</a>
+  <a href="README.md"><b>🇨🇳 中文</b></a> | <b>🇬🇧 English</b>
 </p>
-
-**[🇨🇳 中文](README.md)** | **🇬🇧 English**
 
 ---
 
-## Project Overview
+<p align="center">
+  <img src="./docs/images/placeholder_mouse_companion.webp" width="720" alt="MFCMouseEffect Mouse Companion Showcase">
+</p>
 
-`MFCMouseEffect` is not just a mouse-click effect app.
+<p align="center"><i>Mouse Companion — more than an effect demo, also an important long-term capability direction for the project</i></p>
 
-It is evolving into a full desktop interaction-feedback platform with:
-- mouse effects: `click / trail / scroll / hold / hover`
-- cursor decoration: native and WASM-backed decoration lanes
-- input indicator: mouse, wheel, and keyboard visualization
-- automation mapping: mouse actions and gestures to shortcut injection
-- WASM plugin runtime: separate `effects` and `indicator` surfaces
-- shared Web settings UI: cross-platform, observable, and testable
-- Mouse Companion: plugin-first desktop companion direction
+## ✨ Why Choose MFCMouseEffect
 
-This project is a great fit if you care about:
-- making tutorials, demos, and screen recordings more expressive
-- building desktop interaction feedback beyond a few hardcoded animations
-- adding bounded, debuggable WASM extensibility inside a C++ host
-- maintaining long-term cross-platform desktop architecture across Windows and macOS
+- 🎯 **Five Independent Effect Lanes** — Click, trail, scroll, hold, hover — each is a separate capability surface, not a skin swap
+- 🔌 **WASM Plugin Runtime** — Write your own effects and indicators in WASM; the host controls rendering boundaries, plugins handle logic only
+- ⌨️ **Input Indicator** — Visualize mouse clicks, wheel direction, keyboard combos like `Cmd+Tab` and `W+ x3` at a glance
+- 🤖 **Automation Mapping** — Map mouse actions, wheel inputs, and gestures to shortcut injection — not just eye candy, real productivity
+- 🐾 **Mouse Companion** — Plugin-first Mouse Companion route: a cross-platform desktop pet that follows your cursor
+- 🌐 **Unified Settings** — Shared Web settings UI across platforms — single config path, synchronized state, tunable and recoverable
 
-## Highlights
+> Great for screen recording, tutorials, and live demos. Also great for developers who want bounded WASM extensibility inside a C++ host.
 
-- Host-owned rendering boundary: plugins compute logic, the host controls rendering and resources
-- Shared semantics and settings flows across Windows and macOS
-- WebSettings, diagnostics, regression scripts, and self-checks were designed together
-- Native built-ins, plugin lanes, and fallback paths can coexist cleanly
-- Clear layering across Core, Platform, Server, WebUI, Tools, and Docs
+## 🖼️ Effect Preview
 
-## Main Visuals
+<table>
+  <tr>
+    <td align="center"><img src="./docs/images/ripple_concept.png" width="280" alt="Click Ripple"><br><b>Click Ripple</b></td>
+    <td align="center"><img src="./docs/images/trail_concept.png" width="280" alt="Particle Trail"><br><b>Particle Trail</b></td>
+    <td align="center"><img src="./docs/images/scroll_concept.png" width="280" alt="Scroll Feedback"><br><b>Scroll Feedback</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./docs/images/hold_concept.png" width="280" alt="Hold Charge"><br><b>Hold Charge</b></td>
+    <td align="center"><img src="./docs/images/hover_concept.png" width="280" alt="Hover Glow"><br><b>Hover Glow</b></td>
+    <td align="center"><img src="./docs/images/placeholder_mouse_companion.webp" width="280" alt="Mouse Companion"><br><b>Mouse Companion</b></td>
+  </tr>
+</table>
 
-| Feature | Main Image | Feature | Main Image |
-| :--- | :--- | :--- | :--- |
-| Cursor Effects | <img src="./docs/images/ripple_concept.png" width="360" alt="Cursor Effects main image"> | Cursor Decoration | <img src="./docs/images/placeholder_cursor_decoration.png" width="360" alt="Cursor Decoration placeholder"> |
-| Input Indicator | <img src="./docs/images/placeholder_input_indicator.png" width="360" alt="Input Indicator placeholder"> | Automation Mapping | <img src="./docs/images/placeholder_automation_mapping.png" width="360" alt="Automation Mapping placeholder"> |
-| WASM Plugin Runtime | <img src="./docs/images/placeholder_wasm_plugin_runtime.png" width="360" alt="WASM Plugin Runtime placeholder"> | Plugin Management | <img src="./docs/images/placeholder_plugin_management.png" width="360" alt="Plugin Management placeholder"> |
-| Mouse Companion | <img src="./docs/images/placeholder_mouse_companion.png" width="360" alt="Mouse Companion placeholder"> | Shared WebSettings | <img src="./docs/images/setting_en.png" width="360" alt="WebSettings main image"> |
+<p align="center">
+  <img src="./docs/images/setting_en.png" width="720" alt="WebSettings UI">
+</p>
+<p align="center"><i>Unified Web Settings UI — shared across platforms, everything in one place</i></p>
 
-<details>
-<summary>Feature Overview and Detail Images (expand)</summary>
+## ⌨️ Input Indicator & Automation
 
-## Feature Overview
+<table>
+  <tr>
+    <td align="center"><img src="./docs/images/placeholder_input_indicator.png" width="360" alt="Input Indicator"><br><b>Input Indicator</b></td>
+    <td align="center"><img src="./docs/images/placeholder_automation_mapping.png" width="360" alt="Automation Mapping"><br><b>Automation Mapping</b></td>
+  </tr>
+</table>
 
-### 1. Cursor Effects
-
-Five core interaction lanes are available:
-- `click`
-- `trail`
-- `scroll`
-- `hold`
-- `hover`
-
-Why it matters:
-- these are separate capability lanes, not just cosmetic variants of one effect
-- type normalization and config mapping are continuously aligned across Windows and macOS
-- settings, tuning, and diagnostics are exposed through WebSettings
-- parts of the effect stack can be handed off to WASM plugins
-
-### 2. Cursor Decoration
-
-The project also has a dedicated cursor-decoration layer:
-- built-in `ring / orb` decoration
-- additive lane independent from the five main effect lanes
-- can run as native fallback or a dedicated `cursor_decoration` WASM lane
-- integrated with blacklist policy, fallback control, and plugin state
-
-### 3. Input Indicator
-
-Input indicator support includes:
-- mouse left / right / middle click feedback
-- wheel direction and streak labels such as `W+ x2`
-- keyboard labels and combos such as `Cmd+Tab`
-- relative / absolute positioning
-- multi-monitor targeting and offsets
-- native fallback and WASM indicator routing
-
-### 4. Automation Mapping
-
-Automation mapping is a real product surface, not a side feature:
-- mouse button and wheel mappings to shortcuts
-- drag gesture recognition with direction chains such as `up_right`
-- configurable trigger button, sample step, stroke threshold, and max segments
-- app-scope matching and deterministic priority behavior
-- draw-and-save gesture flow plus self-check and regression coverage
-
-### 5. WASM Plugin Runtime
-
-This is one of the strongest differentiators of the project:
-- separate `effects` and `indicator` surfaces
-- manifest load, reload, import, and export flows
-- budget control, command validation, fallback, and machine-readable diagnostics
-- transient and retained rendering semantics
-- ABI documentation and a bundled plugin template
-
-Current command coverage already includes high-value primitives such as:
-- `spawn_text`
-- `spawn_image`
-- `spawn_pulse`
-- `spawn_polyline`
-- `spawn_path_stroke`
-- `spawn_path_fill`
-- `spawn_ribbon_strip`
-- `spawn_glow_batch`
-- `spawn_sprite_batch`
-- `spawn_quad_batch`
-- retained emitter / trail / quad-field / group primitives
-
-### 6. Plugin Management
-
-The repo already has a dedicated plugin-management surface:
-- unified `Plugin Management` section
-- policy binding for effect lanes, indicator lanes, and cursor-decoration lanes
-- manifest path, enabled-state, failure-state, and fallback visibility
-- apply flow reflects real backend state instead of only mutating a form
-
-### Plugin Quick Start
-
-Plugins are a first-class feature. Start here:
-- Template: `examples/wasm-plugin-template/README.md`
-- Core doc: `docs/architecture/custom-effects-wasm-route.md`
-- ABI spec: `docs/architecture/wasm-plugin-abi-v3-design.md`
-- Load path: WebSettings `Plugin Management` -> choose manifest -> Apply
+- **Input Indicator** — Show mouse clicks, wheel direction, and keyboard combos together, so signals like `L x2`, `W+ x3`, and `Cmd+Tab` stay obvious in recordings and demos
+- **Automation Mapping** — Map mouse actions, wheel input, and gestures to shortcut injection, so the feature goes beyond visual feedback into real workflow automation
 
 <details>
-<summary>More guidance (expand)</summary>
+<summary><b>Expand for the best-fit scenarios</b></summary>
 
-- Pick the correct surface: `effects` or `indicator`
-- If Apply reverts, check manifest path and load status first
-- WebSettings shows diagnostics and fallback state for quick triage
+- **Screen recording / tutorials / live demos**: viewers can see not only where the cursor is, but also what you clicked, switched, or triggered
+- **Productivity tools / desktop enhancement**: gestures and input mapping are not just decorative layers, they can participate in real interaction flows
 
 </details>
 
-### 7. Mouse Companion
+## 🤝 Contributing
 
-`Mouse Companion` is one of the most visible active feature directions:
-- plugin-first route for long-term extensibility
-- macOS currently has a Phase1 visual host
-- Windows is on Phase1.5 with renderer seams and runtime diagnostics
-- the goal is a sustainable companion architecture, not a one-off pet demo
+**The project is actively growing — there are many directions waiting for you!**
 
-### 8. Shared WebSettings
+| Area | Description | Entry Point |
+|:---|:---|:---|
+| 🎨 **New Visual Effects** | Design new click, trail, hover styles | [Effect Docs](./docs/README.md) |
+| 🔌 **WASM Plugins** | Write new plugins or improve tooling | [Plugin Template](./examples/wasm-plugin-template/README.md) |
+| 🖥️ **Cross-Platform Parity** | Windows / macOS behavior alignment | [Issue Tracker](https://github.com/sqmw/MFCMouseEffect/issues) |
+| 🌐 **WebSettings** | Settings UI/UX improvements | [WebUI Source](./MFCMouseEffect/WebUIWorkspace/) |
+| 🐾 **Mouse Companion** | Companion animations, interactions & plugins | [Companion Roadmap (Chinese)](./docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md) |
+| 📝 **Docs & Testing** | Documentation, self-checks, regression tooling | [Docs](./docs/) |
 
-The current settings UI is organized around focused product areas:
-- `General`
-- `Mouse Companion`
-- `Cursor Effects`
-- `Input Indicator`
-- `Automation Mapping`
-- `Plugin Management`
+**Recommended flow:**
 
-Benefits:
-- cleaner capability boundaries
-- backend-state-driven apply behavior
-- easier platform reuse, debugging, and future expansion
+1. Open an [Issue](https://github.com/sqmw/MFCMouseEffect/issues) describing your idea
+2. Brief discussion to align on direction
+3. Submit a PR
+4. For larger architecture changes, email first
 
-## Preview And Image Placeholders
+📮 **Contact:** `ksun22515@gmail.com`
 
-The structure below is ready for later screenshot replacement.
-
-### Current Visuals
-
-| Module | Preview | Module | Preview |
-| :--- | :--- | :--- | :--- |
-| Settings page | <img src="./docs/images/setting_en.png" width="360" alt="Settings page"> | Click effect | <img src="./docs/images/ripple_concept.png" width="360" alt="Click effect"> |
-| Trail effect | <img src="./docs/images/trail_concept.png" width="360" alt="Trail effect"> | Scroll effect | <img src="./docs/images/scroll_concept.png" width="360" alt="Scroll effect"> |
-| Hold effect | <img src="./docs/images/hold_concept.png" width="360" alt="Hold effect"> | Hover effect | <img src="./docs/images/hover_concept.png" width="360" alt="Hover effect"> |
-
-<details>
-<summary>More Detail Images (placeholders, expandable)</summary>
-
-| Scene | Detail Image | Scene | Detail Image |
-| :--- | :--- | :--- | :--- |
-| Input Indicator | <img src="./docs/images/placeholder_input_indicator.png" width="360" alt="Input Indicator detail placeholder"> | Automation Mapping | <img src="./docs/images/placeholder_automation_mapping.png" width="360" alt="Automation Mapping detail placeholder"> |
-| WASM Runtime | <img src="./docs/images/placeholder_wasm_plugin_runtime.png" width="360" alt="WASM Runtime detail placeholder"> | Plugin Management | <img src="./docs/images/placeholder_plugin_management.png" width="360" alt="Plugin Management detail placeholder"> |
-| Cursor Decoration | <img src="./docs/images/placeholder_cursor_decoration.png" width="360" alt="Cursor Decoration detail placeholder"> | Mouse Companion | <img src="./docs/images/placeholder_mouse_companion.png" width="360" alt="Mouse Companion detail placeholder"> |
-
-</details>
-
-</details>
-
-## Platform Status
-
-| Platform | Status | Notes |
-| :--- | :--- | :--- |
-| Windows 10+ | Stable mainline | Most complete capability set, regression compatibility preserved |
-| macOS | Active mainline | Current priority lane for effects, indicator, automation, and WASM |
-| Linux | Follow lane | Compile gate and contract coverage focused |
-
-> Current project priority is `macOS mainline first`, while keeping Windows behavior regression-free.
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Windows
 
-Recommended path:
-1. Open `MFCMouseEffect.slnx` in `Visual Studio 2026`
-2. Use `Release | x64` by default
-3. Run `x64/Release/MFCMouseEffect.exe`
-
-You can also use the wrapper commands:
-
 ```powershell
-.\mfx.cmd build
-.\mfx.cmd build --shipping
-.\mfx.cmd build --gpu
-.\mfx.cmd package
-```
+# Recommended: Open MFCMouseEffect.slnx in Visual Studio 2026, build Release | x64
 
-Notes:
-- `build` defaults to `Release | x64 | no-gpu`
-- `build --shipping` creates a leaner delivery build
-- `build --gpu` enables the Windows GPU hold runtime build
-- `package` generates the installer
+# Or use the wrapper commands
+.\mfx.cmd build            # Default Release | x64
+.\mfx.cmd build --shipping  # Lean delivery build
+.\mfx.cmd package           # Generate installer
+```
 
 ### macOS
 
 ```bash
-# Build and run the core host
-./mfx run
-
-# Run without rebuilding core/WebUI
-./mfx run-no-build
-
-# Fast manual validation with auto stop
-./mfx run-no-build --seconds 30
-
-# Effects self-check
-./mfx effects
-
-# Recommended daily regression
-./mfx verify-effects
-
-# Full POSIX regression suite
-./mfx verify-full
-
-# Packaging
-./mfx package
-./mfx package-no-build
+./mfx build                       # Build current host only
+./mfx build --skip-webui-build    # Skip rebuilding WebUIWorkspace
+./mfx run                         # Build and run
+./mfx run-no-build                # Run without rebuilding
+./mfx run-no-build --seconds 30   # Auto-stop for quick validation
+./mfx package                      # Package
 ```
 
+> ⚠️ macOS requires **Accessibility** and **Input Monitoring** permissions for global input capture.
+
+## 📊 Platform Status
+
+| Platform | Status | Notes |
+|:---|:---:|:---|
+| **Windows 10+** | ✅ Stable mainline | Most complete capability set, regression compatibility preserved |
+| **macOS** | 🔥 Active mainline | Current priority development lane |
+| **Linux** | 🔄 Follow lane | Compile gate and contract coverage |
+
+> Current priority: `macOS mainline first`, while keeping Windows behavior regression-free.
+
 <details>
-<summary>Important Notes And FAQ (expand)</summary>
+<summary><b>📦 Architecture Highlights (expand)</b></summary>
 
-## Important Notes And FAQ
+### Architecture Design
 
-This section is intentionally front-loaded to reduce install and first-run friction.
+- **Host-owned rendering boundary** — Plugins compute logic; the host owns rendering execution, budget checks, fallback, and resources
+- **Clear module layering** — Core / Platform / Server / WebUI / Tools / Docs each have well-defined responsibilities
+- **Progressive extensibility** — Built-in effects work, WASM plugins can layer on top, native fallback catches the rest
+- **Cross-platform semantic alignment** — Windows and macOS share core semantics and settings surface
+- **Built-in observability** — WebSettings, diagnostics, regression scripts, and self-checks were designed together
 
-### 1. Why do effects or automation not work on macOS?
+### WASM Plugin Capabilities
 
-Check system permissions first:
-- `Accessibility`
-- `Input Monitoring`
+- Separate `effects` and `indicator` surfaces
+- Manifest load, reload, import, and export flows
+- Budget control, command validation, error codes, and staged diagnostics
+- Transient and retained rendering semantics
+- Rich command primitives: `spawn_text` / `spawn_image` / `spawn_pulse` / `spawn_polyline` / `spawn_ribbon_strip` / `spawn_glow_batch` and more
 
-The macOS runtime depends on those permissions for global input capture.  
-When permissions are missing, the runtime can degrade gracefully and recover after the permissions are restored.
-
-### 2. Why is Windows GPU support not enabled by default?
-
-That is an intentional project policy:
-- default is `--no-gpu`
-- it is more stable for the common path
-- it avoids extra runtime payload by default
-- use `./mfx build --gpu` only when you explicitly want that route
-
-### 3. Why is `Shipping` different from normal `Release`?
-
-`Shipping` keeps the main runtime and WebUI, but trims deep testing and heavy diagnostics:
-- no full `/api/test` deep test surface
-- better for delivery
-- not the best target for deepest runtime proof workflows
-
-### 4. Is Linux a full end-user platform today?
-
-Not yet.
-
-Linux currently follows the project mainly through:
-- compile success
-- contract coverage
-- structural alignment with the mainline architecture
-
-For the best experience, prefer Windows or macOS.
-
-### 5. Why does WebSettings revert a value after Apply or refresh?
-
-Many settings are backend-state-driven.  
-If the backend binding did not actually succeed, the UI will reconcile back to the real runtime state instead of pretending the apply succeeded.
-
-Typical things to check:
-- manifest path validity
-- whether the target lane is enabled
-- platform support for that route
-- fallback state and plugin load failures
-
-### 6. Can WASM plugins directly control host rendering and windows?
-
-No.
-
-This is one of the core architecture boundaries:
-- plugins compute logic
-- the host owns rendering execution, budget checks, fallback, and resources
-
-That constraint is deliberate and central to the project's long-term design.
-
-### 7. Are there any macOS packaging caveats?
-
-Yes:
-- current macOS packages are unsigned
-- Gatekeeper may block first launch
-- users may need Finder `Open` on first run
-- notarization is not part of the current packaging path yet
+**Plugin quick start:**
+- Template: [`examples/wasm-plugin-template`](./examples/wasm-plugin-template/README.md)
+- Route doc: [`custom-effects-wasm-route.md`](./docs/architecture/custom-effects-wasm-route.md)
+- ABI spec: [`wasm-plugin-abi-v3-design.md`](./docs/architecture/wasm-plugin-abi-v3-design.md)
 
 </details>
 
 <details>
-<summary>Repository Structure (expand)</summary>
-
-## Repository Structure
+<summary><b>📂 Repository Structure (expand)</b></summary>
 
 ```text
 MFCMouseEffect/
@@ -354,26 +186,41 @@ MFCMouseEffect/
 ├── tools/
 │   ├── platform/regression/     # Regression scripts
 │   ├── platform/manual/         # Manual and self-check helpers
-│   └── docs/                    # Doc routing and doc-governance scripts
+│   └── docs/                    # Doc routing and governance scripts
 ├── docs/                        # Architecture, roadmap, workflow, issue docs
 ├── examples/                    # Examples and templates
 └── mfx / mfx.cmd                # Preferred command entrypoints
 ```
 
-### Structural strengths
+</details>
 
-- `MouseFx/Core` owns semantics and reusable capability contracts
-- `Platform/windows`, `Platform/macos`, and `Platform/linux` keep platform code separated
-- `MouseFx/Server` plus `WebUIWorkspace` form a clear settings-server boundary
-- `tools/platform/regression` and `tools/platform/manual` make the project verifiable
-- docs are maintained as part of the engineering system, not as an afterthought
+<details>
+<summary><b>❓ FAQ (expand)</b></summary>
+
+### Effects not showing on macOS?
+
+Check system permissions: `Accessibility` + `Input Monitoring`. The runtime degrades gracefully when missing and recovers once permissions are granted.
+
+### Why is GPU not enabled by default on Windows?
+
+Stability — the default is `--no-gpu`. Use `./mfx build --gpu` when you explicitly want the GPU path.
+
+### What's the difference between Shipping and Release?
+
+Shipping keeps the main runtime and WebUI but trims heavy diagnostics and deep test surfaces. Better for delivery.
+
+### Settings revert after Apply?
+
+Many settings are backend-state-driven. If the backend binding didn't succeed, the UI reconciles to the real state. Check manifest paths and lane status first.
+
+### macOS package blocked on first launch?
+
+Current macOS builds are unsigned. Gatekeeper may block first launch — right-click `Open` in Finder to allow it.
 
 </details>
 
 <details>
-<summary>Regression And Self-Check Entry Points (expand)</summary>
-
-## Regression And Self-Check Entry Points
+<summary><b>🧪 Regression & Self-Check (expand)</b></summary>
 
 ```bash
 # Full POSIX suite
@@ -389,68 +236,25 @@ MFCMouseEffect/
 ./tools/platform/regression/run-posix-wasm-regression-suite.sh --platform auto
 ```
 
-```bash
-# macOS WebSettings manual runner
-./tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60
-
-# macOS effects parity self-check
-./tools/platform/manual/run-macos-effects-type-parity-selfcheck.sh --skip-build
-
-# macOS automation injection self-check
-./tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build
-
-# macOS WASM runtime self-check
-./tools/platform/manual/run-macos-wasm-runtime-selfcheck.sh --skip-build
-```
-
 </details>
 
 <details>
-<summary>Documentation (expand)</summary>
-
-## Documentation
+<summary><b>📖 Documentation (expand)</b></summary>
 
 - Docs overview: [docs/README.md](./docs/README.md)
-- Chinese docs index: [docs/README.zh-CN.md](./docs/README.zh-CN.md)
-- Current active context: [docs/agent-context/current.md](./docs/agent-context/current.md)
+- Chinese docs: [docs/README.zh-CN.md](./docs/README.zh-CN.md)
 - macOS mainline snapshot: [docs/refactoring/phase-roadmap-macos-m1-status.md](./docs/refactoring/phase-roadmap-macos-m1-status.md)
-- P2 capability router: [docs/agent-context/p2-capability-index.md](./docs/agent-context/p2-capability-index.md)
+- P2 capability index: [docs/agent-context/p2-capability-index.md](./docs/agent-context/p2-capability-index.md)
 
 </details>
 
-<details>
-<summary>Contributing (expand)</summary>
+## 📄 License
 
-## Contributing
-
-Issues, ideas, suggestions, and pull requests are all welcome.
-
-For larger features, architecture changes, or behavior changes across platforms, it is best to align first before implementation so work does not split across conflicting directions.
-
-Recommended flow:
-- open an [Issue](https://github.com/sqmw/MFCMouseEffect/issues)
-- discuss the change briefly
-- then send a PR
-- for larger collaboration or architecture topics, email first
-
-Contact:
-- `ksun22515@gmail.com`
-
-Good contribution areas:
-- new visual effects and styles
-- WebSettings UX improvements
-- WASM plugin samples and tooling
-- Windows and macOS behavior alignment
-- docs, testing, self-checks, and regression tooling
-
-</details>
-
-## License
-
-This project is released under the [MIT License](./LICENSE).
-
-You are free to use, modify, and distribute it under the license terms.
+This project is released under the [MIT License](./LICENSE). Free to use, modify, and distribute.
 
 ---
 
-<p align="center"><b>If it helps, please <a href="https://github.com/sqmw/MFCMouseEffect">star ⭐</a> and share feedback in Issues/Discussions.</b></p>
+<p align="center">
+  <b>If it helps, please <a href="https://github.com/sqmw/MFCMouseEffect">star ⭐</a></b><br>
+  <sub>Share feedback on <a href="https://github.com/sqmw/MFCMouseEffect/issues">Issues</a> and <a href="https://github.com/sqmw/MFCMouseEffect/discussions">Discussions</a></sub>
+</p>

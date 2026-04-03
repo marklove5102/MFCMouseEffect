@@ -33,6 +33,11 @@
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
+## 营销文档
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/README.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/reddit-promo-pack.en.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/reddit-posting-playbook.zh-CN.md`
+
 ## 定向架构文档
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.zh-CN.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-abi-v3-design.zh-CN.md`
@@ -81,8 +86,10 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 # 跳过 core/WebUI 编译
 ./mfx run-no-build
 ./mfx run-no-build --seconds 30
-# Windows 默认编译入口
+# macOS 当前宿主编译入口
 ./mfx build
+# macOS 跳过 WebUIWorkspace 重编译
+./mfx build --skip-webui-build
 # Windows 最小发行编译
 ./mfx build --shipping
 # Windows 完整 GPU 编译

@@ -200,6 +200,7 @@
   - `./mfx build`
   - `./mfx build --shipping`
   - `./mfx build --gpu`
+- macOS `./mfx build` is now a real first-class entrypoint again: it rebuilds `WebUIWorkspace` by default, configures the macOS core-host build with the same `mfx_entry_posix_host` contract used by manual/package flows, and accepts `--build-dir`, `--jobs`, and `--skip-webui-build` instead of falling through to the old Windows-only unsupported-path regression.
 - Preferred packaging entrypoint is `./mfx package`.
 - Windows installer remains Inno Setup based.
 - `./mfx package` now reuses the same Windows build contract as `./mfx build`, and `--shipping` forwards `BuildConfiguration=Shipping` into Inno Setup so Windows compile/package no longer depend on raw MSBuild as the primary user-facing entrypoint.

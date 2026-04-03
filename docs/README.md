@@ -32,6 +32,11 @@ Compact AI-first index for fast navigation. This file is intentionally short and
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
+## Marketing Docs
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/README.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/reddit-promo-pack.en.md`
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/reddit-posting-playbook.zh-CN.md`
+
 ## Targeted Architecture Docs
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/custom-effects-wasm-route.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/wasm-plugin-abi-v3-design.md`
@@ -80,8 +85,10 @@ rg -n "permission|automation|app_scope|effects|wasm" docs/refactoring docs/autom
 # skips core/WebUI rebuild
 ./mfx run-no-build
 ./mfx run-no-build --seconds 30
-# Windows default build entrypoint
+# macOS current-host build entrypoint
 ./mfx build
+# macOS build without rebuilding WebUIWorkspace
+./mfx build --skip-webui-build
 # Windows shipping build
 ./mfx build --shipping
 # Windows full GPU build

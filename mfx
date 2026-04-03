@@ -20,6 +20,7 @@ Commands:
 
   build [platform options...]
       Build native project for current host platform.
+      macOS: builds `mfx_entry_posix_host` (+ WebUI by default).
       Windows: Release|x64 by default (`--no-gpu`, optional `--gpu`).
 
   package [platform options...]
@@ -213,6 +214,9 @@ run_build() {
     local -a args=()
     local build_script=""
     case "$OSTYPE" in
+    darwin*)
+        build_script="$repo_root/tools/platform/build/build-macos-project.sh"
+        ;;
     msys*|cygwin*|win32*)
         build_script="$repo_root/tools/platform/build/build-windows-project.sh"
         ;;
@@ -225,22 +229,65 @@ run_build() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-        --gpu|--no-gpu)
+        -h|--help)
             args+=("$1")
             shift
             ;;
+        --build-dir|--jobs)
+            if [[ "$OSTYPE" == darwin* ]]; then
+                [[ $# -ge 2 ]] || { echo "missing value for $1" >&2; exit 2; }
+                args+=("$1" "$2")
+                shift 2
+            else
+                echo "$1 is only supported on macOS build" >&2
+                exit 2
+            fi
+            ;;
+        --skip-webui-build)
+            if [[ "$OSTYPE" == darwin* ]]; then
+                args+=("$1")
+                shift
+            else
+                echo "$1 is only supported on macOS build" >&2
+                exit 2
+            fi
+            ;;
+        --gpu|--no-gpu)
+            if [[ "$OSTYPE" == msys* || "$OSTYPE" == cygwin* || "$OSTYPE" == win32* ]]; then
+                args+=("$1")
+                shift
+            else
+                echo "$1 is only supported on Windows build" >&2
+                exit 2
+            fi
+            ;;
         --release)
-            args+=(--configuration Release)
-            shift
+            if [[ "$OSTYPE" == msys* || "$OSTYPE" == cygwin* || "$OSTYPE" == win32* ]]; then
+                args+=(--configuration Release)
+                shift
+            else
+                echo "$1 is only supported on Windows build" >&2
+                exit 2
+            fi
             ;;
         --shipping)
-            args+=(--configuration Shipping)
-            shift
+            if [[ "$OSTYPE" == msys* || "$OSTYPE" == cygwin* || "$OSTYPE" == win32* ]]; then
+                args+=(--configuration Shipping)
+                shift
+            else
+                echo "$1 is only supported on Windows build" >&2
+                exit 2
+            fi
             ;;
         --configuration)
-            [[ $# -ge 2 ]] || { echo "missing value for --configuration" >&2; exit 2; }
-            args+=("$1" "$2")
-            shift 2
+            if [[ "$OSTYPE" == msys* || "$OSTYPE" == cygwin* || "$OSTYPE" == win32* ]]; then
+                [[ $# -ge 2 ]] || { echo "missing value for --configuration" >&2; exit 2; }
+                args+=("$1" "$2")
+                shift 2
+            else
+                echo "$1 is only supported on Windows build" >&2
+                exit 2
+            fi
             ;;
         *)
             echo "unknown option for build: $1" >&2
