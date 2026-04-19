@@ -1,6 +1,6 @@
 # AI Context Map
 
-Generated: 2026-04-18T14:37:06.830Z
+Generated: 2026-04-19T15:13:05.029Z
 
 ## Goal
 Load minimal docs by task keyword while keeping AGENTS + current context as mandatory baseline.
@@ -29,9 +29,6 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 - `docs/architecture/mouse-companion-procedural-effect-profile-contract.zh-CN.md` (P2, 750 tok)
 - `docs/ops/windows-installer-packaging.md` (P2, 750 tok)
 
-### input-indicator
-- `docs/architecture/mouse-companion-position-mode-contract.zh-CN.md` (P2, 750 tok)
-
 ### workflow
 - `AGENTS.md` (P0, 1500 tok)
 - `docs/architecture/posix-core-lane-smoke-workflow.md` (P2, 435 tok)
@@ -42,7 +39,7 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 - `docs/architecture/mouse-companion-3d-runtime-blueprint.zh-CN.md` (P2, 750 tok)
 - `docs/architecture/mouse-companion-click-parity-tauri-contract.zh-CN.md` (P2, 750 tok)
 - `docs/architecture/mouse-companion-model-import-pipeline-contract.zh-CN.md` (P2, 750 tok)
-- `docs/architecture/windows-launch-at-startup-contract.md` (P2, 619 tok)
+- `docs/architecture/mouse-companion-position-mode-contract.zh-CN.md` (P2, 750 tok)
 
 ## Commands
 ```bash
@@ -59,7 +56,7 @@ Load minimal docs by task keyword while keeping AGENTS + current context as mand
 - `docs/ops/manual-commands.md` -> ~7303 tok
 - `docs/architecture/custom-effects-wasm-route.zh-CN.md` -> ~6872 tok
 - `docs/architecture/custom-effects-wasm-route.md` -> ~6707 tok
-- `docs/agent-context/current.md` -> ~6593 tok
+- `docs/agent-context/current.md` -> ~6598 tok
 - `docs/refactoring/phase-roadmap-macos-m1-status.md` -> ~5868 tok
 
 ## Notes

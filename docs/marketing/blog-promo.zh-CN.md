@@ -25,7 +25,7 @@
 很多人一开始只是想做一个点击波纹，最后却会遇到这些问题：
 
 - 效果越来越多，但全堆在一起，配置和行为越来越乱
-- 想支持录屏、演示、直播，就必须把输入指示器也补上
+- 想支持录屏、演示、直播，就必须把键鼠指示器也补上
 - 想支持高级用户，就得做手势映射、自动化触发
 - 想让社区参与，就需要插件机制，而不是继续硬编码
 - 想跨平台，就必须把“效果逻辑”和“平台渲染”分开
@@ -61,11 +61,11 @@
 
 </details>
 
-### 输入指示器：把“你做了什么输入”讲清楚
+### 键鼠指示器：把“你做了什么输入”讲清楚
 
-| 输入指示器 | 自动化映射 |
+| 键鼠指示器 | 自动化映射 |
 | :--- | :--- |
-| ![输入指示器](https://raw.githubusercontent.com/sqmw/MFCMouseEffect/main/docs/images/placeholder_input_indicator.png) | ![自动化映射](https://raw.githubusercontent.com/sqmw/MFCMouseEffect/main/docs/images/placeholder_automation_mapping.png) |
+| ![键鼠指示器](https://raw.githubusercontent.com/sqmw/MFCMouseEffect/main/docs/images/placeholder_input_indicator.png) | ![自动化映射](https://raw.githubusercontent.com/sqmw/MFCMouseEffect/main/docs/images/placeholder_automation_mapping.png) |
 
 它不仅能展示鼠标点击，还能把滚轮方向、连击语义、键盘组合键一起表达出来。  
 像 `L x2`、`W+ x3`、`Cmd+Tab` 这种信息，对于教程和演示内容尤其有价值。

@@ -19,6 +19,7 @@
 <p align="center">
   <a href="https://github.com/sqmw/MFCMouseEffect/releases">Download</a> ·
   <a href="./docs/README.md">Docs</a> ·
+  <a href="./PRIVACY.md">Privacy</a> ·
   <a href="https://github.com/sqmw/MFCMouseEffect/issues">Issues</a> ·
   <a href="#-contributing">Contributing</a> ·
   <a href="https://github.com/sqmw/MFCMouseEffect">Star</a>
@@ -40,7 +41,7 @@
 
 - 🎯 **Five independent effect lanes** — click, trail, scroll, hold, and hover are separate capability surfaces, not one animation reskinned five times
 - 🔌 **WASM plugin runtime** — write your own effects and indicators in WASM while the host keeps rendering boundaries under control
-- ⌨️ **Input indicator** — visualize mouse clicks, wheel direction, and keyboard combos like `Cmd+Tab` and `W+ x3`
+- ⌨️ **Keyboard & Mouse Indicator** — visualize mouse clicks, wheel direction, and keyboard combos like `Cmd+Tab` and `W+ x3`
 - 🤖 **Automation mapping** — map mouse actions, wheel input, and gestures to shortcut injection, turning visual feedback into workflow power
 - 🐾 **Mouse Companion** — a plugin-first route for a cross-platform desktop companion that follows your cursor
 - 🌐 **Unified settings UI** — shared Web settings across platforms, with one config flow, synchronized state, and recoverable behavior
@@ -67,16 +68,16 @@
 </p>
 <p align="center"><i>Unified Web Settings UI — shared across platforms, everything in one place</i></p>
 
-## ⌨️ Input Indicator & Automation
+## ⌨️ Keyboard/Mouse Indicator & Automation
 
 <table>
   <tr>
-    <td align="center"><img src="./docs/images/placeholder_input_indicator.png" width="360" alt="Input Indicator"><br><b>Input Indicator</b></td>
+    <td align="center"><img src="./docs/images/placeholder_input_indicator.png" width="360" alt="Keyboard and Mouse Indicator"><br><b>Keyboard & Mouse Indicator</b></td>
     <td align="center"><img src="./docs/images/placeholder_automation_mapping.png" width="360" alt="Automation Mapping"><br><b>Automation Mapping</b></td>
   </tr>
 </table>
 
-- **Input Indicator** — show mouse clicks, wheel direction, and keyboard combos together, so signals like `L x2`, `W+ x3`, and `Cmd+Tab` stay obvious in recordings and demos
+- **Keyboard & Mouse Indicator** — show mouse clicks, wheel direction, and keyboard combos together, so signals like `L x2`, `W+ x3`, and `Cmd+Tab` stay obvious in recordings and demos
 - **Automation Mapping** — map mouse actions, wheel input, and gestures to shortcut injection, so input feedback can participate in real productivity flows
 
 <details>
@@ -93,11 +94,13 @@
 
 | Area | Description | Entry Point |
 |:---|:---|:---|
-| 🎨 **New visual effects** | Design new click, trail, hover styles | [Effect docs](./docs/README.md) |
-| 🔌 **WASM plugins** | Write new plugins or improve tooling | [Plugin template](./examples/wasm-plugin-template/README.md) |
-| 🖥️ **Cross-platform parity** | Align Windows / macOS behavior | [Issue Tracker](https://github.com/sqmw/MFCMouseEffect/issues) |
-| 🌐 **WebSettings** | Improve settings UI and UX | [WebUI source](./MFCMouseEffect/WebUIWorkspace/) |
+| 🖱️ **Mouse effects** | Click, trail, scroll, hold, hover, and cursor-decoration styles and tuning | [Effect docs](./docs/README.md) |
+| 🤖 **Automation Mapping** | Map mouse actions, wheel input, and gestures to shortcuts or command chains | [Automation docs](./docs/automation/automation-mapping-notes.md) |
+| ⌨️ **Keyboard & Mouse Indicator** | Mouse, wheel, and keyboard-combo visualization, layout, and WASM indicator work | [Capability index](./docs/agent-context/p2-capability-index.md) |
 | 🐾 **Mouse Companion** | Companion animations, interactions, and plugins | [Companion roadmap](./docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md) |
+| 🔌 **WASM plugins** | Write effect / indicator plugins, or improve ABI, templates, and tooling | [Plugin template](./examples/wasm-plugin-template/README.md) |
+| 🌐 **WebSettings** | Improve settings UX, state sync, and diagnostics entry points | [WebUI source](./MFCMouseEffect/WebUIWorkspace/) |
+| 🖥️ **Cross-platform parity** | Align Windows / macOS behavior | [Issue Tracker](https://github.com/sqmw/MFCMouseEffect/issues) |
 | 📝 **Docs & testing** | Documentation, self-checks, and regression tooling | [Docs](./docs/) |
 
 **Recommended flow:**
@@ -243,6 +246,8 @@ Current macOS builds are unsigned. Gatekeeper may block first launch; right-clic
 
 - Docs overview: [docs/README.md](./docs/README.md)
 - Chinese docs: [docs/README.zh-CN.md](./docs/README.zh-CN.md)
+- Privacy Policy: [PRIVACY.md](./PRIVACY.md)
+- Chinese Privacy Policy: [PRIVACY.zh-CN.md](./PRIVACY.zh-CN.md)
 - macOS mainline snapshot: [docs/refactoring/phase-roadmap-macos-m1-status.md](./docs/refactoring/phase-roadmap-macos-m1-status.md)
 - P2 capability index: [docs/agent-context/p2-capability-index.md](./docs/agent-context/p2-capability-index.md)
 
@@ -251,6 +256,8 @@ Current macOS builds are unsigned. Gatekeeper may block first launch; right-clic
 ## 📄 License
 
 This project is released under the [MIT License](./LICENSE). Free to use, modify, and distribute under the license terms.
+
+Privacy details are available in the [Privacy Policy](./PRIVACY.md).
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-18T14:37:06.830Z",
+  "generated_at": "2026-04-19T15:13:05.029Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -86,13 +86,13 @@
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
       "line_count": 227,
-      "size_bytes": 26370,
-      "estimated_tokens": 6593,
+      "size_bytes": 26392,
+      "estimated_tokens": 6598,
       "max_read_tokens": 1100,
       "line_limit": 220,
       "line_limit_exceeded": true,
-      "hash_sha1": "5f9580699508bbdd046311f672d36d1b87fcf11f",
-      "updated_at": "2026-04-18T14:35:30.500Z"
+      "hash_sha1": "b0dc42529d2cb8b78c542d5e725b7b88dc002994",
+      "updated_at": "2026-04-19T15:06:14.036Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -217,13 +217,13 @@
       "summary": "cursor-decoration-plugin-contract",
       "when_to_read": "Read when task touches wasm runtime, plugin ABI, or sample behavior.",
       "line_count": 62,
-      "size_bytes": 4213,
-      "estimated_tokens": 1054,
+      "size_bytes": 4207,
+      "estimated_tokens": 1052,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "af8863a69ce57cfbaf2e04245f80f6d4c1a9916d",
-      "updated_at": "2026-03-25T15:13:05.737Z"
+      "hash_sha1": "769c77e5db015901b68ca5a076b27602228261f0",
+      "updated_at": "2026-04-19T15:11:26.797Z"
     },
     {
       "id": "docs/architecture/custom-effects-wasm-route.md",
@@ -321,8 +321,8 @@
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "72cb460178a3fcbf3e3924853745ba1a418c0cfe",
-      "updated_at": "2026-03-24T13:51:54.902Z"
+      "hash_sha1": "e36727779b6064096a05ec3608a2fbba78ae28c7",
+      "updated_at": "2026-04-19T15:06:14.037Z"
     },
     {
       "id": "docs/architecture/mouse-companion-action-clip-contract.zh-CN.md",
@@ -519,7 +519,7 @@
       "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/mouse-companion-position-mode-contract.zh-CN.md",
       "priority": "P2",
       "role": "architecture",
-      "topic": "input-indicator",
+      "topic": "general",
       "first_read_rank": 0,
       "tags": [
         "mouse",
@@ -529,20 +529,19 @@
         "contract",
         "zh",
         "cn",
-        "indicator",
         "swift",
         "macos"
       ],
       "summary": "1. 打开 `Mouse Companion` 设置面板，确认页面为单面板布局，且不再出现 `Probe / Runtime` 页签。",
       "when_to_read": "Read only when task keywords match this capability area.",
       "line_count": 129,
-      "size_bytes": 5059,
-      "estimated_tokens": 1265,
+      "size_bytes": 5049,
+      "estimated_tokens": 1263,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "5dc23c4172bccfea7d679e88a65f9c19e25dc745",
-      "updated_at": "2026-03-20T01:48:55.994Z"
+      "hash_sha1": "95b737b22e1166c07d855f96bd4d01f65e5b61d4",
+      "updated_at": "2026-04-19T15:06:50.909Z"
     },
     {
       "id": "docs/architecture/mouse-companion-procedural-effect-profile-contract.zh-CN.md",
@@ -1192,8 +1191,8 @@
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "c797c9aaf5bc316ac2ab951a26c027915f4b30f7",
-      "updated_at": "2026-03-25T15:56:03.991Z"
+      "hash_sha1": "6797d9f2a0b9ad95c5a54940c8ceafbe74567a95",
+      "updated_at": "2026-04-19T15:06:14.035Z"
     },
     {
       "id": "docs/marketing/README.md",
@@ -1246,8 +1245,8 @@
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "5053b7fe605b720498f3dcf52d3606c5d643d13b",
-      "updated_at": "2026-04-03T09:22:25.065Z"
+      "hash_sha1": "97ca3d578d3ef823fcb437959522d2540507d148",
+      "updated_at": "2026-04-19T15:06:14.035Z"
     },
     {
       "id": "docs/marketing/reddit-promo-pack.en.md",
@@ -1278,13 +1277,13 @@
       "summary": "Use this when the subreddit prefers brief, direct posts.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
       "line_count": 203,
-      "size_bytes": 8138,
-      "estimated_tokens": 2035,
+      "size_bytes": 8234,
+      "estimated_tokens": 2059,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "4ca57e160f22e34c45c83d9534ab371b4a1a8b07",
-      "updated_at": "2026-04-03T09:22:25.065Z"
+      "hash_sha1": "77040b94fd983d101c8ca69d598620e11e2f4754",
+      "updated_at": "2026-04-19T15:11:46.802Z"
     },
     {
       "id": "docs/ops/macos-portable-packaging.md",

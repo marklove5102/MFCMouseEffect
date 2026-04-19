@@ -8,7 +8,7 @@
 - `MFCMouseEffect` is not just a mouse click effect toy.
 - It is a cross-platform desktop input-feedback engine with:
   - cursor effects
-  - input indicator
+  - keyboard/mouse indicator
   - automation mapping
   - WASM plugin runtime
   - shared Web settings
@@ -23,7 +23,7 @@
 - `r/cpp`
   - Angle: C++ desktop host with bounded WASM extensibility
 - `r/macapps`
-  - Angle: macOS input visualization / cursor effects / input indicator
+  - Angle: macOS input visualization / cursor effects / keyboard/mouse indicator
 - `r/opensource`
   - Angle: open-source cross-platform desktop tooling with plugin runtime
 - `r/SideProject`
@@ -32,7 +32,7 @@
 ## Title Bank
 - I turned a mouse effects tool into a cross-platform input-feedback engine with a WASM plugin runtime
 - Built an open-source desktop input visualization engine in C++ with cursor effects, automation, and plugins
-- I have been building a cross-platform cursor effects and input indicator engine, and I would love feedback
+- I have been building a cross-platform cursor effects and keyboard/mouse indicator engine, and I would love feedback
 - An open-source desktop input-feedback engine: click/trail/scroll/hold/hover plus WASM plugins
 - I am experimenting with a bounded WASM plugin model for desktop input effects in a C++ host
 - Show HN-style title for Reddit: cross-platform desktop input effects engine with shared settings and plugin lanes
@@ -46,7 +46,7 @@ I have been building an open-source project called MFCMouseEffect.
 It started as a mouse effects idea, but it has gradually become a cross-platform desktop input-feedback engine with:
 - click / trail / scroll / hold / hover effects
 - cursor decoration
-- input indicator for mouse + keyboard
+- keyboard/mouse indicator for clicks, wheel input, and keyboard shortcuts
 - automation mapping for mouse actions / wheel / gestures
 - a bounded WASM plugin runtime
 
@@ -71,7 +71,7 @@ The original idea was simple mouse click effects, but over time I found the more
 
 - cursor effects for click / trail / scroll / hold / hover
 - a separate cursor-decoration lane
-- an input indicator for mouse, wheel, and keyboard combos
+- a keyboard/mouse indicator for clicks, wheel input, and keyboard combos
 - automation mapping for mouse actions and gestures
 - a WASM plugin runtime for effect and indicator surfaces
 
@@ -104,7 +104,7 @@ https://github.com/sqmw/MFCMouseEffect
 
 What is in the demo:
 - cursor effects
-- input indicator
+- keyboard/mouse indicator
 - shared desktop settings UI
 - plugin-ready effect lanes
 
@@ -176,7 +176,7 @@ I also wanted the host/plugin boundary, rendering control, and cross-platform ru
 
 ### Reply: "What should I look at first?"
 ```text
-If you care about product value, look at the effects + input indicator demos first.
+If you care about product value, look at the effects + keyboard/mouse indicator demos first.
 
 If you care about architecture, the most interesting part is probably the bounded WASM plugin route and the shared settings/runtime diagnostics path.
 ```

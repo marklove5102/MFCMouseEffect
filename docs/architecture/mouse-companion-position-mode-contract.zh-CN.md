@@ -1,7 +1,7 @@
 # Mouse Companion 位置模式契约（P2）
 
 ## 目标
-- 将 `mouse_companion` 的位置配置对齐到 `Input Indicator`：位置模式只表达“pet 放哪儿”，不再混入动作语义。
+- 将 `mouse_companion` 的位置配置对齐到键鼠指示器：位置模式只表达“pet 放哪儿”，不再混入动作语义。
 - 支持两类主模式：
   - `relative`：相对鼠标位置
   - `absolute`：绝对屏幕坐标
@@ -11,7 +11,7 @@
 
 ## 判定
 - 类型：`Design behavior`
-- 依据：`mouse_companion.positionMode` 之前同时承担“窗口位置策略”和“动作 follow 语义”，已经不适合当前 mac 收尾目标；`Input Indicator` 已经有更清晰的 `relative / absolute / target_monitor` 契约，可以直接复用。
+- 依据：`mouse_companion.positionMode` 之前同时承担“窗口位置策略”和“动作 follow 语义”，已经不适合当前 mac 收尾目标；键鼠指示器已经有更清晰的 `relative / absolute / target_monitor` 契约，可以直接复用。
 
 ## 配置契约（mouse_companion）
 
@@ -57,7 +57,7 @@
 
 ### `absolute`
 - pet 面板使用目标屏幕的绝对坐标
-- 坐标语义与 `Input Indicator` 保持一致：
+- 坐标语义与键鼠指示器保持一致：
   - `absolute_x`：目标屏幕左上角起点的 X
   - `absolute_y`：目标屏幕左上角起点的 Y
 - mac 宿主内部会转换为 Cocoa 左下角窗口原点：

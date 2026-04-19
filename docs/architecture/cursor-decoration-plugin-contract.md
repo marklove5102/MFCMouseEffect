@@ -28,7 +28,7 @@
   - `demo.cursor-decoration.soft-orb.v2`
   - `demo.cursor-decoration.halo-orb.v2`
 - The lane is driven by pointer move updates through `IInputIndicatorOverlay::OnMove(...)`.
-- Native click/scroll/key input indicator behavior remains unchanged; cursor decoration is an additive persistent layer.
+- Native click/scroll/key indicator behavior remains unchanged; cursor decoration is an additive persistent layer.
 
 ## Current Implementation Notes
 - Windows:

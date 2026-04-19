@@ -30,9 +30,9 @@ export const CARD_SECTIONS = [
     id: 'input-indicator',
     cardClass: 'card-input',
     titleKey: 'section_input_indicator',
-    titleDefault: 'Input Indicator',
+    titleDefault: 'Keyboard & Mouse Indicator',
     descKey: 'desc_input_indicator',
-    descDefault: 'Configure visual feedback for click, wheel, and keyboard input.',
+    descDefault: 'Configure visual feedback for mouse clicks, wheel input, and keyboard shortcuts.',
     mountId: 'input_indicator_settings_mount',
   },
   {
@@ -52,7 +52,7 @@ export const CARD_SECTIONS = [
     titleKey: 'section_plugins',
     titleDefault: 'Plugin Management',
     descKey: 'desc_plugins',
-    descDefault: 'Import, export, and inspect plugin catalog for effects and input-indicator plugins.',
+    descDefault: 'Import, export, and inspect plugin catalog for effects and keyboard/mouse indicator plugins.',
     mountId: 'plugin_management_mount',
   },
 ];

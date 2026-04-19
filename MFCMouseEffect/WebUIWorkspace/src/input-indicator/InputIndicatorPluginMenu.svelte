@@ -106,7 +106,7 @@
     selectBestManifest(catalog);
     if (!statusMessage) {
       statusTone = 'success';
-      statusMessage = text('status_input_indicator_plugin_catalog_ready', 'Indicator plugin list updated.');
+      statusMessage = text('status_input_indicator_plugin_catalog_ready', 'Keyboard/mouse indicator plugin list updated.');
     }
   }
 
@@ -198,7 +198,7 @@
     statusTone = 'success';
     statusMessage = text(
       'status_input_indicator_plugin_loaded',
-      'Indicator plugin loaded.',
+      'Keyboard/mouse indicator plugin loaded.',
     );
   }
 
@@ -251,7 +251,7 @@
 <div class="indicator-plugin-menu">
   <div class="indicator-plugin-menu__hero">
     <div class="indicator-plugin-menu__summary-copy">
-      <div class="indicator-plugin-menu__title" data-i18n="title_input_indicator_plugin_menu">Indicator plugin</div>
+      <div class="indicator-plugin-menu__title" data-i18n="title_input_indicator_plugin_menu">Keyboard/mouse indicator plugin</div>
       <div class="indicator-plugin-menu__summary">{summaryText}</div>
     </div>
     <span class={`indicator-plugin-menu__pill ${pluginEnabled ? 'is-on' : 'is-off'}`}>
@@ -266,7 +266,7 @@
       <span class="indicator-plugin-menu__toggle-copy">
         <span data-i18n="label_input_indicator_plugin_override">Use plugin to override native indicator</span>
         <small data-i18n="hint_input_indicator_plugin_override">
-          When enabled, the input indicator switches to the active WASM plugin; the native renderer is no longer used unless fallback is triggered.
+          When enabled, the keyboard/mouse indicator switches to the active WASM plugin; the native renderer is no longer used unless fallback is triggered.
         </small>
       </span>
       <span class="indicator-plugin-menu__switch-wrap">
@@ -292,7 +292,7 @@
           disabled={busy || runtimeEnabled}
           on:click={enableRuntime}
           data-i18n="btn_input_indicator_plugin_enable_runtime"
-          title={text('tip_input_indicator_plugin_enable_runtime', 'Enable the shared WASM runtime so the selected indicator plugin can render.')}
+          title={text('tip_input_indicator_plugin_enable_runtime', 'Enable the shared WASM runtime so the selected keyboard/mouse indicator plugin can render.')}
         >
           {texts.btn_input_indicator_plugin_enable_runtime || 'Enable Runtime'}
         </button>
@@ -334,7 +334,7 @@
 
     <div class="indicator-plugin-menu__catalog">
       <div class="indicator-plugin-menu__catalog-row">
-        <label for="ii_plugin_manifest" data-i18n="label_input_indicator_plugin_select">Indicator plugin</label>
+        <label for="ii_plugin_manifest" data-i18n="label_input_indicator_plugin_select">Keyboard/mouse indicator plugin</label>
         <div class="indicator-plugin-menu__catalog-actions">
           <button
             type="button"
@@ -342,7 +342,7 @@
             disabled={busy}
             on:click={() => refreshCatalog(true)}
             data-i18n="btn_wasm_refresh_catalog"
-            title={text('tip_input_indicator_plugin_refresh', 'Refresh the compatible indicator plugin list.')}
+            title={text('tip_input_indicator_plugin_refresh', 'Refresh the compatible keyboard/mouse indicator plugin list.')}
           >
             {texts.btn_wasm_refresh_catalog || 'Refresh Plugin List'}
           </button>
@@ -356,7 +356,7 @@
         on:change={handleManifestSelection}
       >
         {#if catalog.length === 0}
-          <option value="">{text('text_input_indicator_plugin_catalog_empty', 'No compatible indicator plugins discovered.')}</option>
+          <option value="">{text('text_input_indicator_plugin_catalog_empty', 'No compatible keyboard/mouse indicator plugins discovered.')}</option>
         {:else}
           {#each catalog as plugin}
             <option value={plugin.manifest_path}>{pluginLabelWithText(plugin)}</option>
@@ -383,7 +383,7 @@
       <span class="indicator-plugin-menu__toggle-copy">
         <span data-i18n="label_input_indicator_wasm_fallback">WASM fallback to native</span>
         <small data-i18n="hint_input_indicator_plugin_fallback">
-          Keep native fallback on if you want the original indicator to recover automatically when runtime or plugin rendering is unavailable.
+          Keep native fallback on if you want the native keyboard/mouse indicator to recover automatically when runtime or plugin rendering is unavailable.
         </small>
       </span>
       <input

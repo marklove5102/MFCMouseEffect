@@ -48,7 +48,7 @@
 </script>
 
 <div class="indicator-subtabs">
-  <div class="indicator-subtabs-bar" role="tablist" aria-label="Input indicator sub sections">
+  <div class="indicator-subtabs-bar" role="tablist" aria-label="Keyboard and mouse indicator sub sections">
     <button
       type="button"
       role="tab"

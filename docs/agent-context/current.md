@@ -27,12 +27,12 @@
 - VM foreground auto-suppression is retired on Windows/macOS: VMware/VirtualBox foreground windows no longer hard-stop effects outside the user blacklist, so virtualization tools now follow the same `effects_blacklist_apps` policy as every other app.
 - Cross-platform click ripple baseline is active: Windows now honors `EffectConfig.ripple`; default click is shorter, smaller, center-clear, softer-glow, and single-ring.
 
-### Input Indicator
+### Keyboard & Mouse Indicator
 - macOS/Windows label and streak semantics are aligned (`L xN`, `W+ xN`); indicator wasm dispatch has dedicated lanes, auto-inferred surface loading, immediate runtime sync on apply, and clean native fallback on missing/stale manifests.
 - macOS cursor-decoration visibility is now native too: `MacosInputIndicatorOverlay::OnMove(...)` drives a retained Swift decoration panel, so `ring / orb` now visibly follow the cursor head on mac instead of being Windows-only.
 
 ### Plugin Management / WebUI
-- Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Input Indicator -> Automation Mapping -> Plugin Management`
+- Unified top-level `Plugin Management` section is active, and sidebar order is now: `General -> Mouse Companion -> Cursor Effects -> Keyboard & Mouse Indicator -> Automation Mapping -> Plugin Management`
 - WebUI apply flow is backend-state-driven (`post-apply reconcile + refresh`).
 - `/api/wasm/policy` must forward `manifest_path_cursor_decoration` alongside the other five effect-lane keys; otherwise the `Effect Plugins -> Cursor Decoration` toggle will look disabled briefly but snap back on after Apply/refresh because the binding never actually clears.
 - When the `cursor_decoration` WASM lane is loaded and enabled, native cursor-decoration fallback must stay suppressed on both Windows and macOS overlays; only one of the two renderers may own that lane at a time.
