@@ -1,5 +1,6 @@
 import WorkspaceSidebar from '../WorkspaceSidebar.svelte';
-import WorkspaceContext from '../WorkspaceContext.svelte';
+import WorkspaceSectionHint from '../WorkspaceSectionHint.svelte';
+import WorkspaceAutomationAssist from '../WorkspaceAutomationAssist.svelte';
 import { readUiState, writeUiState } from './ui-state-storage.js';
 
 const state = {
@@ -11,7 +12,8 @@ const state = {
   runtimePlatform: 'windows',
   runtimeState: {},
   component: null,
-  contextComponent: null,
+  hintComponent: null,
+  auxComponent: null,
   recoverTimer: 0,
   recoverAttempts: 0,
 };
@@ -188,17 +190,6 @@ function ensureSectionTexts() {
   }
 }
 
-function activeSectionSummary() {
-  const section = sectionById(state.activeId);
-  if (!section) {
-    return { title: '', description: '' };
-  }
-  return {
-    title: section.title || '',
-    description: section.description || '',
-  };
-}
-
 function sectionsViewModel() {
   return state.sections.map((section) => ({
     id: section.id,
@@ -207,10 +198,14 @@ function sectionsViewModel() {
   }));
 }
 
+function activeSectionDescription() {
+  const section = sectionById(state.activeId);
+  return `${section?.description || ''}`.trim();
+}
+
 function workspaceTexts() {
   const i18n = state.i18n || {};
   return {
-    workspace_current_label: i18n.workspace_current_label || 'Current Section',
     section_nav_aria: i18n.section_nav_aria || 'Settings sections',
   };
 }
@@ -241,20 +236,27 @@ function updateSidebarView() {
   state.component.$set({
     sections: sectionsViewModel(),
     texts: workspaceTexts(),
+  });
+}
+
+function updateHintView() {
+  if (!state.hintComponent) {
+    return;
+  }
+  state.hintComponent.$set({
+    description: activeSectionDescription(),
+  });
+}
+
+function updateAuxView() {
+  if (!state.auxComponent) {
+    return;
+  }
+  state.auxComponent.$set({
     activeSectionId: state.activeId,
     runtimePlatform: state.runtimePlatform,
     runtimeState: state.runtimeState,
     i18n: state.i18n || {},
-  });
-}
-
-function updateContextView() {
-  if (!state.contextComponent) {
-    return;
-  }
-  state.contextComponent.$set({
-    summary: activeSectionSummary(),
-    texts: workspaceTexts(),
   });
 }
 
@@ -264,7 +266,8 @@ function render(options) {
   if (!state.activeId) {
     revealCardsFallback();
     updateSidebarView();
-    updateContextView();
+    updateHintView();
+    updateAuxView();
     scheduleRecoverRefresh();
     return;
   }
@@ -279,7 +282,8 @@ function render(options) {
   ensureSectionTexts();
   applyCardsVisibility();
   updateSidebarView();
-  updateContextView();
+  updateHintView();
+  updateAuxView();
 
   if (opts.updateHash !== false) {
     updateHashIfNeeded(state.activeId);
@@ -341,20 +345,39 @@ function ensureSidebarComponent() {
   state.component = component;
 }
 
-function ensureContextComponent() {
-  if (state.contextComponent) {
+function ensureAuxComponent() {
+  if (state.auxComponent) {
     return;
   }
-  const mountNode = el('workspace_context_mount');
+  const mountNode = el('workspace_aux_mount');
   if (!mountNode) {
     return;
   }
 
-  state.contextComponent = new WorkspaceContext({
+  state.auxComponent = new WorkspaceAutomationAssist({
     target: mountNode,
     props: {
-      summary: activeSectionSummary(),
-      texts: workspaceTexts(),
+      activeSectionId: state.activeId,
+      runtimePlatform: state.runtimePlatform,
+      runtimeState: state.runtimeState,
+      i18n: state.i18n || {},
+    },
+  });
+}
+
+function ensureHintComponent() {
+  if (state.hintComponent) {
+    return;
+  }
+  const mountNode = el('workspace_hint_mount');
+  if (!mountNode) {
+    return;
+  }
+
+  state.hintComponent = new WorkspaceSectionHint({
+    target: mountNode,
+    props: {
+      description: activeSectionDescription(),
     },
   });
 }
@@ -362,7 +385,8 @@ function ensureContextComponent() {
 function init() {
   collectSections();
   ensureSidebarComponent();
-  ensureContextComponent();
+  ensureHintComponent();
+  ensureAuxComponent();
   bindHashChange();
 
   state.activeId = pickAvailableSectionId(state.activeId);
@@ -379,7 +403,8 @@ function refresh() {
 
   collectSections();
   ensureSidebarComponent();
-  ensureContextComponent();
+  ensureHintComponent();
+  ensureAuxComponent();
   bindHashChange();
 
   state.activeId = pickAvailableSectionId(state.activeId);
@@ -390,7 +415,8 @@ function syncI18n(i18n) {
   state.i18n = i18n || null;
   ensureSectionTexts();
   updateSidebarView();
-  updateContextView();
+  updateHintView();
+  updateAuxView();
 }
 
 function normalizePlatform(value) {
@@ -408,6 +434,7 @@ function syncRuntimeState(runtimeState) {
     input_automation_gesture_route_status: source.input_automation_gesture_route_status || null,
   };
   updateSidebarView();
+  updateAuxView();
 }
 
 function getActiveSectionId() {

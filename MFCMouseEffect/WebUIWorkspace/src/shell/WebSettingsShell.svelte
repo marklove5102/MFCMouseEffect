@@ -28,12 +28,15 @@
     on:action={handleAction}
   />
 
-  <div class="settings-shell">
-    <aside class="workspace-sidebar" id="workspace_sidebar_mount"></aside>
+  <section class="workspace-frame">
+    <div class="workspace-topnav-shell">
+      <div class="workspace-topnav" id="workspace_sidebar_mount"></div>
+    </div>
 
-    <main class="workspace-main">
-      <div id="workspace_context_mount"></div>
+    <main class="workspace-main workspace-main--full">
+      <div id="workspace_hint_mount"></div>
+      <div id="workspace_aux_mount"></div>
       <SettingsGrid />
     </main>
-  </div>
+  </section>
 </div>
