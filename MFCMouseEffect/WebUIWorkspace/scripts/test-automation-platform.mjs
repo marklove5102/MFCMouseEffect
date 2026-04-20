@@ -5,6 +5,8 @@ import {
   normalizeAutomationPayload,
   parseAppScopes,
   readMappings,
+  normalizeActions,
+  normalizeEditorActions,
   serializeAppScopes,
 } from '../src/automation/model.js';
 import {
@@ -73,7 +75,7 @@ runTest('automation payload normalizes schema platform aliases', () => {
         enabled: true,
         trigger: 'left_click',
         app_scopes: ['process:Code'],
-        keys: 'Cmd+C',
+        actions: [{ type: 'send_shortcut', shortcut: 'Cmd+C' }],
       },
     ],
     gesture: {
@@ -94,7 +96,7 @@ runTest('readMappings writes platform-correct app_scopes/app_scope', () => {
       triggerChain: ['left_click'],
       appScopeMode: 'selected',
       appScopeApps: ['Code'],
-      keys: 'Cmd+C',
+      actions: [{ type: 'send_shortcut', shortcut: 'Cmd+C' }],
     },
   ];
   const options = [{ value: 'left_click', label: 'Left Click' }];
@@ -103,6 +105,59 @@ runTest('readMappings writes platform-correct app_scopes/app_scope', () => {
   assert.equal(mappings.length, 1);
   assert.equal(mappings[0].app_scope, 'process:code.app');
   assert.deepEqual(mappings[0].app_scopes, ['process:code.app']);
+  assert.deepEqual(mappings[0].actions, [{ type: 'send_shortcut', shortcut: 'Cmd+C' }]);
+});
+
+runTest('automation actions normalize shortcut and delay steps', () => {
+  assert.deepEqual(
+    normalizeActions([
+      { type: 'send_shortcut', shortcut: 'Cmd+C' },
+      { type: 'delay', delay_ms: 120 },
+      { type: 'open_url', url: 'https://example.com/mfx-open-url' },
+      { type: 'launch_app', app_path: '/Applications/Safari.app' },
+      { type: 'delay', delay_ms: 999999 },
+      { type: 'unknown', shortcut: 'Cmd+X' },
+    ]),
+    [
+      { type: 'send_shortcut', shortcut: 'Cmd+C' },
+      { type: 'delay', delay_ms: 120 },
+      { type: 'open_url', url: 'https://example.com/mfx-open-url' },
+      { type: 'launch_app', app_path: '/Applications/Safari.app' },
+      { type: 'delay', delay_ms: 60000 },
+    ]);
+});
+
+runTest('editor actions keep incomplete steps until save-time normalization', () => {
+  assert.deepEqual(
+    normalizeEditorActions([
+      { type: 'send_shortcut', shortcut: '' },
+      { type: 'delay', delay_ms: 0 },
+      { type: 'open_url', url: '' },
+      { type: 'launch_app', app_path: '' },
+    ]),
+    [
+      { type: 'send_shortcut', shortcut: '' },
+      { type: 'delay', delay_ms: '' },
+      { type: 'open_url', url: '' },
+      { type: 'launch_app', app_path: '' },
+    ]);
+});
+
+runTest('readMappings keeps open_url actions during roundtrip', () => {
+  const rows = [
+    {
+      enabled: true,
+      triggerChain: ['left_click'],
+      appScopeMode: 'all',
+      actions: [{ type: 'open_url', url: 'https://example.com/mfx-roundtrip' }],
+    },
+  ];
+  const options = [{ value: 'left_click', label: 'Left Click' }];
+  const mappings = readMappings(rows, options, 'left_click', 'macos');
+
+  assert.deepEqual(mappings[0].actions, [
+    { type: 'open_url', url: 'https://example.com/mfx-roundtrip' },
+  ]);
 });
 
 if (failed > 0) {

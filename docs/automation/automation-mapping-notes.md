@@ -6,6 +6,13 @@ P1 (`docs/agent-context/current.md`) keeps a concise summary only.
 
 ## Details
 - App-scope normalization/parser contracts are stable.
+- Current user-facing boundary:
+  - Automation mapping currently maps mouse actions, wheel input, and gestures to `actions[]`.
+  - Executable action types currently include `send_shortcut`, `delay`, `open_url`, and `launch_app`.
+  - Trigger chains are supported as input-side matching, for example `left_click>scroll_down`.
+  - Output action chains now have a config/runtime base and run on an automation worker instead of blocking input callbacks; app launch uses `actions[].app_path`, while scripts, richer diagnostics, and profile/layer workflows are tracked in `docs/automation/automation-mapping-todo.zh-CN.md`.
+  - `delay` uses `delay_ms` and is capped to 60000ms.
+  - `open_url` and `launch_app` both reuse platform `ISettingsLauncher`; WebUI action editor now supports `send_shortcut / delay / open_url / launch_app`, and platform contract regression verifies both URL and app launch routes at backend/contract level.
 - Gesture mapping supports preset/custom with similarity threshold.
 - Custom gesture editor uses explicit `Draw -> Save` workflow:
   - Drawing is locked until `Draw` is clicked.

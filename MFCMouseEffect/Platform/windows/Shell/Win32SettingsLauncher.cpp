@@ -50,4 +50,14 @@ bool Win32SettingsLauncher::OpenUrlUtf8(const std::string& url) {
     return reinterpret_cast<INT_PTR>(result) > 32;
 }
 
+bool Win32SettingsLauncher::OpenApplicationPathUtf8(const std::string& appPath) {
+    const std::wstring widePath = Utf8ToWide(appPath);
+    if (widePath.empty()) {
+        return false;
+    }
+
+    const HINSTANCE result = ShellExecuteW(nullptr, L"open", widePath.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    return reinterpret_cast<INT_PTR>(result) > 32;
+}
+
 } // namespace mousefx

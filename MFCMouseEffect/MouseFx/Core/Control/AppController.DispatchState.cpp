@@ -1531,6 +1531,24 @@ bool AppController::InjectShortcutForTest(const std::string& chordText) {
     return keyboardInjector_->SendChord(chordText);
 }
 
+bool AppController::OpenAutomationUrlForTest(const std::string& url) {
+    std::function<bool(const std::string&)> handler;
+    {
+        std::lock_guard<std::mutex> lock(automationOpenUrlHandlerMutex_);
+        handler = automationOpenUrlHandler_;
+    }
+    return handler && handler(url);
+}
+
+bool AppController::LaunchAutomationAppForTest(const std::string& appPath) {
+    std::function<bool(const std::string&)> handler;
+    {
+        std::lock_guard<std::mutex> lock(automationLaunchAppHandlerMutex_);
+        handler = automationLaunchAppHandler_;
+    }
+    return handler && handler(appPath);
+}
+
 void AppController::KillDispatchTimer(uintptr_t timerId) {
     if (!dispatchMessageHost_ || !dispatchMessageHost_->IsCreated()) {
         return;

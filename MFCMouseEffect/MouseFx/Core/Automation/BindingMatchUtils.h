@@ -81,6 +81,34 @@ inline bool ModifierConditionMatches(
     return true;
 }
 
+inline bool HasExecutableActions(const AutomationKeyBinding& binding) {
+    for (const AutomationAction& action : binding.actions) {
+        const std::string type = ToLowerAscii(TrimAscii(action.type));
+        if (type == "send_shortcut" && !TrimAscii(action.shortcut).empty()) {
+            return true;
+        }
+        if (type == "open_url" && !TrimAscii(action.url).empty()) {
+            return true;
+        }
+        if (type == "launch_app" && !TrimAscii(action.appPath).empty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+inline std::string FirstShortcutActionText(const AutomationKeyBinding& binding) {
+    for (const AutomationAction& action : binding.actions) {
+        if (ToLowerAscii(TrimAscii(action.type)) == "send_shortcut") {
+            const std::string shortcut = TrimAscii(action.shortcut);
+            if (!shortcut.empty()) {
+                return shortcut;
+            }
+        }
+    }
+    return {};
+}
+
 inline BindingMatchResult FindBestEnabledBinding(
     const std::vector<AutomationKeyBinding>& mappings,
     const std::vector<ActionHistoryEntry>& actionHistory,
@@ -133,8 +161,7 @@ inline BindingMatchResult FindBestEnabledBinding(
             continue;
         }
 
-        const std::string keys = TrimAscii(binding.keys);
-        if (keys.empty()) {
+        if (!HasExecutableActions(binding)) {
             continue;
         }
 

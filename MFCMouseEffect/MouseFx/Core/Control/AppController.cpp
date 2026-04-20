@@ -80,6 +80,22 @@ AppController::AppController()
     shortcutCaptureSession_.SetClockService(monotonicClockService_.get());
     inputAutomationEngine_.SetForegroundProcessService(foregroundProcessService_.get());
     inputAutomationEngine_.SetKeyboardInjector(keyboardInjector_.get());
+    inputAutomationEngine_.SetOpenUrlHandler([this](const std::string& url) {
+        std::function<bool(const std::string&)> handler;
+        {
+            std::lock_guard<std::mutex> lock(automationOpenUrlHandlerMutex_);
+            handler = automationOpenUrlHandler_;
+        }
+        return handler && handler(url);
+    });
+    inputAutomationEngine_.SetLaunchAppHandler([this](const std::string& appPath) {
+        std::function<bool(const std::string&)> handler;
+        {
+            std::lock_guard<std::mutex> lock(automationLaunchAppHandlerMutex_);
+            handler = automationLaunchAppHandler_;
+        }
+        return handler && handler(appPath);
+    });
     inputAutomationEngine_.SetDiagnosticsEnabled(runtimeDiagnosticsEnabled_);
     if (!inputIndicatorOverlay_) {
         inputIndicatorOverlay_ = std::make_unique<NullInputIndicatorOverlay>();

@@ -11,12 +11,12 @@ constexpr std::string_view kLaunchCaptureFileEnv = "MFX_TEST_SETTINGS_LAUNCH_CAP
 
 } // namespace
 
-bool IsLaunchInputValid(std::string_view url) {
-    if (url.empty()) {
+bool IsLaunchInputValid(std::string_view value) {
+    if (value.empty()) {
         return false;
     }
 
-    for (unsigned char c : url) {
+    for (unsigned char c : value) {
         if (c < 0x20 || c == 0x7f) {
             return false;
         }
@@ -39,7 +39,20 @@ bool WriteLaunchCaptureFile(const std::string& filePath, const char* command, co
     }
     return WritePosixKeyValueCaptureFile(filePath, {
                                                        {"command", command},
+                                                       {"target_kind", "url"},
                                                        {"url", url},
+                                                       {"captured", "1"},
+                                                   });
+}
+
+bool WriteLaunchCaptureFileForApp(const std::string& filePath, const char* command, const std::string& appPath) {
+    if (filePath.empty() || command == nullptr || command[0] == '\0') {
+        return false;
+    }
+    return WritePosixKeyValueCaptureFile(filePath, {
+                                                       {"command", command},
+                                                       {"target_kind", "app"},
+                                                       {"app_path", appPath},
                                                        {"captured", "1"},
                                                    });
 }

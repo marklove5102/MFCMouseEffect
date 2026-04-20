@@ -32,7 +32,7 @@ _mfx_core_http_automation_contract_app_scope_checks() {
             -X POST \
             -H "x-mfcmouseeffect-token: $token" \
             -H "Content-Type: application/json" \
-            -d "{\"automation\":{\"enabled\":true,\"mouse_mappings\":[{\"enabled\":true,\"trigger\":\"left_click\",\"app_scopes\":[\"$selected_scope_escaped\"],\"keys\":\"Cmd+C\"}]}}")"
+            -d "{\"automation\":{\"enabled\":true,\"mouse_mappings\":[{\"enabled\":true,\"trigger\":\"left_click\",\"app_scopes\":[\"$selected_scope_escaped\"],\"actions\":[{\"type\":\"send_shortcut\",\"shortcut\":\"Cmd+C\"}]}]}}")"
         mfx_assert_eq "$code_state_apply_scope" "200" "core state apply selected-scope status"
         mfx_assert_file_contains "$tmp_dir/state-apply-scope.out" "\"ok\":true" "core state apply selected-scope ok"
 
@@ -67,7 +67,7 @@ _mfx_core_http_automation_contract_app_scope_checks() {
         -X POST \
         -H "x-mfcmouseeffect-token: $token" \
         -H "Content-Type: application/json" \
-        -d '{"automation":{"enabled":true,"mouse_mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe","process:code.app","process:code"],"keys":"Cmd+C"}]}}')"
+        -d '{"automation":{"enabled":true,"mouse_mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe","process:code.app","process:code"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+C"}]}]}}')"
     mfx_assert_eq "$code_state_apply_scope_alias_dedupe" "200" "core state apply app-scope alias dedupe status"
 
     local code_state_after_scope_alias_dedupe

@@ -32,6 +32,9 @@ Compact AI-first index for fast navigation. This file is intentionally short and
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
+## Capability Roadmaps
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/automation/automation-mapping-todo.zh-CN.md`
+
 ## Marketing Docs
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/README.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/reddit-promo-pack.en.md`

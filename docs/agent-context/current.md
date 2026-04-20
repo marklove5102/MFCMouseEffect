@@ -75,17 +75,7 @@
 - wasm preflight/load failures are normalized to machine-readable codes; do not depend on free-form text in tests.
 - Optional sidecar metadata path is `<manifest>.mouse_companion_renderer.json`.
 - Sidecar must declare `schema_version >= 1`, `renderer_lane = mouse_companion_renderer`, `supports_appearance_semantics = true`, and `appearance_semantics_mode = builtin_passthrough|wasm_v1`.
-- Runtime plugin diagnostics surface at least:
-  - `appearance_plugin_id`
-  - `appearance_plugin_kind`
-  - `appearance_plugin_source`
-  - `appearance_plugin_selection_reason`
-  - `appearance_plugin_failure_reason`
-  - `appearance_plugin_manifest_path`
-  - `appearance_plugin_runtime_backend`
-  - `appearance_plugin_metadata_path`
-  - `appearance_plugin_metadata_schema_version`
-  - `appearance_plugin_appearance_semantics_mode`
+- Runtime plugin diagnostics surface plugin id/kind/source, selection/failure reason, manifest/runtime backend, metadata path/schema, and appearance semantics mode.
 
 #### Windows `wasm_v1` Semantics Summary
 - `builtin_passthrough` keeps host-generated semantics and only accepts bounded tuning plus optional `combo_preset_override`.
@@ -169,6 +159,7 @@
 
 ### Automation Mapping
 - App-scope normalization/parser contracts are stable.
+- Mapping output config now uses `actions[]`; current executable actions are `send_shortcut`, `delay`, `open_url`, and `launch_app`, and WebUI now exposes a first-round action list editor for those four action types.
 - Preset/custom gesture mapping with thresholding and ambiguity rejection is active.
 - Trigger button supports `none`.
 - `Draw -> Save` custom gesture flow is active.

@@ -63,7 +63,25 @@ nlohmann::json BuildBindingsArray(const std::vector<AutomationKeyBinding>& bindi
                 {keys::automation::kModifierShift, binding.modifiers.shift},
                 {keys::automation::kModifierAlt, binding.modifiers.alt},
             }},
-            {keys::automation::kKeys, binding.keys},
+            {keys::automation::kActions, [&]() {
+                nlohmann::json actions = nlohmann::json::array();
+                for (const AutomationAction& action : binding.actions) {
+                    nlohmann::json actionJson = {
+                        {keys::automation::kActionType, action.type},
+                    };
+                    if (action.type == "send_shortcut") {
+                        actionJson[keys::automation::kActionShortcut] = action.shortcut;
+                    } else if (action.type == "delay") {
+                        actionJson[keys::automation::kActionDelayMs] = action.delayMs;
+                    } else if (action.type == "open_url") {
+                        actionJson[keys::automation::kActionUrl] = action.url;
+                    } else if (action.type == "launch_app") {
+                        actionJson[keys::automation::kActionAppPath] = action.appPath;
+                    }
+                    actions.push_back(std::move(actionJson));
+                }
+                return actions;
+            }()},
         };
         if (gestureBindings) {
             item[keys::automation::kTriggerButton] = binding.triggerButton;

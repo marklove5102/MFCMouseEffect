@@ -18,4 +18,19 @@ bool LaunchUrlWithPosixCommand(const char* command, const std::string& url) {
     return SpawnSettingsCommand(command, url);
 }
 
+bool LaunchAppWithPosixCommand(const char* command, const std::string& appPath) {
+    if (command == nullptr || command[0] == '\0') {
+        return false;
+    }
+    if (!IsLaunchInputValid(appPath)) {
+        return false;
+    }
+
+    const std::string captureFilePath = ReadLaunchCaptureFilePath();
+    if (!captureFilePath.empty()) {
+        return WriteLaunchCaptureFileForApp(captureFilePath, command, appPath);
+    }
+    return SpawnSettingsCommand(command, appPath);
+}
+
 } // namespace mousefx

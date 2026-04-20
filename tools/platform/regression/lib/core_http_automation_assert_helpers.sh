@@ -33,7 +33,7 @@ _mfx_core_http_automation_assert_binding_priority() {
     local payload="$3"
     local expected_matched="$4"
     local expected_index="$5"
-    local expected_keys="$6"
+    local expected_shortcut="$6"
     local expected_scope_specificity="$7"
     local expected_chain_length="$8"
     local output_file="$9"
@@ -52,8 +52,8 @@ _mfx_core_http_automation_assert_binding_priority() {
     mfx_assert_file_contains "$output_file" "\"selected_scope_specificity\":$expected_scope_specificity" "$context selected scope specificity"
     mfx_assert_file_contains "$output_file" "\"selected_chain_length\":$expected_chain_length" "$context selected chain length"
     if [[ "$expected_matched" == "true" ]]; then
-        local expected_keys_escaped
-        expected_keys_escaped="$(_mfx_core_http_automation_json_escape "$expected_keys")"
-        mfx_assert_file_contains "$output_file" "\"selected_keys\":\"$expected_keys_escaped\"" "$context selected keys"
+        local expected_shortcut_escaped
+        expected_shortcut_escaped="$(_mfx_core_http_automation_json_escape "$expected_shortcut")"
+        mfx_assert_file_contains "$output_file" "\"selected_shortcut\":\"$expected_shortcut_escaped\"" "$context selected shortcut"
     fi
 }

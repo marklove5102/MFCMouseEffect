@@ -42,7 +42,7 @@
 - 🎯 **Five independent effect lanes** — click, trail, scroll, hold, and hover are separate capability surfaces, not one animation reskinned five times
 - 🔌 **WASM plugin runtime** — write your own effects and indicators in WASM while the host keeps rendering boundaries under control
 - ⌨️ **Keyboard & Mouse Indicator** — visualize mouse clicks, wheel direction, and keyboard combos like `Cmd+Tab` and `W+ x3`
-- 🤖 **Automation mapping** — map mouse actions, wheel input, and gestures to shortcut injection, turning visual feedback into workflow power
+- 🤖 **Automation mapping** — map mouse actions, wheel input, and gestures to shortcut, delay, URL, and app-launch actions, connecting input feedback to real workflows
 - 🐾 **Mouse Companion** — a plugin-first route for a cross-platform desktop companion that follows your cursor
 - 🌐 **Unified settings UI** — shared Web settings across platforms, with one config flow, synchronized state, and recoverable behavior
 
@@ -78,7 +78,7 @@
 </table>
 
 - **Keyboard & Mouse Indicator** — show mouse clicks, wheel direction, and keyboard combos together, so signals like `L x2`, `W+ x3`, and `Cmd+Tab` stay obvious in recordings and demos
-- **Automation Mapping** — map mouse actions, wheel input, and gestures to shortcut injection, so input feedback can participate in real productivity flows
+- **Automation Mapping** — currently maps mouse actions, wheel input, and gestures to shortcut, delay, URL, and app-launch actions; fuller scripting, profiles, and advanced action chains are on the roadmap
 
 <details>
 <summary><b>Expand for best-fit scenarios</b></summary>
@@ -95,7 +95,7 @@
 | Area | Description | Entry Point |
 |:---|:---|:---|
 | 🖱️ **Mouse effects** | Click, trail, scroll, hold, hover, and cursor-decoration styles and tuning | [Effect docs](./docs/README.md) |
-| 🤖 **Automation Mapping** | Map mouse actions, wheel input, and gestures to shortcuts or command chains | [Automation docs](./docs/automation/automation-mapping-notes.md) |
+| 🤖 **Automation Mapping** | Map mouse actions, wheel input, and gestures to shortcut / delay / URL / app-launch actions; scripting and profiles are on the roadmap | [Automation docs](./docs/automation/automation-mapping-notes.md) |
 | ⌨️ **Keyboard & Mouse Indicator** | Mouse, wheel, and keyboard-combo visualization, layout, and WASM indicator work | [Capability index](./docs/agent-context/p2-capability-index.md) |
 | 🐾 **Mouse Companion** | Companion animations, interactions, and plugins | [Companion roadmap](./docs/architecture/mouse-companion-plugin-landing-roadmap.zh-CN.md) |
 | 🔌 **WASM plugins** | Write effect / indicator plugins, or improve ABI, templates, and tooling | [Plugin template](./examples/wasm-plugin-template/README.md) |

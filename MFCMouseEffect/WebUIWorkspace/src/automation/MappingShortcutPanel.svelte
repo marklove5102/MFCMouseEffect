@@ -2,13 +2,11 @@
   export let rowId = '';
   export let row = {};
   export let rowEnabled = true;
-  export let rowKeys = '';
   export let kind = 'mouse';
   export let texts = {};
   export let captureTargetKeys = 'keys';
   export let captureTargetModifiers = 'modifiers';
   export let modifierInputId = '';
-  export let shortcutInputId = '';
   export let modifierInputValue = '';
   export let modifierInputPlaceholder = '';
   export let gestureButtonValue = 'right';
@@ -18,14 +16,28 @@
   export let isCapturing = () => false;
   export let onModifierKeydown = null;
   export let onModifierInput = null;
-  export let onShortcutKeydown = null;
-  export let onShortcutInput = null;
-  export let onToggleRecord = null;
+  export let actionShortcutInputId = null;
+  export let onActionShortcutKeydown = null;
+  export let onActionShortcutInput = null;
+  export let onToggleActionRecord = null;
+  export let onActionTypeChange = null;
+  export let onActionDelayInput = null;
+  export let onActionUrlInput = null;
+  export let onActionAppPathInput = null;
+  export let onActionMoveUp = null;
+  export let onActionMoveDown = null;
+  export let onActionRemove = null;
+  export let onAddShortcutAction = null;
+  export let onAddDelayAction = null;
+  export let onAddOpenUrlAction = null;
+  export let onAddLaunchAppAction = null;
+  export let onToggleModifierRecord = null;
   export let onTriggerButtonChange = null;
   export let onGestureTriggerChange = null;
   export let onGesturePatternChange = null;
   export let onChainChange = null;
 
+  import MappingActionListEditor from './MappingActionListEditor.svelte';
   import GesturePatternEditor from './GesturePatternEditor.svelte';
   import TriggerChainEditor from './TriggerChainEditor.svelte';
 
@@ -56,35 +68,37 @@
         class:is-recording={isCapturing(rowId, captureTargetModifiers)}
         type="button"
         disabled={!rowEnabled}
-        on:click={() => callHandler(onToggleRecord, captureTargetModifiers)}
+        on:click={() => callHandler(onToggleModifierRecord, captureTargetModifiers)}
       >
         {isCapturing(rowId, captureTargetModifiers) ? (texts.recordStop || texts.recording) : texts.record}
       </button>
     </div>
-    <div class="automation-shortcut-label">{texts.gestureOutputShortcutLabel || texts.shortcutLabel}</div>
   {/if}
-  <div class="automation-shortcut-head">
-    <input
-      id={shortcutInputId}
-      class="automation-keys"
-      type="text"
-      disabled={!rowEnabled}
-      readonly={isCapturing(rowId, captureTargetKeys)}
-      value={rowKeys}
-      placeholder={texts.shortcutPlaceholder}
-      on:keydown={(event) => callHandler(onShortcutKeydown, event)}
-      on:input={(event) => callHandler(onShortcutInput, event)}
-    />
-    <button
-      class="btn-soft automation-record"
-      class:is-recording={isCapturing(rowId, captureTargetKeys)}
-      type="button"
-      disabled={!rowEnabled}
-      on:click={() => callHandler(onToggleRecord, captureTargetKeys)}
-    >
-      {isCapturing(rowId, captureTargetKeys) ? (texts.recordStop || texts.recording) : texts.record}
-    </button>
-  </div>
+
+  <MappingActionListEditor
+    {rowId}
+    {row}
+    {rowEnabled}
+    {texts}
+    {captureTargetKeys}
+    {isCapturing}
+    {actionShortcutInputId}
+    onActionShortcutKeydown={onActionShortcutKeydown}
+    onActionShortcutInput={onActionShortcutInput}
+    onToggleActionRecord={onToggleActionRecord}
+    onActionTypeChange={onActionTypeChange}
+    onActionDelayInput={onActionDelayInput}
+    onActionUrlInput={onActionUrlInput}
+    onActionAppPathInput={onActionAppPathInput}
+    onActionMoveUp={onActionMoveUp}
+    onActionMoveDown={onActionMoveDown}
+    onActionRemove={onActionRemove}
+    onAddShortcutAction={onAddShortcutAction}
+    onAddDelayAction={onAddDelayAction}
+    onAddOpenUrlAction={onAddOpenUrlAction}
+    onAddLaunchAppAction={onAddLaunchAppAction}
+  />
+
   {#if kind === 'gesture'}
     <div class="automation-gesture-trigger-group">
       <div class="automation-modifier-label">{texts.gestureTriggerButtonLabel}</div>

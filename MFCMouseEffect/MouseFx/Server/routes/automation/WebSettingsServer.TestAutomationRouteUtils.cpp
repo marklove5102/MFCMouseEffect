@@ -98,7 +98,27 @@ std::vector<AutomationKeyBinding> ParseAutomationMappings(const json& payload) {
         AutomationKeyBinding binding{};
         binding.enabled = ParseBooleanOrDefault(item, "enabled", true);
         binding.trigger = TrimAscii(ParseStringOrDefault(item, "trigger"));
-        binding.keys = TrimAscii(ParseStringOrDefault(item, "keys"));
+        if (item.contains("actions") && item["actions"].is_array()) {
+            for (const auto& actionJson : item["actions"]) {
+                if (!actionJson.is_object()) {
+                    continue;
+                }
+                AutomationAction action{};
+                action.type = TrimAscii(ParseStringOrDefault(actionJson, "type", "send_shortcut"));
+                action.shortcut = TrimAscii(ParseStringOrDefault(actionJson, "shortcut"));
+                if (actionJson.contains("delay_ms") && actionJson["delay_ms"].is_number_integer()) {
+                    const int64_t delayMs = actionJson["delay_ms"].get<int64_t>();
+                    action.delayMs = delayMs > 0 ? static_cast<uint32_t>(delayMs) : 0u;
+                }
+                if (actionJson.contains("url") && actionJson["url"].is_string()) {
+                    action.url = TrimAscii(actionJson["url"].get<std::string>());
+                }
+                if (actionJson.contains("app_path") && actionJson["app_path"].is_string()) {
+                    action.appPath = TrimAscii(actionJson["app_path"].get<std::string>());
+                }
+                binding.actions.push_back(std::move(action));
+            }
+        }
         binding.appScopes = ParseAppScopes(item);
         mappings.push_back(std::move(binding));
     }
@@ -145,7 +165,7 @@ json BuildSelectedBindingJson(const automation_match::BindingMatchResult& match)
     return json({
         {"index", static_cast<uint64_t>(match.bindingIndex)},
         {"trigger", match.binding->trigger},
-        {"keys", match.binding->keys},
+        {"selected_shortcut", automation_match::FirstShortcutActionText(*match.binding)},
         {"app_scopes", match.binding->appScopes},
         {"app_scopes_normalized", normalizedScopes},
         {"chain_length", static_cast<uint64_t>(match.chainLength)},

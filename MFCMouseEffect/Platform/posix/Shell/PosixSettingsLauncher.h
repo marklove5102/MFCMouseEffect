@@ -6,5 +6,6 @@ namespace mousefx {
 
 // Shared POSIX launcher for opening settings URLs with platform shell tools.
 bool LaunchUrlWithPosixCommand(const char* command, const std::string& url);
+bool LaunchAppWithPosixCommand(const char* command, const std::string& appPath);
 
 } // namespace mousefx

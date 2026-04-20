@@ -135,8 +135,31 @@ void ApplyAutomationBindings(const json& source, std::vector<AutomationKeyBindin
                 binding.modifiers.alt = modifiers["alt"].get<bool>();
             }
         }
-        if (item.contains("keys") && item["keys"].is_string()) {
-            binding.keys = item["keys"].get<std::string>();
+        binding.actions.clear();
+        if (item.contains("actions") && item["actions"].is_array()) {
+            for (const auto& actionJson : item["actions"]) {
+                if (!actionJson.is_object()) {
+                    continue;
+                }
+                AutomationAction action;
+                if (actionJson.contains("type") && actionJson["type"].is_string()) {
+                    action.type = actionJson["type"].get<std::string>();
+                }
+                if (actionJson.contains("shortcut") && actionJson["shortcut"].is_string()) {
+                    action.shortcut = actionJson["shortcut"].get<std::string>();
+                }
+                if (actionJson.contains("delay_ms") && actionJson["delay_ms"].is_number_integer()) {
+                    const int64_t delayMs = actionJson["delay_ms"].get<int64_t>();
+                    action.delayMs = delayMs > 0 ? static_cast<uint32_t>(delayMs) : 0u;
+                }
+                if (actionJson.contains("url") && actionJson["url"].is_string()) {
+                    action.url = actionJson["url"].get<std::string>();
+                }
+                if (actionJson.contains("app_path") && actionJson["app_path"].is_string()) {
+                    action.appPath = actionJson["app_path"].get<std::string>();
+                }
+                binding.actions.push_back(std::move(action));
+            }
         }
         outBindings->push_back(binding);
     }

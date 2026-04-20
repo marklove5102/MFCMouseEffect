@@ -31,6 +31,16 @@ void AppController::SetInputCaptureStatusCallback(
     inputCaptureStatusCallback_ = std::move(callback);
 }
 
+void AppController::SetAutomationOpenUrlHandler(std::function<bool(const std::string&)> handler) {
+    std::lock_guard<std::mutex> lock(automationOpenUrlHandlerMutex_);
+    automationOpenUrlHandler_ = std::move(handler);
+}
+
+void AppController::SetAutomationLaunchAppHandler(std::function<bool(const std::string&)> handler) {
+    std::lock_guard<std::mutex> lock(automationLaunchAppHandlerMutex_);
+    automationLaunchAppHandler_ = std::move(handler);
+}
+
 void AppController::NotifyInputCaptureStatusChanged() {
     std::function<void(const InputCaptureRuntimeStatus&)> callback;
     {

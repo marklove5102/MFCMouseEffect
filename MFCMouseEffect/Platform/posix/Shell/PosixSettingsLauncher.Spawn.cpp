@@ -10,10 +10,10 @@ extern char** environ;
 
 namespace mousefx {
 
-bool SpawnSettingsCommand(const char* command, const std::string& url) {
+bool SpawnSettingsCommand(const char* command, const std::string& target) {
     char* const argv[] = {
         const_cast<char*>(command),
-        const_cast<char*>(url.c_str()),
+        const_cast<char*>(target.c_str()),
         nullptr,
     };
 

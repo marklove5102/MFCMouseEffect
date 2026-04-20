@@ -211,6 +211,15 @@ struct InputIndicatorConfig {
     CursorDecorationConfig cursorDecoration;
 };
 
+struct AutomationAction {
+    // v1 action model. Supported types: send_shortcut, delay, open_url, launch_app.
+    std::string type = "send_shortcut";
+    std::string shortcut;
+    uint32_t delayMs = 0;
+    std::string url;
+    std::string appPath;
+};
+
 struct AutomationKeyBinding {
     struct GesturePoint {
         int x = 0;
@@ -249,7 +258,7 @@ struct AutomationKeyBinding {
     std::vector<std::string> appScopes = {"all"};
     GesturePattern gesturePattern{};
     ModifierCondition modifiers{};
-    std::string keys;
+    std::vector<AutomationAction> actions;
 };
 
 struct GestureAutomationConfig {

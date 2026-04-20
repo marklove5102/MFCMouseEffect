@@ -39,7 +39,7 @@ run_inject_probe() {
     local escaped_keys
     escaped_keys="$(json_escape "$keys")"
     local payload
-    payload="{\"history\":[\"left_click\"],\"mappings\":[{\"enabled\":true,\"trigger\":\"left_click\",\"app_scopes\":[\"all\"],\"keys\":\"$escaped_keys\"}]}"
+    payload="{\"history\":[\"left_click\"],\"mappings\":[{\"enabled\":true,\"trigger\":\"left_click\",\"app_scopes\":[\"all\"],\"actions\":[{\"type\":\"send_shortcut\",\"shortcut\":\"$escaped_keys\"}]}]}"
 
     local code
     code="$(mfx_http_code "$output_file" "$MFX_MANUAL_BASE_URL/api/automation/test-match-and-inject" \
@@ -48,7 +48,7 @@ run_inject_probe() {
     mfx_assert_file_contains "$output_file" "\"ok\":true" "automation inject selfcheck ok ($keys)"
     mfx_assert_file_contains "$output_file" "\"matched\":true" "automation inject selfcheck matched ($keys)"
     mfx_assert_file_contains "$output_file" "\"injected\":true" "automation inject selfcheck injected ($keys)"
-    mfx_assert_file_contains "$output_file" "\"selected_keys\":\"$escaped_keys\"" "automation inject selfcheck selected keys ($keys)"
+    mfx_assert_file_contains "$output_file" "\"selected_shortcut\":\"$escaped_keys\"" "automation inject selfcheck selected shortcut ($keys)"
 }
 
 prepare_textedit_selection() {

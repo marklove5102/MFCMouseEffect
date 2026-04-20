@@ -6,9 +6,9 @@
         i18nKey: 'auto_template_mouse_tabs',
         fallback: 'Browser tabs (wheel switch, middle close)',
         bindings: [
-          { enabled: true, trigger: 'scroll_up', keys: 'Ctrl+Shift+Tab' },
-          { enabled: true, trigger: 'scroll_down', keys: 'Ctrl+Tab' },
-          { enabled: true, trigger: 'middle_click', keys: 'Ctrl+W' },
+          { enabled: true, trigger: 'scroll_up', shortcut: 'Ctrl+Shift+Tab' },
+          { enabled: true, trigger: 'scroll_down', shortcut: 'Ctrl+Tab' },
+          { enabled: true, trigger: 'middle_click', shortcut: 'Ctrl+W' },
         ],
       },
       {
@@ -16,8 +16,8 @@
         i18nKey: 'auto_template_mouse_pages',
         fallback: 'Document paging (PageUp/PageDown)',
         bindings: [
-          { enabled: true, trigger: 'scroll_up', keys: 'PageUp' },
-          { enabled: true, trigger: 'scroll_down', keys: 'PageDown' },
+          { enabled: true, trigger: 'scroll_up', shortcut: 'PageUp' },
+          { enabled: true, trigger: 'scroll_down', shortcut: 'PageDown' },
         ],
       },
     ],
@@ -28,10 +28,10 @@
         fallback: 'Window snap (Win+Arrow)',
         platforms: ['windows'],
         bindings: [
-          { enabled: true, trigger: 'left', keys: 'Win+Left' },
-          { enabled: true, trigger: 'right', keys: 'Win+Right' },
-          { enabled: true, trigger: 'up', keys: 'Win+Up' },
-          { enabled: true, trigger: 'down', keys: 'Win+Down' },
+          { enabled: true, trigger: 'left', shortcut: 'Win+Left' },
+          { enabled: true, trigger: 'right', shortcut: 'Win+Right' },
+          { enabled: true, trigger: 'up', shortcut: 'Win+Up' },
+          { enabled: true, trigger: 'down', shortcut: 'Win+Down' },
         ],
       },
       {
@@ -39,10 +39,10 @@
         i18nKey: 'auto_template_gesture_browser',
         fallback: 'Browser navigation (Alt+Left/Right)',
         bindings: [
-          { enabled: true, trigger: 'left', keys: 'Alt+Left' },
-          { enabled: true, trigger: 'right', keys: 'Alt+Right' },
-          { enabled: true, trigger: 'up', keys: 'Ctrl+L' },
-          { enabled: true, trigger: 'down', keys: 'Ctrl+R' },
+          { enabled: true, trigger: 'left', shortcut: 'Alt+Left' },
+          { enabled: true, trigger: 'right', shortcut: 'Alt+Right' },
+          { enabled: true, trigger: 'up', shortcut: 'Ctrl+L' },
+          { enabled: true, trigger: 'down', shortcut: 'Ctrl+R' },
         ],
       },
     ],
@@ -99,7 +99,7 @@
     return hit.bindings.map((binding) => ({
       enabled: binding.enabled !== false,
       trigger: binding.trigger || '',
-      keys: binding.keys || '',
+      actions: binding.shortcut ? [{ type: 'send_shortcut', shortcut: binding.shortcut }] : [],
     }));
   }
 

@@ -33,6 +33,9 @@
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-core-automation-contract-workflow.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/architecture/posix-linux-compile-gate-workflow.md`
 
+## 能力路线图
+- `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/automation/automation-mapping-todo.zh-CN.md`
+
 ## 营销文档
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/README.md`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/marketing/reddit-promo-pack.en.md`

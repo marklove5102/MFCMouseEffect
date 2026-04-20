@@ -195,7 +195,23 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
                         {"shift", binding.modifiers.shift},
                         {"alt", binding.modifiers.alt},
                     }},
-                    {"keys", EnsureUtf8(binding.keys)},
+                    {"actions", [&]() {
+                        json actions = json::array();
+                        for (const auto& action : binding.actions) {
+                            json actionJson = {{"type", EnsureUtf8(action.type)}};
+                            if (action.type == "send_shortcut") {
+                                actionJson["shortcut"] = EnsureUtf8(action.shortcut);
+                            } else if (action.type == "delay") {
+                                actionJson["delay_ms"] = action.delayMs;
+                            } else if (action.type == "open_url") {
+                                actionJson["url"] = EnsureUtf8(action.url);
+                            } else if (action.type == "launch_app") {
+                                actionJson["app_path"] = EnsureUtf8(action.appPath);
+                            }
+                            actions.push_back(std::move(actionJson));
+                        }
+                        return actions;
+                    }()},
                 });
             }
             return arr;
@@ -242,7 +258,23 @@ void AppendBaseSettingsState(const EffectConfig& cfg, json* out) {
                             {"shift", binding.modifiers.shift},
                             {"alt", binding.modifiers.alt},
                         }},
-                        {"keys", EnsureUtf8(binding.keys)},
+                        {"actions", [&]() {
+                            json actions = json::array();
+                            for (const auto& action : binding.actions) {
+                                json actionJson = {{"type", EnsureUtf8(action.type)}};
+                                if (action.type == "send_shortcut") {
+                                    actionJson["shortcut"] = EnsureUtf8(action.shortcut);
+                                } else if (action.type == "delay") {
+                                    actionJson["delay_ms"] = action.delayMs;
+                                } else if (action.type == "open_url") {
+                                    actionJson["url"] = EnsureUtf8(action.url);
+                                } else if (action.type == "launch_app") {
+                                    actionJson["app_path"] = EnsureUtf8(action.appPath);
+                                }
+                                actions.push_back(std::move(actionJson));
+                            }
+                            return actions;
+                        }()},
                     });
                 }
                 return arr;

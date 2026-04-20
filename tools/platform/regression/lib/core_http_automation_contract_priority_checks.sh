@@ -13,7 +13,7 @@ _mfx_core_http_automation_contract_priority_checks() {
     fi
 
     local payload_priority_scope_specific
-    payload_priority_scope_specific='{"process":"code.app","history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["all"],"keys":"Cmd+V"},{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe"],"keys":"Cmd+C"}]}'
+    payload_priority_scope_specific='{"process":"code.app","history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["all"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+V"}]},{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+C"}]}]}'
     _mfx_core_http_automation_assert_binding_priority \
         "$base_url" \
         "$token" \
@@ -28,7 +28,7 @@ _mfx_core_http_automation_contract_priority_checks() {
     mfx_assert_file_contains "$tmp_dir/scope-priority-specific.out" "\"app_scopes_normalized\":[\"$expected_process_scope\"]" "core app-scope priority process-over-all normalized scope"
 
     local payload_priority_scope_fallback
-    payload_priority_scope_fallback='{"process":"safari","history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["all"],"keys":"Cmd+V"},{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe"],"keys":"Cmd+C"}]}'
+    payload_priority_scope_fallback='{"process":"safari","history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["all"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+V"}]},{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+C"}]}]}'
     _mfx_core_http_automation_assert_binding_priority \
         "$base_url" \
         "$token" \
@@ -43,7 +43,7 @@ _mfx_core_http_automation_contract_priority_checks() {
     mfx_assert_file_contains "$tmp_dir/scope-priority-fallback.out" "\"app_scopes_normalized\":[\"all\"]" "core app-scope priority all-fallback normalized scope"
 
     local payload_priority_long_chain
-    payload_priority_long_chain='{"process":"code","history":["left_click","left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code.app"],"keys":"Cmd+V"},{"enabled":true,"trigger":"left_click>left_click","app_scopes":["all"],"keys":"Cmd+T"}]}'
+    payload_priority_long_chain='{"process":"code","history":["left_click","left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code.app"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+V"}]},{"enabled":true,"trigger":"left_click>left_click","app_scopes":["all"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+T"}]}]}'
     _mfx_core_http_automation_assert_binding_priority \
         "$base_url" \
         "$token" \
@@ -58,7 +58,7 @@ _mfx_core_http_automation_contract_priority_checks() {
     mfx_assert_file_contains "$tmp_dir/scope-priority-long-chain.out" "\"app_scopes_normalized\":[\"all\"]" "core app-scope priority longest-chain-first normalized scope"
 
     local payload_priority_scope_alias_tie
-    payload_priority_scope_alias_tie='{"process":"code.exe","history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code"],"keys":"Cmd+B"},{"enabled":true,"trigger":"left_click","app_scopes":["process:code.app"],"keys":"Cmd+A"}]}'
+    payload_priority_scope_alias_tie='{"process":"code.exe","history":["left_click"],"mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+B"}]},{"enabled":true,"trigger":"left_click","app_scopes":["process:code.app"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+A"}]}]}'
     _mfx_core_http_automation_assert_binding_priority \
         "$base_url" \
         "$token" \

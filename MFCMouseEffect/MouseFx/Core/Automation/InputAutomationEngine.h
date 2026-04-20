@@ -10,13 +10,17 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <deque>
+#include <functional>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace mousefx {
 
-// Maps mouse actions and recognized gestures to keyboard shortcuts.
+// Maps mouse actions and recognized gestures to automation actions.
 class InputAutomationEngine final {
 public:
     struct GestureRouteEvent final {
@@ -75,8 +79,8 @@ public:
         std::vector<GestureRouteEvent> recentEvents{};
     };
 
-    InputAutomationEngine() = default;
-    ~InputAutomationEngine() = default;
+    InputAutomationEngine();
+    ~InputAutomationEngine();
 
     InputAutomationEngine(const InputAutomationEngine&) = delete;
     InputAutomationEngine& operator=(const InputAutomationEngine&) = delete;
@@ -92,6 +96,8 @@ public:
     void OnKey(const KeyEvent& ev);
     void SetForegroundProcessService(IForegroundProcessService* service);
     void SetKeyboardInjector(IKeyboardInjector* injector);
+    void SetOpenUrlHandler(std::function<bool(const std::string&)> handler);
+    void SetLaunchAppHandler(std::function<bool(const std::string&)> handler);
     void SetDiagnosticsEnabled(bool enabled);
     bool DiagnosticsEnabled() const;
     Diagnostics ReadDiagnostics() const;
@@ -102,6 +108,10 @@ private:
         std::vector<ScreenPoint> points;
         std::vector<uint32_t> pointTimesMs;
         std::chrono::steady_clock::time_point timestamp{};
+    };
+    struct QueuedActionChain final {
+        std::vector<AutomationAction> actions{};
+        uint64_t generation = 0;
     };
 
     using ActionHistoryItem = automation_match::ActionHistoryEntry;
@@ -157,11 +167,19 @@ private:
         double runnerUpScore = -1.0,
         const std::vector<ScreenPoint>* previewPoints = nullptr);
     bool ShouldAppendGestureRouteEventLocked(const GestureRouteEvent& event) const;
+    bool QueueBindingActions(const AutomationKeyBinding& binding);
+    bool ExecuteQueuedActions(const std::vector<AutomationAction>& actions, uint64_t generation);
+    bool WaitForActionDelay(uint32_t delayMs, uint64_t generation);
+    bool IsActionGenerationCurrent(uint64_t generation) const;
+    void ActionWorkerLoop();
+    void ClearPendingActionsLocked();
 
     InputAutomationConfig config_{};
     GestureRecognizer gestureRecognizer_{};
     GestureRecognizer buttonlessGestureRecognizer_{};
     IKeyboardInjector* keyboardInjector_ = nullptr;
+    std::function<bool(const std::string&)> openUrlHandler_{};
+    std::function<bool(const std::string&)> launchAppHandler_{};
     std::string suppressNextClickActionId_{};
     std::vector<ActionHistoryItem> mouseActionHistory_{};
     std::vector<ActionHistoryItem> gestureHistory_{};
@@ -188,6 +206,12 @@ private:
     mutable std::mutex diagnosticsMutex_{};
     Diagnostics diagnostics_{};
     uint64_t diagnosticsEventSeq_ = 0;
+    mutable std::mutex actionQueueMutex_{};
+    std::condition_variable actionQueueCv_{};
+    std::deque<QueuedActionChain> pendingActionChains_{};
+    std::thread actionWorker_{};
+    uint64_t actionQueueGeneration_ = 0;
+    bool actionWorkerStop_ = false;
 };
 
 } // namespace mousefx

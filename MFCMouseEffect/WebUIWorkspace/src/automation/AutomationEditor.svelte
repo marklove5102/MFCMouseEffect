@@ -12,6 +12,7 @@
     evaluateRows,
     listTemplateOptions,
     normalizeAutomationPayload,
+    normalizeEditorActions,
     parseAppScopes,
     readMappings,
     readTemplateBindings,
@@ -54,8 +55,8 @@
   let mouseTemplateOptions = [];
   let gestureTemplateOptions = [];
 
-  const AUTOMATION_DRAFT_VERSION = 1;
-  const AUTOMATION_DRAFT_STORAGE_KEY = 'mfx.automation.editor.draft.v1';
+  const AUTOMATION_DRAFT_VERSION = 2;
+  const AUTOMATION_DRAFT_STORAGE_KEY = 'mfx.automation.editor.draft.v2';
 
   let lastIncomingSignature = '';
   let lastI18nRef = null;
@@ -87,7 +88,7 @@
         appScopeDraft: `${source.appScopeDraft || ''}`,
         triggerButton: `${source.triggerButton || ''}`.trim(),
         gesturePattern: source.gesturePattern || {},
-        keys: `${source.keys || ''}`.trim(),
+        actions: normalizeEditorActions(source.actions),
       });
     }
     return out;
@@ -305,7 +306,7 @@
         shift: normalizedShift,
         alt: normalizedAlt,
       },
-      keys: `${binding?.keys || ''}`.trim(),
+      actions: normalizeEditorActions(binding?.actions),
       note: '',
       hasConflict: false,
     };
@@ -372,7 +373,7 @@
   function validationMessages() {
     const isMac = runtimePlatform === 'macos';
     return {
-      missingShortcut: t('auto_missing_shortcut', 'Shortcut is required for enabled mapping.'),
+      missingShortcut: t('auto_missing_action', 'At least one executable action is required for enabled mapping.'),
       duplicate: t('auto_conflict_trigger', 'Duplicate trigger chain + app scope. Keep only one enabled mapping per key.'),
       invalidScope: isMac
         ? t('auto_missing_scope_app_macos', 'Please add at least one target app name when selected-app scope is enabled.')
@@ -405,10 +406,10 @@
         trigger: serializeTriggerChain(triggerChain, options, fallback),
       };
     }
-    if (key === 'keys') {
+    if (key === 'actions') {
       return {
         ...row,
-        keys: `${value || ''}`,
+        actions: normalizeEditorActions(value),
       };
     }
     if (key === 'gesturePattern') {
@@ -596,7 +597,28 @@
       shortcutPlaceholder: isMac
         ? t('placeholder_shortcut_macos', 'Cmd+Shift+S')
         : t('placeholder_shortcut', 'Ctrl+Shift+S'),
-      shortcutLabel: t('label_auto_output_shortcut', 'Output shortcut'),
+      shortcutLabel: t('label_auto_output_shortcut', 'Shortcut'),
+      actionsLabel: t('label_auto_actions', 'Output actions'),
+      actionLabel: t('label_auto_action_item', 'Action'),
+      actionsEmpty: t('text_auto_actions_empty', 'No output action yet. Add one below.'),
+      actionTypeLabel: t('label_action_type', 'Action type'),
+      actionTypeShortcut: t('action_type_send_shortcut', 'Send shortcut'),
+      actionTypeDelay: t('action_type_delay', 'Delay'),
+      actionTypeOpenUrl: t('action_type_open_url', 'Open URL'),
+      actionTypeLaunchApp: t('action_type_launch_app', 'Launch app'),
+      actionDelayLabel: t('label_action_delay_ms', 'Delay (ms)'),
+      actionDelayPlaceholder: t('placeholder_action_delay_ms', 'for example 120'),
+      actionDelayHint: t('hint_action_delay_ms', 'Valid range: 1-60000ms.'),
+      actionUrlLabel: t('label_action_url', 'URL'),
+      actionUrlPlaceholder: t('placeholder_action_url', 'https://example.com'),
+      actionAppPathLabel: t('label_action_app_path', 'App path'),
+      actionAppPathPlaceholder: isMac
+        ? t('placeholder_action_app_path_macos', '/Applications/Safari.app')
+        : t('placeholder_action_app_path_windows', 'C:\\Program Files\\App\\app.exe'),
+      addShortcutAction: t('btn_add_action_shortcut', 'Add shortcut'),
+      addDelayAction: t('btn_add_action_delay', 'Add delay'),
+      addOpenUrlAction: t('btn_add_action_open_url', 'Add URL'),
+      addLaunchAppAction: t('btn_add_action_launch_app', 'Add app'),
       record: t('btn_record_shortcut', 'Record'),
       recordStop: t('btn_record_stop_save', 'Stop / Save'),
       recording: t('btn_recording', 'Press keys...'),
@@ -652,10 +674,13 @@
         isMac ? 'for example code.app' : 'for example code.exe'),
       scopeAllLabel: t('auto_app_scope_all', 'All Apps'),
       scopeSelectedEmpty: t('text_scope_selected_empty', 'No app selected'),
+      actionEmpty: t('text_action_empty', 'No action'),
       shortcutEmpty: t('text_shortcut_empty', 'No shortcut'),
       expand: t('btn_expand_mapping', 'Expand'),
       collapse: t('btn_collapse_mapping', 'Collapse'),
       remove: t('btn_remove_mapping', 'Remove'),
+      moveUp: t('btn_move_up', 'Up'),
+      moveDown: t('btn_move_down', 'Down'),
       add: t('btn_add_mapping', 'Add mapping'),
       addChainNode: t('btn_add_chain_node', 'Add chain node'),
       removeChainNode: t('btn_remove_chain_node', 'Remove node'),
@@ -701,7 +726,7 @@
       gestureDrawHint: t('hint_auto_gesture_draw', 'Each gesture can use a preset shape or your own drawing. Custom drawings will later match by similarity threshold.'),
       hint: t(
         'hint_automation',
-        'Action chain trigger format: action1>action2 (for example left_click>scroll_down).'),
+        'Current scope: mouse actions, wheel input, and gestures can trigger output actions. Trigger chains use action1>action2 (for example left_click>scroll_down); current action editor supports shortcut, delay, URL, and app-launch actions.'),
     };
     mousePanelTexts = panelTextsForKind('mouse');
     gesturePanelTexts = panelTextsForKind('gesture');
@@ -770,7 +795,7 @@
     if (mouseValidation.hasMissingShortcut) {
       return {
         ok: false,
-        message: t('auto_validation_missing_shortcut', 'At least one enabled mapping has empty shortcut text.'),
+        message: t('auto_validation_missing_action', 'At least one enabled mapping has no executable action.'),
       };
     }
     if (mouseValidation.hasDuplicateTrigger) {
@@ -793,7 +818,7 @@
     if (gestureValidation.hasMissingShortcut) {
       return {
         ok: false,
-        message: t('auto_validation_missing_shortcut', 'At least one enabled mapping has empty shortcut text.'),
+        message: t('auto_validation_missing_action', 'At least one enabled mapping has no executable action.'),
       };
     }
     if (gestureValidation.hasDuplicateTrigger) {

@@ -20,4 +20,8 @@ bool MacosSettingsLauncher::OpenUrlUtf8(const std::string& url) {
     return LaunchUrlWithPosixCommand("open", url);
 }
 
+bool MacosSettingsLauncher::OpenApplicationPathUtf8(const std::string& appPath) {
+    return LaunchAppWithPosixCommand("open", appPath);
+}
+
 } // namespace mousefx

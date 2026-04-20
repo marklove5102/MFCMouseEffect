@@ -55,6 +55,12 @@ bool PosixCoreAppShell::Initialize(const AppShellStartOptions& options) {
     appController_ = std::make_unique<AppController>();
     webSettingsCoordinator_ = std::make_unique<WebSettingsLaunchCoordinator>(appController_.get());
     appController_->SetRuntimeDiagnosticsEnabled(options.enableRuntimeDiagnostics);
+    appController_->SetAutomationOpenUrlHandler([this](const std::string& url) {
+        return services_.settingsLauncher && services_.settingsLauncher->OpenUrlUtf8(url);
+    });
+    appController_->SetAutomationLaunchAppHandler([this](const std::string& appPath) {
+        return services_.settingsLauncher && services_.settingsLauncher->OpenApplicationPathUtf8(appPath);
+    });
     if (!appController_ || !appController_->Start()) {
         if (services_.notifier) {
             services_.notifier->ShowWarning(

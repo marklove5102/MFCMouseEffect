@@ -932,6 +932,8 @@ public:
     InputCaptureRuntimeStatus InputCaptureStatus() const;
     bool EffectsSuspendedByInputCapture() const;
     void SetInputCaptureStatusCallback(std::function<void(const InputCaptureRuntimeStatus&)> callback);
+    void SetAutomationOpenUrlHandler(std::function<bool(const std::string&)> handler);
+    void SetAutomationLaunchAppHandler(std::function<bool(const std::string&)> handler);
     
     // Get current config (for effects to read)
     const EffectConfig& Config() const { return config_; }
@@ -1013,6 +1015,8 @@ public:
     bool IsEffectsBlockedByAppBlacklist();
     bool IsEffectsBlockedByAppBlacklistAtPoint(const ScreenPoint& pt) const;
     bool InjectShortcutForTest(const std::string& chordText);
+    bool OpenAutomationUrlForTest(const std::string& url);
+    bool LaunchAutomationAppForTest(const std::string& appPath);
     std::string StartShortcutCaptureSession(uint64_t timeoutMs);
     void StopShortcutCaptureSession(const std::string& sessionId);
     ShortcutCaptureSession::PollResult PollShortcutCaptureSession(const std::string& sessionId);
@@ -1143,7 +1147,11 @@ private:
     std::atomic<uint32_t> inputCaptureError_{0};
     std::atomic<bool> effectsSuspendedByInputCapture_{false};
     std::function<void(const InputCaptureRuntimeStatus&)> inputCaptureStatusCallback_{};
+    std::function<bool(const std::string&)> automationOpenUrlHandler_{};
+    std::function<bool(const std::string&)> automationLaunchAppHandler_{};
     mutable std::mutex inputCaptureStatusCallbackMutex_{};
+    mutable std::mutex automationOpenUrlHandlerMutex_{};
+    mutable std::mutex automationLaunchAppHandlerMutex_{};
 
     uint64_t lastInputTime_ = 0;
     ScreenPoint lastPointerPoint_{};

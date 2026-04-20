@@ -12,6 +12,8 @@ Use it when P1 (`current.md`) is not enough and you need targeted deep context.
 - Do not bulk-open all P2 docs.
 
 ## Automation / Gesture
+- Automation mapping product roadmap / TODO:
+  - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/automation/automation-mapping-todo.zh-CN.md`
 - Gesture matching logic, thresholds, and regression notes:
   - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/automation/gesture-matching.md`
 - Gesture debug UI rendering and preview behavior:

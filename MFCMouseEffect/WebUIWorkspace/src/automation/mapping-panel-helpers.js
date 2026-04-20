@@ -4,6 +4,33 @@ import { normalizeTriggerChain, serializeTriggerChain } from './trigger-chain.js
 export const CAPTURE_TARGET_KEYS = 'keys';
 export const CAPTURE_TARGET_MODIFIERS = 'modifiers';
 
+function firstExecutableActionText(actions) {
+  const source = Array.isArray(actions) ? actions : [];
+  for (const action of source) {
+    const type = `${action?.type || 'send_shortcut'}`.trim().toLowerCase();
+    if (type === 'send_shortcut') {
+      const shortcut = `${action?.shortcut || ''}`.trim();
+      if (shortcut) {
+        return shortcut;
+      }
+      continue;
+    }
+    if (type === 'open_url') {
+      const url = `${action?.url || ''}`.trim();
+      if (url) {
+        return url;
+      }
+    }
+    if (type === 'launch_app') {
+      const appPath = `${action?.app_path ?? action?.appPath ?? ''}`.trim();
+      if (appPath) {
+        return appPath;
+      }
+    }
+  }
+  return '';
+}
+
 export function normalizedPlatform(platform) {
   return normalizeRuntimePlatform(platform);
 }
@@ -267,11 +294,11 @@ export function scopeSummaryForRow(row, texts) {
 }
 
 export function shortcutSummaryForRow(row, texts) {
-  const keys = `${row?.keys || ''}`.trim();
-  if (keys) {
-    return keys;
+  const actionText = firstExecutableActionText(row?.actions);
+  if (actionText) {
+    return actionText;
   }
-  return texts.shortcutEmpty || 'No shortcut';
+  return texts.actionEmpty || texts.shortcutEmpty || 'No action';
 }
 
 export function catalogMetaText(entry) {

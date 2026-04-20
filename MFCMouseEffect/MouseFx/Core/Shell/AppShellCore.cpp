@@ -357,6 +357,12 @@ bool AppShellCore::Initialize(const AppShellStartOptions& options) {
     mouseFx_ = std::make_unique<AppController>();
     webSettingsCoordinator_->ResetController(mouseFx_.get());
     mouseFx_->SetRuntimeDiagnosticsEnabled(options.enableRuntimeDiagnostics);
+    mouseFx_->SetAutomationOpenUrlHandler([this](const std::string& url) {
+        return settingsLauncher_ && settingsLauncher_->OpenUrlUtf8(url);
+    });
+    mouseFx_->SetAutomationLaunchAppHandler([this](const std::string& appPath) {
+        return settingsLauncher_ && settingsLauncher_->OpenApplicationPathUtf8(appPath);
+    });
     if (!mouseFx_->Start()) {
 #ifdef _DEBUG
         NotifyWarning("MFCMouseEffect", BuildStartupFailureMessage(mouseFx_.get()));

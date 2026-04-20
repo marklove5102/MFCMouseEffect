@@ -3,6 +3,7 @@
   import MappingScopePanel from './MappingScopePanel.svelte';
   import MappingShortcutPanel from './MappingShortcutPanel.svelte';
   import { filterCatalogEntries, normalizeCatalogEntries } from './app-catalog.js';
+  import { normalizeEditorActions } from './model.js';
   import {
     pollShortcutCapture,
     readAutomationAppCatalog,
@@ -44,7 +45,7 @@
 
   const dispatch = createEventDispatcher();
   let recordingRowId = '';
-  let recordingTarget = CAPTURE_TARGET_KEYS;
+  let recordingTarget = '';
   let remoteCaptureSessionId = '';
   let remoteCapturePollTimer = 0;
   let localCaptureCommitTimer = 0;
@@ -65,7 +66,7 @@
     return resolveScopeFileAccept(platform);
   }
 
-  function isCapturing(rowId, target = CAPTURE_TARGET_KEYS) {
+  function isCapturing(rowId, target = '') {
     return recordingRowId === rowId && recordingTarget === target;
   }
 
@@ -140,7 +141,11 @@
     if (target === CAPTURE_TARGET_MODIFIERS) {
       return modifierInputId(rowId);
     }
-    return shortcutInputId(rowId);
+    const actionIndex = actionIndexFromCaptureTarget(target);
+    if (actionIndex >= 0) {
+      return actionShortcutInputId(rowId, actionIndex);
+    }
+    return '';
   }
 
   function stopRecording(rowId, blurInput = false) {
@@ -150,7 +155,7 @@
     clearLocalCapturePending();
     const target = recordingTarget;
     recordingRowId = '';
-    recordingTarget = CAPTURE_TARGET_KEYS;
+    recordingTarget = '';
     if (blurInput) {
       const input = document.getElementById(activeCaptureInputId(rowId, target));
       if (input) {
@@ -182,7 +187,10 @@
         if (target === CAPTURE_TARGET_MODIFIERS) {
           applyTriggerModifierShortcut(rowId, result.shortcut);
         } else {
-          emitRowChange(rowId, 'keys', result.shortcut);
+          const actionIndex = actionIndexFromCaptureTarget(target);
+          if (actionIndex >= 0) {
+            applyActionShortcut(rowId, actionIndex, result.shortcut);
+          }
         }
         remoteCaptureSessionId = '';
         stopRecording(rowId, true);
@@ -203,7 +211,7 @@
     }
   }
 
-  async function beginRemoteCapture(rowId, target = CAPTURE_TARGET_KEYS) {
+  async function beginRemoteCapture(rowId, target = '') {
     try {
       const sessionId = await startShortcutCapture(10000);
       if (!sessionId || recordingRowId !== rowId || recordingTarget !== target) {
@@ -226,7 +234,7 @@
     if (recordingRowId === rowId) {
       clearLocalCapturePending();
       recordingRowId = '';
-      recordingTarget = CAPTURE_TARGET_KEYS;
+      recordingTarget = '';
       void endRemoteCapture();
     }
     dispatch('remove', { kind, rowId });
@@ -244,7 +252,63 @@
     dispatch('applytemplate', { kind });
   }
 
-  function focusCaptureInput(rowId, target = CAPTURE_TARGET_KEYS) {
+  function actionShortcutCaptureTarget(index) {
+    return `${CAPTURE_TARGET_KEYS}:${index}`;
+  }
+
+  function actionIndexFromCaptureTarget(target) {
+    const text = `${target || ''}`;
+    if (!text.startsWith(`${CAPTURE_TARGET_KEYS}:`)) {
+      return -1;
+    }
+    const parsed = Number.parseInt(text.slice(`${CAPTURE_TARGET_KEYS}:`.length), 10);
+    return Number.isInteger(parsed) && parsed >= 0 ? parsed : -1;
+  }
+
+  function actionShortcutInputId(rowId, index) {
+    return `auto_action_shortcut_${kind}_${rowId}_${index}`;
+  }
+
+  function normalizedActionsForRow(row) {
+    return normalizeEditorActions(row?.actions);
+  }
+
+  function commitRowActions(row, nextActions) {
+    emitRowChange(row.id, 'actions', normalizeEditorActions(nextActions));
+  }
+
+  function updateActionByIndex(row, index, updater) {
+    const actions = normalizedActionsForRow(row);
+    if (index < 0 || index >= actions.length) {
+      return;
+    }
+    const nextAction = updater(actions[index], index);
+    const nextActions = actions.slice();
+    if (nextAction) {
+      nextActions[index] = nextAction;
+    } else {
+      nextActions.splice(index, 1);
+    }
+    commitRowActions(row, nextActions);
+  }
+
+  function findRowById(rowId) {
+    return rows.find((item) => item.id === rowId);
+  }
+
+  function applyActionShortcut(rowId, index, shortcut) {
+    const row = findRowById(rowId);
+    if (!row) {
+      return;
+    }
+    updateActionByIndex(row, index, (action) => ({
+      ...action,
+      type: 'send_shortcut',
+      shortcut,
+    }));
+  }
+
+  function focusCaptureInput(rowId, target = '') {
     const input = document.getElementById(activeCaptureInputId(rowId, target));
     if (!input) {
       return;
@@ -253,12 +317,12 @@
     input.select();
   }
 
-  function onShortcutKeydown(row, event) {
+  function onActionShortcutKeydown(row, index, event) {
     if (!row.enabled) {
       return;
     }
 
-    if (!isCapturing(row.id, CAPTURE_TARGET_KEYS)) {
+    if (!isCapturing(row.id, actionShortcutCaptureTarget(index))) {
       return;
     }
 
@@ -280,7 +344,7 @@
       !event.shiftKey &&
       !event.metaKey) {
       clearLocalCapturePending();
-      emitRowChange(row.id, 'keys', '');
+      updateActionByIndex(row, index, () => null);
       stopRecording(row.id);
       void endRemoteCapture();
       return;
@@ -293,14 +357,17 @@
 
     if (isModifierOnlyShortcut(shortcut)) {
       clearLocalCapturePending();
-      localCapturePending = { rowId: row.id, target: CAPTURE_TARGET_KEYS, shortcut };
+      localCapturePending = { rowId: row.id, target: actionShortcutCaptureTarget(index), shortcut };
       localCaptureCommitTimer = window.setTimeout(() => {
         if (!localCapturePending) {
           return;
         }
         const pending = localCapturePending;
         clearLocalCapturePending();
-        emitRowChange(pending.rowId, 'keys', pending.shortcut);
+        const pendingIndex = actionIndexFromCaptureTarget(pending.target);
+        if (pendingIndex >= 0) {
+          applyActionShortcut(pending.rowId, pendingIndex, pending.shortcut);
+        }
         stopRecording(pending.rowId);
         void endRemoteCapture();
       }, 240);
@@ -308,16 +375,78 @@
     }
 
     clearLocalCapturePending();
-    emitRowChange(row.id, 'keys', shortcut);
+    applyActionShortcut(row.id, index, shortcut);
     stopRecording(row.id);
     void endRemoteCapture();
   }
 
-  function onShortcutInput(row, event) {
-    if (isCapturing(row.id, CAPTURE_TARGET_KEYS)) {
+  function onActionShortcutInput(row, index, event) {
+    if (isCapturing(row.id, actionShortcutCaptureTarget(index))) {
       return;
     }
-    emitRowChange(row.id, 'keys', event.currentTarget.value);
+    applyActionShortcut(row.id, index, event.currentTarget.value);
+  }
+
+  function onActionTypeChange(row, index, type) {
+    const normalizedType = `${type || ''}`.trim().toLowerCase();
+    updateActionByIndex(row, index, () => {
+      if (normalizedType === 'delay') {
+        return { type: 'delay', delay_ms: 120 };
+      }
+      if (normalizedType === 'open_url') {
+        return { type: 'open_url', url: '' };
+      }
+      if (normalizedType === 'launch_app') {
+        return { type: 'launch_app', app_path: '' };
+      }
+      return { type: 'send_shortcut', shortcut: '' };
+    });
+  }
+
+  function onActionDelayInput(row, index, event) {
+    const value = Number.parseInt(event.currentTarget.value, 10);
+    updateActionByIndex(row, index, (action) => ({
+      ...action,
+      type: 'delay',
+      delay_ms: Number.isFinite(value) ? value : 0,
+    }));
+  }
+
+  function onActionUrlInput(row, index, event) {
+    updateActionByIndex(row, index, (action) => ({
+      ...action,
+      type: 'open_url',
+      url: event.currentTarget.value,
+    }));
+  }
+
+  function onActionAppPathInput(row, index, event) {
+    updateActionByIndex(row, index, (action) => ({
+      ...action,
+      type: 'launch_app',
+      app_path: event.currentTarget.value,
+    }));
+  }
+
+  function moveAction(row, index, direction) {
+    const nextIndex = index + direction;
+    const actions = normalizedActionsForRow(row);
+    if (index < 0 || nextIndex < 0 || index >= actions.length || nextIndex >= actions.length) {
+      return;
+    }
+    const nextActions = actions.slice();
+    const [moved] = nextActions.splice(index, 1);
+    nextActions.splice(nextIndex, 0, moved);
+    commitRowActions(row, nextActions);
+  }
+
+  function removeAction(row, index) {
+    updateActionByIndex(row, index, () => null);
+  }
+
+  function addAction(row, action) {
+    const actions = normalizedActionsForRow(row);
+    commitRowActions(row, actions.concat(action));
   }
 
   function modifierInputId(rowId) {
@@ -545,11 +674,11 @@
     void loadAppCatalog(true);
   }
 
-  function toggleRecord(rowId, target = CAPTURE_TARGET_KEYS) {
+  function toggleRecord(rowId, target = '') {
     if (recordingRowId === rowId && recordingTarget === target) {
       clearLocalCapturePending();
       recordingRowId = '';
-      recordingTarget = CAPTURE_TARGET_KEYS;
+      recordingTarget = '';
       const input = document.getElementById(activeCaptureInputId(rowId, target));
       if (input) {
         input.blur();
@@ -570,10 +699,6 @@
     recordingTarget = target;
     focusCaptureInput(rowId, target);
     void beginRemoteCapture(rowId, target);
-  }
-
-  function shortcutInputId(rowId) {
-    return `auto_keys_${kind}_${rowId}`;
   }
 
   function onRowToggle(rowId, event) {
@@ -614,7 +739,7 @@
         const staleTarget = recordingTarget;
         clearLocalCapturePending();
         recordingRowId = '';
-        recordingTarget = CAPTURE_TARGET_KEYS;
+        recordingTarget = '';
         void endRemoteCapture();
         const input = document.getElementById(activeCaptureInputId(staleId, staleTarget));
         if (input) {
@@ -697,13 +822,12 @@
               rowId={row.id}
               {row}
               rowEnabled={row.enabled}
-              rowKeys={row.keys}
               {kind}
               {texts}
               captureTargetKeys={CAPTURE_TARGET_KEYS}
               captureTargetModifiers={CAPTURE_TARGET_MODIFIERS}
               modifierInputId={modifierInputId(row.id)}
-              shortcutInputId={shortcutInputId(row.id)}
+              actionShortcutInputId={(index) => actionShortcutInputId(row.id, index)}
               modifierInputValue={modifierInputValueForRow(row)}
               modifierInputPlaceholder={modifierInputPlaceholderForRow(row)}
               gestureButtonValue={gestureButtonForRow(row)}
@@ -713,9 +837,21 @@
               {isCapturing}
               onModifierKeydown={(event) => onTriggerModifierKeydown(row, event)}
               onModifierInput={(event) => onTriggerModifierInput(row, event)}
-              onShortcutKeydown={(event) => onShortcutKeydown(row, event)}
-              onShortcutInput={(event) => onShortcutInput(row, event)}
-              onToggleRecord={(target) => toggleRecord(row.id, target)}
+              onActionShortcutKeydown={(index, event) => onActionShortcutKeydown(row, index, event)}
+              onActionShortcutInput={(index, event) => onActionShortcutInput(row, index, event)}
+              onToggleActionRecord={(index) => toggleRecord(row.id, actionShortcutCaptureTarget(index))}
+              onActionTypeChange={(index, type) => onActionTypeChange(row, index, type)}
+              onActionDelayInput={(index, event) => onActionDelayInput(row, index, event)}
+              onActionUrlInput={(index, event) => onActionUrlInput(row, index, event)}
+              onActionAppPathInput={(index, event) => onActionAppPathInput(row, index, event)}
+              onActionMoveUp={(index) => moveAction(row, index, -1)}
+              onActionMoveDown={(index) => moveAction(row, index, 1)}
+              onActionRemove={(index) => removeAction(row, index)}
+              onAddShortcutAction={() => addAction(row, { type: 'send_shortcut', shortcut: '' })}
+              onAddDelayAction={() => addAction(row, { type: 'delay', delay_ms: 120 })}
+              onAddOpenUrlAction={() => addAction(row, { type: 'open_url', url: '' })}
+              onAddLaunchAppAction={() => addAction(row, { type: 'launch_app', app_path: '' })}
+              onToggleModifierRecord={(target) => toggleRecord(row.id, target)}
               onTriggerButtonChange={(event) => emitRowChange(row.id, 'triggerButton', event.currentTarget.value)}
               onGestureTriggerChange={(event) => emitRowChange(row.id, 'triggerChain', event.detail?.trigger)}
               onGesturePatternChange={(event) => emitRowChange(row.id, 'gesturePattern', event.detail?.gesturePattern)}

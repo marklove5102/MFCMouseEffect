@@ -134,7 +134,7 @@ code_state_apply_scope_alias_dedupe="$(mfx_http_code "$tmp_dir/state-apply-scope
     -X POST \
     -H "x-mfcmouseeffect-token: $MFX_MANUAL_SETTINGS_TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{"automation":{"enabled":true,"mouse_mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe","process:code.app","process:code"],"keys":"Cmd+C"}]}}')"
+    -d '{"automation":{"enabled":true,"mouse_mappings":[{"enabled":true,"trigger":"left_click","app_scopes":["process:code.exe","process:code.app","process:code"],"actions":[{"type":"send_shortcut","shortcut":"Cmd+C"}]}]}}')"
 mfx_assert_eq "$code_state_apply_scope_alias_dedupe" "200" "app-scope alias dedupe apply status"
 
 code_state_after_scope_alias_dedupe="$(mfx_http_code "$tmp_dir/state-after-scope-alias-dedupe.out" "$MFX_MANUAL_BASE_URL/api/state" -H "x-mfcmouseeffect-token: $MFX_MANUAL_SETTINGS_TOKEN")"

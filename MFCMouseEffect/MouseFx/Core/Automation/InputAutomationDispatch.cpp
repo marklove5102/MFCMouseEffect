@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <thread>
 
 namespace mousefx::automation_dispatch {
 namespace {
@@ -34,6 +35,37 @@ void AppendActionHistory(
 
 } // namespace
 
+bool DispatchBindingActions(
+    const AutomationKeyBinding& binding,
+    IKeyboardInjector* keyboardInjector) {
+    if (!keyboardInjector) {
+        return false;
+    }
+
+    bool executed = false;
+    for (const AutomationAction& action : binding.actions) {
+        const std::string type = ToLowerAscii(TrimAscii(action.type));
+        if (type == "delay") {
+            if (action.delayMs == 0) {
+                return false;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(action.delayMs));
+            continue;
+        }
+
+        if (type != "send_shortcut") {
+            return false;
+        }
+        const std::string shortcut = TrimAscii(action.shortcut);
+        if (shortcut.empty() || !keyboardInjector->SendChord(shortcut)) {
+            return false;
+        }
+
+        executed = true;
+    }
+    return executed;
+}
+
 bool DispatchAction(
     const std::vector<AutomationKeyBinding>& mappings,
     std::vector<automation_match::ActionHistoryEntry>* history,
@@ -43,12 +75,12 @@ bool DispatchAction(
     const InputModifierState& modifiers,
     automation_match::NormalizeActionIdFn normalizeActionId,
     IForegroundProcessService* foregroundProcessService,
-    IKeyboardInjector* keyboardInjector,
+    const BindingActionDispatcher& dispatchBindingActions,
     DispatchTrace* outTrace) {
     if (outTrace) {
         *outTrace = DispatchTrace{};
     }
-    if (!keyboardInjector || rawActionId.empty() || !normalizeActionId) {
+    if (!dispatchBindingActions || rawActionId.empty() || !normalizeActionId) {
         return false;
     }
 
@@ -82,7 +114,7 @@ bool DispatchAction(
         outTrace->scopeSpecificity = match.scopeSpecificity;
     }
 
-    const bool injected = keyboardInjector->SendChord(TrimAscii(match.binding->keys));
+    const bool injected = dispatchBindingActions ? dispatchBindingActions(*match.binding) : false;
     if (outTrace) {
         outTrace->injected = injected;
     }

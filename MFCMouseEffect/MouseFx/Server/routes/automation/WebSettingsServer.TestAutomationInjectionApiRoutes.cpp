@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "WebSettingsServer.TestAutomationInjectionApiRoutes.h"
 
+#include <chrono>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "MouseFx/Core/Automation/AutomationActionIdNormalizer.h"
@@ -35,6 +37,50 @@ using websettings_test_routes::SetJsonResponse;
 using websettings_test_routes::SetPlainResponse;
 
 namespace {
+
+bool ExecuteBindingForTest(const AutomationKeyBinding& binding, AppController* controller) {
+    if (!controller) {
+        return false;
+    }
+
+    bool executed = false;
+    for (const AutomationAction& action : binding.actions) {
+        const std::string type = ToLowerAscii(TrimAscii(action.type));
+        if (type == "delay") {
+            if (action.delayMs == 0) {
+                return false;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(action.delayMs));
+            continue;
+        }
+        if (type == "send_shortcut") {
+            const std::string shortcut = TrimAscii(action.shortcut);
+            if (shortcut.empty() || !controller->InjectShortcutForTest(shortcut)) {
+                return false;
+            }
+            executed = true;
+            continue;
+        }
+        if (type == "open_url") {
+            const std::string url = TrimAscii(action.url);
+            if (url.empty() || !controller->OpenAutomationUrlForTest(url)) {
+                return false;
+            }
+            executed = true;
+            continue;
+        }
+        if (type == "launch_app") {
+            const std::string appPath = TrimAscii(action.appPath);
+            if (appPath.empty() || !controller->LaunchAutomationAppForTest(appPath)) {
+                return false;
+            }
+            executed = true;
+            continue;
+        }
+        return false;
+    }
+    return executed;
+}
 
 std::vector<ScreenPoint> ParseScreenPointStroke(const json& value) {
     std::vector<ScreenPoint> stroke;
@@ -141,13 +187,7 @@ bool HandleWebSettingsTestAutomationInjectionApiRoute(
             automation_match::ChainTimingLimit{},
             automation_ids::NormalizeMouseActionId);
 
-        bool injected = false;
-        if (match.binding != nullptr) {
-            const std::string keys = TrimAscii(match.binding->keys);
-            if (!keys.empty()) {
-                injected = controller->InjectShortcutForTest(keys);
-            }
-        }
+        const bool injected = match.binding != nullptr && ExecuteBindingForTest(*match.binding, controller);
 
         const json selected = BuildSelectedBindingJson(match);
         SetJsonResponse(resp, json({
@@ -162,7 +202,7 @@ bool HandleWebSettingsTestAutomationInjectionApiRoute(
             {"selected_binding_index", match.binding != nullptr ? static_cast<int64_t>(match.bindingIndex) : -1},
             {"selected_chain_length", static_cast<uint64_t>(match.chainLength)},
             {"selected_scope_specificity", match.scopeSpecificity},
-            {"selected_keys", match.binding != nullptr ? match.binding->keys : std::string{}},
+            {"selected_shortcut", match.binding != nullptr ? automation_match::FirstShortcutActionText(*match.binding) : std::string{}},
             {"selected", selected},
         }).dump());
         return true;

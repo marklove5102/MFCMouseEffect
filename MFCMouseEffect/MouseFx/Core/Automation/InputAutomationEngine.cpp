@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <string>
+#include <utility>
 
 namespace mousefx {
 namespace {
@@ -26,6 +27,7 @@ constexpr std::chrono::milliseconds kMouseChainMaxStepIntervalMs(900);
 constexpr std::chrono::milliseconds kMouseChainMaxTotalIntervalMs(1800);
 constexpr std::chrono::milliseconds kGestureChainMaxStepIntervalMs(2200);
 constexpr std::chrono::milliseconds kGestureChainMaxTotalIntervalMs(5000);
+constexpr size_t kMaxPendingActionChains = 32;
 constexpr std::chrono::milliseconds kButtonlessIdleResetMs(320);
 constexpr std::chrono::milliseconds kPressedGestureResultHoldMs(900);
 constexpr double kButtonlessArmMinMovePx = 16.0;
@@ -486,6 +488,22 @@ bool IsNoisyMotion(
 
 } // namespace
 
+InputAutomationEngine::InputAutomationEngine()
+    : actionWorker_([this] { ActionWorkerLoop(); }) {}
+
+InputAutomationEngine::~InputAutomationEngine() {
+    {
+        std::lock_guard<std::mutex> lock(actionQueueMutex_);
+        actionWorkerStop_ = true;
+        pendingActionChains_.clear();
+        ++actionQueueGeneration_;
+    }
+    actionQueueCv_.notify_all();
+    if (actionWorker_.joinable()) {
+        actionWorker_.join();
+    }
+}
+
 void InputAutomationEngine::UpdateConfig(const InputAutomationConfig& config) {
     auto maxChainLengthForMappings = [](const std::vector<AutomationKeyBinding>& mappings, bool gestureBinding) {
         size_t maxLength = 1;
@@ -532,6 +550,11 @@ void InputAutomationEngine::UpdateConfig(const InputAutomationConfig& config) {
     leftButtonDown_ = false;
     rightButtonDown_ = false;
     middleButtonDown_ = false;
+    {
+        std::lock_guard<std::mutex> lock(actionQueueMutex_);
+        ClearPendingActionsLocked();
+    }
+    actionQueueCv_.notify_all();
     UpdateButtonlessGestureConfig();
     SetDiagnosticsConfigSnapshot();
     UpdateGestureDiagnostics(
@@ -558,7 +581,128 @@ void InputAutomationEngine::Reset() {
     leftButtonDown_ = false;
     rightButtonDown_ = false;
     middleButtonDown_ = false;
+    {
+        std::lock_guard<std::mutex> lock(actionQueueMutex_);
+        ClearPendingActionsLocked();
+    }
+    actionQueueCv_.notify_all();
     UpdateGestureDiagnostics("runtime_reset", "state_cleared", {}, {}, {}, false, false, false, false, 0);
+}
+
+void InputAutomationEngine::ClearPendingActionsLocked() {
+    pendingActionChains_.clear();
+    ++actionQueueGeneration_;
+}
+
+bool InputAutomationEngine::QueueBindingActions(const AutomationKeyBinding& binding) {
+    if (!automation_match::HasExecutableActions(binding)) {
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(actionQueueMutex_);
+        if (actionWorkerStop_ || pendingActionChains_.size() >= kMaxPendingActionChains) {
+            return false;
+        }
+        pendingActionChains_.push_back(QueuedActionChain{
+            binding.actions,
+            actionQueueGeneration_,
+        });
+    }
+    actionQueueCv_.notify_one();
+    return true;
+}
+
+bool InputAutomationEngine::IsActionGenerationCurrent(uint64_t generation) const {
+    std::lock_guard<std::mutex> lock(actionQueueMutex_);
+    return !actionWorkerStop_ && generation == actionQueueGeneration_;
+}
+
+bool InputAutomationEngine::WaitForActionDelay(uint32_t delayMs, uint64_t generation) {
+    std::unique_lock<std::mutex> lock(actionQueueMutex_);
+    return !actionQueueCv_.wait_for(
+        lock,
+        std::chrono::milliseconds(delayMs),
+        [this, generation] {
+            return actionWorkerStop_ || generation != actionQueueGeneration_;
+        });
+}
+
+bool InputAutomationEngine::ExecuteQueuedActions(const std::vector<AutomationAction>& actions, uint64_t generation) {
+    bool executed = false;
+    for (const AutomationAction& action : actions) {
+        if (!IsActionGenerationCurrent(generation)) {
+            return false;
+        }
+
+        const std::string type = ToLowerAscii(TrimAscii(action.type));
+        if (type == "delay") {
+            if (action.delayMs == 0 || !WaitForActionDelay(action.delayMs, generation)) {
+                return false;
+            }
+            continue;
+        }
+
+        if (type != "send_shortcut") {
+            if (type == "open_url") {
+                std::function<bool(const std::string&)> openUrlHandler;
+                {
+                    std::lock_guard<std::mutex> lock(actionQueueMutex_);
+                    openUrlHandler = openUrlHandler_;
+                }
+                const std::string url = TrimAscii(action.url);
+                if (!openUrlHandler || url.empty() || !openUrlHandler(url)) {
+                    return false;
+                }
+                executed = true;
+                continue;
+            }
+            if (type == "launch_app") {
+                std::function<bool(const std::string&)> launchAppHandler;
+                {
+                    std::lock_guard<std::mutex> lock(actionQueueMutex_);
+                    launchAppHandler = launchAppHandler_;
+                }
+                const std::string appPath = TrimAscii(action.appPath);
+                if (!launchAppHandler || appPath.empty() || !launchAppHandler(appPath)) {
+                    return false;
+                }
+                executed = true;
+                continue;
+            }
+            return false;
+        }
+
+        IKeyboardInjector* injector = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(actionQueueMutex_);
+            injector = keyboardInjector_;
+        }
+        const std::string shortcut = TrimAscii(action.shortcut);
+        if (!injector || shortcut.empty() || !injector->SendChord(shortcut)) {
+            return false;
+        }
+        executed = true;
+    }
+    return executed;
+}
+
+void InputAutomationEngine::ActionWorkerLoop() {
+    for (;;) {
+        QueuedActionChain item{};
+        {
+            std::unique_lock<std::mutex> lock(actionQueueMutex_);
+            actionQueueCv_.wait(lock, [this] {
+                return actionWorkerStop_ || !pendingActionChains_.empty();
+            });
+            if (actionWorkerStop_ && pendingActionChains_.empty()) {
+                return;
+            }
+            item = std::move(pendingActionChains_.front());
+            pendingActionChains_.pop_front();
+        }
+        (void)ExecuteQueuedActions(item.actions, item.generation);
+    }
 }
 
 void InputAutomationEngine::OnMouseMove(const ScreenPoint& pt) {
@@ -640,7 +784,18 @@ void InputAutomationEngine::SetForegroundProcessService(IForegroundProcessServic
 }
 
 void InputAutomationEngine::SetKeyboardInjector(IKeyboardInjector* injector) {
+    std::lock_guard<std::mutex> lock(actionQueueMutex_);
     keyboardInjector_ = injector;
+}
+
+void InputAutomationEngine::SetOpenUrlHandler(std::function<bool(const std::string&)> handler) {
+    std::lock_guard<std::mutex> lock(actionQueueMutex_);
+    openUrlHandler_ = std::move(handler);
+}
+
+void InputAutomationEngine::SetLaunchAppHandler(std::function<bool(const std::string&)> handler) {
+    std::lock_guard<std::mutex> lock(actionQueueMutex_);
+    launchAppHandler_ = std::move(handler);
 }
 
 void InputAutomationEngine::SetDiagnosticsEnabled(bool enabled) {
@@ -1102,7 +1257,7 @@ bool InputAutomationEngine::TriggerMouseAction(const std::string& actionId) {
         InputModifierState{},
         automation_ids::NormalizeMouseActionId,
         foregroundProcessService_,
-        keyboardInjector_,
+        [this](const AutomationKeyBinding& binding) { return QueueBindingActions(binding); },
         &trace);
     (void)trace;
     return injected;
@@ -1403,7 +1558,7 @@ bool InputAutomationEngine::TriggerGesture(
         currentModifiers_,
         automation_ids::NormalizeGestureId,
         foregroundProcessService_,
-        keyboardInjector_,
+        [this](const AutomationKeyBinding& binding) { return QueueBindingActions(binding); },
         &trace);
     std::string reason = "preset_binding_not_matched";
     if (usedPresetSimilarity) {
@@ -1747,11 +1902,10 @@ bool InputAutomationEngine::TriggerCustomGesture(
         }
     }
 
-    const std::string keys = TrimAscii(best.binding->keys);
-    if (keys.empty()) {
+    if (!automation_match::HasExecutableActions(*best.binding)) {
         UpdateGestureDiagnostics(
             "custom_trigger",
-            "custom_mapping_missing_keys",
+            "custom_mapping_missing_actions",
             recognizedGestureId,
             diagnosticsMatchedGestureId,
             triggerButton,
@@ -1766,10 +1920,10 @@ bool InputAutomationEngine::TriggerCustomGesture(
             selectedPreviewForDiagnostics);
         return false;
     }
-    if (!keyboardInjector_->SendChord(keys)) {
+    if (!QueueBindingActions(*best.binding)) {
         UpdateGestureDiagnostics(
             "custom_trigger",
-            "custom_mapping_inject_failed",
+            "custom_mapping_action_failed",
             recognizedGestureId,
             diagnosticsMatchedGestureId,
             triggerButton,

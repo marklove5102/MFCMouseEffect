@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <cstdint>
 
 namespace mousefx::config_internal {
 
@@ -67,6 +68,8 @@ EffectSizeScaleConfig SanitizeEffectSizeScaleConfig(EffectSizeScaleConfig scales
 }
 
 namespace {
+
+constexpr uint32_t kAutomationActionMaxDelayMs = 60000;
 
 std::string NormalizeEffectConflictMode(std::string value, const char* onlyValue, const char* otherValue, const char* fallback) {
     value = ToLowerAscii(TrimAscii(value));
@@ -413,7 +416,54 @@ InputAutomationConfig SanitizeInputAutomationConfig(InputAutomationConfig config
                 binding.modifiers.shift = false;
                 binding.modifiers.alt = false;
             }
-            binding.keys = TrimAscii(binding.keys);
+            std::vector<AutomationAction> normalizedActions;
+            normalizedActions.reserve(binding.actions.size());
+            for (AutomationAction& action : binding.actions) {
+                action.type = NormalizeId(std::move(action.type));
+                if (action.type.empty()) {
+                    action.type = "send_shortcut";
+                }
+                if (action.type == "send_shortcut") {
+                    action.shortcut = TrimAscii(action.shortcut);
+                    action.url.clear();
+                    action.appPath.clear();
+                    action.delayMs = 0;
+                    if (action.shortcut.empty()) {
+                        continue;
+                    }
+                } else if (action.type == "delay") {
+                    action.shortcut.clear();
+                    action.url.clear();
+                    action.appPath.clear();
+                    action.delayMs = std::min<uint32_t>(action.delayMs, kAutomationActionMaxDelayMs);
+                    if (action.delayMs == 0) {
+                        continue;
+                    }
+                } else if (action.type == "open_url") {
+                    action.shortcut.clear();
+                    action.appPath.clear();
+                    action.delayMs = 0;
+                    action.url = TrimAscii(action.url);
+                    if (action.url.empty()) {
+                        continue;
+                    }
+                } else if (action.type == "launch_app") {
+                    action.shortcut.clear();
+                    action.url.clear();
+                    action.delayMs = 0;
+                    action.appPath = TrimAscii(action.appPath);
+                    if (action.appPath.empty()) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+                normalizedActions.push_back(std::move(action));
+                if (normalizedActions.size() >= 16) {
+                    break;
+                }
+            }
+            binding.actions = std::move(normalizedActions);
         }
     };
 

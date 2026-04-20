@@ -113,7 +113,7 @@ bool HandleWebSettingsTestAutomationScopeApiRoute(
             {"selected_binding_index", match.binding != nullptr ? static_cast<int64_t>(match.bindingIndex) : -1},
             {"selected_chain_length", static_cast<uint64_t>(match.chainLength)},
             {"selected_scope_specificity", match.scopeSpecificity},
-            {"selected_keys", match.binding != nullptr ? match.binding->keys : std::string{}},
+            {"selected_shortcut", match.binding != nullptr ? automation_match::FirstShortcutActionText(*match.binding) : std::string{}},
             {"selected", selected},
         }).dump());
         return true;

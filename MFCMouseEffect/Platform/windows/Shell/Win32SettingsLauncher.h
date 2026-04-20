@@ -7,6 +7,7 @@ namespace mousefx {
 class Win32SettingsLauncher final : public ISettingsLauncher {
 public:
     bool OpenUrlUtf8(const std::string& url) override;
+    bool OpenApplicationPathUtf8(const std::string& appPath) override;
 };
 
 } // namespace mousefx

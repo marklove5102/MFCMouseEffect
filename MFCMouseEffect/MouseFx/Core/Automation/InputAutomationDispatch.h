@@ -6,6 +6,7 @@
 #include "MouseFx/Core/System/IKeyboardInjector.h"
 
 #include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -21,6 +22,12 @@ struct DispatchTrace final {
     std::string normalizedActionId{};
 };
 
+bool DispatchBindingActions(
+    const AutomationKeyBinding& binding,
+    IKeyboardInjector* keyboardInjector);
+
+using BindingActionDispatcher = std::function<bool(const AutomationKeyBinding&)>;
+
 bool DispatchAction(
     const std::vector<AutomationKeyBinding>& mappings,
     std::vector<automation_match::ActionHistoryEntry>* history,
@@ -30,7 +37,7 @@ bool DispatchAction(
     const InputModifierState& modifiers,
     automation_match::NormalizeActionIdFn normalizeActionId,
     IForegroundProcessService* foregroundProcessService,
-    IKeyboardInjector* keyboardInjector,
+    const BindingActionDispatcher& dispatchBindingActions,
     DispatchTrace* outTrace = nullptr);
 
 } // namespace mousefx::automation_dispatch

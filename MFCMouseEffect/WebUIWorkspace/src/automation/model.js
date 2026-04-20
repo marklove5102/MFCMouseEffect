@@ -18,6 +18,12 @@ const APP_SCOPE_SELECTED = 'selected';
 const APP_SCOPE_PROCESS = 'process';
 const PROCESS_SCOPE_PREFIX = 'process:';
 const MAX_CUSTOM_GESTURE_STROKES = 4;
+const ACTION_SEND_SHORTCUT = 'send_shortcut';
+const ACTION_DELAY = 'delay';
+const ACTION_OPEN_URL = 'open_url';
+const ACTION_LAUNCH_APP = 'launch_app';
+const MAX_ACTIONS_PER_BINDING = 16;
+const MAX_ACTION_DELAY_MS = 60000;
 
 function asObject(value) {
   return value && typeof value === 'object' ? value : {};
@@ -34,6 +40,115 @@ function asText(value) {
 function asNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeDelayMs(value) {
+  const parsed = Math.trunc(asNumber(value, 0));
+  if (parsed <= 0) {
+    return 0;
+  }
+  return Math.min(parsed, MAX_ACTION_DELAY_MS);
+}
+
+function normalizeUrl(value) {
+  return asText(value);
+}
+
+function normalizeActionType(value) {
+  const type = asText(value).toLowerCase() || ACTION_SEND_SHORTCUT;
+  if (type === ACTION_SEND_SHORTCUT || type === ACTION_DELAY || type === ACTION_OPEN_URL || type === ACTION_LAUNCH_APP) {
+    return type;
+  }
+  return '';
+}
+
+export function normalizeEditorActions(value) {
+  const out = [];
+  for (const item of asArray(value)) {
+    const source = asObject(item);
+    const type = normalizeActionType(source.type);
+    if (!type) {
+      continue;
+    }
+    if (type === ACTION_SEND_SHORTCUT) {
+      out.push({ type: ACTION_SEND_SHORTCUT, shortcut: asText(source.shortcut) });
+    } else if (type === ACTION_DELAY) {
+      const delayMs = normalizeDelayMs(source.delay_ms !== undefined ? source.delay_ms : source.delayMs);
+      out.push({ type: ACTION_DELAY, delay_ms: delayMs > 0 ? delayMs : '' });
+    } else if (type === ACTION_OPEN_URL) {
+      out.push({ type: ACTION_OPEN_URL, url: normalizeUrl(source.url) });
+    } else if (type === ACTION_LAUNCH_APP) {
+      out.push({
+        type: ACTION_LAUNCH_APP,
+        app_path: asText(source.app_path !== undefined ? source.app_path : source.appPath),
+      });
+    }
+    if (out.length >= MAX_ACTIONS_PER_BINDING) {
+      break;
+    }
+  }
+  return out;
+}
+
+export function normalizeActions(value) {
+  const out = [];
+  for (const action of normalizeEditorActions(value)) {
+    if (action.type === ACTION_SEND_SHORTCUT) {
+      if (!action.shortcut) {
+        continue;
+      }
+      out.push(action);
+    } else if (action.type === ACTION_DELAY) {
+      if (!action.delay_ms || action.delay_ms <= 0) {
+        continue;
+      }
+      out.push(action);
+    } else if (action.type === ACTION_OPEN_URL) {
+      if (!action.url) {
+        continue;
+      }
+      out.push(action);
+    } else if (action.type === ACTION_LAUNCH_APP) {
+      if (!action.app_path) {
+        continue;
+      }
+      out.push(action);
+    }
+  }
+  return out;
+}
+
+export function firstShortcutActionText(value) {
+  for (const action of normalizeActions(value)) {
+    if (action.type === ACTION_SEND_SHORTCUT && action.shortcut) {
+      return action.shortcut;
+    }
+  }
+  return '';
+}
+
+export function firstExecutableActionText(value) {
+  for (const action of normalizeActions(value)) {
+    if (action.type === ACTION_SEND_SHORTCUT && action.shortcut) {
+      return action.shortcut;
+    }
+    if (action.type === ACTION_OPEN_URL && action.url) {
+      return action.url;
+    }
+    if (action.type === ACTION_LAUNCH_APP && action.app_path) {
+      return action.app_path;
+    }
+  }
+  return '';
+}
+
+export function hasExecutableActions(value) {
+  return !!firstExecutableActionText(value);
+}
+
+export function actionsFromShortcut(value) {
+  const shortcut = asText(value);
+  return shortcut ? [{ type: ACTION_SEND_SHORTCUT, shortcut }] : [];
 }
 
 function normalizeScopeMode(value) {
@@ -402,7 +517,7 @@ function normalizeBinding(item, options, fallbackTrigger, platform = PLATFORM_WI
       gestureTriggerButtonFallback),
     gesturePattern,
     modifiers: normalizeModifierFlags(source.modifiers),
-    keys: asText(source.keys),
+    actions: normalizeEditorActions(source.actions),
   };
 }
 
@@ -481,7 +596,7 @@ export function readMappings(rows, options, fallbackTrigger, platform = PLATFORM
       trigger_button: normalizeGestureTriggerButton(source.triggerButton),
       gesture_pattern: normalizeGesturePattern(source.gesturePattern),
       modifiers: normalizeModifierFlags(source.modifiers),
-      keys: asText(source.keys),
+      actions: normalizeEditorActions(source.actions),
     });
   }
   return out;
@@ -520,10 +635,11 @@ export function evaluateRows(rows, options, fallbackTrigger, messages, platform 
       triggerButton: normalizeGestureTriggerButton(source.triggerButton),
       gesturePattern: normalizeGesturePattern(source.gesturePattern),
       modifiers: normalizeModifierFlags(source.modifiers),
-      keys: asText(source.keys),
+      actions: normalizeEditorActions(source.actions),
       note: '',
       hasConflict: false,
     };
+    const hasExecutableAction = hasExecutableActions(next.actions);
     nextRows.push(next);
 
     if (!next.enabled) {
@@ -535,7 +651,7 @@ export function evaluateRows(rows, options, fallbackTrigger, messages, platform 
       next.note = invalidScopeMessage;
       continue;
     }
-    if (!next.keys) {
+    if (!hasExecutableAction) {
       hasMissingShortcut = true;
       next.hasConflict = true;
       next.note = missingShortcutMessage;
@@ -624,8 +740,8 @@ export function upsertRowsByTrigger(rows, templateBindings, options, fallbackTri
     const modifierKey = canonicalModifierKey(binding.modifiers);
     const gesturePatternKey = canonicalGesturePatternKey(binding.gesturePattern, trigger);
     const triggerButtonKey = normalizeGestureTriggerButton(binding.triggerButton);
-    const keys = asText(binding.keys);
-    if (!trigger || !keys) {
+    const actions = normalizeEditorActions(binding.actions);
+    if (!trigger || !hasExecutableActions(actions)) {
       continue;
     }
 
@@ -655,7 +771,7 @@ export function upsertRowsByTrigger(rows, templateBindings, options, fallbackTri
         triggerButton: triggerButtonKey,
         gesturePattern: normalizeGesturePattern(binding.gesturePattern),
         modifiers: normalizeModifierFlags(binding.modifiers),
-        keys,
+        actions,
       };
       continue;
     }

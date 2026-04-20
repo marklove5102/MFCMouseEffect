@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-19T15:13:05.029Z",
+  "generated_at": "2026-04-20T13:28:45.581Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -85,14 +85,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 227,
-      "size_bytes": 26392,
-      "estimated_tokens": 6598,
+      "line_count": 218,
+      "size_bytes": 26346,
+      "estimated_tokens": 6587,
       "max_read_tokens": 1100,
       "line_limit": 220,
-      "line_limit_exceeded": true,
-      "hash_sha1": "b0dc42529d2cb8b78c542d5e725b7b88dc002994",
-      "updated_at": "2026-04-19T15:06:14.036Z"
+      "line_limit_exceeded": false,
+      "hash_sha1": "b0c0562f04a440686aa4a7dc272b0c992dbac5fa",
+      "updated_at": "2026-04-20T11:45:23.839Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -123,14 +123,14 @@
       ],
       "summary": "This file is a P2 routing map.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 86,
-      "size_bytes": 5123,
-      "estimated_tokens": 1281,
+      "line_count": 88,
+      "size_bytes": 5276,
+      "estimated_tokens": 1319,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "34e09c0ddcb933332f6acaadc641dd4fa5aab27c",
-      "updated_at": "2026-03-25T15:13:05.736Z"
+      "hash_sha1": "1dc51bebfbd8c6c12591569a6c9ba4b8ea03bc22",
+      "updated_at": "2026-04-20T10:15:35.008Z"
     },
     {
       "id": "docs/architecture/agent-doc-governance.md",
@@ -1066,14 +1066,48 @@
       ],
       "summary": "Detailed behavior notes for automation mapping, gesture recognition, and calibration.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 58,
-      "size_bytes": 4814,
-      "estimated_tokens": 1204,
+      "line_count": 65,
+      "size_bytes": 5740,
+      "estimated_tokens": 1435,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "284611868123b648f0b2de832f265cc5eebff075",
-      "updated_at": "2026-03-14T11:53:30.050Z"
+      "hash_sha1": "8d0b42d4c7cc915f0ce9c84cdbcccab2941b95d2",
+      "updated_at": "2026-04-20T11:45:18.202Z"
+    },
+    {
+      "id": "docs/automation/automation-mapping-todo.zh-CN.md",
+      "relative_path": "docs/automation/automation-mapping-todo.zh-CN.md",
+      "absolute_path": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect/docs/automation/automation-mapping-todo.zh-CN.md",
+      "priority": "P2",
+      "role": "automation",
+      "topic": "automation",
+      "first_read_rank": 0,
+      "tags": [
+        "automation",
+        "mapping",
+        "todo",
+        "zh",
+        "cn",
+        "gesture",
+        "regression",
+        "workflow",
+        "macos",
+        "windows",
+        "contract",
+        "abi",
+        "debug"
+      ],
+      "summary": "把当前“鼠标动作 / 手势 -> 快捷键注入”的自动化映射，逐步升级为可被普通用户理解、可被高级用户扩展、可和 BetterTouchTool / X-Mouse Button Control / SteerMouse 做正面对比的桌面输入自动化能力。",
+      "when_to_read": "Read when task touches automation mapping or gesture recognition.",
+      "line_count": 212,
+      "size_bytes": 9873,
+      "estimated_tokens": 2469,
+      "max_read_tokens": 750,
+      "line_limit": 0,
+      "line_limit_exceeded": false,
+      "hash_sha1": "e4857fc54e01152c8aba5fd227fdf08bb0fb9382",
+      "updated_at": "2026-04-20T11:45:09.052Z"
     },
     {
       "id": "docs/automation/gesture-calibration-baseline.md",
@@ -1186,13 +1220,13 @@
       "summary": "很多录屏、教程、演示和桌面工具，功能本身已经足够好，但一到“用户看你怎么操作”这一步，体验就会突然掉下来。",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
       "line_count": 190,
-      "size_bytes": 8251,
-      "estimated_tokens": 2063,
+      "size_bytes": 8294,
+      "estimated_tokens": 2074,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "6797d9f2a0b9ad95c5a54940c8ceafbe74567a95",
-      "updated_at": "2026-04-19T15:06:14.035Z"
+      "hash_sha1": "436c2438930ceff978a782d544882a1c99815f01",
+      "updated_at": "2026-04-20T10:22:33.341Z"
     },
     {
       "id": "docs/marketing/README.md",
@@ -1444,14 +1478,14 @@
       ],
       "summary": "Language: [English](README.md) | [中文](README.zh-CN.md)",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 131,
-      "size_bytes": 5239,
-      "estimated_tokens": 1310,
+      "line_count": 134,
+      "size_bytes": 5369,
+      "estimated_tokens": 1343,
       "max_read_tokens": 750,
       "line_limit": 140,
       "line_limit_exceeded": false,
-      "hash_sha1": "26258bc15188a858380ae4da2f9c952bb1b282bd",
-      "updated_at": "2026-04-03T09:22:45.178Z"
+      "hash_sha1": "83cd08ea8db45f4b03bb82d67b2c26ee90f62fda",
+      "updated_at": "2026-04-20T10:15:35.010Z"
     },
     {
       "id": "docs/README.zh-CN.md",
@@ -1481,14 +1515,14 @@
       ],
       "summary": "语言： [English](README.md) | [中文](README.zh-CN.md)",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 132,
-      "size_bytes": 5388,
-      "estimated_tokens": 1347,
+      "line_count": 135,
+      "size_bytes": 5514,
+      "estimated_tokens": 1379,
       "max_read_tokens": 750,
       "line_limit": 140,
       "line_limit_exceeded": false,
-      "hash_sha1": "36708a7c97f303a73fa9632602953f2987f2141e",
-      "updated_at": "2026-04-03T09:22:45.179Z"
+      "hash_sha1": "e8bc01845049cb0d8e7892b5ac37c36f6a6f5590",
+      "updated_at": "2026-04-20T10:15:35.009Z"
     },
     {
       "id": "docs/refactoring/phase-roadmap-macos-m1-status.md",

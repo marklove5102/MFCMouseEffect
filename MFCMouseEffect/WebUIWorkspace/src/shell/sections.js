@@ -41,7 +41,7 @@ export const CARD_SECTIONS = [
     titleKey: 'section_automation',
     titleDefault: 'Automation Mapping',
     descKey: 'desc_automation',
-    descDefault: 'Map mouse actions and gestures to keyboard shortcuts.',
+    descDefault: 'Map mouse actions, wheel input, and gestures to shortcut, delay, URL, and app-launch actions.',
     mountId: 'automation_editor_mount',
     wrapperClass: 'grid',
     mountClass: 'span2',

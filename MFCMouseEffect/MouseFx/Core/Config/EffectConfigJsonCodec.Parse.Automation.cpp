@@ -104,7 +104,37 @@ void ParseBindingsArray(
                 keys::automation::kModifierAlt,
                 binding.modifiers.alt);
         }
-        binding.keys = GetOr<std::string>(item, keys::automation::kKeys, binding.keys);
+        binding.actions.clear();
+        if (item.contains(keys::automation::kActions) &&
+            item[keys::automation::kActions].is_array()) {
+            for (const auto& actionJson : item[keys::automation::kActions]) {
+                if (!actionJson.is_object()) {
+                    continue;
+                }
+                AutomationAction action;
+                action.type = GetOr<std::string>(
+                    actionJson,
+                    keys::automation::kActionType,
+                    action.type);
+                action.shortcut = GetOr<std::string>(
+                    actionJson,
+                    keys::automation::kActionShortcut,
+                    action.shortcut);
+                action.delayMs = GetOr<uint32_t>(
+                    actionJson,
+                    keys::automation::kActionDelayMs,
+                    action.delayMs);
+                action.url = GetOr<std::string>(
+                    actionJson,
+                    keys::automation::kActionUrl,
+                    action.url);
+                action.appPath = GetOr<std::string>(
+                    actionJson,
+                    keys::automation::kActionAppPath,
+                    action.appPath);
+                binding.actions.push_back(std::move(action));
+            }
+        }
         outBindings->push_back(binding);
     }
 }
