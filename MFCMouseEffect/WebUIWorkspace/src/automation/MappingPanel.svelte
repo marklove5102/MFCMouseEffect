@@ -799,41 +799,41 @@
           on:change={(event) => emitRowChange(row.id, 'enabled', event.currentTarget.checked)}
         />
         <details class="automation-collapse" on:toggle={(event) => onRowToggle(row.id, event)}>
-          <div class="automation-row-headbar">
-            <summary
-              class="automation-row-head"
-              title={texts.expand || 'Expand'}
-              aria-label={texts.expand || 'Expand'}
-            >
-              <span class="automation-row-head-icon" aria-hidden="true"></span>
-              <span class="automation-row-head-main">{gestureSummaryForRow(row)}</span>
-              <span class="automation-row-head-badges">
-                <span class="automation-row-head-meta">{scopeSummaryForRow(row)}</span>
-                {#if kind === 'gesture'}
-                  <span class="automation-row-head-meta">{modifierShortcutTextForRow(row)}</span>
-                {/if}
-                <span class="automation-row-head-meta">{shortcutSummaryForRow(row)}</span>
-              </span>
-            </summary>
-            <button
-              class="automation-row-remove"
-              type="button"
-              on:click|stopPropagation={() => emitRemove(row.id)}
-              title={texts.remove}
-              aria-label={texts.remove}
-            >
-              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                <path
-                  d="M6 2.5h4m-6 2h8m-7 0v7m3-7v7m3-7v7M5.5 2.5l.4-1h4.2l.4 1m-6.1 0h7.2l-.5 9.2a1 1 0 0 1-1 .8H5.9a1 1 0 0 1-1-.8L4.4 2.5Z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.3"
-                />
-              </svg>
-            </button>
-          </div>
+          <summary
+            class="automation-row-head"
+            title={texts.expand || 'Expand'}
+            aria-label={texts.expand || 'Expand'}
+          >
+            <span class="automation-row-head-icon" aria-hidden="true"></span>
+            <span class="automation-row-head-main">{gestureSummaryForRow(row)}</span>
+            <span class="automation-row-head-badges">
+              <span class="automation-row-head-meta">{scopeSummaryForRow(row)}</span>
+              {#if kind === 'gesture'}
+                <span class="automation-row-head-meta">{modifierShortcutTextForRow(row)}</span>
+              {/if}
+              <span class="automation-row-head-meta">{shortcutSummaryForRow(row)}</span>
+            </span>
+            <span class="automation-row-head-tools">
+              <button
+                class="automation-row-remove"
+                type="button"
+                on:click|preventDefault|stopPropagation={() => emitRemove(row.id)}
+                title={texts.remove}
+                aria-label={texts.remove}
+              >
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path
+                    d="M6 2.5h4m-6 2h8m-7 0v7m3-7v7m3-7v7M5.5 2.5l.4-1h4.2l.4 1m-6.1 0h7.2l-.5 9.2a1 1 0 0 1-1 .8H5.9a1 1 0 0 1-1-.8L4.4 2.5Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.3"
+                  />
+                </svg>
+              </button>
+            </span>
+          </summary>
           <div
             class="automation-row-body"
             class:automation-row-body--mouse={kind === 'mouse'}

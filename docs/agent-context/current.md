@@ -161,7 +161,7 @@
 
 ### Automation Mapping
 - App-scope normalization/parser contracts are stable.
-- Mapping output config now uses `actions[]`; current executable actions are `send_shortcut`, `delay`, `open_url`, and `launch_app`, WebUI exposes a first-round action list editor for those four action types, and the current visual refresh is rolling out mouse-first with softer card rows, de-bordered section panels, keycap-like shortcut inputs, hover-revealed action tool icons, stronger recording-state emphasis, and a header-integrated ghost delete action while `gesture mapping` intentionally stays on the previous presentation until the mouse-side direction is validated.
+- Mapping output config now uses `actions[]`; current executable actions are `send_shortcut`, `delay`, `open_url`, and `launch_app`, WebUI exposes a first-round action list editor for those four action types, and the current visual refresh now aligns both mouse and gesture mapping on the same card-based language with de-bordered section panels, keycap-like shortcut inputs, hover-revealed action tool icons, stronger recording-state emphasis, and header-integrated ghost delete actions while keeping mouse `blue` and gesture `teal` as separate recognition accents.
 - Preset/custom gesture mapping with thresholding and ambiguity rejection is active.
 - Trigger button supports `none`.
 - `Draw -> Save` custom gesture flow is active.
