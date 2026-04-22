@@ -11,6 +11,10 @@ Keep P1 concise; add details here when needed.
 ## WebSettings Manual
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60`
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-core-websettings-manual.sh --auto-stop-seconds 60 --no-open`
+- `./mfx start --debug`:
+  - keeps automation gesture debug visible only for debug startup
+  - the panel now starts collapsed and shows a compact `title + stage + reason` summary row
+  - click the summary row to expand a `left canvas + right diagnostics panel` view, with recent events / recent action runs kept inside collapsible sections
 
 ## Automation Manual
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build`
