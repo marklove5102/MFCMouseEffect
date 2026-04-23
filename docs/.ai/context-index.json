@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-23T14:00:41.255Z",
+  "generated_at": "2026-04-23T14:13:23.785Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -1378,14 +1378,14 @@
       ],
       "summary": "Common manual commands for local iteration and debugging.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 296,
-      "size_bytes": 30543,
-      "estimated_tokens": 7636,
+      "line_count": 297,
+      "size_bytes": 30728,
+      "estimated_tokens": 7682,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "cd9448480975b7f993ff78f7a44fca56d3eab51f",
-      "updated_at": "2026-04-23T13:55:17.128Z"
+      "hash_sha1": "6c251120b3225cef1e06b6bd2f3c815d13bcdf89",
+      "updated_at": "2026-04-23T14:12:45.060Z"
     },
     {
       "id": "docs/ops/windows-installer-packaging.md",

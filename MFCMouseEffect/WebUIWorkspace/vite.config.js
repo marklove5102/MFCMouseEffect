@@ -157,6 +157,15 @@ function resolveDevRuntime() {
 }
 
 function createDevRuntimePlugin() {
+  async function readRequestBody(req) {
+    const chunks = [];
+    for await (const chunk of req) {
+      if (chunk == null) continue;
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    return chunks.length > 0 ? Buffer.concat(chunks) : undefined;
+  }
+
   return {
     name: 'mfx-dev-runtime',
     configureServer(server) {
@@ -211,11 +220,15 @@ function createDevRuntimePlugin() {
             headers.set(key, value);
           }
 
+          const method = trimText(req.method || 'GET').toUpperCase() || 'GET';
+          const requestBody = method === 'GET' || method === 'HEAD'
+            ? undefined
+            : await readRequestBody(req);
+
           const response = await fetch(target, {
-            method: req.method || 'GET',
+            method,
             headers,
-            body: req.method === 'GET' || req.method === 'HEAD' ? undefined : req,
-            duplex: req.method === 'GET' || req.method === 'HEAD' ? undefined : 'half',
+            body: requestBody,
           });
 
           res.statusCode = response.status;
@@ -225,8 +238,8 @@ function createDevRuntimePlugin() {
             }
             res.setHeader(key, value);
           }
-          const body = Buffer.from(await response.arrayBuffer());
-          res.end(body);
+          const responseBody = Buffer.from(await response.arrayBuffer());
+          res.end(responseBody);
         } catch (error) {
           res.statusCode = 502;
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
