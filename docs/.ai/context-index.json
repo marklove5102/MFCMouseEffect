@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-04-23T12:43:50.573Z",
+  "generated_at": "2026-04-23T13:47:02.759Z",
   "repo_root": "/Users/sunqin/study/language/cpp/code/MFCMouseEffect",
   "budgets": {
     "priority": {
@@ -85,14 +85,14 @@
       ],
       "summary": "current",
       "when_to_read": "Read after P0 for current decisions and active constraints.",
-      "line_count": 220,
-      "size_bytes": 29907,
-      "estimated_tokens": 7477,
+      "line_count": 221,
+      "size_bytes": 30304,
+      "estimated_tokens": 7576,
       "max_read_tokens": 1100,
       "line_limit": 220,
-      "line_limit_exceeded": false,
-      "hash_sha1": "4fdef2fa79e9acfd09f4298de0f31b95591e8ddb",
-      "updated_at": "2026-04-23T12:20:35.978Z"
+      "line_limit_exceeded": true,
+      "hash_sha1": "ea39a3b817782ab156d93167ead63ba3ec378180",
+      "updated_at": "2026-04-23T13:32:15.323Z"
     },
     {
       "id": "docs/agent-context/p2-capability-index.md",
@@ -1378,14 +1378,14 @@
       ],
       "summary": "Common manual commands for local iteration and debugging.",
       "when_to_read": "Read when task touches automation mapping or gesture recognition.",
-      "line_count": 295,
-      "size_bytes": 30364,
-      "estimated_tokens": 7591,
+      "line_count": 296,
+      "size_bytes": 30599,
+      "estimated_tokens": 7650,
       "max_read_tokens": 750,
       "line_limit": 0,
       "line_limit_exceeded": false,
-      "hash_sha1": "6b44501d52f32906dd5fca2d591d86adeaa1b0c3",
-      "updated_at": "2026-04-23T11:58:36.274Z"
+      "hash_sha1": "d4efadb792f1585e03f7371d0e979967f4f85f13",
+      "updated_at": "2026-04-23T13:32:15.323Z"
     },
     {
       "id": "docs/ops/windows-installer-packaging.md",

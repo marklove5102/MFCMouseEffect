@@ -18,6 +18,7 @@ Keep P1 concise; add details here when needed.
   - `./mfx fast --debug --web`
   - host build policy stays attached to `start` vs `fast`
   - `--web` switches browser startup to the Vite dev UI and automatically carries the current token into the opened URL
+  - `./mfx start --debug` opens the rebuilt static WebUI, and it should now visually match `./mfx start --debug --web` for checked-in Svelte component styles because the static build copies and loads the generated `*.svelte.css` files
   - the helper reuses an existing dev server when possible; otherwise it starts `pnpm run dev` inside `MFCMouseEffect/WebUIWorkspace`
   - Vite still reads `base_url/token` from `/tmp/mfx-core-websettings.probe` by default, and `MFX_WEBUI_DEV_PROBE_FILE`, `MFX_WEBUI_DEV_BASE_URL`, and `MFX_WEBUI_DEV_TOKEN` remain available as lower-level overrides
   - raw fallback when debugging the dev server itself:

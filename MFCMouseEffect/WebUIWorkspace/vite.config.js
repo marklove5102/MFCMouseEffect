@@ -67,10 +67,12 @@ const TARGETS = {
 
 function pickBuildTarget(mode) {
   const target = TARGETS[mode] || TARGETS.workspace;
+  const fileName = target.fileName;
   return {
     entry: path.resolve(__dirname, ENTRY_ROOT, target.entry),
     name: target.name,
-    fileName: target.fileName,
+    fileName,
+    cssFileName: fileName.replace(/\.js$/, '.css'),
   };
 }
 
@@ -277,6 +279,12 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           extend: true,
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name === 'style.css') {
+              return target.cssFileName;
+            }
+            return '[name][extname]';
+          },
         },
       },
     },
