@@ -165,7 +165,7 @@
 - Preset/custom gesture mapping with thresholding and ambiguity rejection is active.
 - `Draw -> Save` custom gesture flow is active.
 - macOS shortcut capture/injection punctuation path is aligned.
-- Automation live-debug now defaults to a collapsed summary entry above the mapping cards; expanding it reveals a `large gesture canvas on the left + result/status panel on the right` layout with recent events and recent action runs folded behind disclosures instead of the previous full-page diagnostic block.
+- Automation live-debug now defaults to a collapsed summary entry above the mapping cards; expanding it reveals a `observational data panel on the left + large gesture canvas on the right` layout (sidebar: matched gesture, reason, stage, trigger, modifiers, candidates, runner-up, recent events/action runs; canvas: recognized gesture hero drawing) with recent events and recent action runs folded behind disclosures.
 
 ## Observability And Debug Contract
 - Runtime diagnostics are gated by debug mode where required.

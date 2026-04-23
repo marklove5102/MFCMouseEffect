@@ -188,64 +188,6 @@
     {/if}
 
     <div class="workspace-debug-layout">
-      <div class="workspace-debug-canvas-card">
-        <div class="workspace-debug-canvas-card__title">
-          {t('label_auto_gesture_debug_last_gesture', '识别手势')}
-        </div>
-        <div class="workspace-debug-canvas-card__subtitle">
-          {displayGestureLabel(recognizedGestureHint, recognizedGestureId)}
-        </div>
-        {#if heroGesturePreview}
-          <svg
-            class="workspace-debug-canvas"
-            viewBox={`0 0 ${heroGesturePreview.width} ${heroGesturePreview.height}`}
-            aria-hidden="true"
-          >
-            <path
-              class="workspace-debug-canvas__grid"
-              fill="none"
-              stroke="rgba(182, 205, 232, 0.42)"
-              stroke-width="2"
-              stroke-dasharray="12 12"
-              d={`M 28 ${(heroGesturePreview.height / 2).toFixed(1)} H ${(heroGesturePreview.width - 28).toFixed(1)} M ${(heroGesturePreview.width / 2).toFixed(1)} 20 V ${(heroGesturePreview.height - 20).toFixed(1)}`}
-            />
-            <path
-              class="workspace-debug-canvas__path"
-              fill="none"
-              stroke="#2f7ed8"
-              stroke-width="14"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d={heroGesturePreview.path}
-            />
-            {#if heroGesturePreview.startPoint}
-              <circle
-                class="workspace-debug-canvas__start"
-                cx={heroGesturePreview.startPoint.x}
-                cy={heroGesturePreview.startPoint.y}
-                r="18"
-                fill="#eef6ff"
-                stroke="#2f7ed8"
-                stroke-width="8"
-              />
-            {/if}
-            {#if heroGesturePreview.arrowPath}
-              <path
-                class="workspace-debug-canvas__arrow"
-                fill="#eef6ff"
-                stroke="#2f7ed8"
-                stroke-width="9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d={heroGesturePreview.arrowPath}
-              />
-            {/if}
-          </svg>
-        {:else}
-          <div class="workspace-debug-canvas workspace-debug-canvas--empty">-</div>
-        {/if}
-      </div>
-
       <aside class="workspace-debug-sidebar">
         <div class="workspace-debug-insight-grid">
           <div class="workspace-debug-insight-card">
@@ -401,6 +343,64 @@
           </details>
         {/if}
       </aside>
+
+      <div class="workspace-debug-canvas-card">
+        <div class="workspace-debug-canvas-card__title">
+          {t('label_auto_gesture_debug_last_gesture', '识别手势')}
+        </div>
+        <div class="workspace-debug-canvas-card__subtitle">
+          {displayGestureLabel(recognizedGestureHint, recognizedGestureId)}
+        </div>
+        {#if heroGesturePreview}
+          <svg
+            class="workspace-debug-canvas"
+            viewBox={`0 0 ${heroGesturePreview.width} ${heroGesturePreview.height}`}
+            aria-hidden="true"
+          >
+            <path
+              class="workspace-debug-canvas__grid"
+              fill="none"
+              stroke="rgba(182, 205, 232, 0.42)"
+              stroke-width="2"
+              stroke-dasharray="12 12"
+              d={`M 28 ${(heroGesturePreview.height / 2).toFixed(1)} H ${(heroGesturePreview.width - 28).toFixed(1)} M ${(heroGesturePreview.width / 2).toFixed(1)} 20 V ${(heroGesturePreview.height - 20).toFixed(1)}`}
+            />
+            <path
+              class="workspace-debug-canvas__path"
+              fill="none"
+              stroke="#2f7ed8"
+              stroke-width="14"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d={heroGesturePreview.path}
+            />
+            {#if heroGesturePreview.startPoint}
+              <circle
+                class="workspace-debug-canvas__start"
+                cx={heroGesturePreview.startPoint.x}
+                cy={heroGesturePreview.startPoint.y}
+                r="18"
+                fill="#eef6ff"
+                stroke="#2f7ed8"
+                stroke-width="8"
+              />
+            {/if}
+            {#if heroGesturePreview.arrowPath}
+              <path
+                class="workspace-debug-canvas__arrow"
+                fill="#eef6ff"
+                stroke="#2f7ed8"
+                stroke-width="9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d={heroGesturePreview.arrowPath}
+              />
+            {/if}
+          </svg>
+        {:else}
+          <div class="workspace-debug-canvas workspace-debug-canvas--empty">-</div>
+        {/if}
+      </div>
     </div>
   </section>
 {/if}
@@ -436,7 +436,7 @@
 
   .workspace-debug-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.9fr);
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.7fr);
     gap: 12px;
     align-items: start;
   }
@@ -772,7 +772,7 @@
     white-space: nowrap;
   }
 
-  @media (max-width: 1080px) {
+  @media (max-width: 960px) {
     .workspace-debug-layout {
       grid-template-columns: 1fr;
     }
