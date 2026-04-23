@@ -10,12 +10,14 @@ Usage:
   ./mfx <command> [options]
 
 Commands:
-  run [--minutes N | --seconds N] [--debug] [--web] [--no-open]
+  run [--minutes N | --seconds N] [--debug] [--no-open]
       Build + run macOS core host and print settings URL.
+      --debug starts the Vite source-mode WebUI after the host is ready.
       Default auto stop: 30 minutes.
 
-  run-no-build [--minutes N | --seconds N] [--debug] [--web] [--no-open]
+  run-no-build [--minutes N | --seconds N] [--debug] [--no-open]
       Run macOS core host without rebuilding core/WebUI.
+      --debug starts the Vite source-mode WebUI after the host is ready.
       Default auto stop: 30 minutes.
 
   build [platform options...]
@@ -73,7 +75,6 @@ run_start() {
     local minutes=30
     local seconds=""
     local debug_mode=0
-    local web_mode=0
     local open_browser=1
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -93,10 +94,6 @@ run_start() {
             ;;
         --no-debug)
             debug_mode=0
-            shift
-            ;;
-        --web)
-            web_mode=1
             shift
             ;;
         --no-open)
@@ -132,13 +129,13 @@ run_start() {
     if [[ "$debug_mode" == "1" ]]; then
         args+=(--debug)
     fi
-    if [[ "$web_mode" == "1" || "$open_browser" == "0" ]]; then
+    if [[ "$debug_mode" == "1" || "$open_browser" == "0" ]]; then
         args+=(--no-open)
     fi
 
     "$repo_root/tools/platform/manual/run-macos-core-websettings-manual.sh" "${args[@]}"
 
-    if [[ "$web_mode" == "1" ]]; then
+    if [[ "$debug_mode" == "1" ]]; then
         local -a web_args=()
         if [[ "$open_browser" == "0" ]]; then
             web_args+=(--no-open)
