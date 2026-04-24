@@ -26,14 +26,34 @@ function fallbackReadResult(payloadState) {
   };
 }
 
+/**
+ * AutomationApi — Svelte 5 compatible.
+ *
+ * Problem: Svelte 5 compiles `export function read/validate` in AutomationEditor
+ * as private class fields. Accessing them via `instance[name]()` throws
+ * "Cannot read from private field" in dev (ESM/HMR) mode.
+ *
+ * Fix: the component receives an `onReady(api)` callback prop. On mount it calls
+ * onReady({ read, validate }) with plain JS function references, which are safe
+ * to hold and call from outside without touching any private fields.
+ */
 export function createAutomationApi(Component, mountId) {
   let component = null;
   let mountObserver = null;
+  // Externalized method references registered by the component via onReady.
+  let registeredRead = null;
+  let registeredValidate = null;
+
   let latestProps = {
     schema: {},
     payloadState: {},
     i18n: {},
   };
+
+  function onReadyCallback(api) {
+    registeredRead = (api && typeof api.read === 'function') ? api.read : null;
+    registeredValidate = (api && typeof api.validate === 'function') ? api.validate : null;
+  }
 
   function stopMountObserver() {
     if (!mountObserver) {
@@ -57,6 +77,14 @@ export function createAutomationApi(Component, mountId) {
     mountObserver.observe(root, { childList: true, subtree: true });
   }
 
+  function buildComponentProps(extraProps) {
+    return {
+      ...latestProps,
+      ...(extraProps || {}),
+      onReady: onReadyCallback,
+    };
+  }
+
   function ensureComponent(initialProps) {
     if (initialProps && typeof initialProps === 'object') {
       latestProps = {
@@ -75,18 +103,10 @@ export function createAutomationApi(Component, mountId) {
     }
     component = new Component({
       target: mount,
-      props: latestProps,
+      props: buildComponentProps(),
     });
     stopMountObserver();
     return component;
-  }
-
-  function invoke(name, fallback) {
-    const target = ensureComponent();
-    if (!target || typeof target[name] !== 'function') {
-      return fallback();
-    }
-    return target[name]();
   }
 
   return {
@@ -101,18 +121,26 @@ export function createAutomationApi(Component, mountId) {
         return;
       }
       const mount = document.getElementById(mountId);
-      component = syncMountedComponent(target, mount, (mountNode, props) => new Component({
-        target: mountNode,
-        props,
-      }), nextProps);
+      component = syncMountedComponent(
+        target,
+        mount,
+        (mountNode, props) => new Component({ target: mountNode, props: buildComponentProps(props) }),
+        nextProps,
+      );
     },
 
     read() {
-      return invoke('read', () => fallbackReadResult(latestProps.payloadState));
+      if (typeof registeredRead === 'function') {
+        return registeredRead();
+      }
+      return fallbackReadResult(latestProps.payloadState);
     },
 
     validate() {
-      return invoke('validate', emptyValidationResult);
+      if (typeof registeredValidate === 'function') {
+        return registeredValidate();
+      }
+      return emptyValidationResult();
     },
 
     syncI18n(i18n) {
@@ -122,10 +150,12 @@ export function createAutomationApi(Component, mountId) {
         return;
       }
       const mount = document.getElementById(mountId);
-      component = syncMountedComponent(target, mount, (mountNode, props) => new Component({
-        target: mountNode,
-        props,
-      }), nextProps);
+      component = syncMountedComponent(
+        target,
+        mount,
+        (mountNode, props) => new Component({ target: mountNode, props: buildComponentProps(props) }),
+        nextProps,
+      );
     },
   };
 }

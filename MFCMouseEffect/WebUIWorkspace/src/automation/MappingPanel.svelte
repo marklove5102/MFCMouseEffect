@@ -43,6 +43,12 @@
   export let texts = {};
   export let platform = 'windows';
 
+  export let onAdd = null;
+  export let onRemove = null;
+  export let onRowChange = null;
+  export let onTemplateChange = null;
+  export let onApplyTemplate = null;
+
   const dispatch = createEventDispatcher();
   let recordingRowId = '';
   let recordingTarget = '';
@@ -227,6 +233,7 @@
   }
 
   function emitRowChange(rowId, key, value) {
+    if (onRowChange) onRowChange({ detail: { kind, rowId, key, value } });
     dispatch('rowchange', { kind, rowId, key, value });
   }
 
@@ -237,18 +244,24 @@
       recordingTarget = '';
       void endRemoteCapture();
     }
+    if (onRemove) onRemove({ detail: { kind, rowId } });
     dispatch('remove', { kind, rowId });
   }
 
   function emitAdd() {
+    if (onAdd) {
+      onAdd({ detail: { kind } });
+    }
     dispatch('add', { kind });
   }
 
   function emitTemplateChange(value) {
+    if (onTemplateChange) onTemplateChange({ detail: { kind, value } });
     dispatch('templatechange', { kind, value });
   }
 
   function emitApplyTemplate() {
+    if (onApplyTemplate) onApplyTemplate({ detail: { kind } });
     dispatch('applytemplate', { kind });
   }
 

@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import MappingPanel from './MappingPanel.svelte';
   import {
     DEFAULT_GESTURE_MAX_DIRECTIONS,
@@ -27,6 +28,12 @@
   export let schema = {};
   export let payloadState = {};
   export let i18n = {};
+  /**
+   * onReady(api) — called once on mount.
+   * api = { read, validate } — plain JS function references, so callers
+   * don't need to access Svelte 5 private class fields.
+   */
+  export let onReady = null;
 
   let mouseOptions = [];
   let appScopeOptions = [];
@@ -859,6 +866,15 @@
   $: if (!skipDraftPersist && lastIncomingSignature) {
     writeDraftSnapshot();
   }
+
+  // Register read/validate with the parent api via plain JS closure references.
+  // This avoids the Svelte 5 "Cannot read from private field" error that occurs
+  // when callers try to access exported component methods via instance[name]().
+  onMount(() => {
+    if (typeof onReady === 'function') {
+      onReady({ read, validate });
+    }
+  });
 </script>
 
 <div class="automation-flow">
@@ -888,11 +904,11 @@
           templateValue={mouseTemplate}
           templateOptions={mouseTemplateOptions}
           texts={mousePanelTexts}
-          on:rowchange={onPanelRowChange}
-          on:remove={onPanelRemove}
-          on:add={onPanelAdd}
-          on:templatechange={onPanelTemplateChange}
-          on:applytemplate={onPanelApplyTemplate}
+          onRowChange={onPanelRowChange}
+          onRemove={onPanelRemove}
+          onAdd={onPanelAdd}
+          onTemplateChange={onPanelTemplateChange}
+          onApplyTemplate={onPanelApplyTemplate}
         />
       </div>
     </div>
@@ -932,11 +948,11 @@
           templateValue={gestureTemplate}
           templateOptions={gestureTemplateOptions}
           texts={gesturePanelTexts}
-          on:rowchange={onPanelRowChange}
-          on:remove={onPanelRemove}
-          on:add={onPanelAdd}
-          on:templatechange={onPanelTemplateChange}
-          on:applytemplate={onPanelApplyTemplate}
+          onRowChange={onPanelRowChange}
+          onRemove={onPanelRemove}
+          onAdd={onPanelAdd}
+          onTemplateChange={onPanelTemplateChange}
+          onApplyTemplate={onPanelApplyTemplate}
         />
       </div>
     </div>
