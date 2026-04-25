@@ -10,14 +10,16 @@ Usage:
   ./mfx <command> [options]
 
 Commands:
-  run [--minutes N | --seconds N] [--debug] [--no-open]
+  run [--minutes N | --seconds N] [--debug] [--open | --no-open]
       Build + run macOS core host and print settings URL.
       --debug starts the Vite source-mode WebUI after the host is ready.
+      Default browser behavior: do not open settings automatically.
       Default auto stop: 30 minutes (disabled by default in --debug).
 
-  run-no-build [--minutes N | --seconds N] [--debug] [--no-open]
+  run-no-build [--minutes N | --seconds N] [--debug] [--open | --no-open]
       Run macOS core host without rebuilding core/WebUI.
       --debug starts the Vite source-mode WebUI after the host is ready.
+      Default browser behavior: do not open settings automatically.
       Default auto stop: 30 minutes (disabled by default in --debug).
 
   build [platform options...]
@@ -76,7 +78,7 @@ run_start() {
     local seconds=""
     local duration_overridden=0
     local debug_mode=0
-    local open_browser=1
+    local open_browser=0
     while [[ $# -gt 0 ]]; do
         case "$1" in
         --minutes)
@@ -101,6 +103,10 @@ run_start() {
             ;;
         --no-open)
             open_browser=0
+            shift
+            ;;
+        --open)
+            open_browser=1
             shift
             ;;
         *)
@@ -143,7 +149,7 @@ run_start() {
 
     if [[ "$debug_mode" == "1" ]]; then
         local -a web_args=()
-        if [[ "$open_browser" == "0" ]]; then
+        if [[ "$open_browser" != "1" ]]; then
             web_args+=(--no-open)
         fi
         "$repo_root/tools/platform/manual/run-webui-dev-manual.sh" "${web_args[@]}"

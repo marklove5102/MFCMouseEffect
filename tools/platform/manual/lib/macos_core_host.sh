@@ -8,6 +8,7 @@ MFX_MANUAL_SETTINGS_TOKEN=""
 MFX_MANUAL_BASE_URL=""
 MFX_MANUAL_LOG_FILE=""
 MFX_MANUAL_HOST_BIN=""
+MFX_MANUAL_LAUNCH_LABEL=""
 MFX_MANUAL_STARTUP_SKIP_REASON=""
 MFX_MANUAL_STARTUP_DIAGNOSTICS_FILE=""
 MFX_MANUAL_SINGLE_INSTANCE_SEQ=0
@@ -241,6 +242,7 @@ mfx_manual_start_core_host() {
     mfx_terminate_stale_entry_host "before manual host start"
 
     rm -f "$probe_file" "$diagnostics_file" "$start_probe_file" "$start_diagnostics_file" "$start_pid_file"
+    MFX_MANUAL_LAUNCH_LABEL=""
     MFX_MANUAL_STARTUP_SKIP_REASON=""
     MFX_MANUAL_STARTUP_DIAGNOSTICS_FILE="$diagnostics_file"
 
@@ -266,6 +268,7 @@ mfx_manual_start_core_host() {
                 /bin/sh -c 'echo "$$" > "$MFX_MANUAL_LAUNCH_PID_FILE"; exec "$MFX_MANUAL_HOST_BIN" "$@"' \
                 mfx-manual-host \
                 "${host_args[@]}"
+        MFX_MANUAL_LAUNCH_LABEL="$launch_label"
     elif command -v setsid >/dev/null 2>&1; then
         nohup setsid env MFX_CORE_WEB_SETTINGS_PROBE_FILE="$start_probe_file" \
             MFX_CORE_WEB_SETTINGS_PROBE_DIAGNOSTICS_FILE="$start_diagnostics_file" \
@@ -363,6 +366,9 @@ mfx_manual_stop_core_host() {
     if [[ -z "$pid" ]]; then
         return 0
     fi
+    if [[ -n "$MFX_MANUAL_LAUNCH_LABEL" ]] && command -v launchctl >/dev/null 2>&1; then
+        launchctl remove "$MFX_MANUAL_LAUNCH_LABEL" >/dev/null 2>&1 || true
+    fi
     if ! kill -0 "$pid" 2>/dev/null; then
         return 0
     fi
@@ -411,7 +417,22 @@ mfx_manual_schedule_auto_stop() {
     local seconds="$2"
     local base_url="${3:-$MFX_MANUAL_BASE_URL}"
     local token="${4:-$MFX_MANUAL_SETTINGS_TOKEN}"
+    local launch_label="${5:-$MFX_MANUAL_LAUNCH_LABEL}"
     if [[ -z "$pid" || "$seconds" -le 0 ]]; then
+        return 0
+    fi
+    if [[ -n "$launch_label" ]] && command -v launchctl >/dev/null 2>&1; then
+        local stop_label="com.mfcmouseeffect.manual-core-host-stop.$$.$pid"
+        launchctl remove "$stop_label" >/dev/null 2>&1 || true
+        launchctl submit \
+            -l "$stop_label" \
+            -o /dev/null \
+            -e /dev/null \
+            -- /usr/bin/env \
+                "PATH=$PATH" \
+                "MFX_MANUAL_STOP_SECONDS=$seconds" \
+                "MFX_MANUAL_STOP_LAUNCH_LABEL=$launch_label" \
+                /bin/sh -c 'sleep "$MFX_MANUAL_STOP_SECONDS"; launchctl remove "$MFX_MANUAL_STOP_LAUNCH_LABEL" >/dev/null 2>&1 || true'
         return 0
     fi
     (

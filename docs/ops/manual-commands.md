@@ -17,10 +17,12 @@ Keep P1 concise; add details here when needed.
 - unified WebUI source-mode debug:
   - `./mfx fast --debug`
   - host build policy stays attached to `start` vs `fast`
-  - `--debug` starts the Vite dev UI and automatically carries the current token into the opened URL
+  - `--debug` starts the Vite dev UI and prints a tokenized `web_browser_url`
+  - `./mfx start` / `./mfx start --debug` do not open the settings browser automatically; pass `--open` when a manual launch should also open the resolved URL
   - when no explicit `--minutes/--seconds` is provided, `--debug` keeps the core host alive instead of auto-stopping after 30 minutes
   - the macOS core host is submitted through `launchctl` before the URL is printed, so closing or finishing the wrapper command does not silently drop the backend
-  - `./mfx start` opens the rebuilt static WebUI for release-near validation
+  - timed runs submit a matching `launchctl` stopper job, so `--seconds/--minutes` debug smoke checks keep working after the wrapper command exits
+  - `./mfx start` runs the rebuilt static WebUI for release-near validation and prints `settings_url`
   - source-mode contract smoke: `pnpm --dir MFCMouseEffect/WebUIWorkspace run test:webui-dev-contract`
   - the helper reuses an existing dev server when possible (and restarts automatically when `vite.config.js` changes); otherwise it stops stale workspace Vite servers first, relaunches Vite through `launchctl`, and records the actual Vite Node pid instead of the transient wrapper pid
   - `web_browser_url` is printed only after `/__mfx/dev-runtime` confirms the backend via `/api/state`; stale probe files should surface as runtime-unavailable instead of a half-loaded UI
