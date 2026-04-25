@@ -39,6 +39,7 @@ Keep P1 concise; add details here when needed.
   - mouse-action mapping keeps only the circular down-arrow connector between trigger chain and execute-actions blocks; the extra vertical connector line was removed to avoid a stray shadow-tail look
   - mouse-action mapping trigger chains render as a horizontal step flow (`1 -> 2 -> add`) instead of stacked selects, and execute-action adders sit in a compact queue toolbar so the edit card reads as trigger sequence first, action queue second
   - mouse-action mapping now avoids inner trigger/action card frames: the left edit area uses spacing, compact headings, and a light divider instead of nested bordered panels
+  - desktop automation mapping restores vertical column separators between trigger/actions, selected-apps, and app-library lanes; mobile single-column layout still removes those dividers
 
 ## Automation Manual
 - `/Users/sunqin/study/language/cpp/code/MFCMouseEffect/tools/platform/manual/run-macos-automation-injection-selfcheck.sh --skip-build`

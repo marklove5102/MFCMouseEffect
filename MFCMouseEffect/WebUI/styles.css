@@ -1778,6 +1778,36 @@ textarea {
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
 }
 
+.automation-row-body > .automation-chain-group + .automation-scope-group,
+.automation-row-body > .automation-chain-group + .automation-shortcut-pane,
+.automation-row-body > .automation-scope-group + .automation-shortcut-pane {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.automation-row-body > .automation-scope-group,
+.automation-row-body > .automation-shortcut-pane {
+  position: relative;
+  padding-left: 18px;
+}
+
+.automation-row-body > .automation-scope-group::before,
+.automation-row-body > .automation-shortcut-pane::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  background: rgba(208, 224, 240, 0.92);
+}
+
+.automation-row-body--gesture > .automation-scope-group::before,
+.automation-row-body--gesture > .automation-shortcut-pane::before {
+  background: rgba(200, 229, 224, 0.96);
+}
+
 .automation-chain-group {
   grid-column: auto;
   display: flex;
@@ -2576,6 +2606,21 @@ textarea {
   align-items: start;
 }
 
+.effects-scope-layout > .automation-shortcut-pane {
+  position: relative;
+  padding-left: 18px;
+}
+
+.effects-scope-layout > .automation-shortcut-pane::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  background: rgba(208, 224, 240, 0.92);
+}
+
 .automation-scope-chip-list {
   display: flex;
   flex-wrap: wrap;
@@ -3205,6 +3250,18 @@ textarea {
   .automation-row-body,
   .automation-row-body.is-scope-all {
     grid-template-columns: 1fr;
+  }
+
+  .automation-row-body > .automation-scope-group,
+  .automation-row-body > .automation-shortcut-pane,
+  .effects-scope-layout > .automation-shortcut-pane {
+    padding-left: 0;
+  }
+
+  .automation-row-body > .automation-scope-group::before,
+  .automation-row-body > .automation-shortcut-pane::before,
+  .effects-scope-layout > .automation-shortcut-pane::before {
+    content: none;
   }
 
   .automation-gesture-settings {
