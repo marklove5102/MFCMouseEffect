@@ -20,10 +20,6 @@ export function updateComponentProps(component, nextProps) {
   if (!component || !nextProps || typeof nextProps !== 'object') {
     return false;
   }
-  if (typeof component.$set === 'function') {
-    component.$set(nextProps);
-    return true;
-  }
 
   let assigned = false;
   for (const [key, value] of Object.entries(nextProps)) {
@@ -35,6 +31,19 @@ export function updateComponentProps(component, nextProps) {
       assigned = true;
     } catch (_error) {
       // Fall through and allow remaining props to sync.
+    }
+  }
+  if (assigned) {
+    return true;
+  }
+
+  if (typeof component.$set === 'function') {
+    try {
+      component.$set(nextProps);
+      return true;
+    } catch (_error) {
+      // Svelte 5 dev/HMR rejects instance.$set() on compiled component instances.
+      // Let the caller remount if direct prop assignment was also unavailable.
     }
   }
   return assigned;

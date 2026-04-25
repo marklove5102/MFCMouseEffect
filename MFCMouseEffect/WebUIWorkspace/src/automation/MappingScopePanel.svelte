@@ -1,4 +1,5 @@
 <script>
+  import SelectedAppsPanel from './SelectedAppsPanel.svelte';
   export let rowEnabled = true;
   export let scopeOptions = [];
   export let scopeMode = 'all';
@@ -18,6 +19,11 @@
   export let catalogMetaText = (entry) => '';
   export let layout = 'stacked';
 
+  $: scopeTitleText = texts.scopeTitle || '已选应用';
+  $: scopeEmptyText = texts.scopeEmpty || '已选应用会显示在这里';
+  $: scopeEmptyHint = texts.scopeEmptyHint || '从右侧应用库中选择或搜索应用';
+  $: scopeRemoveAppText = texts.scopeRemoveApp || '移除';
+
   function callHandler(handler, ...args) {
     if (typeof handler === 'function') {
       handler(...args);
@@ -27,35 +33,18 @@
 
 {#if layout === 'two-column'}
   <div class="effects-scope-layout">
-    <div class="automation-scope-group automation-col">
-      <select
-        class="automation-scope-select"
-        disabled={!rowEnabled}
-        value={scopeMode}
-        on:change={(event) => callHandler(onScopeModeChange, event)}
-      >
-        {#each scopeOptions as option (option.value)}
-          <option value={option.value}>{option.label}</option>
-        {/each}
-      </select>
-      {#if scopeMode === 'selected'}
-        <div class="automation-scope-chip-list">
-          {#each scopeApps as app (app)}
-            <span class="automation-scope-chip">
-              <span>{app}</span>
-              <button
-                type="button"
-                class="automation-scope-chip-remove"
-                disabled={!rowEnabled}
-                on:click={() => callHandler(onRemoveScopeApp, app)}
-              >
-                &times;
-              </button>
-            </span>
-          {/each}
-        </div>
-      {/if}
-    </div>
+    <SelectedAppsPanel
+      {rowEnabled}
+      {scopeOptions}
+      {scopeMode}
+      {scopeApps}
+      {scopeTitleText}
+      {scopeEmptyText}
+      {scopeEmptyHint}
+      {scopeRemoveAppText}
+      {onScopeModeChange}
+      {onRemoveScopeApp}
+    />
     {#if scopeMode === 'selected'}
       <div class="automation-shortcut-pane automation-col">
         <input
@@ -120,35 +109,18 @@
     {/if}
   </div>
 {:else}
-  <div class="automation-scope-group automation-col">
-    <select
-      class="automation-scope-select"
-      disabled={!rowEnabled}
-      value={scopeMode}
-      on:change={(event) => callHandler(onScopeModeChange, event)}
-    >
-      {#each scopeOptions as option (option.value)}
-        <option value={option.value}>{option.label}</option>
-      {/each}
-    </select>
-    {#if scopeMode === 'selected'}
-      <div class="automation-scope-chip-list">
-        {#each scopeApps as app (app)}
-          <span class="automation-scope-chip">
-            <span>{app}</span>
-            <button
-              type="button"
-              class="automation-scope-chip-remove"
-              disabled={!rowEnabled}
-              on:click={() => callHandler(onRemoveScopeApp, app)}
-            >
-              &times;
-            </button>
-          </span>
-        {/each}
-      </div>
-    {/if}
-  </div>
+  <SelectedAppsPanel
+    {rowEnabled}
+    {scopeOptions}
+    {scopeMode}
+    {scopeApps}
+    {scopeTitleText}
+    {scopeEmptyText}
+    {scopeEmptyHint}
+    {scopeRemoveAppText}
+    {onScopeModeChange}
+    {onRemoveScopeApp}
+  />
   {#if scopeMode === 'selected'}
     <div class="automation-shortcut-pane automation-col">
       <input

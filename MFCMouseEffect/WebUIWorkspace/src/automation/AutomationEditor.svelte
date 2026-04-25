@@ -676,6 +676,10 @@
         isMac
           ? 'Failed to scan app list. You can still add app manually or pick a file.'
           : 'Failed to scan app list. You can still add exe manually or pick a file.'),
+      scopeTitle: t('label_scope_title', '已选应用'),
+      scopeEmpty: t('text_scope_empty', '已选应用会显示在这里'),
+      scopeEmptyHint: t('hint_scope_empty', '从右侧应用库中选择或搜索应用'),
+      scopeRemoveApp: t('label_scope_remove_app', '移除'),
       scopeAppPlaceholder: t(
         isMac ? 'placeholder_scope_process_app' : 'placeholder_scope_process',
         isMac ? 'for example code.app' : 'for example code.exe'),
@@ -902,13 +906,15 @@
 <div class="automation-flow">
   <section class="automation-card automation-card--master">
     <div class="automation-card-head">
-      <h3 class="automation-card-title">{uiText.autoEnabled}</h3>
+      <div>
+        <h3 class="automation-card-title">{uiText.autoEnabled}</h3>
+        <p class="automation-card-hint">{uiText.hint}</p>
+      </div>
       <label class="automation-inline-toggle" for="auto_enabled">
         <span>{automationEnabled ? 'ON' : 'OFF'}</span>
         <input id="auto_enabled" type="checkbox" bind:checked={automationEnabled} />
       </label>
     </div>
-    <p class="automation-card-hint">{uiText.hint}</p>
   </section>
 
   <section class="automation-card automation-card--mouse">
@@ -949,14 +955,20 @@
         <div class="automation-gesture-setup-title">{uiText.gestureSetup}</div>
         <div class="automation-gesture-intro">{uiText.gestureDrawHint}</div>
         <div class="automation-gesture-settings">
-          <label for="auto_gesture_min_distance">{uiText.gestureMinDistance}</label>
-          <input id="auto_gesture_min_distance" type="number" min="10" max="4000" bind:value={gestureMinDistance} />
+          <div class="automation-gesture-field">
+            <label for="auto_gesture_min_distance">{uiText.gestureMinDistance}</label>
+            <input id="auto_gesture_min_distance" type="number" min="10" max="4000" bind:value={gestureMinDistance} />
+          </div>
 
-          <label for="auto_gesture_sample_step">{uiText.gestureSampleStep}</label>
-          <input id="auto_gesture_sample_step" type="number" min="2" max="256" bind:value={gestureSampleStep} />
+          <div class="automation-gesture-field">
+            <label for="auto_gesture_sample_step">{uiText.gestureSampleStep}</label>
+            <input id="auto_gesture_sample_step" type="number" min="2" max="256" bind:value={gestureSampleStep} />
+          </div>
 
-          <label for="auto_gesture_max_dirs">{uiText.gestureMaxDirections}</label>
-          <input id="auto_gesture_max_dirs" type="number" min="1" max="8" bind:value={gestureMaxDirections} />
+          <div class="automation-gesture-field">
+            <label for="auto_gesture_max_dirs">{uiText.gestureMaxDirections}</label>
+            <input id="auto_gesture_max_dirs" type="number" min="1" max="8" bind:value={gestureMaxDirections} />
+          </div>
         </div>
       </div>
       <div class="automation-mapping-shell automation-mapping-shell--gesture">
